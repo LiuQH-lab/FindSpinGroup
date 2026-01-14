@@ -1,0 +1,123 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/04/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-04-12
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Physical Review"
+_citation_journal_volume        122
+_citation_page_first            1402
+_citation_page_last             1406
+_citation_article_id            ?
+_citation_year                  1961
+_citation_DOI                   10.1103/PhysRev.122.1402
+
+loop_
+_citation_author_name
+"L.M. Corliss"
+"N. Elliott"
+"J.M. Hastings"
+"R.L. Sass"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  626717
+_atomic_positions_source_other               .
+
+_transition_temperature  300
+_experiment_temperature  4.2
+
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK5  4  2  special  primary  1  .
+mGM4+ 1  1  .   primary    1   .
+mK6 4  2   special secondary  1  no
+mGM2+ 1  1   .   secondary  1    no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at room temperature (icsd)
+Only the z component of the Cr moment was determined, the component on the basal plane is estimated assuming a total moment agrreeing with the theoretical value of 4 muB.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two primary irreps with wavevectors (1/3,1/3,0) and (0,0,0) are present, which implies that two order parameters are involved
+The second primary irrep corresponds to a k=0 arrangement of the z spin components, which is not however a third harmonc of the primary mK5 modulation, and it breaks further the system symmetry.
+Secondary irreps are symmtry allowed, but are not present in the model.
+The structure is proposed using ad-hoc arguments. It seems that possible alternative simpler models with a single primary irrep were not systematically crosschecked.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,-a,c;2/3,5/3,0'
+
+
+
+_space_group_magn.number_BNS  157.55
+_space_group_magn.name_BNS  "P 3 1 m'"
+_cell_length_a             6.37390
+_cell_length_b             6.37390
+_cell_length_c             6.02000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+1/3,x-y+2/3,z,+1
+3 -x+y+2/3,-x+1/3,z,+1
+4 x-y+2/3,-y+1/3,z,-1
+5 y,x,z,-1
+6 -x+1/3,-x+y+2/3,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cr1_1 Cr 0.00000 0.00000 0.00000
+Cr1_2 Cr 0.00000 0.00000 0.50000
+Se1_1 Se 0.00000 0.33333 0.25000
+Se1_2 Se 0.33333 0.33333 0.75000
+Se1_3 Se 0.66666 0.66667 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1_1 -1.95 -1.95 -2.90 mx,mx,mz
+Cr1_2 1.95 1.95 2.90 mx,mx,mz
+
