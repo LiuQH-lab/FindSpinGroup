@@ -1,0 +1,22 @@
+[project]
+name = "findspingroup"
+description = "Spin space group (SSG) symmetry analysis toolkit for magnetic materials. Automatically identifies and classifies SSGs, generating symmetry operations, spin Wyckoff positions, and spin Brillouin zones. Designed for integration with first-principles and high-throughput computational workflows."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26.0",
+    "pytest>=8.4.2",
+    "scipy>=1.17.0",
+    "seekpath>=2.1.0",
+    "spglib>=2.6.0",
+    "sympy>=1.14.0",
+]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "findspingroup.version.__version__"}
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["findspingroup*"]
+namespaces = false
+[project.scripts]
+findspin = "findspingroup.find_spin_group:main"
