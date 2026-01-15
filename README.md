@@ -15,7 +15,7 @@ cd findspingroup
 pip install -e .
 ```
 
-Python version: >= 3.12
+Python version: >= 3.11
 
 ## Quick start
 ```python
