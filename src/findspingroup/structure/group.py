@@ -1078,7 +1078,7 @@ class SpinSpaceGroup:
             for k_point in kpoints:
                 little_group = []
                 for op in self.gspg:
-                    eop = np.linalg.det(op[0]) * np.array(op[1])
+                    eop = np.linalg.det(op[0]) * np.array(np.linalg.inv(op[1]).T) # inverse transpose for k-point operation
                     target_kpoint = eop @ np.array(k_point) % 1
                     diff = getNormInf(np.array(k_point) % 1, target_kpoint)
                     if diff < self.tol:
@@ -1089,7 +1089,7 @@ class SpinSpaceGroup:
             for k_point in kpoints:
                 little_group = []
                 for op in self.gspg:
-                    eop = np.linalg.det(op[0]) * np.array(op[1])
+                    eop = np.linalg.det(op[0]) * np.array(np.linalg.inv(op[1]).T) # inverse transpose for k-point operation
                     if self.is_primitive:
                         target_kpoint = eop @ np.array(k_point) % 1
                         diff = getNormInf(np.array(k_point) % 1, target_kpoint)
