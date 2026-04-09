@@ -1,0 +1,135 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:54:55
+# Database entry: 0.92 CaMn2Sb2
+# Cif-like file for the case 0.92
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ca Mn2 Sb2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        321
+_citation_page_first            2612
+_citation_page_last             2616
+_citation_article_id            .
+_citation_year                  2009
+_citation_DOI                   10.1016/j.jmmm.2009.03.054
+
+loop_
+_citation_author_name
+"II W. Ratcliff"
+"A.L. Sharma"
+"A. Gomes"
+"J. Gonzalez"
+"Q. Huang"
+"J. Singleton"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   163778
+_atomic_positions_source_other               .
+
+_transition_temperature     83
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3- 2 2 special primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+direction of moments on the ab plane was not resolved. Direction along a has been taken to have a symmetry not allowing a weak FM component along c
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep active. magnetic symmetry corresponds to one of its epikernels
+Direction of the moments has been assumed alone a (equivalently along b, or along (1,1,0)) to produce a magnetic symmetry not allowing weak FM along c. For any other direction, weak FM is to be expected.
+Symmetry-allowed linear magnetoelectric effect if insulator or semiconductor.
+;
+
+_parent_space_group.name_H-M_alt  'P  -3m  1'
+_parent_space_group.IT_number                       164
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+2b,-a,c;0,0,0'
+
+
+_space_group_magn.number_BNS  12.60
+_space_group_magn.name_BNS  "C  2'/m"
+_space_group_magn.point_group_name  "2'/m"
+_space_group_magn.point_group_number  "5.3.14"
+_cell_length_a                 4.52850
+_cell_length_b                 4.52850
+_cell_length_c                 7.44530
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+y,y,z,+1
+3 x-y,-y,-z,-1
+4 -x,-y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ca1 Ca 0.00000 0.00000 0.00000 1
+Mn1 Mn 0.33330 0.66670 0.61540 1
+Sb1 Sb 0.33330 0.66670 0.24830 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 2.8 0.0 0.0 mx,0,0
+

@@ -1,0 +1,190 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:12:55
+# Database entry: 1.108 TbMn2O5
+# Cif-like file for the case 1.108
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Tb Mn2 O5'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        71
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            214402
+_citation_year                  2005
+_citation_DOI                   10.1103/PhysRevB.71.214402
+
+loop_
+_citation_author_name
+"G.R. Blake"
+"L.C. Chapon"
+"P.G. Radaelli"
+"S. Park"
+"N. Hur"
+"S.-W. Cheong"
+"J. Rodriguez-Carvajal"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   84353
+_atomic_positions_source_other               .
+
+_transition_temperature     40
+_experiment_temperature     27
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mG1 4 2 general primary 36 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Magnitudes moments: Mn1 1.86(7); Mn2 2.41(5); Tb1_1/Tb1_2 1.18(9); Tb1_3/Tb1_4 2.24(7)
+The phase is known to be ferroelectric/polar along the y axis.
+The low symmetry of the model is not consistent with the polarity being restricted to the y axis. The whole plane xy would be polar.
+10 spin parameters refined (36 are symmetry allowed)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Model of higher symmetry (C_amc2_1; c,a,b;3/8,0,0) close to the reported spin arrangement, consistent with the polarity along the y direction and with the active irrep, seems not to have been tested.
+Only one irrep exists for this propagation vector.
+Multiferroic type II
+;
+
+_parent_space_group.name_H-M_alt  'P  b  a  m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/4]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,4c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,b;0,0,1/4'
+
+
+_space_group_magn.number_BNS  8.36
+_space_group_magn.name_BNS  "C_a  m"
+_space_group_magn.point_group_name  "m1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 14.65020
+_cell_length_b                 8.51680
+_cell_length_c                 22.70000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,y,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z+1/2,+1
+3 x,y,z+1/2,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tb1_1 Tb 0.06995 0.17260 0.00000 1
+Tb1_2 Tb 0.93005 0.82740 0.00000 1
+Tb1_3 Tb 0.18005 0.67260 0.00000 1
+Tb1_4 Tb 0.31995 0.32740 0.00000 1
+Tb1_5 Tb 0.06995 0.17260 0.25000 1
+Tb1_6 Tb 0.93005 0.82740 0.25000 1
+Tb1_7 Tb 0.18005 0.67260 0.25000 1
+Tb1_8 Tb 0.31995 0.32740 0.25000 1
+Mn1_1 Mn 0.00000 0.50000 0.06545 1
+Mn1_2 Mn 0.25000 0.00000 0.93455 1
+Mn1_3 Mn 0.00000 0.50000 0.31545 1
+Mn1_4 Mn 0.25000 0.00000 0.18455 1
+Mn2_1 Mn 0.20600 0.35100 0.12500 1
+Mn2_2 Mn 0.79400 0.64900 0.12500 1
+Mn2_3 Mn 0.04400 0.85100 0.12500 1
+Mn2_4 Mn 0.45600 0.14900 0.12500 1
+O1_1 O 0.00000 0.00000 0.06775 1
+O1_2 O 0.25000 0.50000 0.93225 1
+O1_3 O 0.00000 0.00000 0.31775 1
+O1_4 O 0.25000 0.50000 0.18225 1
+O2_1 O 0.08085 0.44630 0.00000 1
+O2_2 O 0.91915 0.55370 0.00000 1
+O2_3 O 0.16915 0.94630 0.00000 1
+O2_4 O 0.33085 0.05370 0.00000 1
+O2_5 O 0.08085 0.44630 0.25000 1
+O2_6 O 0.91915 0.55370 0.25000 1
+O2_7 O 0.16915 0.94630 0.25000 1
+O2_8 O 0.33085 0.05370 0.25000 1
+O3_1 O 0.07640 0.43240 0.12500 1
+O3_2 O 0.92360 0.56760 0.12500 1
+O3_3 O 0.17360 0.93240 0.12500 1
+O3_4 O 0.32640 0.06760 0.12500 1
+O4_1 O 0.19865 0.20620 0.06207 1
+O4_2 O 0.80135 0.79380 0.06207 1
+O4_3 O 0.05135 0.70620 0.93793 1
+O4_4 O 0.44865 0.29380 0.93793 1
+O4_5 O 0.19865 0.20620 0.31207 1
+O4_6 O 0.80135 0.79380 0.31207 1
+O4_7 O 0.05135 0.70620 0.18793 1
+O4_8 O 0.44865 0.29380 0.18793 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Tb1_1 1.16 -0.22 0.0 mx,my,0
+Tb1_2 -1.16 0.22 0.0 mx,my,0
+Tb1_3 2.08 -0.84 0.0 mx,my,0
+Tb1_4 2.08 -0.84 0.0 mx,my,0
+Tb1_5 0.0 0.0 0.0 0,0,mz
+Tb1_6 0.0 0.0 0.0 0,0,mz
+Tb1_7 0.0 0.0 0.0 0,0,mz
+Tb1_8 0.0 0.0 0.0 0,0,mz
+Mn1_1 -1.78 0.54 0.0 mx,my,mz
+Mn1_2 -1.75 0.64 0.0 mx,my,mz
+Mn1_3 1.78 -0.54 0.0 mx,my,mz
+Mn1_4 -1.75 0.64 0.0 mx,my,mz
+Mn2_1 2.07 -1.24 0.0 mx,my,mz
+Mn2_2 2.07 -1.24 0.0 mx,my,mz
+Mn2_3 2.4 -0.25 0.0 mx,my,mz
+Mn2_4 2.4 -0.25 0.0 mx,my,mz
+

@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:18:52
+# Database entry: 1.179 NdCoAsO
+# Cif-like file for the case 1.179
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Nd Co As O'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        81
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            104405
+_citation_year                  2010
+_citation_DOI                   10.1103/PhysRevB.81.104405
+
+loop_
+_citation_author_name
+"M.A. McGuire"
+"D.J. Gout"
+"V.O. Garlea"
+"A.S. Sefat"
+"B.C. Sales"
+"D. Mandrus"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   180774
+_atomic_positions_source_other               .
+
+_transition_temperature     14
+_experiment_temperature     0.3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ5- 2 2 special primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+A ferromagnetic state emerges near 69 K with a small saturation moment of about 0.2 mB on Co atoms.
+At 14 K the material enters an antiferromagnetic state with propagation vector ( 0, 0, 1/2) and small ordered moments on
+Co and Nd (~ 0.3 mB). Near 3.5 K a third transition is observed, and corresponds to the antiferromagnetic ordering of
+larger moments on Nd (~ 1.39 mB), with the same propagation vector.
+In the article the wrong magnetic space group Pcc'n is given for the proposed model (instead of P_anma).
+Due to powder averaging, the direction of the magnetic momtnent in the ab plane cannot be uniquely determined. A similar model, where the momnts are paralell to the [110] direction can be defined by using the magnetic space group C_cmca.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+;
+
+_parent_space_group.name_H-M_alt  'P  4/n  m  m'
+_parent_space_group.IT_number                       129
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-a,b;1/2,0,1/4'
+
+
+_space_group_magn.number_BNS  62.450
+_space_group_magn.name_BNS  "P_a  n  m  a"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 3.98237
+_cell_length_b                 3.98237
+_cell_length_c                 16.6246
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y+1/2,z+1/2,+1
+3 x+1/2,-y,-z+1/2,+1
+4 -x,y+1/2,-z,+1
+5 -x,-y,-z+1/2,+1
+6 x+1/2,y+1/2,-z,+1
+7 -x+1/2,y,z,+1
+8 x,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Nd Nd 0.25000 0.25000 0.07110 1
+Co Co 0.75000 0.25000 0.25000 1
+As As 0.25000 0.25000 0.32505 1
+O O 0.75000 0.25000 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd 1.39(5) 0.0 0.0 mx,0,0
+Co -0.32(5) 0.0 0.0 mx,0,0
+

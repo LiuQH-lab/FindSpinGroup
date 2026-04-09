@@ -1,0 +1,141 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/22/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-12-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Sr2 Ho Ru O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        16
+_citation_page_first            7611
+_citation_page_last             7624
+_citation_article_id            .
+_citation_year                  2004
+_citation_DOI                   10.1088/0953-8984/16/43/005
+
+loop_
+_citation_author_name
+"N. G. Parkinson"
+"P. D Hatton"
+"J. A. K. Howard"
+"C. Ritter"
+"R. M. Ibberson"
+"M. K. Wu"
+
+_temperature_position_structure         50
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  164512
+_atomic_positions_source_other               .
+
+_transition_temperature     34
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+ 1 1 . primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Non standard setting P2_1/n of the parent space group
+Position structure from a determination at 50K
+The positions of Ho and Ru are interchanged with respect to other published structures (see #0.792 and #0.793). The two structural models are not equivalent. They are difficult to distinguish due to the similar values of the a and b parameters.
+The moment canting could only be established to be on the plane ab. It is assumed here to be along a in order to maintain the ordering limited to a single irrep and to maximize the MSG.
+FM along b.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-a+c;0,0,0'
+
+_space_group_magn.number_BNS  14.75
+_space_group_magn.name_BNS  "P 2_1/c"
+_space_group_magn.point_group_name  "2/m"
+_space_group_magn.point_group_number  "5.1.12"
+_cell_length_a                 5.7573
+_cell_length_b                 5.7764
+_cell_length_c                 8.1420
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.36
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,y+1/2,-z+1/2,+1 
+3 -x,-y,-z,+1 
+4 x+1/2,-y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1 Sr 0.00750 0.03060 0.75520 1
+Ho1 Ho 0.50000 0.00000 0.50000 1
+Ru1 Ru 0.50000 0.00000 0.00000 1
+O1 O 0.30150 0.27760 0.96050 1
+O2 O 0.26670 0.29350 0.54030 1
+O3 O 0.93290 0.48090 0.73040 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ho1 0.97(12) 0.0 -7.87(4) mx,my,mz 7.94 ? ?
+Ru1 0.22 0.0 -1.79(9) mx,my,mz 1.80 ? ?
+

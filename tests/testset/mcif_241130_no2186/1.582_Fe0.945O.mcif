@@ -1,0 +1,145 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 23/05/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-05-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW"
+_citation_journal_volume        110
+_citation_page_first            1333
+_citation_page_last             1341
+_citation_article_id            .
+_citation_year                  1958
+_citation_DOI                   10.1103/PhysRev.110.1333
+
+loop_
+_citation_author_name
+"W. L. Roth"
+
+_atomic_positions_source_database_code_ICSD  24698
+_atomic_positions_source_other               .
+
+_transition_temperature  200
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL2+  4  1  .  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure (unit cell) not provided. Here one determined at 90K by another study is used.
+The structure exhibits a magnetically induced rombohedral distortion, consistent with the symmetry break produced by the magnetic ordering.
+Moment components with non-significant digits to yield the reported moment magnitude.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic structure
+1-dim small irrep as primary
+The irrep star has 4 k-vectors. The possible alternative multi-k spin arrangements, which could fit the data were not considered.
+;
+
+_parent_space_group.name_H-M_alt  'F m -3 m'
+_parent_space_group.IT_number                       225
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/4a-1/4b,1/4b-1/4c,a+b+c;0,0,0'
+
+_space_group_magn.number_BNS  167.108
+_space_group_magn.name_BNS  "R_I -3c"
+_cell_length_a             8.54420
+_cell_length_b             8.54420
+_cell_length_c             8.54420
+_cell_angle_alpha          89.99
+_cell_angle_beta           89.99
+_cell_angle_gamma          89.99
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 z,x,y,+1 
+3 y,z,x,+1 
+4 -y+1/2,-x+1/2,-z+1/2,+1 
+5 -z+1/2,-y+1/2,-x+1/2,+1 
+6 -x+1/2,-z+1/2,-y+1/2,+1 
+7 -x,-y,-z,+1 
+8 -z,-x,-y,+1 
+9 -y,-z,-x,+1 
+10 y+1/2,x+1/2,z+1/2,+1 
+11 z+1/2,y+1/2,x+1/2,+1 
+12 x+1/2,z+1/2,y+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/4,z+3/4,+1 
+3 x,y+1/2,z+1/2,+1 
+4 x,y+3/4,z+1/4,+1 
+5 x+1/4,y,z+3/4,+1 
+6 x+1/4,y+1/4,z+1/2,+1 
+7 x+1/4,y+1/2,z+1/4,+1 
+8 x+1/4,y+3/4,z,+1 
+9 x+1/2,y,z+1/2,+1 
+10 x+1/2,y+1/4,z+1/4,+1 
+11 x+1/2,y+1/2,z,+1 
+12 x+1/2,y+3/4,z+3/4,+1 
+13 x+3/4,y,z+1/4,+1 
+14 x+3/4,y+1/4,z,+1 
+15 x+3/4,y+1/2,z+3/4,+1 
+16 x+3/4,y+3/4,z+1/2,+1 
+17 x,y+3/4,z+3/4,-1 
+18 x,y,z+1/2,-1 
+19 x,y+1/4,z+1/4,-1 
+20 x,y+1/2,z,-1 
+21 x+1/4,y+3/4,z+1/2,-1 
+22 x+1/4,y,z+1/4,-1 
+23 x+1/4,y+1/4,z,-1 
+24 x+1/4,y+1/2,z+3/4,-1 
+25 x+1/2,y+3/4,z+1/4,-1 
+26 x+1/2,y,z,-1 
+27 x+1/2,y+1/4,z+3/4,-1 
+28 x+1/2,y+1/2,z+1/2,-1 
+29 x+3/4,y+3/4,z,-1 
+30 x+3/4,y,z+3/4,-1 
+31 x+3/4,y+1/4,z+1/2,-1 
+32 x+3/4,y+1/2,z+1/4,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.00000 0.00000 0.00000 0.945
+O1 O 0.25000 0.25000 0.25000   1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1 1.915 1.915 1.915 mx,mx,mx  3.32
+

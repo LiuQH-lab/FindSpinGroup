@@ -1,0 +1,190 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/25/2022
+# From a file provided by Palmerina Gonzalez-Izquierdo
+
+data_5yOhtAoR
+_audit_creation_date            2022-07-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "C7 H14 Cl4 Fe N" 
+_chemical_formula_weight                 309.85
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Mater. Chem. C"
+_citation_journal_volume        8
+_citation_page_first            11389
+_citation_page_last             11398
+_citation_article_id            .
+_citation_year                  2020
+_citation_DOI                   10.1039/d0tc02341h
+
+loop_
+_citation_author_name
+"P. Gonzalez-Izquierdo"
+"O. Fabelo"
+"L. Canadillas-Delgado"
+"G. Beobide"
+"O. Vallcorba"
+"M. Sanchez-Andujar"
+"M. T. Fernandez-Diaz"
+"I. de Pedro"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     3
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  3  .
+mGM2-  1  1  .  primary  3  .
+
+
+_exptl_crystal_magnetic_properties_details
+;
+Neutron single-crystal on the D19 in Institut Laue-Langevin
+FM along c
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim irreps present in the magnetic arrangement. This means that two distinct order parameters in the sense of Landau theory are necessarily involved in the magnetic ordering of the phase.
+The mGM2- presence in the spin arrangement is essentially restricted to the mx component (a strictly mGM2- arrangement requires opposite mx values at the two listed split Fe sites, while mGM2+ requires equal ones).
+;
+
+_parent_space_group.name_H-M_alt  'P b c a'
+_parent_space_group.IT_number                       61
+_parent_space_group.transform_Pp_abc  'a, b, c; 0, 0, 0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  19.27
+_space_group_magn.name_BNS  "P 2_1'2_1'2_1"
+_space_group_magn.point_group_name  "2'2'2"
+_space_group_magn.point_group_number  "6.3.19"
+_cell_length_a                 13.0547
+_cell_length_b                 12.5671
+_cell_length_c                 14.6000
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,z+1/2,+1 
+3 x+1/2,-y+1/2,-z,-1 
+4 -x,y+1/2,-z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1_1 Fe 0.28313 0.04257 0.24911 1
+Fe1_2 Fe 0.71687 0.95743 0.75089 1
+Cl4_1 Cl 0.20126 0.98871 0.37133 1
+Cl4_2 Cl 0.79874 0.01129 0.62867 1
+Cl2_1 Cl 0.44185 0.98530 0.25593 1
+Cl2_2 Cl 0.55815 0.01470 0.74407 1
+Cl1_1 Cl 0.21625 0.97854 0.12215 1
+Cl1_2 Cl 0.78375 0.02146 0.87785 1
+Cl3_1 Cl 0.27853 0.21746 0.24236 1
+Cl3_2 Cl 0.72147 0.78254 0.75764 1
+N1_1 N 0.09747 0.29606 0.08214 1
+N1_2 N 0.90253 0.70394 0.91786 1
+C7_1 C 0.98131 0.33580 0.95338 1
+C7_2 C 0.01869 0.66420 0.04662 1
+H71_1 H 0.90110 0.36310 0.95030 1
+H71_2 H 0.09890 0.63690 0.04970 1
+H72_1 H 0.01830 0.36440 0.89040 1
+H72_2 H 0.98170 0.63560 0.10960 1
+C3_1 C 0.09808 0.18040 0.94560 1
+C3_2 C 0.90192 0.81960 0.05440 1
+H31_1 H 0.12500 0.19240 0.87680 1
+H31_2 H 0.87500 0.80760 0.12320 1
+H32_1 H 0.10590 0.09540 0.96080 1
+H32_2 H 0.89410 0.90460 0.03920 1
+C2_1 C 0.16512 0.24460 0.01129 1
+C2_2 C 0.83488 0.75540 0.98871 1
+H21_1 H 0.21980 0.19510 0.04810 1
+H21_2 H 0.78020 0.80490 0.95190 1
+H22_1 H 0.20540 0.30910 0.97640 1
+H22_2 H 0.79460 0.69090 0.02360 1
+C6_1 C 0.02784 0.21554 0.12530 1
+C6_2 C 0.97216 0.78446 0.87470 1
+H61_1 H 0.99240 0.25250 0.18550 1
+H61_2 H 0.00760 0.74750 0.81450 1
+H62_1 H 0.07460 0.15080 0.14920 1
+H62_2 H 0.92540 0.84920 0.85080 1
+C4_1 C 0.98634 0.21480 0.95810 1
+C4_2 C 0.01366 0.78520 0.04190 1
+H4_1 H 0.93950 0.17980 0.90430 1
+H4_2 H 0.06050 0.82020 0.09570 1
+C5_1 C 0.95033 0.17800 0.05248 1
+C5_2 C 0.04967 0.82200 0.94752 1
+H51_1 H 0.87360 0.21070 0.06770 1
+H51_2 H 0.12640 0.78930 0.93230 1
+H52_1 H 0.93960 0.09250 0.05740 1
+H52_2 H 0.06040 0.90750 0.94260 1
+C8_1 C 0.03521 0.38287 0.03740 1
+C8_2 C 0.96479 0.61713 0.96260 1
+H81_1 H 0.08920 0.44620 0.02040 1
+H81_2 H 0.91080 0.55380 0.97960 1
+H82_1 H 0.98250 0.41160 0.08930 1
+H82_2 H 0.01750 0.58840 0.91070 1
+H1_1 H 0.14240 0.33180 0.13180 1
+H1_2 H 0.85760 0.66820 0.86820 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1_1 -1.23(7) -3.5(2) 0.05 mx,my,mz 3.7(2) ? ?
+Fe1_2 1.81(11) -3.20(19) 0.05 mx,my,mz 3.7(2) ? ?
+

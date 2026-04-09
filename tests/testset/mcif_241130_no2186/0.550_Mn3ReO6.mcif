@@ -1,0 +1,127 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 26/02/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-02-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Chem. Commun."
+_citation_journal_volume        52
+_citation_page_first            5558
+_citation_page_last             5560
+_citation_article_id            .
+_citation_year                  2016
+_citation_DOI                   10.1039/c6cc01290f
+
+loop_
+_citation_author_name
+"A. M. Arevalo-Lopez"
+"F. Stegemann"
+"J. P. Attfield"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  109
+_experiment_temperature  100
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mE1-E2- 2  2  general  primary  18  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Re orders below 99K, while Mn atoms order below 109K
+Non-standard parent setting P2_1/n
+Position structure from a determination at 120K in the paramagnetic phase
+Moment components with non-significant digits to yield the reported moment magnitudes
+See Li et al. (Chem. Mater. 2016, 28, 3148) for a very different model of this structure. Unfortunately the information in this reference is incomplete and these alternative magnetic structure are not in this database.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim physically irreducible irrep along a general direction as primary
+Irrep label corresponds to the standard setting of P2_1/c, where the propagation vector is (1/2,1/2,1/2) (point E)
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,-1/2a+1/2b,-2a+b+2c;-1/4,0,1/2'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             10.54160
+_cell_length_b             10.77380
+_cell_length_c             7.71000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.097
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y+1/2,z,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1_1 Mn 0.25055 0.22580 0.24290
+Mn1_2 Mn  0.99945 0.47580 0.25710
+Mn2_1 Mn 0.25000 0.00000 0.00000
+Mn2_2 Mn  0.00000 0.25000 0.50000
+Re1_1 Re 0.25000 0.00000 0.50000
+Re1_2 Re  0.00000 0.25000 0.00000
+O1_1 O 0.06060 0.28535 0.23660
+O1_2 O  0.18940 0.53535 0.26340
+O2_1 O 0.34530 0.33625 0.05770
+O2_2 O  0.90470 0.58625 0.44230
+O3_1 O 0.42310 0.10100 0.07130
+O3_2 O  0.82690 0.35100 0.42870
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1_1 -0.78 0.78 0.00000 mx,my,mz         1.1 
+Mn1_2 -0.78 0.78 0.00000 mx,my,mz         1.1
+Mn2_1  1.34 1.34 0.00000 mx,my,mz         1.9
+Mn2_2 -1.34 -1.34 0.00000 mx,my,mz        1.9
+Re1_1 0.00000 0.00000 0.00000 mx,my,mz    0.0
+Re1_2 0.00000 0.00000 0.00000 mx,my,mz    0.0
+

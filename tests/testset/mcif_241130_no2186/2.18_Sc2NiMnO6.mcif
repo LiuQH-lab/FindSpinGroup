@@ -1,0 +1,151 @@
+##CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/02/2018 15:41:06
+# icsd_251833_1.5K.cif
+
+data_5yOhtAoR
+_audit_creation_date            2018-02-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorganic Chenistry"
+_citation_journal_volume        54
+_citation_page_first            8012
+_citation_page_last             8021
+_citation_article_id            ?
+_citation_year                  2015
+_citation_DOI                   10.1021/acs.inorgchem.5b01195
+
+loop_
+_citation_author_name
+"W. Yi"
+"A.J. Princep"
+"Y. Guo"
+"R.D. Johnson"
+"D. Khalyavin"
+"P. Manuel"
+"A. Senyshyn"
+"I.A. Presniakov"
+"A.V. Sobolev"
+"Y. Matsushita"
+"M. Tanaka"
+"A.A. Belik"
+"A.T. Boothroyd"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  251833
+_atomic_positions_source_other               .
+
+_transition_temperature  17
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1+ 1  1  .  primary  3  .
+mD1+D2+ 2  2 general primary 6  .
+mY2+ 1  1  .  secondary 3  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Above 17K the Ni spins become disordered and the Mn spin are arranged according to the propagation vector (1/2 0 1/2) yielding a 1k magnetic structure (see entry #1.199).
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k- maximal magnetic symmetry (4 possible)
+the mY1+ irrep for the propagation vector (1/2 0 1/2) applies to the Mn spin arrangement, while the mE1+E2+ irrep involves only the Ni spins (this irrep is not possible for the Mn spins).
+A secondary irrep mY2+ spin mode is allowed for the Mn spins, associated with the splitting of the Mn site, and it is absent.
+The structure is essentially collinear
+Parent space in non-standard setting: P21/n
+k vectors in P21/c setting: (1/2,0,0) and (0 1/2 1/2)
+Irrep labels used here is for the standard setting of the parent space group
+Although a dielectric anomaly is observed at the transition to this structure, the structure is non-polar.
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+k2 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b-1/2c,-1/2a+1/2b+1/2c,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S  -1"
+_cell_length_a             9.98170
+_cell_length_b             10.70540
+_cell_length_c             14.68240
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.87
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+3 x,y,z+1/2,-1
+4 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1_1 Mn 0.25000 0.00000 0.25000
+Mn1_2 Mn  0.00000 0.25000 0.00000
+Ni1_1 Ni 0.25000 0.00000 0.00000
+Ni1_2 Ni  0.00000 0.25000 0.25000
+Sc1_1 Sc 0.48650 0.03850 0.12700
+Sc1_2 Sc  0.76350 0.28850 0.12300
+Sc1_3 Sc  0.48650 0.53850 0.12700
+Sc1_4 Sc  0.76350 0.78850 0.12300
+O1_1 O 0.18300 0.46900 0.12900
+O1_2 O  0.06700 0.71900 0.12100
+O1_3 O  0.18300 0.96900 0.12900
+O1_4 O  0.06700 0.21900 0.12100
+O2_1 O 0.09600 0.09200 0.28150
+O2_2 O  0.15400 0.34200 0.96850
+O2_3 O  0.09600 0.59200 0.28150
+O2_4 O  0.15400 0.84200 0.96850
+O3_1 O 0.33700 0.15000 0.21300
+O3_2 O  0.91300 0.40000 0.03700
+O3_3 O  0.33700 0.65000 0.21300
+O3_4 O  0.91300 0.90000 0.03700
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1_1 1.17(18) -0.01(1) 1.19(23) mx,my,mz
+Mn1_2 -1.17 -0.01 -1.19 mx,my,mz
+Ni1_1 -1.03(42) 0.0 -1.09(27) mx,my,mz
+Ni1_2 -1.03 0.00 -1.09 mx,my,mz
+
+

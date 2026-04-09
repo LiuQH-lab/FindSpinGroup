@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:09:54
+# Database entry: 1.59 KTb3F12
+# Cif-like file for the case 1.59
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'K Tb3 F1 2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Applied Physics"
+_citation_journal_volume        91
+_citation_page_first            8519
+_citation_page_last             8521
+_citation_article_id            .
+_citation_year                  2002
+_citation_DOI                   10.1063/1.1450828
+
+loop_
+_citation_author_name
+"M. Guillot"
+"M. El-Ghozzi"
+"D. Avignant"
+"G. Andre"
+"F. Bouree"
+"A. Cousson"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   51125
+_atomic_positions_source_other               .
+
+_transition_temperature     3.6
+_experiment_temperature     1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+position structure from room temperature
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep active: this means equivalence between the MSG and the irrep assignment.
+Tb1 moment is symmetry-forced to be zero.
+;
+
+_parent_space_group.name_H-M_alt  'I  4/m'
+_parent_space_group.IT_number                       87
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/2,0,0'
+
+
+_space_group_magn.number_BNS  84.58
+_space_group_magn.name_BNS  "P_I  4_2/m"
+_space_group_magn.point_group_name  "4/m1'"
+_space_group_magn.point_group_number  "11.2.36"
+_cell_length_a                 7.71500
+_cell_length_b                 7.71500
+_cell_length_c                 7.53000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+1/2,x+1/2,z+1/2,+1
+3 y+1/2,-x+1/2,z+1/2,+1
+4 -x,-y,z,+1
+5 -x,-y,-z,+1
+6 y+1/2,-x+1/2,-z+1/2,+1
+7 -y+1/2,x+1/2,-z+1/2,+1
+8 x,y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+K1 K 0.00000 0.00000 0.00000 1
+Tb1 Tb 0.00000 0.00000 0.50000 1
+Tb2 Tb 0.00000 0.50000 0.25000 1
+F1 F 0.34550 0.02000 0.00000 1
+F2 F 0.23770 0.03350 0.68000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Tb1 0.0 0.0 0.0 0,0,0
+Tb2 0.0 0.0 6.95(4) 0,0,mz
+

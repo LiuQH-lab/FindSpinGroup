@@ -1,4 +1,5 @@
 import copy
+import itertools
 import math
 import re
 from fractions import Fraction
@@ -46,20 +47,44 @@ def rotation_angle(R,axis,eigenvals):
 
     return angle
 
-def times_of_rotation(rotation_angle):
+def times_of_rotation(rotation_angle, order_hint=None):
     """
         2*pi*m/n = rotation_angle
         m/n = rotation_angle/2pi
     """
 
     m_n = rotation_angle/(2*3.14159265357)
-    f = Fraction(m_n).limit_denominator(30)
+    if order_hint is not None:
+        n = int(order_hint)
+        if n < 1:
+            raise ValueError("order_hint must be a positive integer")
+        m = int(round(m_n * n)) % n
+        if m == 0 and abs(m_n) > 1e-8:
+            m = n
+        return m, n
+
+    f = Fraction(m_n).limit_denominator(120)
     m, n = f.numerator, f.denominator
     return m, n
 
 
+def _hm_improper_display_order(op: np.ndarray, fallback_order: int) -> int:
+    """
+    Return the HM display order for an improper operation.
+
+    The matrix order of an improper rotation can be larger than the HM symbol
+    order. For example, a crystallographic `-3` operation has matrix order 6,
+    but its HM token must still be `-3`. The HM order is determined by the
+    proper rotation obtained after multiplying by inversion.
+    """
+    try:
+        return int(get_element_order(-np.asarray(op, dtype=float)))
+    except Exception:
+        return int(fallback_order)
+
+
 def costheta(v1, v2):
-    """计算两个向量夹角的余弦值 (假设 v1, v2 未归一化)"""
+    """Return the cosine between two non-normalized vectors."""
     norm_product = np.linalg.norm(v1) * np.linalg.norm(v2)
     if norm_product == 0:
         return 0
@@ -69,130 +94,109 @@ def costheta(v1, v2):
 def find_rotation(operations, rotation_times, axis, perp_axis=None, exclude=None, improper=False):
 
     """
-    寻找符合几何约束的旋转操作。
+    Find a rotation that satisfies the requested geometric constraints.
 
     Parameters:
     -----------
     operations : list
-        操作列表，格式: [..., ..., ..., vector, (power, order), det]
+        Operation list in the form `[..., ..., ..., vector, (power, order), det]`.
     rotation_times : int
-        目标旋转阶数 (n)
+        Target rotation order.
     axis : array_like
-        目标轴方向 (target axis)
+        Target axis direction.
     perp_axis : array_like, optional
-        参考垂直轴。如果提供，将用于确定右手系方向。
+        Optional perpendicular reference axis used to determine handedness.
     exclude : array_like, optional
-        需要排除的轴（通常是已确定的主轴）。
+        Axis to exclude, usually an already fixed principal axis.
     improper : bool
-        是否寻找非正规旋转 (improper rotation)。
+        Whether to search for an improper rotation.
 
     Returns:
     --------
     (index, direction) : tuple
-        找到的操作索引和校正后的方向向量。
+        The matched operation index and corrected direction vector.
     """
 
-    # --- 物理阈值常量 ---
-    TOL_PARALLEL = 1e-2  # 判定平行的容差
-    TOL_CHIRALITY = 1e-4  # 判定混合积是否为0的容差
-    MIN_DEVIATION = 1.000001  # 初始最小偏差值
+    # Geometric tolerances.
+    TOL_PARALLEL = 1e-2
+    TOL_CHIRALITY = 1e-4
+    MIN_DEVIATION = 1.000001
 
     best_op_index = None
     best_direction = None
-    min_deviation = MIN_DEVIATION
+    best_rank = None
 
-    # 目标行列式值: Proper (+1), Improper (-1)
+    # Target determinant: proper (+1) or improper (-1).
     target_det = -1 if improper else 1
 
     for i, op in enumerate(operations):
-        # 1. 解包数据，提高可读性
+        # Unpack fields for readability.
         op_vec = np.array(op[3])
         op_rot_info = op[4]  # (power, order)
         op_det = op[5]
 
-        # 2. 基础属性筛选
+        # Basic property filters.
         if op_det != target_det:
             continue
         if op_rot_info is None or op_rot_info[1] != rotation_times:
             continue
 
-        # 3. 几何筛选：排除轴 (Exclude)
-        # 如果当前轴平行于 exclude 轴，直接跳过
+        # Exclude axes parallel to the forbidden axis.
         if exclude is not None:
             if abs(abs(costheta(exclude, op_vec)) - 1) < TOL_PARALLEL:
                 continue
 
-        # 4. 几何筛选：垂直轴 (Perp_axis)
-        # 原逻辑：如果太过于平行于 perp_axis (即不垂直)，跳过
-        # 这里保留你原代码的意图: abs(cos) > 0.8 意味着夹角 < 36度，显然不够垂直
+        # Reject vectors that are too parallel to the perpendicular reference.
         if perp_axis is not None:
             if abs(costheta(perp_axis, op_vec)) > 0.8:
                 continue
 
-        # 5. 确定候选方向
-        # 计算轴与目标的对齐程度
+        # Measure alignment against the target axis.
         cos_val = costheta(op_vec, axis)
 
-        # 我们只关心当前这个轴是否比之前找到的更接近 target axis
         current_deviation = abs(abs(cos_val) - 1)
-        if current_deviation > min_deviation:
+        if current_deviation >= MIN_DEVIATION:
             continue
 
-        # 生成候选列表：可能是原向量，也可能是反向量
-        # 根据你的逻辑，只考虑 power=1 (基转动) 或 power=n-1 (逆转动)
+        # Consider both axis directions. Prefer the standard representative
+        # with rotation-time 1; if it does not exist, fall back to the
+        # smallest same-axis representative.
         candidates = []
 
-        # 检查正向 (+op_vec)
-        if op_rot_info[0] == 1:
-            candidates.append(op_vec)
+        forward_step = op_rot_info[0]
+        reverse_step = op_rot_info[1] - op_rot_info[0]
+        candidates.append((op_vec, forward_step))
+        # For order-2 operations, +v and -v are the same rotation-time but still
+        # represent distinct axis directions in the rigid basis convention.
+        candidates.append((-op_vec, reverse_step))
 
-        # 检查反向 (-op_vec)，通常对应 op_rot_info[0] == order - 1
-        # 如果你的数据中包含逆操作，这里可以放宽条件，或者保持你原有的逻辑
-        if op_rot_info[1] - op_rot_info[0] == 1:
-            candidates.append(-op_vec)
-
-        for candidate_vec in candidates:
-            # --- 关键修改：统一的右手系检查 ---
+        for candidate_vec, effective_step in candidates:
             is_valid = True
 
-            # 如果提供了 exclude 和 perp_axis，我们必须检查手性
+            # Enforce a right-handed convention when both reference axes exist.
             if exclude is not None and perp_axis is not None:
-                # 计算混合积 (exclude x candidate) · perp
-                # 几何意义：如果 > 0，则 (exclude, candidate, perp) 构成右手系
-                # 注意：这里向量的顺序决定了谁是x, y, z。
-                # 假设顺序是: Exclude(主轴) -> Candidate(副轴) -> Perp(第三轴)
                 mixed_product = np.dot(perp_axis, np.cross(exclude, candidate_vec))
 
                 if mixed_product < TOL_CHIRALITY:
-                    # 如果混合积为负(左手系) 或 为0(共面)，则不仅是不符合右手系，也可能是方向错了
                     is_valid = False
 
-            # 如果只需要垂直检查，不需要手性（比如只给了 perp 但没给 exclude）
             elif perp_axis is not None:
-                # 比如 Cubic 系统中避免选到不想要的对角线方向
-                # 原代码逻辑: costheta(perp_axis, vec) < -0.1 continue
                 if costheta(perp_axis, candidate_vec) < -0.1:
                     is_valid = False
 
-            # 只有 exclude 没有 perp 的情况 (原代码逻辑)
             elif exclude is not None:
-                if costheta(exclude, candidate_vec) < 0.1:  # 稍微偏向正向
+                if costheta(exclude, candidate_vec) < 0.1:
                     is_valid = False
 
-            # --- 更新最佳结果 ---
             if is_valid:
-                # 重新计算该 candidate 的具体偏差
                 final_cos = costheta(candidate_vec, axis)
-                # 只有当它确实指向我们想要的方向 (cos > 0) 且偏差更小时才更新
-                # 注意：如果上面通过了右手系检查，但方向和 target axis 反了，
-                # 说明 target axis 本身可能不是右手系的建议方向，这里需要权衡。
-                # 但通常我们寻找的是 "最接近 target axis 且满足右手系" 的操作。
+                this_deviation = abs(final_cos - 1)
+                step_rank = 0 if effective_step == 1 else 1
+                candidate_rank = (step_rank, effective_step, this_deviation)
 
-                this_deviation = abs(final_cos - 1)  # 我们希望 cos 接近 +1
-
-                # 如果这是目前找到的最优解
-                if this_deviation < min_deviation:
-                    min_deviation = this_deviation
+                # Update the current best candidate.
+                if best_rank is None or candidate_rank < best_rank:
+                    best_rank = candidate_rank
                     best_op_index = i
                     best_direction = candidate_vec
 
@@ -275,8 +279,612 @@ def reverse_direction(operations, direction):
     return operations
 
 
+def find_operation_index_by_matrix(operations, target_matrix, tol=1e-2):
+    for i, op in enumerate(operations):
+        if np.allclose(op[0], target_matrix, atol=tol, rtol=tol):
+            return i
+    raise ValueError("No operation matches the canonical generator matrix.")
 
-def identify_point_group(point_group_matrices,tol=1e-2):
+
+def classify_point_group_operations(point_group_matrices, tol=1e-2):
+    """
+    Classify raw point-group matrices into the enriched operation records used by
+    ``identify_point_group``.
+
+    This is intentionally exposed as a diagnostic helper so we can inspect which
+    order/type/axis assignments are being made before the later symbolic
+    standardization logic branches on them.
+    """
+    op_order_type_direction_addition_det = []
+    for op in point_group_matrices:
+        order = get_element_order(op)
+
+        if order == 1:  # map 1
+            op_order_type_direction_addition_det.append([op, order, '1', None, None, 1])
+
+        eigvals, eigvecs = np.linalg.eig(op.astype(np.float64))
+        eigvecs = eigvecs.T
+
+        if order > 2:  # map n or -n
+            for i, val in enumerate(eigvals):
+                if abs(val.imag) < tol:  # find the direction
+                    if abs(val.real - 1) < tol:  # n
+                        axis = eigvecs[i].real
+                        angle = rotation_angle(op, axis, eigvals)
+                        m, n = times_of_rotation(angle, order_hint=order)
+                        op_order_type_direction_addition_det.append(
+                            [op, order, str(n), axis, [m, n], 1]
+                        )
+                        break
+
+                    if abs(val.real + 1) < tol:  # -n
+                        axis = eigvecs[i].real
+                        angle = rotation_angle(-op, axis, -eigvals)
+                        m, n = times_of_rotation(angle, order_hint=order)
+                        display_n = _hm_improper_display_order(op, n)
+                        op_order_type_direction_addition_det.append(
+                            [op, order, str(-display_n), axis, [m, n], -1]
+                        )
+                        break
+                if i == 2:
+                    raise ValueError('can not find eigenvector for rotation, try another tolerance!')
+
+        if order == 2:  # -1, m, 2
+            if abs(sum(eigvals) + 3) < tol:  # -1
+                op_order_type_direction_addition_det.append([op, order, '-1', None, None, -1])
+
+            if abs(sum(eigvals) + 1) < tol:  # 2
+                for i, val in enumerate(eigvals):
+                    if abs(val - 1) < tol:  # find direction
+                        axis = eigvecs[i]
+                        break
+                    if i == 2:
+                        raise ValueError('can not find eigenvector for rotation 2, try another tolerance!')
+                op_order_type_direction_addition_det.append([op, order, '2', axis, [1, 2], 1])
+
+            if abs(sum(eigvals) - 1) < tol:  # m
+                for i, val in enumerate(eigvals):
+                    if abs(val + 1) < tol:  # find norm vector
+                        axis = eigvecs[i]
+                        break
+                    if i == 2:
+                        raise ValueError('can not find norm vector for mirror, try another tolerance!')
+                op_order_type_direction_addition_det.append([op, order, 'm', axis, None, -1])
+    return op_order_type_direction_addition_det
+
+
+def _load_standard_point_group_generators(group_symbol, *, id=False):
+    if id:
+        from findspingroup.data.POINT_GROUP_MATRIX import point_group_generators_cartesian as pg_gens
+    else:
+        from findspingroup.data.POINT_GROUP_MATRIX import point_group_generators as pg_gens
+
+    if group_symbol not in pg_gens:
+        return generate_non_crystallographic_point_groups(group_symbol)
+    return [np.array(op) for op in pg_gens[group_symbol]]
+
+
+def _build_transition_matrix_linear_system(matrices_list, standard_list):
+    I = np.eye(3)
+    a_blocks = []
+    for matrix, standard in zip(matrices_list, standard_list):
+        a_blocks.append(np.kron(I, matrix) - np.kron(standard.T, I))
+    return np.vstack(a_blocks)
+
+
+def _axis_line_misalignment(axis, target_axis):
+    axis = np.asarray(axis, dtype=np.complex128).real
+    target_axis = np.asarray(target_axis, dtype=np.complex128).real
+    axis = axis / np.linalg.norm(axis)
+    target_axis = target_axis / np.linalg.norm(target_axis)
+    return 1.0 - abs(costheta(axis, target_axis))
+
+
+def _transition_combo_quality(matrices_list, standard_list):
+    linear_system = _build_transition_matrix_linear_system(matrices_list, standard_list)
+    _, singular_values, _ = np.linalg.svd(linear_system)
+    return float(singular_values[-1]), singular_values
+
+
+def _try_td_generator_candidates(operations, *, id=False, tol=1e-2):
+    standard_list = _load_standard_point_group_generators('-43m', id=id)
+    standard_ops = classify_point_group_operations(standard_list, tol=tol)
+    standard_by_symbol = {op[2]: op for op in standard_ops}
+
+    minus4_candidates = [(idx, op) for idx, op in enumerate(operations) if op[2] == '-4']
+    three_candidates = [(idx, op) for idx, op in enumerate(operations) if op[2] == '3']
+    mirror_candidates = [(idx, op) for idx, op in enumerate(operations) if op[2] == 'm']
+
+    if not minus4_candidates or not three_candidates or not mirror_candidates:
+        raise ValueError("Missing one of the required Td generator families (-4, 3, m).")
+
+    target_minus4 = standard_by_symbol['-4'][3]
+    target_three = standard_by_symbol['3'][3]
+    target_mirror = standard_by_symbol['m'][3]
+
+    def axis_rank(item, target_axis):
+        _, op = item
+        return _axis_line_misalignment(op[3], target_axis)
+
+    # First try the user's intended canonical directions directly.
+    preferred = [
+        min(minus4_candidates, key=lambda item: axis_rank(item, target_minus4)),
+        min(three_candidates, key=lambda item: axis_rank(item, target_three)),
+        min(mirror_candidates, key=lambda item: axis_rank(item, target_mirror)),
+    ]
+    preferred_indices = [item[0] for item in preferred]
+    preferred_generators = [item[1][0] for item in preferred]
+    try:
+        find_transition_matrix_deterministic(preferred_generators, '-43m', id=id, tol=tol)
+        return preferred_generators, preferred_indices
+    except ValueError:
+        pass
+
+    ranked = []
+    for minus4_index, minus4_op in minus4_candidates:
+        for three_index, three_op in three_candidates:
+            for mirror_index, mirror_op in mirror_candidates:
+                generators = [minus4_op[0], three_op[0], mirror_op[0]]
+                min_sv, singular_values = _transition_combo_quality(generators, standard_list)
+                ranked.append(
+                    (
+                        min_sv,
+                        axis_rank((minus4_index, minus4_op), target_minus4)
+                        + axis_rank((three_index, three_op), target_three)
+                        + axis_rank((mirror_index, mirror_op), target_mirror),
+                        (minus4_index, three_index, mirror_index),
+                        generators,
+                    )
+                )
+
+    ranked.sort(key=lambda item: (item[0], item[1]))
+    last_error = None
+    for _min_sv, _axis_score, indices, generators in ranked:
+        try:
+            find_transition_matrix_deterministic(generators, '-43m', id=id, tol=tol)
+            return generators, list(indices)
+        except ValueError as exc:
+            last_error = exc
+
+    if last_error is not None:
+        raise last_error
+    raise ValueError("No valid Td generator combination found.")
+
+
+def _transition_nullspace_threshold(singular_values, tol):
+    max_sv = float(np.max(singular_values)) if len(singular_values) else 0.0
+    return max(float(tol) * 1e-4, max_sv * 1e-8, 1e-12)
+
+
+def _expected_transition_nullspace_dimension(standard_list):
+    """
+    Estimate the exact null-space dimension from the standard generators alone.
+
+    If ``M_i = P D_i P^{-1}`` exactly, then every valid solution has the form
+    ``P C`` where ``C`` commutes with the standard generators ``D_i``. The
+    dimension of that commutant is therefore the exact null-space dimension of
+    the transition system in the noise-free case, and gives a principled lower
+    bound for near-null admission under small perturbations.
+    """
+    standard_system = _build_transition_matrix_linear_system(standard_list, standard_list)
+    _, singular_values, _ = np.linalg.svd(standard_system)
+    max_sv = float(np.max(singular_values)) if len(singular_values) else 0.0
+    exact_tol = max(max_sv * 1e-10, 1e-12)
+    return max(1, int(np.sum(singular_values < exact_tol)))
+
+
+def _expand_transition_nullspace_dimension_via_gap(
+    singular_values,
+    current_dim,
+    *,
+    tol,
+):
+    """
+    Recover near-null clusters that the strict relative threshold can miss.
+
+    Some roundtripped low-order groups (for example near-``mm2`` cases) produce
+    a tail like ``[..., 2e-6, 2e-6, 1e-16]``.  The current base threshold sees
+    only the final singular value as null, which leaves a 1D null space whose
+    basis matrix is singular.  If that tail is clearly separated from the bulk
+    by a large spectral gap, we treat the whole tail as an effective null-space
+    cluster.
+    """
+    if len(singular_values) < 2:
+        return current_dim
+
+    expanded_dim = current_dim
+    gap_ratio_required = 1e4
+    tail_value_limit = max(float(tol) * 1e-3, 1e-5)
+
+    for i in range(len(singular_values) - 1):
+        upper = float(singular_values[i])
+        lower = float(singular_values[i + 1])
+        tail_dim = len(singular_values) - i - 1
+        if tail_dim <= expanded_dim:
+            continue
+        if lower > tail_value_limit:
+            continue
+        ratio = upper / max(lower, 1e-300)
+        if ratio < gap_ratio_required:
+            continue
+        expanded_dim = tail_dim
+
+    return expanded_dim
+
+
+def _transition_dimension_candidates(
+    singular_values,
+    *,
+    initial_dim,
+    gap_dim,
+    expected_dim,
+):
+    candidates = []
+
+    def add(dim):
+        if 1 <= dim <= len(singular_values) and dim not in candidates:
+            candidates.append(dim)
+
+    add(initial_dim)
+    add(gap_dim)
+    add(expected_dim)
+    add(expected_dim + 1)
+    add(expected_dim + 2)
+    add(min(len(singular_values), expected_dim + 3))
+    return candidates
+
+
+def _transition_residual_tolerances(
+    singular_values,
+    *,
+    dim,
+    sv_tol,
+):
+    admitted = float(singular_values[-dim])
+    candidates = [max(sv_tol * 10.0, 1e-8)]
+    candidates.extend(max(admitted * factor, 1e-8) for factor in (1.0, 2.0, 5.0, 10.0))
+
+    ordered = []
+    seen = set()
+    for value in candidates:
+        key = round(float(value), 15)
+        if key in seen:
+            continue
+        seen.add(key)
+        ordered.append(float(value))
+    return ordered
+
+
+def _search_transition_candidate_progressive(
+    singular_values,
+    vh,
+    linear_system,
+    *,
+    sv_tol,
+    initial_dim,
+    gap_dim,
+    expected_dim,
+):
+    best_candidate = None
+    best_meta = None
+    attempts = []
+
+    for dim in _transition_dimension_candidates(
+        singular_values,
+        initial_dim=initial_dim,
+        gap_dim=gap_dim,
+        expected_dim=expected_dim,
+    ):
+        basis_matrices = [vector.reshape(3, 3) for vector in vh[-dim:, :]]
+        basis_metrics = [_transition_basis_metrics(matrix) for matrix in basis_matrices]
+        for residual_tol in _transition_residual_tolerances(
+            singular_values,
+            dim=dim,
+            sv_tol=sv_tol,
+        ):
+            candidate = _search_transition_candidate(
+                basis_matrices,
+                linear_system,
+                residual_tol=residual_tol,
+            )
+            attempts.append(
+                {
+                    "dim": int(dim),
+                    "residual_tol": float(residual_tol),
+                    "basis_metrics": basis_metrics,
+                    "candidate": candidate,
+                }
+            )
+            if candidate is None:
+                continue
+            if not candidate["passes_residual_tol"] or candidate["sigma_min"] < 1e-8:
+                continue
+            meta = (
+                int(dim),
+                float(residual_tol),
+                *_candidate_sort_key(candidate),
+            )
+            if best_candidate is None or meta < best_meta:
+                best_candidate = candidate
+                best_meta = meta
+        if best_candidate is not None:
+            break
+
+    return best_candidate, attempts
+
+
+def _transition_basis_metrics(matrix):
+    singular_values = np.linalg.svd(matrix, compute_uv=False)
+    sigma_min = float(singular_values[-1])
+    sigma_max = float(singular_values[0])
+    cond = math.inf if sigma_min < 1e-15 else float(sigma_max / sigma_min)
+    return {
+        "det": float(np.linalg.det(matrix)),
+        "fro_norm": float(np.linalg.norm(matrix)),
+        "sigma_min": sigma_min,
+        "sigma_max": sigma_max,
+        "condition_number": cond,
+    }
+
+
+def _score_transition_candidate(matrix, linear_system):
+    fro_norm = float(np.linalg.norm(matrix))
+    if fro_norm < 1e-15:
+        return None
+    normalized = np.asarray(matrix, dtype=float) / fro_norm
+    singular_values = np.linalg.svd(normalized, compute_uv=False)
+    sigma_min = float(singular_values[-1])
+    sigma_max = float(singular_values[0])
+    cond = math.inf if sigma_min < 1e-15 else float(sigma_max / sigma_min)
+    residual = float(np.linalg.norm(linear_system @ normalized.reshape(-1)))
+    return {
+        "matrix": normalized,
+        "residual": residual,
+        "sigma_min": sigma_min,
+        "sigma_max": sigma_max,
+        "condition_number": cond,
+        "det": float(abs(np.linalg.det(normalized))),
+    }
+
+
+def _candidate_sort_key(metrics):
+    return (
+        -metrics["sigma_min"],
+        metrics["residual"],
+        metrics["condition_number"],
+        -metrics["det"],
+    )
+
+
+def _search_transition_candidate(
+    basis_matrices,
+    linear_system,
+    *,
+    residual_tol,
+):
+    best_candidate = None
+    best_key = None
+
+    def consider_candidate(candidate_matrix):
+        nonlocal best_candidate, best_key
+        metrics = _score_transition_candidate(candidate_matrix, linear_system)
+        if metrics is None:
+            return
+        metrics["passes_residual_tol"] = metrics["residual"] <= residual_tol
+        key = (
+            not metrics["passes_residual_tol"],
+            *_candidate_sort_key(metrics),
+        )
+        if best_candidate is None or key < best_key:
+            best_candidate = metrics
+            best_key = key
+
+    for coeffs in _iter_transition_coefficients(len(basis_matrices)):
+        candidate = np.zeros((3, 3), dtype=float)
+        for coeff, basis in zip(coeffs, basis_matrices):
+            candidate += coeff * basis
+        consider_candidate(candidate)
+
+    if best_candidate is None or not best_candidate["passes_residual_tol"] or best_candidate["sigma_min"] < 1e-8:
+        rng = np.random.default_rng(0)
+        for _ in range(max(64, 16 * len(basis_matrices))):
+            coeffs = rng.normal(size=len(basis_matrices))
+            candidate = np.zeros((3, 3), dtype=float)
+            for coeff, basis in zip(coeffs, basis_matrices):
+                candidate += coeff * basis
+            consider_candidate(candidate)
+
+    return best_candidate
+
+
+def _iter_transition_coefficients(dim):
+    base_scales = (1.0, -1.0, 0.5, -0.5, 2.0, -2.0)
+
+    seen = set()
+
+    def emit(coeffs):
+        key = tuple(float(value) for value in coeffs)
+        if all(abs(value) < 1e-12 for value in key):
+            return
+        if key in seen:
+            return
+        seen.add(key)
+        return np.asarray(key, dtype=float)
+
+    for i in range(dim):
+        for scale in base_scales:
+            coeffs = np.zeros(dim)
+            coeffs[i] = scale
+            candidate = emit(coeffs)
+            if candidate is not None:
+                yield candidate
+
+    for i, j in itertools.combinations(range(dim), 2):
+        for scale_i in base_scales:
+            for scale_j in base_scales:
+                coeffs = np.zeros(dim)
+                coeffs[i] = scale_i
+                coeffs[j] = scale_j
+                candidate = emit(coeffs)
+                if candidate is not None:
+                    yield candidate
+
+    deterministic_templates = [
+        [1.0, math.sqrt(2.0), math.sqrt(3.0), math.pi, math.e, (1.0 + math.sqrt(5.0)) / 2.0],
+        [1.0, -math.sqrt(2.0), math.sqrt(3.0), -math.pi, math.e, -(1.0 + math.sqrt(5.0)) / 2.0],
+        [1.0, 2.0, 3.0, 5.0, 7.0, 11.0],
+        [1.0, -2.0, 3.0, -5.0, 7.0, -11.0],
+    ]
+    for template in deterministic_templates:
+        coeffs = np.array([template[i % len(template)] for i in range(dim)], dtype=float)
+        candidate = emit(coeffs)
+        if candidate is not None:
+            yield candidate
+        candidate = emit(-coeffs)
+        if candidate is not None:
+            yield candidate
+
+    if dim <= 5:
+        exhaustive_values = (1.0, -1.0, 0.5, -0.5, 2.0)
+        for coeffs in itertools.product(exhaustive_values, repeat=dim):
+            candidate = emit(coeffs)
+            if candidate is not None:
+                yield candidate
+
+
+def analyze_transition_matrix_problem(matrices_list, group_symbol, id=False, tol=1e-2):
+    """
+    Diagnose the conjugacy problem solved by ``find_transition_matrix_deterministic``.
+
+    Returns a dictionary containing the singular-value spectrum of the linear
+    system, inferred null-space dimension, basis metrics, and the best
+    deterministic candidate found by the current candidate search strategy.
+    """
+    standard_list = _load_standard_point_group_generators(group_symbol, id=id)
+    if len(matrices_list) != len(standard_list):
+        raise ValueError(
+            f"Matrix count ({len(matrices_list)}) does not match the number of standard generators ({len(standard_list)})."
+        )
+
+    linear_system = _build_transition_matrix_linear_system(matrices_list, standard_list)
+    _, singular_values, vh = np.linalg.svd(linear_system)
+    sv_tol = _transition_nullspace_threshold(singular_values, tol)
+    initial_null_space_dim = int(np.sum(singular_values < sv_tol))
+    if initial_null_space_dim == 0:
+        if singular_values[-1] < max(float(tol), 1e-8):
+            initial_null_space_dim = 1
+        else:
+            raise ValueError("No null space found; the input matrices may not form the requested point group.")
+    null_space_dim = _expand_transition_nullspace_dimension_via_gap(
+        singular_values,
+        initial_null_space_dim,
+        tol=tol,
+    )
+    expected_null_space_dim = _expected_transition_nullspace_dimension(standard_list)
+    best_candidate, attempts = _search_transition_candidate_progressive(
+        singular_values,
+        vh,
+        linear_system,
+        sv_tol=sv_tol,
+        initial_dim=initial_null_space_dim,
+        gap_dim=null_space_dim,
+        expected_dim=expected_null_space_dim,
+    )
+
+    return {
+        "group_symbol": group_symbol,
+        "input_count": len(matrices_list),
+        "standard_count": len(standard_list),
+        "singular_values": [float(value) for value in singular_values],
+        "null_space_tolerance": float(sv_tol),
+        "initial_null_space_dimension": initial_null_space_dim,
+        "null_space_dimension": null_space_dim,
+        "expected_null_space_dimension": expected_null_space_dim,
+        "dimension_candidates": _transition_dimension_candidates(
+            singular_values,
+            initial_dim=initial_null_space_dim,
+            gap_dim=null_space_dim,
+            expected_dim=expected_null_space_dim,
+        ),
+        "basis_metrics": []
+        if not attempts
+        else attempts[0]["basis_metrics"],
+        "attempts": [
+            {
+                "dim": int(attempt["dim"]),
+                "residual_tol": float(attempt["residual_tol"]),
+                "basis_metrics": attempt["basis_metrics"],
+                "candidate": None
+                if attempt["candidate"] is None
+                else {
+                    "residual": float(attempt["candidate"]["residual"]),
+                    "sigma_min": float(attempt["candidate"]["sigma_min"]),
+                    "sigma_max": float(attempt["candidate"]["sigma_max"]),
+                    "condition_number": float(attempt["candidate"]["condition_number"])
+                    if math.isfinite(attempt["candidate"]["condition_number"])
+                    else math.inf,
+                    "det": float(attempt["candidate"]["det"]),
+                    "passes_residual_tol": bool(attempt["candidate"]["passes_residual_tol"]),
+                },
+            }
+            for attempt in attempts
+        ],
+        "best_candidate": None
+        if best_candidate is None
+        else {
+            "residual": float(best_candidate["residual"]),
+            "sigma_min": float(best_candidate["sigma_min"]),
+            "sigma_max": float(best_candidate["sigma_max"]),
+            "condition_number": float(best_candidate["condition_number"])
+            if math.isfinite(best_candidate["condition_number"])
+            else math.inf,
+            "det": float(best_candidate["det"]),
+            "passes_residual_tol": bool(best_candidate["passes_residual_tol"]),
+        },
+    }
+
+
+def analyze_point_group_identification(point_group_matrices, _id=False, tol=1e-2):
+    """
+    Diagnostic helper for the early classification phase inside
+    ``identify_point_group``.
+    """
+    operations = classify_point_group_operations(point_group_matrices, tol=tol)
+    order_group = len(operations)
+    metric_matrix = np.array(
+        sum([op[0].T @ op[0] for op in operations]) / order_group,
+        dtype=np.float64,
+    )
+    summary = {
+        "operations_count": order_group,
+        "classified_operations": operations,
+        "metric_matrix": metric_matrix.tolist(),
+        "needs_metric_basis_change": not np.allclose(metric_matrix, np.eye(3), rtol=1e-2),
+        "max_order": max(op[1] for op in operations),
+        "mirror_count": sum(op[2] == "m" for op in operations),
+        "has_inversion": any(op[2] == "-1" for op in operations),
+        "has_improper": any(op[5] == -1 for op in operations),
+    }
+    try:
+        symbol, _, transformation, generator_indices, symbol_s = identify_point_group(
+            point_group_matrices,
+            _id=_id,
+            tol=tol,
+        )
+        summary.update(
+            {
+                "identified_hm_symbol": symbol,
+                "identified_s_symbol": symbol_s,
+                "transformation": np.asarray(transformation, dtype=float).tolist(),
+                "generator_indices": list(generator_indices),
+            }
+        )
+    except Exception as exc:
+        summary["identify_error"] = str(exc)
+    return summary
+
+
+def identify_point_group(point_group_matrices,_id= False,tol=1e-2):
     """
 
         input : point_group_matrices [op,...]
@@ -286,56 +894,10 @@ def identify_point_group(point_group_matrices,tol=1e-2):
 
     # Step 1 : determination of ops
 
-    op_order_type_direction_addition_det = []
-    for op in point_group_matrices:
-        order = get_element_order(op)
-
-        if order == 1: # map 1
-            op_order_type_direction_addition_det.append([op,order,'1',None,None,1])
-
-        eigvals, eigvecs = np.linalg.eig(op.astype(np.float64))
-        eigvecs = eigvecs.T
-
-        if order > 2 : # map n or -n
-            for i,val in enumerate(eigvals):
-                if abs(val.imag) < tol: # find the direction
-                    if abs(val.real - 1) < tol: # n
-                        axis = eigvecs[i].real
-                        angle = rotation_angle(op,axis,eigvals)
-                        m , n = times_of_rotation(angle)
-                        op_order_type_direction_addition_det.append([op,order,str(n),axis,[m,n],1])  # rotate around axis m times of 2*pi/n
-                        break
-
-                    if abs(val.real + 1) < tol: # -n
-                        axis = eigvecs[i].real
-                        angle = rotation_angle(-op,axis,-eigvals)   #   multiply -1 to op
-                        m , n = times_of_rotation(angle)
-                        op_order_type_direction_addition_det.append([op,order,str(-n),axis,[m,n],-1])  # rotate around axis m times of 2*pi/n
-                        break
-                if i == 2:
-                    raise ValueError('can not find eigenvector for rotation, try another tolerance!')
-
-        if order == 2: # -1, m, 2
-            if abs(sum(eigvals) + 3) < tol: # -1
-                op_order_type_direction_addition_det.append([op,order,'-1',None,None,-1])
-
-            if abs(sum(eigvals) + 1) < tol: # 2
-                for i,val in enumerate(eigvals):
-                    if abs(val-1) < tol: # find direction
-                        axis = eigvecs[i]
-                        break
-                    if i == 2:
-                        raise ValueError('can not find eigenvector for rotation 2, try another tolerance!')
-                op_order_type_direction_addition_det.append([op,order,'2',axis,[1,2],1])
-
-            if abs(sum(eigvals) - 1) < tol: # m
-                for i,val in enumerate(eigvals):
-                    if abs(val + 1) < tol: # find norm vector
-                        axis = eigvecs[i]
-                        break
-                    if i == 2:
-                        raise ValueError('can not find norm vector for mirror, try another tolerance!')
-                op_order_type_direction_addition_det.append([op,order,'m',axis,None,-1])
+    op_order_type_direction_addition_det = classify_point_group_operations(
+        point_group_matrices,
+        tol=tol,
+    )
 
 
     # Step 2 : determination of point group
@@ -418,7 +980,7 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                 group_symbol_S = 'Th'
 
                 ir_index, ir_direction = find_rotation(operations,
-                                                       3, np.array([1, 1, 1]), improper=True)
+                                                       6, np.array([1, 1, 1]), improper=True)
                 operations = reverse_direction(operations, ir_direction)
 
                 mirror_index, m_direction = find_mirror(operations, np.array([1, 0, 0]), cubic=ir_direction)
@@ -429,19 +991,11 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                 if mirror > 0: # Td
                     group_symbol = '-43m'
                     group_symbol_S = 'Td'
-                    ir_index, ir_direction = find_rotation(operations,
-                                                           4, np.array([1, 0, 0]), improper=True)
-                    operations = reverse_direction(operations,
-                                                                             ir_direction)
-                    r_index, r_direction = find_rotation(operations,
-                                                           3, np.array([1, 1, 1]),ir_direction)
-                    operations = reverse_direction(operations,
-                                                                             r_direction)
-                    generators = [operations[ir_index][0],
-                                  operations[r_index][0],
-                                  operations[ir_index][0] @ operations[r_index][0] @ operations[ir_index][0]@ operations[ir_index][0] @ operations[r_index][0] @operations[ir_index][0]@operations[ir_index][0]
-                                  ]  # matrix -4_100 @ 3+_111 @ 2_100 @ 3+_111 @ 2_100
-                    generators_index = [ir_index,r_index,np.where([np.allclose(i[0],operations[ir_index][0] @ operations[r_index][0] @ operations[ir_index][0] @ operations[ir_index][0]@ operations[r_index][0] @operations[ir_index][0] @operations[ir_index][0],atol=1e-2) for i in operations])[0][0]]
+                    generators, generators_index = _try_td_generator_candidates(
+                        operations,
+                        id=_id,
+                        tol=tol,
+                    )
 
 
                 else:  # O
@@ -466,7 +1020,7 @@ def identify_point_group(point_group_matrices,tol=1e-2):
             group_symbol_S = 'Oh'
 
             ir_index, ir_direction = find_rotation(operations,
-                                                   3, np.array([1, 1, 1]), improper=True)
+                                                   6, np.array([1, 1, 1]), improper=True)
             operations = reverse_direction(operations,ir_direction)
 
             mirror_index, m_direction = find_mirror(operations, np.array([1, 0, 0]),cubic=ir_direction)
@@ -505,7 +1059,7 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                         group_symbol = f'-{int(max_order/2)}'  # -n   S2n
                         group_symbol_S = f'S{max_order}'
                         improper_rotation_index, direction = find_rotation(operations,
-                                                                           int(max_order/2), np.array([0, 0, 1]), improper=True)
+                                                                           max_order, np.array([0, 0, 1]), improper=True)
                         operations = reverse_direction(operations,
                                                                                  direction)
                         generators = [operations[improper_rotation_index][0]] # matrix
@@ -534,7 +1088,10 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                         generators_index = [rotation_index,mirror_index]
                     else:
                         if (order_group / 2) % 2 == 0: # nmm    Cnv
-                            group_symbol = f'{int(order_group/2)}mm'
+                            if int(order_group/2) > 9:
+                                group_symbol = f'({int(order_group/2)})mm'
+                            else:
+                                group_symbol = f'{int(order_group/2)}mm'
                             group_symbol_S = f'C{int(order_group/2)}v'
                             rotation_index, direction = find_rotation(operations,
                                                                       int(order_group / 2), np.array([0, 0, 1]))
@@ -543,9 +1100,10 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                                 direction)
                             mirror_index, m_direction = find_mirror(operations, np.array([1, 0, 0]))
                             operations = reverse_direction(operations,m_direction)
-                            mirror2_index, m2_direction = find_mirror(operations, m_direction,direction,exclude=m_direction)
-                            operations = reverse_direction(operations,
-                                                                                     m2_direction)
+                            mirror2_index = find_operation_index_by_matrix(
+                                operations,
+                                operations[rotation_index][0] @ operations[mirror_index][0],
+                            )
                             generators = [operations[rotation_index][0],operations[mirror_index][0],operations[mirror2_index][0]]
                             generators_index = [rotation_index,mirror_index,mirror2_index]
 
@@ -584,8 +1142,10 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                             mz_index, mz_direction = find_mirror(operations, direction)
                             m_index, m_direction = find_mirror(operations, np.array([1, 0, 0]),direction)
                             operations = reverse_direction(operations,m_direction)
-                            m2_index, m2_direction = find_mirror(operations, m_direction,direction,m_direction)
-                            operations = reverse_direction(operations,m2_direction)
+                            m2_index = find_operation_index_by_matrix(
+                                operations,
+                                operations[rotation_index][0] @ operations[m_index][0],
+                            )
                             generators = [operations[rotation_index][0],operations[mz_index][0],operations[m_index][0],operations[m2_index][0]]
                             generators_index = [rotation_index,mz_index,m_index,m2_index]
 
@@ -605,8 +1165,10 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                             r_index, r_direction = find_rotation(operations,
                                                                       2, np.array([1, 0, 0]), direction)
                             operations = reverse_direction(operations,r_direction)
-                            m_index, m_direction = find_mirror(operations, r_direction,direction,r_direction)
-                            operations = reverse_direction(operations,m_direction)
+                            m_index = find_operation_index_by_matrix(
+                                operations,
+                                operations[srotation_index][0] @ operations[r_index][0],
+                            )
                             generators = [operations[srotation_index][0],operations[r_index][0],operations[m_index][0]]
                             generators_index = [srotation_index,r_index,m_index]
 
@@ -621,7 +1183,7 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                                 group_symbol = f'-{int(order_group/4)}m'
                                 group_symbol_S = f'D{int(order_group/4)}d'
                             srotation_index, direction = find_rotation(operations,
-                                                                      int(order_group / 4), np.array([0, 0, 1]),improper=True)
+                                                                      int(order_group / 2), np.array([0, 0, 1]),improper=True)
                             operations = reverse_direction(
                                 operations,
                                 direction)
@@ -646,8 +1208,10 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                             r_index, r_direction = find_rotation(operations,
                                                                       2, np.array([1, 0, 0]), direction)
                             operations = reverse_direction(operations,r_direction)
-                            m_index, m_direction = find_mirror(operations, r_direction,direction,r_direction)
-                            operations = reverse_direction(operations,m_direction)
+                            m_index = find_operation_index_by_matrix(
+                                operations,
+                                operations[srotation_index][0] @ operations[r_index][0],
+                            )
                             generators = [operations[srotation_index][0],operations[r_index][0],operations[m_index][0]]
                             generators_index = [srotation_index,r_index,m_index]
         else: # Cn Dn
@@ -684,11 +1248,10 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                     operations = reverse_direction(
                         operations,
                         r_direction)
-                    r2_index, r2_direction = find_rotation(operations,
-                                                       2, r_direction, direction, r_direction)
-                    operations = reverse_direction(
+                    r2_index = find_operation_index_by_matrix(
                         operations,
-                        r2_direction)
+                        operations[rotation_index][0] @ operations[r_index][0],
+                    )
                     generators = [operations[rotation_index][0],operations[r_index][0],operations[r2_index][0]]  # matrix
                     generators_index = [rotation_index,r_index,r2_index]
 
@@ -764,10 +1327,10 @@ def identify_point_group(point_group_matrices,tol=1e-2):
                 mirror_index, m_direction = find_mirror(operations, np.array([1, 0, 0]))
                 operations = reverse_direction(operations,
                                                                          m_direction)
-                mirror2_index, m2_direction = find_mirror(operations, m_direction,
-                                                          exclude=m_direction)
-                operations = reverse_direction(operations,
-                                                                         m2_direction)
+                mirror2_index = find_operation_index_by_matrix(
+                    operations,
+                    operations[rotation_index][0] @ operations[mirror_index][0],
+                )
                 generators = [
                               operations[mirror_index][0],
                               operations[mirror2_index][0],
@@ -815,7 +1378,7 @@ def identify_point_group(point_group_matrices,tol=1e-2):
     # print(group_symbol)
     # print(generators_index)
 
-    P2 = find_transition_matrix_deterministic(generators, group_symbol)
+    P2 = find_transition_matrix_deterministic(generators, group_symbol,id = _id)
     transformation = P1 @ P2
 
     for op in operations:
@@ -858,21 +1421,41 @@ def generate_non_crystallographic_point_groups(hm_symbol):
 
 
     if bool(re.search(r'\(', hm_symbol)):
-        patterns = [r'\((\d+)\)', r'-(\d+)', r'(\d+)/m', r'(\d+)mm', r"(\d+)m", r'(\d+)/mmm', r'-\((\d+)\)2m', r'-\((\d+)\)m', r'\((\d+)\)22',
-                r'\((\d+)\)2']
-
+        pattern_index_pairs = [
+            (r'-\((\d+)\)2m', 6),
+            (r'\((\d+)\)/mmm', 5),
+            (r'\((\d+)\)22', 8),
+            (r'\((\d+)\)mm', 3),
+            (r'\((\d+)\)/m', 2),
+            (r'-\((\d+)\)m', 7),
+            (r'\((\d+)\)2', 9),
+            (r'\((\d+)\)m', 4),
+            (r'-\((\d+)\)', 1),
+            (r'\((\d+)\)', 0),
+        ]
     else:
-        patterns = [r'(\d)', r'-(\d)', r'(\d+)/m', r'(\d+)mm', r"(\d+)m", r'(\d+)/mmm', r'-(\d)2m', r'-(\d)m',
-                    r'(\d)22',r'(\d)2']
-    patterns = [re.compile(p) for p in patterns]
+        pattern_index_pairs = [
+            (r'-(\d+)2m', 6),
+            (r'(\d+)/mmm', 5),
+            (r'(\d+)22', 8),
+            (r'(\d+)mm', 3),
+            (r'(\d+)/m', 2),
+            (r'-(\d+)m', 7),
+            (r'(\d+)2', 9),
+            (r'(\d+)m', 4),
+            (r'-(\d+)', 1),
+            (r'(\d+)', 0),
+        ]
 
     n = None
     pattern_index = None
-    for index,pattern in enumerate(patterns):
+    for pattern_text, mapped_index in pattern_index_pairs:
+        pattern = re.compile(pattern_text)
         match = re.fullmatch(pattern, hm_symbol)
         if match:
             n = int(match.group(1))
-            pattern_index = index
+            pattern_index = mapped_index
+            break
     if n is None:
         raise ValueError('No pattern found')
     generators = nonc_point_group_generators(n,pattern_index)
@@ -884,131 +1467,82 @@ def generate_non_crystallographic_point_groups(hm_symbol):
 
 
 
-def find_transition_matrix_deterministic(matrices_list, group_symbol, tol=1e-2):
+def find_transition_matrix_deterministic(matrices_list, group_symbol, id =False, tol=1e-2):
     """
-    确定性地计算非奇异转换矩阵 P。
+    Deterministically compute a nonsingular transformation matrix ``P``.
 
-    修正点：
-    1. 严格保持与原 random 函数一致的 reshape 和 return P.T 逻辑。
-    2. 使用更稳健的基向量混合策略，确保 det(P) 不为 0。
+    Compared with the older implementation, this version:
+    1. uses a relative singular-value threshold to estimate the null space;
+    2. searches the null space deterministically using residual/condition
+       scoring instead of relying on ad hoc coefficients or random fallback.
     """
-    from findspingroup.data.POINT_GROUP_MATRIX import point_group_generators
-
-    # 1. 准备标准生成元
-    if group_symbol not in point_group_generators:
-        standard_list = generate_non_crystallographic_point_groups(group_symbol)
-        # raise ValueError(f"不支持的点群: {group_symbol}")
-    else:
-        standard_list = [np.array(op) for op in point_group_generators[group_symbol]]
+    standard_list = _load_standard_point_group_generators(group_symbol, id=id)
 
     if len(matrices_list) != len(standard_list):
-        raise ValueError(f"矩阵数量 ({len(matrices_list)}) 与标准生成元数量 ({len(standard_list)}) 不匹配。")
+        raise ValueError(
+            f"Matrix count ({len(matrices_list)}) does not match the number of standard generators ({len(standard_list)})."
+        )
 
-    # 2. 构建线性方程组
-    # 逻辑维持原样：对应的 kron 构造需要配合最后的 return P.T
-    I = np.eye(3)
-    A_blocks = []
-    for M, D in zip(matrices_list, standard_list):
-        A_block = np.kron(I, M) - np.kron(D.T, I)
-        A_blocks.append(A_block)
+    linear_system = _build_transition_matrix_linear_system(matrices_list, standard_list)
+    _, singular_values, vh = np.linalg.svd(linear_system)
 
-    A = np.vstack(A_blocks)
-
-    # 3. SVD分解求零空间
-    U, S, Vh = np.linalg.svd(A)
-
-    # 获取零空间基向量 (对应于极小的奇异值)
-    null_mask = S < tol
-    null_space_dim = np.sum(null_mask)
-
-    # 如果 SVD 数值误差导致没有捕捉到零空间 (rank deficient)，强制取最后几行
+    sv_tol = _transition_nullspace_threshold(singular_values, tol)
+    null_space_dim = int(np.sum(singular_values < sv_tol))
     if null_space_dim == 0:
-        # 强行尝试取最小的奇异值对应的向量，或者报错
-        # 通常物理上必定有解，这里给一个保底
-        if S[-1] < 0.1:
+        if singular_values[-1] < max(float(tol), 1e-8):
             null_space_dim = 1
         else:
-            raise ValueError("没有找到零空间，输入矩阵可能不构成指定的点群。")
+            raise ValueError(
+                "No null space found; the input matrices may not form the requested point group. "
+                "Adjust point-group identification tolerances first: "
+                "`find_spin_group(..., meigtol=...)`, and then `matrix_tol=...` if needed. "
+                "Do not start by changing `.scif` output precision."
+            )
+    null_space_dim = _expand_transition_nullspace_dimension_via_gap(
+        singular_values,
+        null_space_dim,
+        tol=tol,
+    )
+    expected_null_space_dim = _expected_transition_nullspace_dimension(standard_list)
+    best_candidate, attempts = _search_transition_candidate_progressive(
+        singular_values,
+        vh,
+        linear_system,
+        sv_tol=sv_tol,
+        initial_dim=null_space_dim,
+        gap_dim=null_space_dim,
+        expected_dim=expected_null_space_dim,
+    )
 
-    # 取 Vh 的最后几行作为基向量
-    basis_vectors_flat = Vh[-null_space_dim:, :]
+    if best_candidate is None or not best_candidate["passes_residual_tol"] or best_candidate["sigma_min"] < 1e-8:
+        tried_dims = sorted({attempt["dim"] for attempt in attempts})
+        raise ValueError(
+            "Unable to find a nonsingular matrix P in the null space. "
+            "Adjust PG-standardization tolerances first: "
+            "`find_spin_group(..., matrix_tol=...)`, and `meigtol=...` if needed. "
+            "Do not start by changing `.scif` output precision. "
+            f"Tried near-null dimensions: {tried_dims}."
+        )
 
-    # 将基向量 reshape 为 3x3 矩阵
-    # 注意：这里不做 .T，完全模拟原代码 P_flat.reshape(3,3) 的行为
-    basis_matrices = [b.reshape(3, 3) for b in basis_vectors_flat]
-
-    # 4. 确定性混合基向量寻找非奇异解
-    # 策略：贪婪叠加。
-    # P_final = v1 + c2*v2 + c3*v3 ...
-
-    current_P = basis_matrices[0]
-
-    # 如果零空间维度 > 1，我们需要混合它们以避开奇异点
-    if len(basis_matrices) > 1:
-        for i, V in enumerate(basis_matrices[1:]):
-            # 如果当前已经是非奇异且行列式较大，可以直接停止，也可以继续混合增加鲁棒性
-            # 这里设定一个满意的阈值
-            if abs(np.linalg.det(current_P)) > 0.5:
-                break
-
-            # 尝试不同的系数混合，寻找能显著增加行列式的方向
-            best_alpha = 0
-            max_det = abs(np.linalg.det(current_P))
-
-            # 扫描系数：这保证了如果在这个方向上有非奇异解，我们一定能撞上
-            # 使用素数或非整数步长可以避免巧合的整数抵消
-            coeffs = [1.0, -1.0, 0.5, 2.0, 1.5, -1.5]
-
-            for alpha in coeffs:
-                temp_P = current_P + alpha * V
-                det_val = abs(np.linalg.det(temp_P))
-                if det_val > max_det:
-                    max_det = det_val
-                    best_alpha = alpha
-
-            if best_alpha != 0:
-                current_P = current_P + best_alpha * V
-
-    # 5. 检查结果
-    if abs(np.linalg.det(current_P)) < 1e-4:
-        # 极少数情况：如果确定性搜索失败（非常罕见），
-        # 可以在这个狭窄的零空间内做最后一次随机尝试作为保底
-        # print("Deterministic mix failed, trying random mix in null space...")
-        for _ in range(50):
-            coeffs = np.random.uniform(-2, 2, size=len(basis_matrices))
-            P_rand = sum(c * B for c, B in zip(coeffs, basis_matrices))
-            if abs(np.linalg.det(P_rand)) > 1e-3:
-                current_P = P_rand
-                break
-
-        if abs(np.linalg.det(current_P)) < 1e-4:
-            raise ValueError("无法在零空间中找到非奇异矩阵 P。")
-
-    # 6. 返回结果
-    # 必须保留 .T，因为原代码的 Kronecker 构建方式实际上解出的是 P^T
-    return current_P.T
+    # Keep `.T`: the current Kronecker construction solves for P^T.
+    return best_candidate["matrix"].T
 def find_transition_matrix_random(matrices_list, group_symbol, tol=1e-2, max_tries=1000):
     """
-    随机尝试，直到找到一个非奇异的 P。
-
-    输入:
-      matrices_list: list of 3x3 numpy.ndarray
-      group_symbol: str，比如 "C3"
-
-    输出:
-      P: 3x3 numpy.ndarray
+    Randomly try candidate combinations until a nonsingular `P` is found.
     """
 
     from findspingroup.data.POINT_GROUP_MATRIX import point_group_generators
 
     if group_symbol not in point_group_generators: #
         standard_list = generate_non_crystallographic_point_groups(group_symbol)
-        # raise ValueError(f"不支持的点群: {group_symbol}")
+        # raise ValueError(f"Unsupported point group: {group_symbol}")
     else:
         standard_list = [np.array(op) for op in point_group_generators[group_symbol]]
 
     if len(matrices_list) != len(standard_list):
-        raise ValueError(f"矩阵数量 ({len(matrices_list)}) 与标准生成元数量 ({len(standard_list)}) 不匹配。")
+        raise ValueError(
+            f"Matrix count ({len(matrices_list)}) does not match the number of standard generators ({len(standard_list)})."
+        )
 
     I = np.eye(3)
     A_blocks = []
@@ -1018,11 +1552,11 @@ def find_transition_matrix_random(matrices_list, group_symbol, tol=1e-2, max_tri
 
     A = np.vstack(A_blocks)
 
-    # SVD分解
+    # SVD decomposition.
     U, S, Vh = np.linalg.svd(A)
     null_space_dim = np.sum(S < tol)
     if null_space_dim == 0:
-        raise ValueError("没有零空间，可能群元素给错了。")
+        raise ValueError("No null space found; the group elements may be inconsistent.")
 
     basis_vectors = Vh[-null_space_dim:, :]  # nullspace basis
 
@@ -1040,26 +1574,18 @@ def find_transition_matrix_random(matrices_list, group_symbol, tol=1e-2, max_tri
 
         tries += 1
 
-    raise ValueError(f"在 {max_tries} 次尝试中未找到非奇异的P。")
+    raise ValueError(f"Failed to find a nonsingular P after {max_tries} attempts.")
 
 
 def getNormInf(matrix1, matrix2, mode=True):
-    if mode == True:
-        a = np.array(matrix1) % 1
-        b = np.array(matrix2) % 1
-        c = [1, 2, 3]
-        for i in range(3):
-            if a[i] > b[i]:
-                c[i] = min(a[i] - b[i], 1 + b[i] - a[i])
-            if a[i] < b[i]:
-                c[i] = min(b[i] - a[i], 1 + a[i] - b[i])
-            if a[i] == b[i]:
-                c[i] = 0
-        max_value = max(c)
-    else:
-        diff = np.abs(matrix1 - matrix2)
-        max_value = np.max(diff)
-    return max_value
+    if mode:
+        a = np.mod(np.asarray(matrix1, dtype=float), 1.0)
+        b = np.mod(np.asarray(matrix2, dtype=float), 1.0)
+        diff = np.abs(a - b)
+        wrapped = np.minimum(diff, 1.0 - diff)
+        return float(np.max(wrapped))
+    diff = np.abs(np.asarray(matrix1, dtype=float) - np.asarray(matrix2, dtype=float))
+    return float(np.max(diff))
 
 
 def is_close_matrix_pair(pair1, pair2, tol=1e-5):
@@ -1071,12 +1597,88 @@ def is_close_matrix_pair(pair1, pair2, tol=1e-5):
     return True
 
 
+def _dedup_bucket_decimals(tol: float) -> int:
+    tol = float(max(tol, 1e-12))
+    return max(0, int(np.ceil(-np.log10(tol))) - 1)
+
+
+def _matrix_pair_bucket_key(item, tol=1e-5):
+    decimals = _dedup_bucket_decimals(tol)
+    key_parts = []
+    for value in item:
+        arr = np.asarray(value, dtype=float).reshape(-1)
+        key_parts.append(tuple(np.round(arr, decimals)))
+    return tuple(key_parts)
+
+
 def deduplicate_matrix_pairs(matrix_list, tol=1e-5):
     unique = []
+    buckets = {}
     for item in matrix_list:
-        if not any(is_close_matrix_pair(item, u, tol) for u in unique):
-            unique.append(item)
+        bucket_key = _matrix_pair_bucket_key(item, tol=tol)
+        candidates = buckets.get(bucket_key, [])
+        if any(is_close_matrix_pair(item, u, tol) for u in candidates):
+            continue
+        unique.append(item)
+        buckets.setdefault(bucket_key, []).append(item)
     return unique
+
+
+def _canonicalize_fractional_translation(translation, tol=3e-3, max_den=12):
+    translation = np.mod(np.asarray(translation, dtype=float), 1.0)
+    snapped = []
+    for value in translation:
+        approx = float(Fraction(float(value)).limit_denominator(max_den))
+        if abs(value - approx) < tol:
+            value = approx
+        if abs(value) < tol or abs(value - 1.0) < tol:
+            value = 0.0
+        snapped.append(value)
+    return np.mod(np.asarray(snapped, dtype=float), 1.0)
+
+
+def _fractional_bucket_params(tol: float):
+    tol = float(max(tol, 1e-12))
+    bins = max(1, int(np.ceil(1.0 / tol)))
+    bucket_width = 1.0 / bins
+    neighbor_radius = max(1, int(np.ceil(tol / bucket_width)))
+    return bins, neighbor_radius
+
+
+def _fractional_bucket_key(position, bins: int):
+    wrapped = np.mod(np.asarray(position, dtype=float), 1.0)
+    indices = np.floor(wrapped * bins).astype(int) % bins
+    return tuple(int(value) for value in indices)
+
+
+def _fractional_neighbor_keys(bucket_key, bins: int, neighbor_radius: int):
+    for dx in range(-neighbor_radius, neighbor_radius + 1):
+        for dy in range(-neighbor_radius, neighbor_radius + 1):
+            for dz in range(-neighbor_radius, neighbor_radius + 1):
+                yield (
+                    (bucket_key[0] + dx) % bins,
+                    (bucket_key[1] + dy) % bins,
+                    (bucket_key[2] + dz) % bins,
+                )
+
+
+def _append_unique_fractional_position(
+    position,
+    positions: list,
+    buckets: dict,
+    *,
+    tol: float,
+    bins: int,
+    neighbor_radius: int,
+):
+    bucket_key = _fractional_bucket_key(position, bins)
+    for neighbor_key in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius):
+        for existing in buckets.get(neighbor_key, ()):
+            if getNormInf(position, existing) < tol:
+                return False
+    positions.append(position)
+    buckets.setdefault(bucket_key, []).append(position)
+    return True
 
 
 def compute_invariant_metric(point_group_rotations):
@@ -1110,12 +1712,25 @@ def get_space_group_from_operations(space_group_operations,symprec = 0.02,bz = F
 
     positions = []
     types = []
+    bins, neighbor_radius = _fractional_bucket_params(1e-3)
+    position_buckets = {}
+    rotations = np.asarray([op[0] for op in space_group_operations], dtype=float)
+    translations = np.mod(np.asarray([op[1] for op in space_group_operations], dtype=float), 1.0)
     for index,site in enumerate(weird_sites):
-        for op in space_group_operations:
-            new_pos = np.dot(op[0], site) + op[1]
-            new_pos = np.mod(new_pos, 1)
-            if not any(getNormInf(new_pos,p) < 1e-3 for p in positions):
-                positions.append(new_pos)
+        # Preserve the original fractional representatives here. G0/L0
+        # standard-setting detection feeds identify-index exact generator
+        # matching downstream, and snapping translations too early can change
+        # the standard origin shift enough to lose canonical generators.
+        transformed_positions = np.mod(rotations @ site + translations, 1.0)
+        for new_pos in transformed_positions:
+            if _append_unique_fractional_position(
+                new_pos,
+                positions,
+                position_buckets,
+                tol=1e-3,
+                bins=bins,
+                neighbor_radius=neighbor_radius,
+            ):
                 types.append(index+1)
 
     cell = (lattice*20, positions, types)
@@ -1150,26 +1765,44 @@ def get_magnetic_space_group_from_operations(magnetic_space_group_operations):
     weird_sites = [np.array([0.1715870, 0.27754210, 0.737388700]),np.array([0,0,0])]
     weird_moments = [np.array([1.234,0.789,0.345]),np.array([0,0,0])]
 
+    canonical_operations = [
+        [int(op[0]), np.asarray(op[1], dtype=float), _canonicalize_fractional_translation(op[2])]
+        for op in magnetic_space_group_operations
+    ]
+
     # get point group rotations
-    point_group_rotations = deduplicate_matrix_pairs([i[1] for i in magnetic_space_group_operations])
+    point_group_rotations = deduplicate_matrix_pairs([i[1] for i in canonical_operations])
     g = compute_invariant_metric(point_group_rotations)
     lattice = np.linalg.cholesky(g)  # L @ L.T = g , rows as basis vectors
 
     positions = []
     types = []
     moments = []
+    bins, neighbor_radius = _fractional_bucket_params(1e-4)
+    position_buckets = {}
+    rotations = np.asarray([op[1] for op in canonical_operations], dtype=float)
+    translations = np.mod(np.asarray([op[2] for op in canonical_operations], dtype=float), 1.0)
+    time_reversals = np.asarray([int(op[0]) for op in canonical_operations], dtype=float)
+    det_signs = np.asarray([round(np.linalg.det(op[1])) for op in canonical_operations], dtype=float)
     for index,site in enumerate(weird_sites):
-        for op in magnetic_space_group_operations:
-            new_pos = np.dot(op[1], site) + op[2]
-            new_pos = np.mod(new_pos, 1)
-            if not any(getNormInf(new_pos,p) < 1e-4 for i,p in enumerate(positions)):
-                positions.append(new_pos)
+        transformed_positions = np.mod(rotations @ site + translations, 1.0)
+        transformed_moments = (det_signs * time_reversals)[:, None] * (rotations @ weird_moments[index])
+        for new_pos, new_mom in zip(transformed_positions, transformed_moments):
+            if _append_unique_fractional_position(
+                new_pos,
+                positions,
+                position_buckets,
+                tol=1e-4,
+                bins=bins,
+                neighbor_radius=neighbor_radius,
+            ):
                 types.append(index+1)
-                new_mom = np.dot(round(np.linalg.det(op[1])) * op[1] * op[0], weird_moments[index])
                 moments.append(new_mom)
 
-    cell = (lattice, positions, types, moments@lattice)
+    cell = (lattice * 5, positions, types, moments@lattice)
     magnetic_space_group_dataset :SpglibMagneticDataset=get_magnetic_symmetry_dataset(cell, symprec=symprec,mag_symprec=0.02)
+    if magnetic_space_group_dataset is None:
+        return None
 
     msg_int_num = magnetic_space_group_dataset.uni_number
     msg_bns_num,msg_bns_symbol = MSG_INT_TO_BNS[msg_int_num]
@@ -1191,7 +1824,7 @@ def get_magnetic_space_group_from_operations(magnetic_space_group_operations):
             "mpg_symbol":mpg_symbol}
 
 
-def get_arithmetic_crystal_class_from_ops(ops):
+def get_arithmetic_crystal_class_from_ops(ops, *, include_kpath: bool = True):
     """
     rely on spglib
     :parameter: ops: list of [rotation matrix, translation vector], space group operations
@@ -1200,7 +1833,11 @@ def get_arithmetic_crystal_class_from_ops(ops):
 
 
     # get point group rotations
-    acc_dataset,kpath_info = get_space_group_from_operations(ops,bz=True)
+    if include_kpath:
+        acc_dataset, kpath_info = get_space_group_from_operations(ops, bz=True)
+    else:
+        acc_dataset = get_space_group_from_operations(ops, bz=False)
+        kpath_info = None
 
     if acc_dataset is None:
         raise ValueError("Can not find spg dataset in arithmetic crystal class ")
@@ -1249,5 +1886,4 @@ def get_arithmetic_crystal_class_from_ops(ops):
     # L_acc = L_acc_std @ primitive_transformation
     # L_input = L_acc @ primitive_transformation^-1 @ input_acc_std_transformation
     # L_input = L_acc @ input_acc_transformation
-    return acc_symbol, input_acc_transformation,input_acc_origin_shift,kpath_info
-
+    return acc_symbol, input_acc_transformation, input_acc_origin_shift, kpath_info

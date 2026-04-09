@@ -1,0 +1,119 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/05/2020 
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        65
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            224414
+_citation_year                  2002
+_citation_DOI                   10.1103/PhysRevB.65.224414
+
+loop_
+_citation_author_name
+"D. Vaknin"
+"J. L. Zarestky"
+"L. L. Miller"
+"J.-P. Rivera"
+"H. Schmid"
+
+_atomic_positions_source_database_code_ICSD  400625
+_atomic_positions_source_other               .
+
+_transition_temperature  22
+_experiment_temperature  10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2-  1  1  .  primary  1  .
+mGM4-  1  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Position structure from a determination at room temperature
+Co moment: 4.2
+Apparently the model is not the result of a systematic least-squares fit of the data
+See #0.193 and #0.383 for a different model of this structure with higher symmetry and a single irrep involved.
+See #0.385 for a model with rather different symmetry also involving two irreps.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps as primary: two order parameters are involved in the sense of Landau theory, one of them being very small.
+From ME properties the authors propose that the magnetic point group of the system should be 2'_x. 
+The reported magnetic structure has however as magnetic point group 2'_x/m_x. Assumedly the system has in addition a weak FM component along b, which would reduce the point group to 2'_x.
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a,b-c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.77
+_space_group_magn.name_BNS  "P 2_1'/c"
+_cell_length_a             10.20010
+_cell_length_b             5.91990
+_cell_length_c             4.68990
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,y+1/2,z+1/2,+1 
+3 x+1/2,-y+1/2,-z+1/2,-1 
+4 -x,-y,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Li1_1 Li 0.00000 0.00000 0.00000
+Li1_2 Li  0.50000 0.00000 0.50000
+P1 P 0.09447 0.25000 0.41843
+Co1 Co 0.27859 0.25000 0.97929
+O1 O 0.09768 0.25000 0.74103
+O2 O 0.45504 0.25000 0.20427
+O3_1 O 0.16630 0.04460 0.28198
+O3_2 O  0.33370 0.95540 0.78198
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 0.0 4.19 -0.34 mx,my,mz
+

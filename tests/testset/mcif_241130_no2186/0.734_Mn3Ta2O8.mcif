@@ -1,0 +1,147 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/16/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-10-16
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Mn3 Ta2 O8"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Mater. Chem."
+_citation_journal_volume        9
+_citation_page_first            1575
+_citation_page_last             1578
+_citation_article_id            .
+_citation_year                  1999
+_citation_DOI                   10.1039/A902149C
+
+loop_
+_citation_author_name
+"J. Grins"
+"S. Esmaeilzadeh"
+"P. Berastegui"
+"S. Eriksson"
+
+_temperature_position_structure         295
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     23
+_experiment_temperature     10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3-GM4- 2 2 general primary 10 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 295K
+Direction of the spins on the ab plane is undetermined. Here a simple crystallographic direction has been arbitrarily chosen.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim physically irreducible representation along a general direction
+;
+
+_parent_space_group.name_H-M_alt  "I 4_1/a"
+_parent_space_group.IT_number           88
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,c,-b;0,0,0'
+
+_space_group_magn.number_BNS  15.87
+_space_group_magn.name_BNS  "C 2'/c"
+_space_group_magn.point_group_name  "2'/m"
+_space_group_magn.point_group_number  "5.3.14"
+_cell_length_a                 11.27280
+_cell_length_b                 11.27280
+_cell_length_c                 9.80300
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,y+1/2,-z,+1 
+3 -x,-y+1/2,z,-1 
+4 -x,-y,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ta1_1 Ta5+ 0.42179 0.05600 0.12990 1
+Ta1_2 Ta5+ 0.19400 0.17179 0.87990 1
+Mn1_1 Mn2+ 0.87940 0.54880 0.09900 1
+Mn1_2 Mn2+ 0.70120 0.62940 0.84900 1
+Mn2 Mn2+ 0.00000 0.75000 0.87500 1
+Mn3 Mn2+ 0.00000 0.75000 0.37500 1
+O1_1 O2- 0.37180 0.20160 0.21010 1
+O1_2 O2- 0.04840 0.12180 -0.03990 1
+O2_1 O2- 0.46330 0.89650 0.01870 1
+O2_2 O2- 0.35350 0.21330 0.76870 1
+O3_1 O2- 0.19730 0.30800 -0.00040 1
+O3_2 O2- 0.44200 0.44730 0.24960 1
+O4_1 O2- 0.31680 -0.03740 0.24230 1
+O4_2 O2- 0.28740 0.06680 -0.00770 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1_1 0.0 -4.01(2) 0.0 mx,my,mz 4.01(2) ? ?
+Mn1_2 0.0 4.01(2) 0.0 mx,my,mz 4.01(2) ? ?
+Mn2 0.0 4.01(2) 0.0 mx,my,0 4.01(2) ? ?
+Mn3 0.0 4.01(2) 0.0 mx,my,0 4.01(2) ? ?
+

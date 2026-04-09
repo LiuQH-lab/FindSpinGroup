@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:16:16
+# Database entry: 1.154 NaFeSi2O6
+# Cif-like file for the case 1.154
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Na Fe Si2 O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        91
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            214415
+_citation_year                  2015
+_citation_DOI                   10.1103/PhysRevB.91.214415
+
+loop_
+_citation_author_name
+"Baum, M"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     9
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+positions from a 1.8K measurement
+This commensurate phase only appears only in synthetic samples and coexists with the incommensurate phases reported for the natural samples (see entries #1.1.36 and #1.1.37).
+Fe moment: 1.7(1) with an angle 11(8) with respect to the c direction. Moment components given here approximately complying with the moment modulus and direction reported in the reference.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep active: equivalent to MSG assignment
+;
+
+_parent_space_group.name_H-M_alt  'C  2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-2c,-b,-a+c;0,0,0'
+
+
+_space_group_magn.number_BNS  14.84
+_space_group_magn.name_BNS  "P_C  2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 9.66180
+_cell_length_b                 8.79330
+_cell_length_c                 5.29460
+_cell_angle_alpha              90.00
+_cell_angle_beta               107.33
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Na1 Na 0.00000 0.30020 0.25000 1
+Fe1 Fe 0.00000 0.89940 0.25000 1
+Si1 Si 0.29050 0.09030 0.23790 1
+O1 O 0.11370 0.07960 0.13840 1
+O2 O 0.35950 0.25510 0.30410 1
+O3 O 0.35260 0.00890 0.01050 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.3 0.0 1.8 mx,0,mz
+

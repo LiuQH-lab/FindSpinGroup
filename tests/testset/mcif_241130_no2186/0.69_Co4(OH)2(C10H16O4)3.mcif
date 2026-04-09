@@ -1,0 +1,183 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:52:35
+# Database entry: 0.69 Co4(OH)2(C10H16O4)3
+# Cif-like file for the case 0.69
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Co4 (O H )2(C1 0H1 6O4 )3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        89
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            104413
+_citation_year                  2014
+_citation_DOI                   10.1103/PhysRevB.89.104413
+
+loop_
+_citation_author_name
+"R. Sibille"
+"E. Lhotel"
+"T. Mazet"
+"B. Malaman"
+"C. Ritter"
+"V. Ban"
+"M. François"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               'Inorg. Chem. 2012, 51, 2885-2892'
+
+_transition_temperature     5.4
+_experiment_temperature     1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+H labels from original reference have been changed.
+Choice of representative atoms in the article is ambiguous, and spin relative signs have been chosen to match the figure in the article.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  14.79
+_space_group_magn.name_BNS  "P  2_1'/c'  "
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 15.19920
+_cell_length_b                 4.91200
+_cell_length_c                 22.87700
+_cell_angle_alpha              90.00
+_cell_angle_beta               101.50
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,y+1/2,-z+1/2,-1
+4 x,-y+1/2,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co01 Co 0.90375 0.06059 0.25459 1
+Co02 Co 0.02737 0.10852 0.15734 1
+O003 O 0.20710 0.81120 0.26201 1
+O004 O 0.97860 0.34090 0.21692 1
+H004 H 0.94300 0.44500 0.19760 1
+O005 O 0.07420 0.72490 0.15413 1
+O006 O 0.15090 0.19610 0.21724 1
+O007 O 0.91420 0.03520 0.09590 1
+O008 O 0.07400 0.35320 0.10006 1
+O009 O 0.87540 0.84090 0.17276 1
+C010 C 0.21350 0.05330 0.24850 1
+C011 C 0.88020 0.25790 0.43990 1
+H011 H 0.92090 0.40770 0.45310 1
+H012 H 0.87900 0.14180 0.47410 1
+C012 C 0.30230 0.19570 0.26640 1
+H013 H 0.29250 0.35910 0.28810 1
+H014 H 0.32100 0.25370 0.23030 1
+C013 C 0.78580 0.37040 0.41620 1
+H015 H 0.76880 0.48490 0.44670 1
+H016 H 0.78770 0.48470 0.38190 1
+C014 C 0.62490 0.28010 0.36810 1
+H017 H 0.60930 0.42160 0.39380 1
+H018 H 0.63270 0.36640 0.33130 1
+C015 C 0.08610 0.59880 0.10660 1
+C016 C 0.70510 0.97400 0.06680 1
+H019 H 0.72300 0.13100 0.04620 1
+H0110 H 0.69310 0.03600 0.10470 1
+C017 C 0.54670 0.08320 0.35360 1
+H0111 H 0.56370 0.93090 0.33120 1
+H0112 H 0.53340 0.01270 0.39040 1
+C018 C 0.61950 0.85670 0.02990 1
+H0113 H 0.63140 0.79540 0.99190 1
+H0114 H 0.60180 0.69930 0.05030 1
+C019 C 0.46330 0.21630 0.31760 1
+H0115 H 0.47700 0.27800 0.28020 1
+H0116 H 0.45000 0.37650 0.33910 1
+C020 C 0.37920 0.04200 0.30380 1
+H021 H 0.39130 0.87960 0.28260 1
+H022 H 0.36270 0.98560 0.34080 1
+C021 C 0.86310 0.89090 0.11820 1
+C022 C 0.54260 0.05740 0.01840 1
+H023 H 0.53050 0.11820 0.05640 1
+H024 H 0.56040 0.21520 0.99810 1
+C023 C 0.71420 0.15730 0.39820 1
+H025 H 0.70630 0.05750 0.43340 1
+H026 H 0.73380 0.02930 0.37110 1
+C024 C 0.78180 0.77320 0.07840 1
+H027 H 0.76310 0.61110 0.09690 1
+H028 H 0.79690 0.72020 0.04080 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co01 0.0 -2.19(7) 0.0 mx,my,mz
+Co02 0.0 2.13(5) -1.64(8) mx,my,mz
+

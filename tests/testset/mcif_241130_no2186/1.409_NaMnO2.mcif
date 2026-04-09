@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 24/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW LETTERS"
+_citation_journal_volume        99
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            247211
+_citation_year                  2007
+_citation_DOI                   10.1103/PhysRevLett.99.247211
+
+loop_
+_citation_author_name
+"M. Giot"
+"L.C. Chapon"
+"J. Androulakis"
+"M.A. Green"
+"P.G. Radaelli"
+"A. Lappas"
+
+
+
+_atomic_positions_source_database_code_ICSD  21028
+_atomic_positions_source_other               .
+
+_transition_temperature  45
+_experiment_temperature  4K
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mV1+  2  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a model at room temperature retrieved from ICSD
+The MSG is triclnic and the material is reported to exhibit a triclinic distortion below T_N, which is not fully characterized. Here, the structure is described with the positional structure at room temperature, including cell parameters, reported by other authors.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (1 possible)
+1-dim small irrep as primary. The irrep has two k-vectors and only one is involved. k-domains expected
+;
+
+_parent_space_group.name_H-M_alt  'C 2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,1/4a-1/4b,1/2a+1/2b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             11.32400
+_cell_length_b             5.72000
+_cell_length_c             5.79900
+_cell_angle_alpha          90.00
+_cell_angle_beta           113.10
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/4,y+3/4,z,+1
+3 x+1/2,y+1/2,z,+1
+4 x+3/4,y+1/4,z,+1
+5 x+3/4,y+3/4,z,-1
+6 x,y+1/2,z,-1
+7 x+1/4,y+1/4,z,-1
+8 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.00000 0.00000 0.00000
+Na1 Na 0.00000 0.25000 0.50000
+O1 O 0.14880 0.00000 0.79860
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 -1.79(6) 0.00000 1.71(6) mx,my,mz
+
+

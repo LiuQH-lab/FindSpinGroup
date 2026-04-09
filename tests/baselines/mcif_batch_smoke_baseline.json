@@ -1,0 +1,224 @@
+{
+  "examples/0.800_MnTe.mcif": {
+    "case_id": "examples/0.800_MnTe.mcif",
+    "file_name": "0.800_MnTe.mcif",
+    "result": {
+      "acc": "6/mmmP",
+      "conf": "Collinear",
+      "gspg": {
+        "effective_mpg_symbol": "6/mmm1'",
+        "npg_symbol_s": "Ci",
+        "output_mode": "reduced_point_part_with_spin_only_annotation",
+        "point_part_linear": "-1|6_{3}/ -1|m 1|m -1|m",
+        "real_space_setting": "G0std",
+        "spin_frame_setting": "ossg_oriented_spin_frame",
+        "spin_only_component_symbol_s": "C∞v",
+        "spin_only_part_linear": "∞_{110}m|1",
+        "symbol_linear": "-1|6_{3}/ -1|m 1|m -1|m ∞_{110}m|1",
+        "symbol_mode": "npg_x_spin_only",
+        "tentative_symbol_s": "Ci x C∞v"
+      },
+      "index": "194.164.1.1.L",
+      "phase": "AFM(Altermagnet)",
+      "properties": {
+        "ahc_w_soc": "No",
+        "ahc_wo_soc": "No",
+        "is_alter": "(Altermagnet)",
+        "is_spin_orbit_magnet": "",
+        "ss_w_soc": "Yes",
+        "ss_wo_soc": "k-dependent"
+      }
+    },
+    "status": "ok",
+    "tensor_summary": {
+      "AHE_wSOC": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "AHE_woSOC": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "BCDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "IMDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "MSGBCDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "MSGIMDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "MSGQMDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "QMDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      }
+    }
+  },
+  "examples/2.35_CrSe.mcif": {
+    "case_id": "examples/2.35_CrSe.mcif",
+    "file_name": "2.35_CrSe.mcif",
+    "result": {
+      "acc": "622P",
+      "conf": "Noncoplanar",
+      "gspg": {
+        "effective_mpg_symbol": "6/m'm'm'",
+        "npg_symbol_s": "D3d",
+        "output_mode": "explicit_ops",
+        "point_part_linear": "2_{100}|6_{3}/ -1|m m_{100}|m -1|m",
+        "real_space_setting": "G0std",
+        "spin_frame_setting": "ossg_oriented_spin_frame",
+        "spin_only_component_symbol_s": "C3",
+        "spin_only_part_linear": "3|1",
+        "symbol_linear": "2_{100}|6_{3}/ -1|m m_{100}|m -1|m 3|1",
+        "symbol_mode": "point_part_and_spin_only",
+        "tentative_symbol_s": null
+      },
+      "index": "194.149.3.3",
+      "phase": "AFM\n(SOM)",
+      "properties": {
+        "ahc_w_soc": "Yes",
+        "ahc_wo_soc": "No",
+        "is_alter": "",
+        "is_spin_orbit_magnet": "(SOM)",
+        "ss_w_soc": "Yes",
+        "ss_wo_soc": "k-dependent"
+      }
+    },
+    "status": "ok",
+    "tensor_summary": {
+      "AHE_wSOC": {
+        "free_parameters": 1,
+        "is_zero": false,
+        "relations_count": 1
+      },
+      "AHE_woSOC": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "BCDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "IMDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "MSGBCDTensor": {
+        "free_parameters": 1,
+        "is_zero": false,
+        "relations_count": 1
+      },
+      "MSGIMDTensor": {
+        "free_parameters": 1,
+        "is_zero": false,
+        "relations_count": 1
+      },
+      "MSGQMDTensor": {
+        "free_parameters": 2,
+        "is_zero": false,
+        "relations_count": 2
+      },
+      "QMDTensor": {
+        "free_parameters": 1,
+        "is_zero": false,
+        "relations_count": 1
+      }
+    }
+  },
+  "tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif": {
+    "case_id": "tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif",
+    "file_name": "0.26_TmAgGe.mcif",
+    "result": {
+      "acc": "mmmC",
+      "conf": "Coplanar",
+      "gspg": {
+        "effective_mpg_symbol": "mm21'",
+        "npg_symbol_s": "C2",
+        "output_mode": "explicit_ops",
+        "point_part_linear": "1|m 2_{001}|m 2_{001}|2",
+        "real_space_setting": "G0std",
+        "spin_frame_setting": "ossg_oriented_spin_frame",
+        "spin_only_component_symbol_s": "Cs",
+        "spin_only_part_linear": "m|1",
+        "symbol_linear": "1|m 2_{001}|m 2_{001}|2 m|1",
+        "symbol_mode": "npg_x_spin_only",
+        "tentative_symbol_s": "C2 x Cs"
+      },
+      "index": "38.6.1.2.P2",
+      "phase": "FM/FiM",
+      "properties": {
+        "ahc_w_soc": "Yes",
+        "ahc_wo_soc": "No",
+        "is_alter": "",
+        "is_spin_orbit_magnet": "",
+        "ss_w_soc": "Yes",
+        "ss_wo_soc": "Zeeman"
+      }
+    },
+    "status": "ok",
+    "tensor_summary": {
+      "AHE_wSOC": {
+        "free_parameters": 1,
+        "is_zero": false,
+        "relations_count": 1
+      },
+      "AHE_woSOC": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "BCDTensor": {
+        "free_parameters": 2,
+        "is_zero": false,
+        "relations_count": 2
+      },
+      "IMDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      },
+      "MSGBCDTensor": {
+        "free_parameters": 2,
+        "is_zero": false,
+        "relations_count": 2
+      },
+      "MSGIMDTensor": {
+        "free_parameters": 1,
+        "is_zero": false,
+        "relations_count": 1
+      },
+      "MSGQMDTensor": {
+        "free_parameters": 3,
+        "is_zero": false,
+        "relations_count": 4
+      },
+      "QMDTensor": {
+        "free_parameters": 0,
+        "is_zero": true,
+        "relations_count": 0
+      }
+    }
+  }
+}

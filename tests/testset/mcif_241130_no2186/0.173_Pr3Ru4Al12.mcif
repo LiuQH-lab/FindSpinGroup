@@ -1,0 +1,131 @@
+##CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 20/02/2018 19:01:43
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-02-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        97
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            014431
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.97.014431
+
+loop_
+_citation_author_name
+"M.S. Henriques"
+"D.I. Gorbunov"
+"A.V. Andreev"
+"X. Fabreges"
+"A. Gukasov"
+"M. Uhlarz"
+"V. Petricek"
+"B. Ouladdiaf"
+"J. Wosnitza"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  39
+_experiment_temperature  10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5+ 2  2  special  primary  1  .
+mGM2+ 1  1  .        "secondary?" 1 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+Single crystal ND
+Below 7K another phase is stabilized with a spin reorientation (see #0.174)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Very rare case, together with the other phase at lower temperature (see #0.174), where a strong magnetic splitting of a site is reported, with two atoms that are equivalent in the paramagnetic structure having very different spin moduli.
+The reported symmetry breaking is reached through the presence of a spin mode according to a 2-dim irrep mGM5+ along a special direction, which accordingly must be taken as a primary order parameter. The MSG is not maximal and a secondary spin mode transforming according to the irrep mGM2+ and compatible with a higher hexagonal symmetry is also present in the spin arrangement. However, the amplitude of this second spin mode is much larger than the one that formally is the primary one.  Being rather fundamental in the spin arrangement. Therefore its role does not seem to be a mere secondary induced effect,
+;
+
+_parent_space_group.name_H-M_alt  'P  6_3/m  m  c  '
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,a+2b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  63.462
+_space_group_magn.name_BNS  "C  m'  c'  m"
+_cell_length_a             8.85800
+_cell_length_b             8.85800
+_cell_length_c             9.62400
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z+1/2,+1
+3 -x,-y,-z,+1
+4 x,y,-z+1/2,+1
+5 x-y,-y,-z,-1
+6 -x+y,y,-z+1/2,-1
+7 -x+y,y,z,-1
+8 x-y,-y,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Pr1_1 Pr 0.19165 0.38330 0.25000
+Pr1_2 Pr  0.61670 0.80835 0.25000
+Ru1 Ru 0.00000 0.00000 0.00000
+Ru2_1 Ru 0.50000 0.00000 0.00000
+Ru2_2 Ru  0.00000 0.50000 0.00000
+Al1_1 Al 0.56176 0.12352 0.25000
+Al1_2 Al  0.87648 0.43824 0.25000
+Al2_1 Al 0.83771 0.67542 0.07558
+Al2_2 Al  0.32458 0.16229 0.07558
+Al3 Al 0.33333 0.66667 0.00781
+Al4 Al 0.00000 0.00000 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Pr1_1 0.00000 0.00000 3.1(3) 0,0,mz
+Pr1_2 0.00000 0.00000 1.4(2) 0,0,mz
+
+

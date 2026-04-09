@@ -1,0 +1,117 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 04/05/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-05-04
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        10
+_citation_page_first            685
+_citation_page_last             689
+_citation_article_id            .
+_citation_year                  1972
+_citation_DOI                   10.1016/0038-1098(72)90586-8
+
+loop_
+_citation_author_name
+"R. Chamard-Bois"
+"N. Nhung"
+"J. Yakinthos"
+"M. Wintenberger"
+
+_atomic_positions_source_database_code_ICSD  103294
+_atomic_positions_source_other               .
+
+_temperature_position_structure         .
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            293
+
+_transition_temperature  3.3
+_experiment_temperature  1.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX5+  6  2  special  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Cell parameters determined at room temperature
+Direction of the spins on the ab plane is undetermined. Here a direction of maximal symmetry is taken.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim small irrep along a special direction as primary
+The star of the active irrep has three k-vectors. This is the 1k model, which is considered in the paper more likely than multi-k models involving more than one vector, which could equally fit the data.
+;
+
+_parent_space_group.name_H-M_alt  'P m -3 m'
+_parent_space_group.IT_number                       221
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a,b;0,0,0'
+
+_space_group_magn.number_BNS  51.298
+_space_group_magn.name_BNS  "P_a m m a"
+_cell_length_a             3.36100
+_cell_length_b             3.36100
+_cell_length_c             6.72200
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z+1/2,+1 
+3 x,-y,-z,+1 
+4 -x,y,-z+1/2,+1 
+5 -x,-y,-z,+1 
+6 x,y,-z+1/2,+1 
+7 -x,y,z,+1 
+8 x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Er1 Er 0.00000 0.00000 0.00000
+Rh1 Rh 0.50000 0.50000 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Er1 6.1(3) 0.00000 0.00000 mx,0,0  6.1(3)
+

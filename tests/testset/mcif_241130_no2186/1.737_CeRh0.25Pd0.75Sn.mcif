@@ -1,0 +1,162 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/06/2023
+# From a mCIF file provided by Clemens Ritter
+
+data_5yOhtAoR
+_audit_creation_date            2023-02-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ce1 Rh0.25 Pd0.75 Sn1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        106
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            064436
+_citation_year                  2022
+_citation_DOI                   10.1103/PhysRevB.106.064436
+
+loop_
+_citation_author_name
+"R. Tripathi"
+"D.T. Adroja"
+"C. Ritter"
+"S. Sharma"
+"C. Yang"
+"A.D. Hillier"
+"M. Koza"
+"F. Demmel"
+"A. Sundaresan"
+"S. Langridge"
+"W. Higemoto"
+"T.U. Ito"
+"A.M. Strydom"
+"G.B.G. Stenning"
+"A. Bhattacharyya"
+"D. Keen"
+"H.C. Walker"
+"R.S. Perry"
+"F. Pratt"
+"Q. Si"
+"T. Takabatake"
+
+_temperature_position_structure         1.5
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     1.3
+_experiment_temperature     0.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA4 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 1.5K. According to the structure determination the compound composition deviates from the nominal one, being CeRh0.2Pd0.8Sn
+This commensurate magnetic structure appears below TN2=1.3K. It coexists with the incommensurate one with k=[0,0,0.4] which appears below TN1=5 K (see #1.1.143). 
+Assuming equal magnetic moment values in a phase separated system the magnetic moment amounts in both phases at 0.5 K to about 1.37 Bohr magneton.
+;
+
+_active_magnetic_irreps_details
+;
+1k commensurate magnetic structure
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  "P -6 2 m"
+_parent_space_group.IT_number                       189
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  "a,b,2c;0,0,0"
+_space_group_magn.transform_BNS_Pp_abc  "a,b,c;0,0,1/4"
+
+_space_group_magn.number_BNS  190.232
+_space_group_magn.name_BNS  "P_c -6 2 c"
+_space_group_magn.point_group_name  "-6m21'"
+_space_group_magn.point_group_number  "26.2.96"
+_cell_length_a                 7.53050
+_cell_length_b                 7.53050
+_cell_length_c                 8.25260
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              120.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x-y,z,+1 
+3 -x+y,-x,z,+1 
+4 x-y,-y,-z+1/2,+1 
+5 y,x,-z+1/2,+1 
+6 -x,-x+y,-z+1/2,+1 
+7 -x+y,-x,-z,+1 
+8 x,y,-z,+1 
+9 -y,x-y,-z,+1 
+10 -x,-x+y,z+1/2,+1 
+11 x-y,-y,z+1/2,+1 
+12 y,x,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ce1 Ce 0.58570 0.00000 0.00000 1.00000
+Rh1 Rh 0.00000 0.00000 0.00000 0.19992
+Pd1 Pd 0.00000 0.00000 0.00000 0.79992
+Rh2 Rh 0.33333 0.66667 0.25000 0.19998
+Pd2 Pd 0.33333 0.66667 0.25000 0.79998
+Sn1 Sn 0.24880 0.00000 0.25000 1.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ce1 0.0 0.0 -1.37(1) 0,0,mz 1.37(1) ? ?
+

@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/26/2024
+
+data_5yOhtAoR
+_audit_creation_date            2024-12-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Fe2 Se3 O12 H6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "APL Mater."
+_citation_journal_volume        12
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            .
+_citation_year                  2024
+_citation_DOI                   10.1063/5.0241243
+
+loop_
+_citation_author_name
+"E. E. Oyeka"
+"X. Huai"
+"M. Marshall"
+"M. J. Winiarski"
+"A. Blachowski"
+"H. Cao"
+"T. T. Tran"
+
+_temperature_position_structure         298
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     77
+_experiment_temperature      5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3 2 2 special primary 4 .
+mGM1 1 1 . secondary? 2 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Position structure from a determination at 298K
+FM along a.
+A second magnetic phase below 4K with unknown structure is reported.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+mGM3 along a special direction, corresponding to the spin component on the xy plane, is the primary irrep yielding the observed MSG, but the secondary irrep mGM1 associated wit the mz components has a similar weight in the reported spin arrangement, and therefore it does not seem to be secondary. The two irreps contribute to the arrangement with similar importance.
+Apparently the authors have not tried models restricted to a single irrep on the xy plane.
+;
+
+_parent_space_group.name_H-M_alt  'R 3 c'
+_parent_space_group.IT_number                       161
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/3a+2/3b+2/3c,-a,-1/3a-2/3b+1/3c;1/5,9/10,0'
+
+
+_space_group_magn.number_BNS  9.37
+_space_group_magn.name_BNS  "C c"
+_space_group_magn.point_group_name  "m"
+_space_group_magn.point_group_number  "4.1.9"
+_cell_length_a                 9.36430
+_cell_length_b                 9.36430
+_cell_length_c                 20.28080
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+y+1/3,y+2/3,z+1/6,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/3,y+2/3,z+2/3,+1 
+3 x+2/3,y+1/3,z+1/3,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Se1_1 Se 0.76648 0.61327 0.72006 1
+Se1_2 Se 0.38673 0.15321 0.72006 1
+Se1_3 Se 0.84679 0.23352 0.72006 1
+Fe1 Fe 0.00000 0.00000 0.00030 1
+Fe2 Fe 0.00000 0.00000 0.26848 1
+O1_1 O 0.81740 0.53130 0.78470 1
+O1_2 O 0.46870 0.28610 0.78470 1
+O1_3 O 0.71390 0.18260 0.78470 1
+O2_1 O 0.94080 0.80050 0.71189 1
+O2_2 O 0.19950 0.14030 0.71189 1
+O2_3 O 0.85970 0.05920 0.71189 1
+O3_1 O 0.81360 0.52750 0.65680 1
+O3_2 O 0.47250 0.28610 0.65680 1
+O3_3 O 0.71390 0.18640 0.65680 1
+O4_1 O 0.61610 0.47020 0.90050 1
+O4_2 O 0.52980 0.14590 0.90050 1
+O4_3 O 0.85410 0.38390 0.90050 1
+H1_1 H 0.59200 0.53800 0.88500 1
+H1_2 H 0.46200 0.05400 0.88500 1
+H1_3 H 0.94600 0.40800 0.88500 1
+H2_1 H 0.58200 0.43800 0.93900 1
+H2_2 H 0.56200 0.14400 0.93900 1
+H2_3 H 0.85600 0.41800 0.93900 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 -0.92(8) 1.7(1) -4.3(1) mx,my,mz 4.86(6) ? ?
+Fe2 0.2(1) -0.4(2) -2.3(2) mx,my,mz 2.4(1) ? ?
+

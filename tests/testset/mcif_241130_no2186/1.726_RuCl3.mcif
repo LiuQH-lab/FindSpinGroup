@@ -1,0 +1,145 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/27/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-27
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ru1 Cl3"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Physics: Conference Series"
+_citation_journal_volume        746
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            012060
+_citation_year                  2016
+_citation_DOI                   10.1088/1742-6596/746/1/012060
+
+loop_
+_citation_author_name
+"C. Ritter"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  20717
+_atomic_positions_source_other               .
+
+_transition_temperature     14
+_experiment_temperature     1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL2 3 1 . primary 8 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+alpha-RuCl3
+Positional structure including non-magnetic atoms from a determination at room temperature by another work and retrieved from the ICSD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim small irrep
+The star of the irrep has 3 k-vectors. Multi-k arrangements with more then one k-vector of the irrep involved, which could equally fit the data, were not considered.
+MSG is polar along the (2,1,0) direction
+;
+
+_parent_space_group.name_H-M_alt  'P 3_1 1 2'
+_parent_space_group.IT_number                       151
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b+c,a+b,c;0,0,0'
+
+_space_group_magn.number_BNS  5.16
+_space_group_magn.name_BNS  "C_c 2"
+_space_group_magn.point_group_name  "21'"
+_space_group_magn.point_group_number  "3.2.7"
+_cell_length_a                 11.92000
+_cell_length_b                 5.96000
+_cell_length_c                 34.40000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,2x-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ru1_1 Ru 0.22200 0.55600 0.16667 1
+Ru1_2 Ru 0.55600 0.55600 0.00000 1
+Ru2_1 Ru 0.38900 0.22200 0.16667 1
+Ru2_2 Ru 0.22200 0.22200 0.00000 1
+Cl1_1 Cl 0.38900 0.55600 0.45835 1
+Cl1_2 Cl 0.72200 0.22200 0.62502 1
+Cl1_3 Cl 0.88900 0.22200 0.79168 1
+Cl2_1 Cl 0.22200 0.88900 0.45835 1
+Cl2_2 Cl 0.55550 0.55500 0.62502 1
+Cl2_3 Cl 0.22250 0.55600 0.79168 1
+Cl3_1 Cl 0.05550 0.22200 0.45835 1
+Cl3_2 Cl 0.88900 0.88900 0.62502 1
+Cl3_3 Cl 0.05550 0.88900 0.79168 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ru1_1 0.58 0.29 0.0 mx,my,mz 0.5(1) ? ?
+Ru1_2 0.58 0.29 0.0 2my,my,0 0.5(1) ? ?
+Ru2_1 0.58 0.29 0.0 mx,my,mz 0.5(1) ? ?
+Ru2_2 -0.58 -0.29 0.0 2my,my,0 0.5(1) ? ?
+

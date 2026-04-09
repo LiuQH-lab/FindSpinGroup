@@ -1,0 +1,138 @@
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+# --- Magnetic Structure Data ---
+
+data_UGUXD7ZQ
+_audit_creation_date               2018-09-23
+_audit_creation_method             'Bilbao Crystallographic Server'
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        92
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            224408
+_citation_year                  2015
+_citation_DOI                   10.1103/PhysRevB.92.224408
+
+loop_
+_citation_author_name
+"A.R. Wildes"
+"V. Simonet"
+"E. Ressouche"
+"G.J. McIntyre"
+"M. Avdeev"
+"E. Suard"
+"S.A.J. Kimber"
+"D. Lançon"
+"G. Pepe"
+"B. Moubaraki"
+"T.J. Hicks"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  155
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1+  1  1  .  primary  2  .
+mY2+  1  1  .  primary  4  .
+mY2-  1  1  .  primary  2  .
+mY1-  1  1  .  secondary 1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD, NSD, polarized and unpolarized
+The model reported in tables and figures of the original reference, and reproduced here, is inconsistent with the statement in the same reference that it involves only two irreps. Three irreps are in fact required. The model breaks all the point-group symmetry operations. Only the C-centering as an anti-centering is left.
+See entry #1.230 for a completely different model of the same phase, with a single irrep active and monoclinic symmetry.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Three irreps active as primary
+Centrosymmetry is broken and the system is polar.
+moments: N1: 1.05; N2: 1.06
+;
+
+
+_parent_space_group.name_H-M_alt            "C 2/m"
+_parent_space_group.IT_number               12
+_parent_space_group.transform_Pp_abc        "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1  [0 1 0]
+
+_parent_space_group.child_transform_Pp_abc   "a,b,c;0,0,0"
+_space_group_magn.transform_BNS_Pp_abc      '-c,b,a+b;0,0,0'
+
+_space_group_magn.number_BNS           1.3
+_space_group_magn.name_BNS             "P_S 1"
+_space_group_magn.point_group_name     "?"
+_space_group_magn.point_group_number   ?
+_cell_length_a                     5.81100
+_cell_length_b                     10.06400
+_cell_length_c                     6.59400
+_cell_angle_alpha                  90.0000
+_cell_angle_beta                   106.997
+_cell_angle_gamma                  90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1   x,y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1   x,y,z,+1
+2   x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ni1_1     Ni  0.000000  0.333350  0.000000  0.866000
+Ni1_2     Ni  0.000000  0.666650  0.000000  0.866000
+Ni2     Ni  0.000000  0.000000  0.000000  0.236000
+P1_1      P  0.058800  0.000000  0.170000  0.754000
+P1_2      P  0.441200  0.500000  0.830000  0.754000
+P2_1      P  0.058800  0.333500  0.170000  0.115000
+P2_2      P  0.441200  0.166500  0.830000  0.115000
+P2_3      P  0.058800  0.666500  0.170000  0.115000
+P2_4      P  0.441200  0.833500  0.830000  0.115000
+S1_1      S  0.242700  0.500000  0.244200  1.000000
+S1_2      S  0.257300  0.000000  0.755800  1.000000
+S2_1      S  0.249200  0.330700  0.756700  1.000000
+S2_2      S  0.250800  0.169300  0.243300  1.000000
+S2_3      S  0.249200  0.669300  0.756700  1.000000
+S2_4      S  0.250800  0.830700  0.243300  1.000000
+
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1_1   0.94(3)   0.0 -0.26(4)         mx,my,mz
+Ni1_2  -0.94(3)   0.0  0.26(4)         mx,my,mz
+Ni2   1.0(5)   0.5(6) 0.0(9)         mx,my,mz
+   

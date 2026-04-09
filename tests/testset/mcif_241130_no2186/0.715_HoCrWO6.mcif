@@ -1,0 +1,141 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 17/08/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-08-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ho Cr W O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev       "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        514
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            167219
+_citation_year                  2020
+_citation_DOI                   10.1016/j.jmmm.2020.167219
+
+loop_
+_citation_author_name
+"C. Dhitala"
+"D. Phamb"
+"T. Lawalb"
+"C. Bucholza"
+"A. Poyrazc"
+"Q. Zhangd"
+"R. Nepale"
+"R. Jine"
+"R. Raif"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_temperature_position_structure         300
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  24.5
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1  1  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at 300K
+Figure in the article is inconsistent with respect to the sign of some moment components when compared with the tables in the article and in the supplementary material. The tables have been assumed correct.
+See #0.316 for a similar phase of DyCrWO6, where a model with much lower symmetry is reported with two primary irreps involved.
+See #0.716 for the magnetic structure at 18K reported in the same article
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim primary irrep
+;
+
+_parent_space_group.name_H-M_alt  'P n a 2_1'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  33.144
+_space_group_magn.name_BNS  "P n a 2_1"
+_cell_length_a             10.87240
+_cell_length_b             5.16610
+_cell_length_c             7.30960
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z+1/2,+1 
+3 -x+1/2,y+1/2,z+1/2,+1 
+4 x+1/2,-y+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+W1 W 0.35440 0.44400 0.00400
+Ho1 Ho 0.04310 0.45460 0.25000
+Cr1 Cr 0.13250 0.95300 0.99900
+O1 O 0.97290 0.76840 0.04300
+O2 O 0.52140 0.25600 0.96100
+O3 O 0.21420 0.61700 0.06300
+O4 O 0.29150 0.12700 0.93500
+O5 O 0.14310 0.05950 0.25500
+O6 O 0.11910 0.82940 0.74400
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Ho1 -0.91(5) 5.65(3) 6.53(2) mx,my,mz  8.7(4)
+Cr1 0.00000 -2.32(5) 0.00000 mx,my,mz  2.32(5)
+

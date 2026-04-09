@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/24/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-09-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Bi4 Fe5 O13 F"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        96
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            094420
+_citation_year                  2017
+_citation_DOI                   10.1103/PhysRevB.96.094420
+
+loop_
+_citation_author_name
+"A. A,Tsirlin"
+"I. Rousochatzakis"
+"D. Filimonov"
+"D. Batuk"
+"M. Frontzek"
+"A. M. Abakumov"
+
+_temperature_position_structure         1.5
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  189146
+_atomic_positions_source_other               .
+
+_transition_temperature     178
+_experiment_temperature     80
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM5- 2 2 special primary 10 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Three magnetic phases are reported in the temperature interval 178 -1.5K, all having the same MSG.
+Except for the magnetic atoms, the positional structure, including the cell parameters, are not given in the publication. Here those retrieved from ICSD for a different study at 1.5K are used.
+The magnetic structure is also reported at other various temperatures in the interval 178K-1.5K (see the other entries)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special direction as primary
+The model includes some ad-hoc relation between the moments of symmetry independent atoms, which is not symmetry forced neither by the MSG nor by the active irrep.
+;
+
+_parent_space_group.name_H-M_alt  'P 4_2/m b c'
+_parent_space_group.IT_number                       135
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,1/4,0'
+
+_space_group_magn.number_BNS  86.73
+_space_group_magn.name_BNS  "P_C 4_2/n"
+_space_group_magn.point_group_name  "4/m1'"
+_space_group_magn.point_group_number  "11.2.36"
+_cell_length_a                 11.7192
+_cell_length_b                 11.7192
+_cell_length_c                 18.0501
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y+1/2,x+1/2,z+1/2,+1 
+3 y+1/2,-x+1/2,z+1/2,+1 
+4 -x,-y,z,+1 
+5 -x+1/2,-y+1/2,-z,+1 
+6 y,-x,-z+1/2,+1 
+7 -y,x,-z+1/2,+1 
+8 x+1/2,y+1/2,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1_1 Fe 0.25000 0.25000 0.0783 1.0000
+Fe1_2 Fe 0.25000 0.75000 0.0783 1.0000
+Fe2_1 Fe 0.0057 0.8429 0.00000 1.0000
+Fe2_2 Fe 0.3429 0.0057 0.00000 1.0000
+Fe3 Fe 0.25000 0.25000 0.25000 1.0000
+Bi1_1 Bi 0.00501 0.66439 0.15718 1.0000
+Bi1_2 Bi 0.00501 0.83561 0.34282 1.0000
+O1_1 O 0.00000 0.00000 0.00000 0.5000
+O1_2 O 0.00000 0.50000 0.50000 0.5000
+O2_1 O 0.70772 0.58406 0.58635 1.0000
+O2_2 O 0.70772 0.91594 0.91365 1.0000
+O3_1 O 0.77220 0.36270 0.00000 1.0000
+O3_2 O 0.77220 0.13730 0.50000 1.0000
+O4   O 0.74370 0.57620 0.75000 1.0000
+O5_1 O 0.86070 0.72073 0.33318 1.0000
+O5_2 O 0.86070 0.77927 0.16682 1.0000
+F1_1 F 0.00000 0.00000 0.25840 0.2500
+F1_2 F 0.00000 0.50000 0.25840 0.2500
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1_1 -1.68 3.45 0.0 mx,my,0 3.84(5)  116(1)   90
+Fe1_2  1.99 0.97 0.0 mx,my,0 2.21(5)   26(1)   90
+Fe2_1 -2.18 1.42 0.0 mx,my,0 2.60(3)  147(2)   90
+Fe2_2 -1.42 -2.18 0.0 mx,my,0 2.60(3) -123(2)  90
+Fe3    0.0 0.0 0.0 mx,my,0  0.0       .      .

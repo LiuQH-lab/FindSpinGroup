@@ -1,0 +1,182 @@
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 25/02/2018 18:07:37
+
+data_5yOhtAoR
+_audit_creation_date            2018-02-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        95
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            174431
+_citation_year                  2017
+_citation_DOI                   10.1103/PhysRevB.95.174431
+
+loop_
+_citation_author_name
+"A. Sazonov"
+"V. Hutanu"
+"M. Meven"
+"G. Roth"
+"H. Murakawa"
+"Y. Tokura"
+"V.K. Guduru"
+"L.C.J.M. Peters"
+"U. Zeitler"
+"L.F. Kiss"
+"D. Szaller"
+"B. Nafradi"
+"I. Kezsmarki"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  ?
+_atomic_positions_source_other               "Acta Crystallogr. B 72, 126 (2016)"
+
+_transition_temperature  5.7
+_experiment_temperature  2.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5  2  2  special  primary  2  .
+mDT1  4  2  special  secondary 3 no
+mDT2  4  2  special  secondary 3 no
+mSM1  4  2  special  secondary 3 no
+mSM2  4  2  special  secondary 3 no
+
+_exptl_crystal_magnetic_properties_details
+;
+Single crystal ND
+Positional structure from a measurement at 10K (see reference), except for the positions of the magnetic sites that are reported with the magnetic model.
+At higher temperatures the paramagnetic state exhibits several phases: a parent P-42_1m phase, an incomensurate phase and a lock-in phase below 270-160K with SG P2_12_12 and a 3x3x1 supercell.
+90º degrees related domains are reported.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+The high temperature phase with SG P-42_1m is taken here as parent phase for the representational analysis.
+The irrep decomposition of the structure therefore includes non-magnetic irreps that are not listed here. The propagation vector given above refers to the spin arrangement. The presence of the structural modulation allows the presence of non-zero magnetic propagation vectors, as induced secondary harmonics: DT ((0,1/3,0),(1/3,0,0)) and SM ((1/3,1/3,0), (1/3,-1/3,0)). Their amplitudes are however negligible.
+The refinement of a model with all symmetry-allowed spin parameters set free yielded deviations smaller than the standard deviations from the present simpler model, which is constrained to the compatible k=0 magnetic irrep (along a special direction). The role of this irrep can be considered primary when considered together with the structural modulation that reduces the SG to P2_12_12.
+;
+
+_parent_space_group.name_H-M_alt  'P  -4  2_1  m'
+_parent_space_group.IT_number                       113
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  18.19
+_space_group_magn.name_BNS  "P  2_12_1'2'"
+_cell_length_a             23.52000
+_cell_length_b             23.52000
+_cell_length_c             5.03000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z,+1
+3 x+1/2,-y+1/2,-z,-1
+4 -x,-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ca1 Ca 0.10860 0.05270 0.50300
+Ca2 Ca 0.11450 0.39230 0.49000
+Ca3 Ca 0.05540 0.22450 0.49900
+Ca4 Ca 0.27460 0.11140 0.51500
+Ca5 Ca 0.26770 0.45110 0.47500
+Ca6 Ca 0.21530 0.26640 0.51900
+Ca7 Ca 0.44090 0.05250 0.51700
+Ca8 Ca 0.45050 0.39730 0.51600
+Ca9 Ca 0.40280 0.21150 0.49200
+Co1 Co 0.00000 0.00000 0.001
+Co2 Co 0.0066 0.3352 0.017
+Co3 Co 0.1628 0.1636 -0.006
+Co4 Co 0.3336 0.0018 0.015
+Co5 Co 0.3340 0.3313 0.0017
+Si1 Si 0.04180 0.12140 0.93400
+Si2 Si 0.05060 0.45680 0.92000
+Si3 Si 0.12410 0.28620 0.08100
+Si4 Si 0.21240 0.04110 0.07100
+Si5 Si 0.21600 0.38120 0.03200
+Si6 Si 0.28270 0.20810 0.96300
+Si7 Si 0.38270 0.12340 0.94400
+Si8 Si 0.38300 0.45490 0.93500
+Si9 Si 0.45200 0.28110 0.05600
+O1 O 0.99170 0.16470 0.82200
+O2 O 0.17400 0.98540 0.17420
+O3 O 0.17970 0.32650 0.17240
+O4 O 0.34010 0.17580 0.83600
+O5 O 0.00000 0.50000 0.79500
+O6 O 0.04230 0.11830 0.24500
+O7 O 0.05050 0.45820 0.23540
+O8 O 0.12470 0.28220 0.75100
+O9 O 0.21650 0.04360 0.75400
+O10 O 0.20800 0.38470 0.72200
+O11 O 0.27760 0.20320 0.27380
+O12 O 0.38630 0.12090 0.25800
+O13 O 0.38620 0.45840 0.26300
+O14 O 0.46240 0.27600 0.74430
+O15 O 0.02500 0.06200 0.77100
+O16 O 0.09860 0.14350 0.77300
+O17 O 0.03420 0.39550 0.77700
+O18 O 0.10390 0.47980 0.75350
+O19 O 0.13880 0.22660 0.22490
+O20 O 0.07110 0.31250 0.22390
+O21 O 0.18260 0.09530 0.22390
+O22 O 0.27130 0.03010 0.23000
+O23 O 0.18640 0.43570 0.20640
+O24 O 0.27790 0.37940 0.17060
+O25 O 0.28700 0.27280 0.83380
+O26 O 0.23010 0.17990 0.79530
+O27 O 0.35620 0.06740 0.79150
+O28 O 0.44030 0.13710 0.78770
+O29 O 0.38090 0.38790 0.83100
+O30 O 0.43500 0.48210 0.78200
+O31 O 0.48410 0.22760 0.21850
+O32 O 0.39180 0.28310 0.18090
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 2.79(1) -0.07(6) 0.00000 mx,my,0
+Co2 2.79000 -0.07 0.00000 mx,my,mz
+Co3 -2.79000 -0.07 0.00000 mx,my,mz
+Co4 2.79000 -0.07 0.00000 mx,my,mz
+Co5 2.79000 -0.07 0.00000 mx,my,mz
+
+

@@ -1,0 +1,143 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 13/03/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-13
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        95
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            054413
+_citation_year                  2017
+_citation_DOI                   10.1103/PhysRevB.95.054413
+
+loop_
+_citation_author_name
+"M. Zhu"
+"K.V. Shanavas"
+"Y. Wang"
+"T. Zou"
+"W.F. Sun"
+"W. Tian"
+"V.O. Garlea"
+"A. Podlesnyak"
+"M. Matsuda"
+"M.B. Stone"
+"D. Keavney"
+"Z.Q. Mao"
+"D.J. Singh"
+"X. Ke"
+
+
+
+_atomic_positions_source_database_code_ICSD  188554
+_atomic_positions_source_other               .
+
+_transition_temperature  64
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mDT2  4  1  special  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure here from a room temperature model taken from the icsd, which does not include the Fe substitution.
+This magnetic structure cannot be distinguished from another one of maximal symmetry, where all the Ru sites have non-zero moments (see #1.318) (The diffraction data cannot determine the phase of the spin wave)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+2-dim irrep within the k and -k subspace along a special direction (special phase of the spin wave) as primary.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 1/4 0]
+
+_parent_space_group.child_transform_Pp_abc  '4a,4b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,1/4a-1/4b,1/2a+1/2b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  63.466
+_space_group_magn.name_BNS  "C_c m c m"
+_cell_length_a             15.50040
+_cell_length_b             15.50040
+_cell_length_c             12.72780
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z,+1
+3 -y+1/4,-x+1/4,-z,+1
+4 y+1/4,x+1/4,-z,+1
+5 -x,-y,-z,+1
+6 x,y,-z,+1
+7 y+1/4,x+1/4,z,+1
+8 -y+1/4,-x+1/4,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/8,y+7/8,z+1/2,+1
+3 x+1/4,y+3/4,z,+1
+4 x+3/8,y+5/8,z+1/2,+1
+5 x+1/2,y+1/2,z,+1
+6 x+5/8,y+3/8,z+1/2,+1
+7 x+3/4,y+1/4,z,+1
+8 x+7/8,y+1/8,z+1/2,+1
+9 x+1/8,y+3/8,z+1/2,-1
+10 x+1/4,y+1/4,z,-1
+11 x+3/8,y+1/8,z+1/2,-1
+12 x+1/2,y,z,-1
+13 x+5/8,y+7/8,z+1/2,-1
+14 x+3/4,y+3/4,z,-1
+15 x+7/8,y+5/8,z+1/2,-1
+16 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Sr1_1 Sr 0.00000 0.00000 0.35830
+Sr1_2 Sr  0.12500 0.12500 0.85830
+Ru1_1 Ru 0.00000 0.00000 0.00000
+Ru1_2 Ru  0.12500 0.12500 0.50000
+O1 O 0.00000 0.12500 0.00000
+O2_1 O 0.00000 0.00000 0.17220
+O2_2 O  0.12500 0.12500 0.67220
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ru1_1 0.00000 0.00000 0.4 0,0,mz
+Ru1_2 0.00000 0.00000 0.00000 0,0,0

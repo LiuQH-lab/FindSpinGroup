@@ -1,6 +1,6 @@
 import argparse
 import sys
-from .find_spin_group import find_spin_groups
+from .find_spin_group import find_spin_group
 
 
 def main():
@@ -8,11 +8,21 @@ def main():
     parser.add_argument("cif_file", help="Path to the CIF file")
     parser.add_argument("--space_tol", type=float, default=0.02, help="Spatial tolerance")
     parser.add_argument("--mtol", type=float, default=0.02, help="Magnetic tolerance")
+    parser.add_argument("--meigtol", type=float, default=0.00002, help="Point-group eigenvalue tolerance")
+    parser.add_argument("--matrix_tol", type=float, default=0.01, help="Point-group standardization tolerance")
+    parser.add_argument("--parser_atol", type=float, default=0.02, help="CIF/SCIF parser expansion tolerance")
 
     args = parser.parse_args()
 
     try:
-        result = find_spin_groups(args.cif_file, space_tol=args.space_tol, mtol=args.mtol)
+        result = find_spin_group(
+            args.cif_file,
+            space_tol=args.space_tol,
+            mtol=args.mtol,
+            meigtol=args.meigtol,
+            matrix_tol=args.matrix_tol,
+            parser_atol=args.parser_atol,
+        )
         print(result)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

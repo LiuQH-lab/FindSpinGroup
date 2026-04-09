@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        97
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            054431
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.97.054431
+
+loop_
+_citation_author_name
+"A.S. Cavichini"
+"M.T. Orlando"
+"J.B. Depianti"
+"J.L. Passamai"
+"F. Damay"
+"F. Porcher"
+"E. Granado"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  121
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+  1  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Parent structure in non-standard P2_1/n setting.
+FM along the b direction.
+The fit could not distinguish the sign of the FM my component for the Mn atoms. The fit was undistinguishable for positive and negative values. Here from the two possibilities, the one where the spin follows the tilt of the octahedra is chosen.
+
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,a+c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.75
+_space_group_magn.name_BNS  "P  2_1/c"
+_cell_length_a             5.42500
+_cell_length_b             5.64480
+_cell_length_c             7.71650
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.28
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ca1 Ca 0.48730 0.55544 0.25310
+Mn1 Mn 0.50000 0.00000 0.50000
+Re1 Re 0.50000 0.00000 0.00000
+O1 O 0.31820 0.28110 0.05630
+O2 O 0.21120 0.81190 0.04840
+O3 O 0.59850 0.96880 0.23220
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 -2.41(3) -0.8(3) -3.53(3) mx,my,mz
+Re1 -0.16(4) 0.00000 0.15(4) mx,my,mz

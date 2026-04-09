@@ -1,0 +1,122 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-21
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        13
+_citation_page_first            121
+_citation_page_last             124
+_citation_article_id            ?
+_citation_year                  1979
+_citation_DOI                   10.1016/0304-8853(79)90044-1
+
+loop_
+_citation_author_name
+"W. Scharf"
+"H. Weitzel"
+"I. Yaeger"
+"I. Maartense"
+"B. Wanklyn"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  15854
+_atomic_positions_source_other               .
+
+_transition_temperature  1.97
+_experiment_temperature  1.65
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY2  2  2  special  primary  4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Spin modulus 3.05(3) and 59(2) degrees as canting angle with the x-axis
+A more recent work (J. Magn. Magn. Mat. 151, 123 (1995)) corrects spin modulus and canting angle to 3.2 and 29.9, respectively.
+Above 1.97K, up to 2.96K, an incommensurate phase exists
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+2-dim irrep active along a special direction
+Non-collinear structure. Zero spin y-component is dictated by symmetry
+;
+
+_parent_space_group.name_H-M_alt  'P  b  c  n'
+_parent_space_group.IT_number                       60
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,b;1/4,1/8,1/4'
+
+
+_space_group_magn.number_BNS  19.28
+_space_group_magn.name_BNS  "P_c2_12_12_1"
+_cell_length_a             14.14750
+_cell_length_b             11.42400
+_cell_length_c             5.04460
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/4,-z,+1
+3 -x+1/2,-y+3/4,z+1/2,+1
+4 -x,y+1/2,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1_1 Co 0.00000 0.09090 0.25000
+Co1_2 Co  0.00000 0.90910 0.75000
+Nb1_1 Nb 0.16160 0.16210 0.74450
+Nb1_2 Nb  0.83840 0.83790 0.25550
+O1_1 O 0.09520 0.19830 0.43290
+O1_2 O  0.90480 0.80170 0.56710
+O2_1 O 0.07530 0.05765 0.88840
+O2_2 O  0.92470 0.94235 0.11160
+O3_1 O 0.25230 0.06190 0.56930
+O3_2 O  0.74770 0.93810 0.43070
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1_1 1.57 0.00000 2.61 mx,0,mz
+Co1_2 1.57 0.00000 2.61 mx,0,mz
+
+

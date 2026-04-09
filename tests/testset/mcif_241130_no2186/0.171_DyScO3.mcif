@@ -1,0 +1,126 @@
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/02/2018 19:06:05
+# icsd_99545_Pnma_par_modified.cif
+
+data_5yOhtAoR
+_audit_creation_date            2018-02-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        96
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            ?
+_citation_year                  144407
+_citation_DOI                   10.1103/PhysRevB.96.144407
+
+loop_
+_citation_author_name
+"L.S. Wu"
+"S.E. Nikitin"
+"M. Frontzek"
+"A.I. Kolesnikov"
+"G. Ehlers"
+"M.D. Lumsden"
+"K.A. Shaykhutdinov"
+"E.-J. Guo"
+"A.T. Savici"
+"Z. Gai"
+"A.S. Sefat"
+"A. Podlesnyak"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  99545
+_atomic_positions_source_other               .
+
+_transition_temperature  3.15
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1- 1  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+1-dim single irrep active
+The parent structure has been transformed to the Pnma standard setting
+Parent structure has been taken from icsd_99545 but lattice parameters have been changed to those reported in the reference (10K).
+Magnetic symmetry allows linear magnetoelectric effect
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a  '
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  62.449
+_space_group_magn.name_BNS  "P  n  'm  'a  '"
+_cell_length_a             5.66900
+_cell_length_b             7.85150
+_cell_length_c             5.41360
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z+1/2,+1
+3 -x,y+1/2,-z,+1
+4 -x+1/2,-y,z+1/2,+1
+5 -x,-y,-z,-1
+6 -x+1/2,y+1/2,z+1/2,-1
+7 x,-y+1/2,z,-1
+8 x+1/2,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Dy1 Dy 0.00000 0.25000 0.00000
+Sc1 Sc 0.00000 0.00000 0.50000
+O1 O 0.55500 0.25000 0.88040
+O2 O 0.30400 0.93920 0.69260
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Dy1 8.36(2) 0.00000 4.44(3) mx,0,mz
+
+

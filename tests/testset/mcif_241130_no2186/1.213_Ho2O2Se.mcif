@@ -1,0 +1,113 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/03/2018 23:13:54
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-12
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        10
+_citation_page_first            735
+_citation_page_last             738
+_citation_article_id            ?
+_citation_year                  1972
+_citation_DOI                   10.1016/0038-1098(72)90182-2
+
+loop_
+_citation_author_name
+"G. Quezel"
+"J. Rossat-Mignod"
+"H.Y. Lang"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  25809
+_atomic_positions_source_other               .
+
+_transition_temperature  4
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM1- 3  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+unit cell parameters taken from a room-temperature structure (icsd 25809). Atomic positions from the reference.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1 single irrep active, small irrep is 1-dim
+The irrep star has three wave vectors (1/2,0,0), (0,1/2,0) and (1/2,1/2,0) which correspond to the propagation vectors of three equivalent domain-related descriptions of the spin arrangement.
+Canting along y is allowed within the MSG and the irrep, but collinearity is symmetry forced.
+;
+
+_parent_space_group.name_H-M_alt  'P  -3m  1'
+_parent_space_group.IT_number                       164
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '-a-b,a-b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,-a,-b;-1/4,-1/4,0'
+
+
+
+_space_group_magn.number_BNS  13.73
+_space_group_magn.name_BNS  "P_A  2/c"
+_cell_length_a             3.80700
+_cell_length_b             6.59390
+_cell_length_c             6.76600
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,-z,+1
+3 -x+1/2,-y+1/2,-z,+1
+4 -x+1/2,y+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ho1 Ho 0.50000 0.83334 0.287
+Se1 Se 0.00000 0.00000 0.00000
+O1 O 0.50000 0.83334 0.619
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ho1 0.00000 0.00000 9.3(2) 0,my,mz
+
+

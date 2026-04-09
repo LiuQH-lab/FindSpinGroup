@@ -1,0 +1,150 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/06/2025
+# From a file submitted by V. Petricek
+
+data_5yOhtAoR
+_audit_creation_date            2025-01-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Zn1 Fe2 O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        109
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            064421
+_citation_year                  2024
+_citation_DOI                   10.1103/PhysRevB.109.064421
+
+loop_
+_citation_author_name
+"Margarita G. Dronova"
+"Vaclav Petricek"
+"Zachary Morgan"
+"Feng Ye"
+"Daniel M. Silevitch"
+"Yejun Feng"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     10
+_experiment_temperature     6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mW2 12 4 special primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+4-dim small irrep along a special direction
+The paper discusses several possible models. This is the one considered the best.
+The star of the active irrep has 3 k-vectors. Possible multi-k solutions were also considered and discarded.
+;
+
+_parent_space_group.name_H-M_alt  "F d-3 m"
+_parent_space_group.IT_number                       227
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;3/8,3/8,3/8'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  121.332
+_space_group_magn.name_BNS  "I_c -4 2 m"
+_space_group_magn.point_group_name  "-42m.1'"
+_space_group_magn.point_group_number  "14.2.49"
+_cell_length_a                 8.5379
+_cell_length_b                 8.5379
+_cell_length_c                 17.0758
+_cell_angle_alpha              90
+_cell_angle_beta               90
+_cell_angle_gamma              90
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z,+1 
+3 y,-x,-z,+1 
+4 -y,x,-z,+1 
+5 -x,y,-z,+1 
+6 x,-y,-z,+1 
+7 -y,-x,z,+1 
+8 y,x,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+3 x+1/2,y+1/2,z+1/2,+1 
+4 x+1/2,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Zn1_1 Zn 0.25 0.25 -0.125 1
+Zn1_2 Zn 0 0 -0.25 1
+Zn1_3 Zn -0.5 0 -0.5 1
+Fe1_1 Fe -0.375 0.125 -0.1875 1
+Fe1_2 Fe 0.125 0.125 -0.4375 1
+O1_1 O -0.13524 0.13524 -0.18238 1
+O1_2 O -0.63524 0.13524 -0.43238 1
+O1_3 O 0.38524 0.11476 -0.19262 1
+O1_4 O 0.11476 0.11476 -0.05738 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1_1 2.392(7) 2.392(7) 0.53(2) mx,mx,mz 3.42 ? ?
+Fe1_2 1.860(8) -1.860(8) 0.0 mx,-mx,0 2.63 ? ?
+

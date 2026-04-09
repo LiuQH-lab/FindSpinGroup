@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/18/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-11-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Lu Mn6 Sn6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Alloys and Compounds"
+_citation_journal_volume        200
+_citation_page_first            51
+_citation_page_last             57
+_citation_article_id            .
+_citation_year                  1993
+_citation_DOI                   10.1016/0925-8388(93)90470-8
+
+loop_
+_citation_author_name
+"G. Venturini"
+"R. Welter"
+"B. Malaman"
+"E. Ressouche"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  57416
+_atomic_positions_source_other               .
+
+_transition_temperature     353
+_experiment_temperature     300
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA6+ 2 2 special primary 2 .
+mA3+ 1 1  .  secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The direction of the moments on the ab plane is undetermined. A direction of maximal symmetry has been assumed.
+An incommensurate magnetic phase at lower temperatures.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep along a special direction.
+A secondary irrep is symmetry allowed, but not present.
+;
+
+_parent_space_group.name_H-M_alt  'P 6/m m m'
+_parent_space_group.IT_number                       191
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,2a+b,c;0,0,0'
+
+_space_group_magn.number_BNS  63.466
+_space_group_magn.name_BNS  "C_c m c m"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 5.50700
+_cell_length_b                 5.50700
+_cell_length_c                 17.98800
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-x+y,-z,+1 
+3 x,x-y,-z+1/2,+1 
+4 -x,-y,z+1/2,+1 
+5 -x,-y,-z,+1 
+6 x,x-y,z,+1 
+7 -x,-x+y,z+1/2,+1 
+8 x,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Lu1 Lu 0.00000 0.00000 0.25000 1
+Mn1_1 Mn 0.50000 0.00000 0.12800 1
+Mn1_2 Mn 0.00000 0.50000 0.12800 1
+Sn1 Sn 0.33333 0.66667 0.00000 1
+Sn2 Sn 0.33333 0.66667 0.25000 1
+Sn3 Sn 0.00000 0.00000 0.08320 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1_1 0.0 1.33(1) 0.0 mx,my,0 1.33(1) ? ?
+Mn1_2 0.0 1.33(1) 0.0 0,my,0 1.33(1) ? ?
+

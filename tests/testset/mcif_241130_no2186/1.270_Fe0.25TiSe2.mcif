@@ -1,0 +1,127 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2019-01-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Rev. Phys. Appl."
+_citation_journal_volume        22
+_citation_page_first            1131
+_citation_page_last             1138
+_citation_article_id            ?
+_citation_year                  1987
+_citation_DOI                   10.1051/rphysap:0198700220100113100
+
+loop_
+_citation_author_name
+"G. Calvarin"
+"J. Gavarri"
+"M.A. Buhannic"
+"P. Colombet"
+"M. Danot"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  68276
+_atomic_positions_source_other               .
+
+_transition_temperature  75
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mB2  2  1  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+This one of the two models discussed for this composition. A second one, with a very small magnetic moment on the Ti site, which in contrast with the analogous model for Fe0.48TiSe2 (see #1.269) drastically lowers the magnetic symmetry and implies the activity of a second irrep, is also reported.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+2-dim irrep active along special direction.
+The propagation vector in the standard setting (C2/m) of the parent space group is (1/2,0,1/4) (plane B)
+;
+
+_parent_space_group.name_H-M_alt  'F 2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'c,-b,1/2a-1/2c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+c,b,c;1/4,0,1/8'
+
+
+
+_space_group_magn.number_BNS  15.90
+_space_group_magn.name_BNS  "C_c 2/c"
+_cell_length_a             12.32290
+_cell_length_b             7.13250
+_cell_length_c             23.78780
+_cell_angle_alpha          90.00
+_cell_angle_beta           89.67
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y,-z+3/4,+1
+3 -x+1/2,-y,-z+1/4,+1
+4 x,-y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+3 x,y,z+1/2,-1
+4 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.00000 0.00000 0.00000 0.912
+Ti1 Ti 0.00000 0.00000 0.00000 0.088
+Ti2_1 Ti 0.49590 0.00000 0.12520 0.978
+Ti2_2 Ti 0.50410 0.00000 0.87480 0.978
+Fe2_1 Fe 0.49590 0.00000 0.12520 0.022
+Fe2_2 Fe 0.50410 0.00000 0.87480 0.022
+Ti3_1 Ti 0.25000 0.25920 0.87500 0.978
+Ti3_2 Ti 0.25000 0.75920 0.12500 0.978
+Fe3_1 Fe 0.25000 0.25920 0.87500 0.022
+Fe3_2 Fe 0.25000 0.75920 0.12500 0.022
+Se1_1 Se 0.41560 0.74660 0.18965 1.
+Se1_2 Se 0.58440 0.74660 0.81035 1.
+Se2_1 Se 0.33200 0.00000 0.31230 1.
+Se2_2 Se 0.66800 0.00000 0.68770 1.
+Se3_1 Se 0.16490 0.00000 0.19075 1.
+Se3_2 Se 0.83510 0.00000 0.80925 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.00000 0.00000 4.03(9) mx,0,mz

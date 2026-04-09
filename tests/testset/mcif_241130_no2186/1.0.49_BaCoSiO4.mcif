@@ -1,0 +1,174 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/28/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-09-28
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ba1 Co1 Si1 O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "NATURE COMMUNICATIONS"
+_citation_journal_volume        12
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            5339
+_citation_year                  2021
+_citation_DOI                   10.1038/s41467-021-25657-6
+
+loop_
+_citation_author_name
+"L. Ding"
+"X. Xu"
+"H. O. Jeschke"
+"X. Bai"
+"E. Feng"
+"A. S. Alemayehu"
+"J. Kim"
+"F.-T. Huang"
+"Q. Zhang"
+"X. Ding"
+"N. Harrison"
+"V. Zapf"
+"D. Khomskii"
+"I. I. Mazin"
+"S.-W. Cheong"
+"H. Cao"
+
+_temperature_position_structure         10
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     3.2
+_experiment_temperature     1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK1 2 1 special primary 6 .
+mGM1 1 1 .  secondary  3  yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+See #0.724 for a different magnetic phase under magnetic field along c.
+Position structure from a determination at 10K
+Information in the original reference is incomplete. The model here has been constructed with some asumptions inferred from the figures in the paper. Some misinterpretation may have occurred.
+Weak FM along c
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim (k,-k) irrep along a special direction as primary
+A second 1-dim irrep is allowed as secondary, and it is present in the reported spin arrangement.
+The proposed spin arrangement implies a very specific combination of the contributions from the primary and secondary irreps.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3'
+_parent_space_group.IT_number                       173
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '-a-2b,2a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  173.129
+_space_group_magn.name_BNS  "P 6_3"
+_space_group_magn.point_group_name  "6"
+_space_group_magn.point_group_number  "21.1.76"
+_cell_length_a                 15.78310
+_cell_length_b                 15.78310
+_cell_length_c                 8.64470
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x-y,x,z+1/2,+1 
+3 -y,x-y,z,+1 
+4 -x,-y,z+1/2,+1 
+5 -x+y,-x,z,+1 
+6 y,-x+y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1_1 Ba 0.00000 0.00000 0.25000 1
+Ba1_2 Ba 0.33334 0.66667 0.25000 1
+Ba1_3 Ba 0.33334 0.66667 0.75000 1
+Ba2 Ba 0.66667 0.00000 0.22110 1
+Ba3 Ba 0.66667 0.00000 0.72100 1
+Co1_1 Co 0.77634 0.22867 0.53000 1
+Co1_2 Co 0.10966 0.89533 0.53000 1
+Co1_3 Co 0.55700 0.43800 0.03000 1
+Si1_1 Si 0.56166 0.11083 0.43100 1
+Si1_2 Si 0.89500 0.77750 0.43100 1
+Si1_3 Si 0.77166 0.55583 0.93100 1
+O1_1 O 0.64741 0.20661 0.52270 1
+O1_2 O 0.98073 0.87327 0.52270 1
+O1_3 O 0.68593 0.46006 0.02270 1
+O2_1 O 0.55296 0.00883 0.49040 1
+O2_2 O 0.88630 0.67550 0.49040 1
+O2_3 O 0.78036 0.65783 0.99040 1
+O3_1 O 0.12524 0.44317 0.44700 1
+O3_2 O 0.45856 0.10983 0.44700 1
+O3_3 O 0.20810 0.22350 0.94700 1
+O4_1 O 0.80516 0.26483 0.75130 1
+O4_2 O 0.13850 0.93150 0.75130 1
+O4_3 O 0.52816 0.40183 0.25130 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Co1_1 1.565 3.13 0.0 mx,my,mz 2.71(5) ? ?
+Co1_2 1.565 3.13 0.0 mx,my,mz 2.71(5) ? ?
+Co1_3 1.565 3.13 0.0 mx,my,mz 2.71(5) ? ?
+

@@ -1,0 +1,140 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 19/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "phys. stat. sol. (b)"
+_citation_journal_volume        63
+_citation_page_first            699
+_citation_page_last             707
+_citation_article_id            .
+_citation_year                  1974
+_citation_DOI                   10.1002/pssb.2220630234
+
+loop_
+_citation_author_name
+"M. Melamud"
+"H. Pinto"
+"J. Makovsky"
+"H. Shared"
+
+_atomic_positions_source_database_code_ICSD  27511
+_atomic_positions_source_other  
+
+_temperature_position_structure         293
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .             .
+
+_transition_temperature  21.5
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK3  2  1  special  primary  1  .
+mGM4+ 1  1   .      secondary 1  yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD and NSD
+Position structure from another study at 293K 
+Moment magnitude is from the NSD. A quite different magnitude of 3.0(3) is reported for the fit of NPD data.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special direction as primary
+A k=0 component (third harmonic) according to irrep mGM4+ is allowed by the MSG, and it is present in the model. This secondary contribution is necessary in order to have the same moment magnitude in the two symmetry independent Co sites, as considered in the model.
+See #1.0.9 for another similar model of this structure, but with different moment magnitudes of the two independent Co atoms
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '-a-2b,2a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  193.259
+_space_group_magn.name_BNS  "P 6_3'/m' c m'"
+_cell_length_a             12.47410
+_cell_length_b             12.47410
+_cell_length_c             6.03150
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x-y,z,+1 
+3 -x+y,-x,z,+1 
+4 y,x,-z+1/2,+1 
+5 -x,-x+y,-z+1/2,+1 
+6 x-y,-y,-z+1/2,+1 
+7 -x,-y,-z,+1 
+8 y,-x+y,-z,+1 
+9 x-y,x,-z,+1 
+10 -y,-x,z+1/2,+1 
+11 x,x-y,z+1/2,+1 
+12 -x+y,y,z+1/2,+1 
+13 x-y,x,z+1/2,-1 
+14 -x,-y,z+1/2,-1 
+15 y,-x+y,z+1/2,-1 
+16 -x+y,y,-z,-1 
+17 -y,-x,-z,-1 
+18 x,x-y,-z,-1 
+19 -x+y,-x,-z+1/2,-1 
+20 x,y,-z+1/2,-1 
+21 -y,x-y,-z+1/2,-1 
+22 x-y,-y,z,-1 
+23 y,x,z,-1 
+24 -x,-x+y,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1_1 Co 0.00000 0.00000 0.00000
+Co1_2 Co 0.33333 0.66667 0.00000
+Cs1 Cs 0.66667 0.00000 0.75000
+Cl1_1 Cl 0.84550 0.00000 0.25000
+Cl1_2 Cl 0.17884 0.66667 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1_1 0.00000 0.00000 2.3(3) 0,0,mz  2.3(3)
+Co1_2 0.00000 0.00000 -2.3 0,0,mz    2.3
+

@@ -1,0 +1,162 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:20:24
+# Database entry: 3.3 Ho2RhIn8
+# Cif-like file for the case 3.3
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ho2 Rh In8'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        91
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            144404
+_citation_year                  2015
+_citation_DOI                   10.1103/PhysRevB.91.144404
+
+loop_
+_citation_author_name
+"P. Čermak"
+"K. Prokes"
+"B. Ouladdiaf"
+"M. Boehm"
+"M. Kratochvilova"
+"P. Javorsky"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     10.4
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1- 2 1 . primary 1 .
+mR2+ 2 1 . primary 1 .
+mGM3+ 1 1 . primary 1 .
+mA1- 1 1 . secondary? 1 present
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Phase AF2 stabilized under magnetic field along z
+Magnetic field along z: 4T
+;
+
+_active_magnetic_irreps_details
+;
+3k magnetic structure
+k-maximal magnetic symmetry
+4 k-vectors present, only 3 rational independent
+structure modelized assuming a spin flip phase.
+Four irreps active with four different propagation vectors
+The model equalizes the modulus of the four irrep spin waves
+The symmetry break only requires the presence of three of the four k-vectors. The distinction between primary and secondary spin waves is in this case arbitrary, as the four spin waves in the model have equal amplitude moduli.
+;
+
+_parent_space_group.name_H-M_alt  'P  4/m  m  m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k0 [0 0 0]
+k1 [1/2 0 0]
+k2 [0 1/2 1/2]
+k3 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;1/4,0,0'
+
+
+_space_group_magn.number_BNS  63.464
+_space_group_magn.name_BNS  "C  m'  c  m'  "
+_space_group_magn.point_group_name  "m'm'm"
+_space_group_magn.point_group_number  "8.4.27"
+_cell_length_a                 9.12960
+_cell_length_b                 9.12960
+_cell_length_c                 23.90600
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z,+1
+3 -x+1/2,-y,-z,+1
+4 x+1/2,y,-z,+1
+5 -x+1/2,y,-z,-1
+6 x+1/2,-y,-z,-1
+7 x,-y,z,-1
+8 -x,y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ho1_1 Ho -0.50000 0.00000 0.84510 1
+Ho1_2 Ho -0.50000 0.00000 0.34510 1
+Ho1_3 Ho -0.50000 0.00000 0.15490 1
+Ho1_4 Ho -0.50000 0.00000 0.65490 1
+In1_1 In -0.50000 0.25000 0.25000 1
+In1_2 In -0.75000 0.00000 0.25000 1
+In2 In -0.75000 0.25000 0.15430 1
+In3_1 In -0.50000 0.25000 0.43775 1
+In3_2 In -0.50000 0.75000 0.06225 1
+In3_3 In -0.75000 0.00000 0.06225 1
+In3_4 In -0.25000 0.00000 0.56225 1
+Rh1_1 Rh -0.50000 0.00000 0.00000 1
+Rh2_2 Rh -0.50000 0.00000 0.50000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ho1_1 0.0 0.0 7.5(5) 0,0,mz
+Ho1_2 0.0 0.0 -7.5 0,0,mz
+Ho1_3 0.0 0.0 7.5 0,0,mz
+Ho1_4 0.0 0.0 7.5 0,0,mz
+

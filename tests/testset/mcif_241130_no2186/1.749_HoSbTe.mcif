@@ -1,0 +1,135 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/18/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-02-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ho1 Sb1 Te1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        61
+_citation_page_first            11399
+_citation_page_last             11409
+_citation_article_id            .
+_citation_year                  2022
+_citation_DOI                   10.1021/acs.inorgchem.2c01711
+
+loop_
+_citation_author_name
+"I. Plokhikh"
+"V. Pomjakushin"
+"D. J. Gawryluk"
+"O. Zaharko"
+"E. Pomjakushina"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     3
+_experiment_temperature     2.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1 4 2 special primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Below 1.7K this is the only phase observed. At the temperature of this reported model (2.5K) it coexists with anothe phase with k=(1/2,0,1/4)
+The model in the mcif file of the supplemental material is in a different setting and slightly differs from the model given in Table S1 and Table 2 of the article. The structure here is the one reported in these tables.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim small irrep along a special direction
+The irrep has two k-vectors in its star. Possible 2k-structures with the two k-vectors of the irrep star are not considered.
+;
+
+_parent_space_group.name_H-M_alt  'P 4/n m m'
+_parent_space_group.IT_number                       129
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  "P_a 2_1/m"
+_space_group_magn.name_BNS  11.55
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  5.2.13
+_cell_length_a                 8.4376(1)
+_cell_length_b                 4.2188(1)
+_cell_length_c                 9.1305(1)
+_cell_angle_alpha              90
+_cell_angle_beta               90
+_cell_angle_gamma              90
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y+1/2,-z,+1 
+3 -x,-y,-z,+1 
+4 x,-y+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ho1 Ho 0.875 0.25 0.2754 1
+Sb1 Sb 0.125 0.25 0  1
+Te2 Te 0.875 0.25 0.6220 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ho1 0.0 4.985(8) 0.0 0,my,0 4.985(8) ? ?
+

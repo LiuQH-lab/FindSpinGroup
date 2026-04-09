@@ -1,0 +1,140 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:18:09
+# Database entry: 1.165 Ni3TeO6
+# Cif-like file for the case 1.165
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ni3 Te O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        22
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            056002
+_citation_year                  2010
+_citation_DOI                   stacks.iop.org/JPhysCM/22/056002
+
+loop_
+_citation_author_name
+"I. Živkovic"
+"K. Prsa"
+"O. Zaharko"
+"H. Berger"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   240377
+_atomic_positions_source_other               .
+
+_transition_temperature     52
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT1 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+propagation vector in original reference incorrectly identified as (0,0,1/2)
+The lattice parameters of icsd 240377 are defective; they have been corrected to approximate values based on icsd 27076
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (1 possible)
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'R  3'
+_parent_space_group.IT_number                       146
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 3/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-a,-b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  146.12
+_space_group_magn.name_BNS  "R_I  3"
+_space_group_magn.point_group_name  "31'"
+_space_group_magn.point_group_number  "16.2.61"
+_cell_length_a                 5.1
+_cell_length_b                 5.1
+_cell_length_c                 27.53400
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x-y,z,+1
+3 -x+y,-x,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z+1/3,+1
+3 x+2/3,y+1/3,z+2/3,+1
+4 x,y,z+1/2,-1
+5 x+1/3,y+2/3,z+5/6,-1
+6 x+2/3,y+1/3,z+1/6,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Te1 Te 0.00000 0.00000 0.35425 1
+Ni1 Ni 0.00000 0.00000 0.25329 1
+Ni2 Ni 0.00000 0.00000 0.10720 1
+Ni3 Ni 0.00000 0.00000 0.00634 1
+O1 O 0.62980 0.66990 0.14225 1
+O2 O 0.99300 0.63470 0.22265 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1 0.0 0.0 -2.03(2) 0,0,mz
+Ni2 0.0 0.0 2.03 0,0,mz
+Ni3 0.0 0.0 2.03 0,0,mz
+

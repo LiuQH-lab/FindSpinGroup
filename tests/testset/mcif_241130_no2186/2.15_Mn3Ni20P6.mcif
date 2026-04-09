@@ -1,0 +1,177 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:20:11
+# Database entry: 2.15 Mn3Ni20P6
+# Cif-like file for the case 2.15
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Mn3 Ni20 P6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Solid State Chemistry"
+_citation_journal_volume        237
+_citation_page_first            343
+_citation_page_last             384
+_citation_article_id            .
+_citation_year                  2016
+_citation_DOI                   10.1016/j.jssc.2016.02.028
+
+loop_
+_citation_author_name
+"J. Cedervall"
+"P. Beran"
+"M. Vennstrom"
+"T. Danielsson"
+"S. Ronneteg"
+"V. Hoglin"
+"D. Lindell"
+"O. Eriksson"
+"G. Andre"
+"Y. Andersson"
+"P. Nordblad"
+"M. Sahlberg"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   72351
+_atomic_positions_source_other               .
+
+_transition_temperature     29
+_experiment_temperature     26
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX5+ 6 2 special primary 2 .
+mDT5 12 2 special primary 3 .
+mGM4+ 3 3 special secondary 2 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a room temperature measurement
+two other phases, one commensurate and one incommensurate, above 29K and below 25K respectively.
+Above 29K, Mn2 is not ordered
+;
+
+_active_magnetic_irreps_details
+;
+
+;
+
+_parent_space_group.name_H-M_alt  'F  m  -3m'
+_parent_space_group.IT_number                       225
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1]
+k2 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,-a,c;0,0,1/4'
+
+
+_space_group_magn.number_BNS  65.486
+_space_group_magn.name_BNS  "C  m  m'  m'  "
+_space_group_magn.point_group_name  "m'm'm"
+_space_group_magn.point_group_number  "8.4.27"
+_cell_length_a                 11.08500
+_cell_length_b                 11.08500
+_cell_length_c                 22.17000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z+1/2,+1
+3 -x,-y,-z+1/2,+1
+4 x,-y,z,+1
+5 x,-y,-z+1/2,-1
+6 -x,-y,z,-1
+7 -x,y,z,-1
+8 x,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1_1 Mn 0.00000 0.00000 0.00000 1
+Mn1_2 Mn 0.00000 0.50000 0.25000 1
+Mn1_3 Mn 0.00000 0.50000 0.75000 1
+Mn2_1 Mn 0.25000 0.25000 0.12500 1
+Mn2_2 Mn 0.25000 0.25000 0.62500 1
+Ni1_1 Ni 0.38290 0.38290 0.19145 1
+Ni1_2 Ni 0.61710 0.38290 0.80855 1
+Ni1_3 Ni 0.38290 0.88290 0.44145 1
+Ni1_4 Ni 0.38290 0.88290 0.94145 1
+Ni2_1 Ni 0.00000 0.82550 0.91275 1
+Ni2_2 Ni 0.00000 0.82550 0.08725 1
+Ni2_3 Ni 0.82550 0.00000 0.91275 1
+Ni2_4 Ni 0.82550 0.00000 0.08725 1
+Ni2_5 Ni 0.82550 0.82550 0.00000 1
+Ni2_6 Ni 0.00000 0.32550 0.16275 1
+Ni2_7 Ni 0.82550 0.50000 0.16275 1
+Ni2_8 Ni 0.82550 0.32550 0.25000 1
+Ni2_9 Ni 0.00000 0.32550 0.66275 1
+Ni2_10 Ni 0.82550 0.50000 0.66275 1
+Ni2_11 Ni 0.82550 0.32550 0.75000 1
+P1_1 P 0.26470 0.00000 0.00000 1
+P1_2 P 0.00000 0.26470 0.00000 1
+P1_3 P 0.00000 0.00000 0.13235 1
+P1_4 P 0.00000 0.00000 0.86765 1
+P1_5 P 0.26470 0.50000 0.25000 1
+P1_6 P 0.00000 0.76470 0.25000 1
+P1_7 P 0.00000 0.50000 0.38235 1
+P1_8 P 0.26470 0.50000 0.75000 1
+P1_9 P 0.00000 0.76470 0.75000 1
+P1_10 P 0.00000 0.50000 0.88235 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1_1 0.0 2.2(3) 0.0 0,my,0
+Mn1_2 0.0 -2.2 0.0 0,my,0
+Mn1_3 0.0 -2.2 0.0 0,my,0
+Mn2_1 0.0 2.7(2) 0.0 mx,my,0
+Mn2_2 0.0 -2.7 0.0 mx,my,0
+

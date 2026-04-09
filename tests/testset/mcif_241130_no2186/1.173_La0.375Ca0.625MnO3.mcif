@@ -1,0 +1,158 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:18:32
+# Database entry: 1.173 La0.375Ca0.625MnO3
+# Cif-like file for the case 1.173
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'La0 .375Ca0 .625Mn O3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Solid State Chem."
+_citation_journal_volume        239
+_citation_page_first            99
+_citation_page_last             105
+_citation_article_id            .
+_citation_year                  2016
+_citation_DOI                   10.1016/j.jssc.2016.04.023
+
+loop_
+_citation_author_name
+"A. Martinelli"
+"M. Ferretti"
+"C. Ritter"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     150
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ1 2 2 special primary 9 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+parent structure is a structural distorted structure with triplication of the unit cell along a
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep active. MSG corresponds to one of the irrep epikernel.
+the refined spin model includes constraints not forced by the MSG or the active irrep.
+Polar magnetic symmetry along a (parent Pnma setting). Spin driven electric polarization along a is symmetry allowed. Possible type II multiferroic.
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,c,-a;0,1/4,1/8'
+
+
+_space_group_magn.number_BNS  26.72
+_space_group_magn.name_BNS  "P_b  m  c  2_1"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 16.22910
+_cell_length_b                 7.50560
+_cell_length_c                 10.84720
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z+1/4,+1
+3 x,-y+1/2,z,+1
+4 x+1/2,y,-z+1/4,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1_1 La 0.00370 0.25000 0.49340 0.375
+La1_2 La 0.49630 0.75000 0.74340 0.375
+Ca1_1 Ca 0.00370 0.25000 0.49340 0.625
+Ca1_2 Ca 0.49630 0.75000 0.74340 0.625
+La2_1 La 0.34230 0.25000 0.00860 0.375
+La2_2 La 0.15770 0.75000 0.25860 0.375
+Ca2_1 Ca 0.34230 0.25000 0.00860 0.625
+Ca2_2 Ca 0.15770 0.75000 0.25860 0.625
+La3_1 La 0.17590 0.25000 0.25930 0.375
+La3_2 La 0.32410 0.75000 0.50930 0.375
+Ca3_1 Ca 0.17590 0.25000 0.25930 0.625
+Ca3_2 Ca 0.32410 0.75000 0.50930 0.625
+Mn1 Mn 0.00000 0.00000 0.25000 1.
+Mn2_1 Mn 0.16820 0.49850 0.00870 1.
+Mn2_2 Mn 0.33180 0.50150 0.25870 1.
+O1_1 O 0.33270 0.25000 0.22640 1.
+O1_2 O 0.16730 0.75000 0.47640 1.
+O2_1 O 0.15910 0.25000 0.03965 1.
+O2_2 O 0.34090 0.75000 0.28965 1.
+O3_1 O 0.50040 0.25000 0.03225 1.
+O3_2 O 0.99960 0.75000 0.28225 1.
+O4_1 O 0.24040 0.53450 0.14740 1.
+O4_2 O 0.25960 0.46550 0.39740 1.
+O5_1 O 0.07590 0.96360 0.11435 1.
+O5_2 O 0.42410 0.03640 0.36435 1.
+O6_1 O 0.09250 0.02740 0.36945 1.
+O6_2 O 0.40750 0.97260 0.61945 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 -2.4(1) 0.0 -2.9(2) mx,my,mz
+Mn2_1 2.4(1) 0.0 -0.3(1) mx,my,mz
+Mn2_2 -2.4 0.0 -0.3 mx,my,mz
+

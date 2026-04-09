@@ -1,0 +1,150 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:19:04
+# Database entry: 1.184 Na2Co2TeO6
+# Cif-like file for the case 1.184
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Na2 Co2 Te O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        94
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            214416
+_citation_year                  2016
+_citation_DOI                   10.1103/PhysRevB.94.214416
+
+loop_
+_citation_author_name
+"E. Lefrançois"
+"M. Songvilay"
+"J. Robert"
+"G. Nataf"
+"E. Jordan"
+"L. Chaix"
+"C.V. Colin"
+"P. Lejay"
+"A. Hadj-Azzem"
+"R. Ballou"
+"V. Simonet"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     27
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM2 3 1 . primary 4 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+small irrep is 1-dim: one to one correspondence between MSG and irrep.
+The MSG is of type IV, i.e. with gray magnetic point group symmetry that forbids any linear magnetoelectric effect. The original reference assigns a wrong MSG and erroneously reports the possibility of linear magnetoelectric effects.
+The MSG is orthorhombic but we describe it in an hexagonal parent-like setting, with the unit cell doubled along a.
+;
+
+_parent_space_group.name_H-M_alt  'P  6_322'
+_parent_space_group.IT_number                       182
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,b,c;1/4,1/4,1/4'
+
+
+_space_group_magn.number_BNS  19.29
+_space_group_magn.name_BNS  "P_C  2_12_12_1"
+_space_group_magn.point_group_name  "2221'"
+_space_group_magn.point_group_number  "6.2.18"
+_cell_length_a                 10.52540
+_cell_length_b                 5.26270
+_cell_length_c                 11.18200
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,2x-y,-z+1/2,+1
+3 -x+1/2,-2x+y,-z,+1
+4 -x,-y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1 Co 0.00000 0.00000 0.25000 1.
+Co2 Co 0.16667 0.66667 0.75000 1.
+Te1 Te 0.16667 0.66667 0.25000 1.
+O1_1 O 0.32900 0.98300 0.34690 1.
+O1_2 O 0.50850 0.67500 0.34690 1.
+O1_3 O 0.16250 0.34200 0.34690 1.
+Na1_1 Na 0.09500 0.62000 0.97000 0.082
+Na1_2 Na 0.69000 0.57000 0.97000 0.082
+Na1_3 Na 0.21500 0.81000 0.97000 0.082
+Na2 Na 0.00000 0.00000 0.00000 0.13
+Na3_1 Na 0.33500 0.05000 0.99000 0.24
+Na3_2 Na 0.97500 0.62000 0.99000 0.24
+Na3_3 Na 0.69000 0.33000 0.99000 0.24
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 0.0 2.95(3) 0.0 0,my,mz
+Co2 0.0 -2.5(3) 0.0 0,my,mz
+

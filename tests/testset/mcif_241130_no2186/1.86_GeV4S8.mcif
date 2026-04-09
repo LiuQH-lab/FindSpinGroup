@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:11:19
+# Database entry: 1.86 GeV4S8
+# Cif-like file for the case 1.86
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ge V4 S8'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Chem. Mater."
+_citation_journal_volume        18
+_citation_page_first            2174
+_citation_page_last             2180
+_citation_article_id            .
+_citation_year                  2006
+_citation_DOI                   10.1021/cm052809m
+
+loop_
+_citation_author_name
+"H. Muller"
+"W. Kockelmann"
+"D. Johrendt"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     13
+_experiment_temperature     4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM2 12 1 special primary 7 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The structure has been reported having as magnetic space group P_bmn2_1 (BNS notation) , but the figure and moments in the article are inconsistent with this symmetry. Probably there has been some confusion between the BNS and OG notations, and it was meant the group P_2bm'n2_1' (OG notation), which is the label of the magnetic space group P_ana2_1 (BNS) in OG notation, which is the one that actually describes the symmetry of the configuration shown in the article.
+According to the magnetic symmetry of the phase, the effective space group for the atomic positions is Pmn21, and the structure is being described in a standard setting for this space group, except for the doubling of the b parameter.
+A structural transition to a Imm2 phase has been reported to take place at 30K, prior to the magnetic ordering (PHYSICAL REVIEW B 77, 212102 2008).
+The magnetic ordering has been assumed to keep the structural symmetry, but the structure reported has a significant Pmn21 distortion, and deviates significantly from Imm2 symmetry.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+All possible k-maximal magnetic symmetries are polar along the z-axis, i.e. any magnetic ordering for this propagation vector is necessarily polar.
+The basis modes involved of the active irrep mSM2 include both those of k and -k.
+;
+
+_parent_space_group.name_H-M_alt  'F  -43m'
+_parent_space_group.IT_number                       216
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '-1/2a+1/2b,a+b,-c;5/8,1/8,1/2'
+_space_group_magn.transform_BNS_Pp_abc  'b,a,-c;3/4,0,1/2'
+
+
+_space_group_magn.number_BNS  33.149
+_space_group_magn.name_BNS  "P_a  n  a  2_1"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 6.8362(2)
+_cell_length_b                 13.587(1)
+_cell_length_c                 9.6384(4)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y,z+1/2,+1
+3 x+1/2,-y+1/2,z+1/2,+1
+4 -x,y+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+V1_1 V 0.2878(9) 0.1243(6) 0.1047(9) 1
+V1_2 V 0.00000 0.9724(7) 0.3841(4) 1
+V1_3 V 0.00000 0.7738(7) 0.3888(6) 1
+Ge1 Ge 0.00000 0.3756(8) 0.9968(6) 1
+S1_1 S 0.0000 0.0042(5) 0.6313(1) 1
+S1_2 S 0.0000 0.2454(4) 0.6323(4) 1
+S1_3 S 0.2366(3) 0.1316(5) 0.8712(3) 1
+S2_1 S 0.0000 0.0143(1) 0.1288(8) 1
+S2_2 S 0.0000 0.2405(3) 0.1339(5) 1
+S2_3 S 0.2703(1) 0.8760(9) 0.8675(3) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+V1_1 0.0 0.0 0.697(5) mx,my,mz
+V1_2 0.0 0.0 0.128(6) 0,my,mz
+V1_3 0.0 0.0 0.128(6) 0,my,mz
+

@@ -1,0 +1,146 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:09:25
+# Database entry: 1.49 Ag2NiO2
+# Cif-like file for the case 1.49
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ag2 Ni O2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        25
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            286005
+_citation_year                  2013
+_citation_DOI                   10.1088/0953-8984/25/28/286005
+
+loop_
+_citation_author_name
+"H. Nozaki"
+"M. Månsson"
+"B. Roessli"
+"V. Pomjakushin"
+"K. Kamazawa"
+"Y. Ikedo"
+"H.E. Fischer"
+"T.C. Hansen"
+"H. Yoshida"
+"Z. Hiroi"
+"J. Sugiyama"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     56
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mU2 2 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The propagation vector is reported as (1,1/3,1/2), equivalent to
+(0, 2/3, 1/2).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+The model includes a relation 1/2 between the moments of the two independent Ni atoms. This restricts the configuration to a primary irrep mode (spin wave) mU2. A second irrep mode mA2 with k2 = (0 0 1/2) is symmetry-allowed (third harmonic), and its possible presence makes the two Ni sites symmetry-independent, its collinearity not being symmetry-forced. The presence of this secondary third harmonic is also necessary to have a model with equal moduli of all moments.
+;
+
+_parent_space_group.name_H-M_alt  'C  2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 2/3 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,3b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  15.90
+_space_group_magn.name_BNS  "C_c  2/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 5.0421(3)
+_cell_length_b                 8.7462(6)
+_cell_length_c                 16.3698(6)
+_cell_angle_alpha              90.00
+_cell_angle_beta               101.491(6)
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x,-y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x,y,z+1/2,-1
+4 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ag1_1 Ag 0.217(2) 0.00000 0.32055(10) 1
+Ag1_2 Ag 0.717 0.166667 0.32055 1
+Ni1_1 Ni 0.00000 0.00000 0.00000 1
+Ni1_2 Ni 0.50000 0.166667 0.00000 1
+O1_1 O 0.378(2) 0.00000 0.06385(10) 1
+O1_2 O 0.878 0.166667 0.06385 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1_1 0.31 0.0 0.65 mx,0,mz
+Ni1_2 -0.155 0.0 -0.325 mx,0,mz
+

@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 18/09/2018 17:13:34
+
+data_5yOhtAoR
+_audit_creation_date            2018-09-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        98
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            094406
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.98.094406
+
+loop_
+_citation_author_name
+"J. Hembacher"
+"D.I. Badrtdinov"
+"L. Ding"
+"Z. Sobczak"
+"C. Ritter"
+"V.V. Mazurenko"
+"A.A. Tsirlin"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  79507
+_atomic_positions_source_other               .
+
+_transition_temperature  21
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL1- 2  1 . primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (1 possible)
+The spin arrangement shown in the figure of the article corresponds to the propagation vector (1/2,-1/2,1/2) and not to the mentioned (1/2,1/2,1/2). Both vectors are in the irrep star and correspond to equivalent domains.
+Positional structure taken from a icsd room temperature entry
+Probably the model refined is not distinguishable for NPD data from a 2k structure with the two wave vectors of the star involved, which is not mentioned.
+;
+
+_parent_space_group.name_H-M_alt  'C 2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 -1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/4a+1/4b,-1/4a+1/4b-1/2c,-1/2a+1/2b;1/8,7/8,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             16.42200
+_cell_length_b             10.55140
+_cell_length_c             15.63200
+_cell_angle_alpha          90.00
+_cell_angle_beta           94.78
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/4,-y+3/4,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/4,y+1/4,z,+1
+4 x+1/4,y+3/4,z+1/2,+1
+5 x+1/2,y,z+1/2,+1
+6 x+1/2,y+1/2,z,+1
+7 x+3/4,y+1/4,z+1/2,+1
+8 x+3/4,y+3/4,z,+1
+9 x+3/4,y+1/4,z,-1
+10 x+3/4,y+3/4,z+1/2,-1
+11 x,y+1/2,z,-1
+12 x,y,z+1/2,-1
+13 x+1/4,y+1/4,z+1/2,-1
+14 x+1/4,y+3/4,z,-1
+15 x+1/2,y+1/2,z+1/2,-1
+16 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ba1 Ba 0.00000 0.00000 0.00000
+Mo1 Mo 0.00000 0.00000 0.25000
+P1 P 0.31470 0.00000 0.14495
+O1_1 O 0.01210 0.13050 0.15615
+O1_2 O  0.98790 0.13050 0.84385
+O2 O 0.38260 0.00000 0.21960
+O3 O 0.34310 0.00000 0.05610
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mo1 0.82(3) 0.00000 0.84(3) mx,my,mz

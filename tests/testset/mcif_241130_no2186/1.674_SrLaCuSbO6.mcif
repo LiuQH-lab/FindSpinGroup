@@ -1,0 +1,153 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/19/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-09-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Sr1 La1 Cu1 Sb1 O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        105
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            054414
+_citation_year                  2022
+_citation_DOI                   10.1103/PhysRevB.105.054414
+
+loop_
+_citation_author_name
+"M. Watanabe"
+"N. Kurita"
+"H. Tanaka"
+"W. Ueno"
+"K. Matsui"
+"T. Goto"
+"M. Hagihala"
+
+_temperature_position_structure         20
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     13.6
+_experiment_temperature     3.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mD1-D2- 2 2 general primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 20K
+Non-standard parent setting P2_1/n 
+The propagation vector becomes (0 1/2 1/2) in the parent standard setting P2_1/c
+An alternative model with the moments along a could equally fit the data. 
+Apparently non-collinear models with the moments not aligned with the crystallographic axes were not tested.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim physically irreducible irrep along a general direction
+The two magnetic orderings with the spins along b discussed in the paper as different alternative models, which were not distinguishable by the data, are in fact twin-related equivalent arrangements. They are related by the two-fold rotation or the mirror plane broken by the magnetic arrangement. The two irreps discussed in the paper as alternative irreps for these two models are in fact complex conjugate one from the other. They constitute a single physically irreducible representation and they cannot give place to non-equivalent models.
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-1/2a+1/2b,c,b;0,1/4,0'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 11.00900
+_cell_length_b                 11.00730
+_cell_length_c                 8.38460
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.51
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y+1/2,z,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cu1_1 Cu 0.25000 0.00000 0.50000 1.
+Cu1_2 Cu 0.00000 0.25000 0.00000 1.
+La1_1 La 0.00549 0.01168 0.24861 0.5
+La1_2 La 0.24451 0.26168 0.25139 0.5
+Sr1_1 Sr 0.00549 0.01168 0.24861 0.5
+Sr1_2 Sr 0.24451 0.26168 0.25139 0.5
+Sb1_1 Sb 0.25000 0.00000 0.00000 1.
+Sb1_2 Sb 0.00000 0.25000 0.50000 1.
+O1_1 O 0.14145 0.14170 0.04046 1.
+O1_2 O 0.10855 0.39170 0.45954 1.
+O2_1 O 0.11015 0.39080 0.03937 1.
+O2_2 O 0.13985 0.64080 0.46063 1.
+O3_1 O 0.46380 0.24545 0.27164 1.
+O3_2 O 0.78620 0.49545 0.22836 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Cu1_1 0.0 0.39(3) 0.0 mx,my,mz 0.39(3) ? ?
+Cu1_2 0.0 0.39(3) 0.0 mx,my,mz 0.39(3) ? ?
+

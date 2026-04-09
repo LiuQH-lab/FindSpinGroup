@@ -1,0 +1,137 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-21
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        68
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            214419
+_citation_year                  2003
+_citation_DOI                   10.1103/PhysRevB.68.214419
+
+loop_
+_citation_author_name
+"K. Kaneko"
+"N. Metoki"
+"N. Bernhoeft"
+"G.H. Lander"
+"Y. Ishii"
+"S. Ikeda"
+"Y. Tokiwa"
+"Y. Haga"
+"Y. Ōnuki"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  86
+_experiment_temperature  9
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA3+  1  1  .  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD, NSD
+orbital moment mL=1.84(7), spin moment mS=-1.09(7)
+see also (Tokiwa et al, J. Phys. Soc. Jpn 71, 725 (2002))
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep active
+null moment at Ni site is symmetry forced
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m m m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,-1/2a+1/2b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  140.550
+_space_group_magn.name_BNS  "I_c 4/m c m"
+_cell_length_a             8.44920
+_cell_length_b             8.44920
+_cell_length_c             13.55020
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x,z,+1
+3 y,-x,z,+1
+4 y,x,-z+1/2,+1
+5 -y,-x,-z+1/2,+1
+6 -x,-y,z,+1
+7 -x,y,-z+1/2,+1
+8 x,-y,-z+1/2,+1
+9 -x,-y,-z,+1
+10 y,-x,-z,+1
+11 -y,x,-z,+1
+12 -y,-x,z+1/2,+1
+13 y,x,z+1/2,+1
+14 x,y,-z,+1
+15 x,-y,z+1/2,+1
+16 -x,y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+5 x,y,z+1/2,-1
+6 x,y+1/2,z,-1
+7 x+1/2,y,z,-1
+8 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+U1 U 0.00000 0.00000 0.00000
+Ni1 Ni 0.00000 0.00000 0.25000
+Ga1 Ga 0.25000 0.25000 0.00000
+Ga2 Ga 0.00000 0.25000 0.15350
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+U1 0.00000 0.00000 0.75(5) 0,0,mz
+Ni1 0.00000 0.00000 0.00000 0,0,0
+

@@ -1,0 +1,127 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 20/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        8
+_citation_page_first            1001
+_citation_page_last             1005
+_citation_article_id            .
+_citation_year                  1970
+_citation_DOI                   10.1016/0038-1098(70)90505-3
+
+loop_
+_citation_author_name
+"V. J. Minkiewicz"
+"D. E. Cox"
+"G. Shirane"
+
+_atomic_positions_source_database_code_ICSD  60261
+_atomic_positions_source_other               .
+
+_transition_temperature  11
+_experiment_temperature  5.13
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK3  2  1  special  primary  1  .
+mK5  4  2  special  primary  1  .
+mGM4+ 1  1  .  secondary 1  no
+mGM6+ 2 2  special secondary 1 no
+mK4  2  1  special secondary 1  no
+mK6  4 2   special secondary 1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD and NSD
+Improved models were published later
+The direction of the spin basal component is undetermined. The one chosen in this paper, namely (1,2,0) corresponds to a maximal symmetry. The other non-equivalent direction that maximizes the symmetry is (1,1,0) (or equivalent), which implies a different MSG: Cm'c2_1' (N. 36.174). This alternative direction is the one chosen in a modified model of the structure (see  #1.0.34).
+Although these two alternative models may be undistinguishable by NPD data, they are bound to exhibit quite different macroscopic properties: the Cm'c2_1' model is polar along c, which implies that some magnetically induced spontaneous polarization along this direction can exist, while the C22'2_1' model, reproduced here, is non-polar.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps as primary, i.e. two order parameters in the sense of Landau theory are present. One for the spin arrangement along c and another one for the one on the basal plane. Sucessive distinct phase transitions very close in temperature, corresponding to these two different order parameters, have been reported later.
+Four secondary irreps are symmetry-allowed, but are not present in the model.
+See #1.0.34 for a model of this structure with a non-zero contribution of one of these secondary irrep components, which breaks the exact 120 degrees spin rotation assumed in the present structure.
+Weak FM, corresponding to one of the secondary irreps is symmetry-allowed along the (1,2,0) direction.
+;
+ 
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/3a+2/3b,-a,c;0,0,1/4'
+
+
+
+_space_group_magn.number_BNS  20.34
+_space_group_magn.name_BNS  "C 2 2' 2_1'"
+_cell_length_a             20.76000
+_cell_length_b             20.76000
+_cell_length_c             5.87000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+y,y,-z+1/2,+1 
+3 x-y,-y,-z,-1 
+4 -x,-y,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/3,y+2/3,z,+1 
+3 x+2/3,y+1/3,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Rb1_1 Rb 0.11111 0.22222 0.75000
+Rb1_2 Rb  0.22222 0.11111 0.25000
+Ni1_1 Ni 0.00000 0.00000 0.00000
+Ni1_2 Ni  0.00000 0.33333 0.00000
+Ni1_3 Ni  0.00000 0.66667 0.00000
+Cl1_1 Cl 0.05333 0.10666 0.25000
+Cl1_2 Cl  0.89333 0.94667 0.25000
+Cl1_3 Cl  0.05333 0.44000 0.25000
+Cl1_4 Cl  0.89333 0.28000 0.25000
+Cl1_5 Cl  0.05333 0.28000 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Ni1_1 0.00000 0.00000 -1.50(15) mx,2mx,mz  1.50(15)
+Ni1_2 0.75 1.50 0.75 mx,2mx,mz  1.50
+Ni1_3 -0.75 -1.50 0.75 mx,2mx,mz  1.50
+

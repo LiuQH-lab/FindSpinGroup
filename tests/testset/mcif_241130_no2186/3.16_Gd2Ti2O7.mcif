@@ -1,0 +1,157 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 17/03/2018 16:45:58
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        16
+_citation_page_first            L321
+_citation_page_last             L326
+_citation_article_id            ?
+_citation_year                  2004
+_citation_DOI                   10.1088/0953-8984/16/28/L01
+
+loop_
+_citation_author_name
+"J.R. Stewart"
+"G. Ehlers"
+"A.S. Wills"
+"S.T. Bramwell"
+"J.S. Gardner"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  24207
+_atomic_positions_source_other               .
+
+_transition_temperature  0.7
+_experiment_temperature  0.05
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL2-  4  1  special-2  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+diffuse scattering
+This is the 4k structure considered as reference in the article, which reports an unspecified weak order of the Gd site with symmetry-forced zero moment. The presence of a non-zero moment on this site would imply a different lower symmetry for this phase.
+spin modulus: 7.0
+spin components given here with non-significant digits to yield the reported spin modulus
+;
+
+_active_magnetic_irreps_details
+;
+4k magnetic structure
+4k-maximal symmetry (6 possible)
+4-dim irrep active (11 possible MSGs possible for the same irrep involving from 1 to 4 k-vectors)
+An alternative 1k model for this phase has been reported in PhysRevB.64, 140407 (2001) (see #1.56)
+;
+
+_parent_space_group.name_H-M_alt  'F  d  -3  m'
+_parent_space_group.IT_number                       227
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+k2 [-1/2 1/2 1/2]
+k3 [1/2 -1/2 1/2]
+k4 [1/2 1/2 -1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;15/8,3/8,15/8'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  216.77
+_space_group_magn.name_BNS  "F_S-43m"
+_cell_length_a             20.37040
+_cell_length_b             20.37040
+_cell_length_c             20.37040
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,-z,+1
+3 -x,y,-z,+1
+4 -x,-y,z,+1
+5 z,x,y,+1
+6 y,z,x,+1
+7 -y,z,-x,+1
+8 -z,-x,y,+1
+9 -y,-z,x,+1
+10 z,-x,-y,+1
+11 y,-z,-x,+1
+12 -z,x,-y,+1
+13 -x,z,-y,+1
+14 -x,-z,y,+1
+15 -z,-y,x,+1
+16 z,-y,-x,+1
+17 y,-x,-z,+1
+18 -y,x,-z,+1
+19 -y,-x,z,+1
+20 y,x,z,+1
+21 x,-z,-y,+1
+22 x,z,y,+1
+23 -z,y,-x,+1
+24 z,y,x,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+5 x,y,z+1/2,-1
+6 x,y+1/2,z,-1
+7 x+1/2,y,z,-1
+8 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Gd1_1 Gd 0.06250 0.81250 0.06250
+Gd1_2 Gd  0.31250 0.18750 0.18750
+Ti1_1 Ti 0.31250 0.06250 0.31250
+Ti1_2 Ti  0.06250 0.93750 0.43750
+O1_1 O 0.12500 0.87500 0.12500
+O1_2 O  0.50000 0.00000 0.25000
+O1_3 O  0.25000 0.25000 0.25000
+O2_1 O 0.27565 0.87500 0.12500
+O2_2 O  0.12500 0.02565 0.12500
+O2_3 O  0.50000 0.15065 0.25000
+O2_4 O  0.50000 0.59935 0.50000
+O2_5 O  0.09935 0.25000 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Gd1_1 4.95 0.00000 -4.95 mx,0,-mx
+Gd1_2 0.00000 0.00000 0.00000 0,0,0
+
+

@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/02/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-02-03
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        3
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            111402(R)
+_citation_year                  2019
+_citation_DOI                   10.1103/PhysRevMaterials.3.111402
+
+loop_
+_citation_author_name
+"M.H. Karigerasi"
+"K. Kang"
+"A. Ramanathan"
+"D.L. Gray"
+"M.D. Frontzek"
+"H. Cao"
+"A. Schleife"
+"D.P. Shoemaker"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  270
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2  1  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure was included in the refinement but it is not reported. Here, the RT structure in the paramagnetic phase is used.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+1-dim irrep active as primary
+;
+
+_parent_space_group.name_H-M_alt  'P -6'
+_parent_space_group.IT_number                       174
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  174.135
+_space_group_magn.name_BNS  "P -6'"
+_cell_length_a             11.14180
+_cell_length_b             11.14180
+_cell_length_c             3.83110
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x-y,z,+1
+3 -x+y,-x,z,+1
+4 -x+y,-x,-z,-1
+5 x,y,-z,-1
+6 -y,x-y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cu1 Cu 0.24890 0.08680 0.00000 0.709
+Mn1 Mn 0.24890 0.08680 0.00000 0.291
+Cu2 Cu 0.58940 0.50430 0.00000 0.914
+Mn2 Mn 0.58940 0.50430 0.00000 0.086
+Cu3 Cu 0.42060 0.50300 0.50000 0.846
+Mn3 Mn 0.42060 0.50300 0.50000 0.154
+Mn4 Mn 0.19660 0.46820 0.00000 1.
+Mn5 Mn 0.80510 0.94220 0.50000 1.
+Mn6 Mn 0.80560 0.53100 0.50000 1.
+As1 As 0.33100 0.33540 0.00000 1.
+As2 As 0.67540 0.67210 0.50000 1.
+As3 As 0.00000 0.00000 0.00000 1.
+As4 As 0.33333 0.66667 0.50000 1.
+As5 As 0.66667 0.33333 0.00000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn4 3.02(8) 0.00000 0.00000 mx,my,0
+Mn5 3.02 0.00000 0.00000 mx,my,0
+Mn6 3.02 0.00000 0.00000 mx,my,0
+

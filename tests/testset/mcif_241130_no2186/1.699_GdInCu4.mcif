@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/26/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-10-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Gd1 In1 Cu4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        11
+_citation_page_first            1095
+_citation_page_last             1104
+_citation_article_id            .
+_citation_year                  1999
+_citation_DOI                   10.1088/0953-8984/11/4/017
+
+loop_
+_citation_author_name
+"H. Nakamura"
+"N. Kim"
+"M. Shiga"
+"R. Kmiec"
+"K. Tomala"
+"E. Ressouche"
+"J. P. Sanchez"
+"B. Malaman"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  627611
+_atomic_positions_source_other               .
+
+_transition_temperature     7
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mW1 6 1 special primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at room temperature by another work and retrieved from the ICSD
+Significant diffuse scattering is reported
+Half of the Gd moments remain disordered.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim small extended irrep (k,-k), along a special direction (special phase of the modulation)
+Zero moment in one of the split Gd sites is symmetry dictated
+;
+
+_parent_space_group.name_H-M_alt  'F -4 3 m'
+_parent_space_group.IT_number                       216
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;0,1/4,1/2'
+
+_space_group_magn.number_BNS  121.332
+_space_group_magn.name_BNS  "I_c -4 2 m"
+_space_group_magn.point_group_name  "-42m1'"
+_space_group_magn.point_group_number  "14.2.49"
+_cell_length_a                 7.22700
+_cell_length_b                 14.45400
+_cell_length_c                 7.22700
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y+1/2,-z,+1 
+3 -x,-y+1/2,z,+1 
+4 -x,y,-z,+1 
+5 z+1/2,-y+1/2,-x+1/2,+1 
+6 -z+1/2,-y+1/2,x+1/2,+1 
+7 -z+1/2,y,-x+1/2,+1 
+8 z+1/2,y,x+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+3 x,y+1/2,z,-1 
+4 x+1/2,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Gd1_1 Gd 0.00000 0.00000 0.00000 1
+Gd1_2 Gd 0.00000 0.25000 0.50000 1
+In1 In 0.25000 0.12500 0.25000 1
+Cu1_1 Cu 0.62550 0.31275 0.62550 1
+Cu1_2 Cu 0.62550 0.56275 0.12550 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Gd1_1 0.0 6.9(5) 0.0 0,my,0 6.9(5) ? ?
+Gd1_2 0.0 0.0 0.0 0,0,0 0.0 ? ?
+

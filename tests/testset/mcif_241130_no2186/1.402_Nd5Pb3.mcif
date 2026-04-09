@@ -1,0 +1,126 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 17/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        30
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            ?
+_citation_year                  2018
+_citation_DOI                   10.1088/1361-648X/aaaf3e
+
+loop_
+_citation_author_name
+"J.-Q. Yan"
+"M. Ochi"
+"H.B. Cao"
+"B. Saparov"
+"J.-G. Cheng"
+"Y. Uwatoko"
+"R. Arita"
+"B.C. Sales"
+"D.G. Mandrus"
+
+
+
+_atomic_positions_source_database_code_ICSD  4815
+_atomic_positions_source_other               .
+
+
+_transition_temperature  44
+_experiment_temperature  25
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM2+  3  1  .  primary  4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Position structure from a determination at 173K
+Below 8K another phase is reported with the same MSG, but with Nd2_2 having a non-null moment (see #1.401).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+1-dim small irrep. The irrep has 3 k-vectors in its star and the model involves only one.
+Apparently alternative 2k and 3k models under the same irrep were not tested.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m c m'
+_parent_space_group.IT_number                       193
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a+b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  62.454
+_space_group_magn.name_BNS  "P_B n m a"
+_cell_length_a             18.45500
+_cell_length_b             9.22750
+_cell_length_c             6.74070
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-2x+y,-z+1/2,+1
+3 -x,-y,z+1/2,+1
+4 x+1/2,2x-y,-z,+1
+5 -x,-y,-z,+1
+6 x+1/2,2x-y,z+1/2,+1
+7 x,y,-z+1/2,+1
+8 -x+1/2,-2x+y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Nd1 Nd 0.16667 0.66667 0.00000
+Nd2_1 Nd 0.11565 0.00000 0.25000
+Nd2_2 Nd  0.00000 0.23130 0.25000
+Pb1_1 Pb 0.30107 0.00000 0.25000
+Pb1_2 Pb  0.00000 0.60214 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd1 0.0 0.0 2.7(1) 0,my,mz
+Nd2_1 0.0 0.0 0.0 0,0,mz
+Nd2_2 0.0 0.0 2.1(2) 0,0,mz
+

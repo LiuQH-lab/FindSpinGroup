@@ -1,0 +1,153 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 25/05/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-05-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        103
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            184422
+_citation_year                  2021
+_citation_DOI                   10.1103/PhysRevB.103.184422
+
+loop_
+_citation_author_name
+"G. Subias"
+"J. Blasco"
+"J. Herrero-Martin"
+"J. A. Rodríguez-Velamazan"
+"M. Valvidares"
+"R. Fan"
+"P. Steadman"
+"J. Garcia"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_temperature_position_structure         293
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  52
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mB2  2  1  general  primary  8  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Non-standard A2mm setting of the parent space group Cmm2
+Position structure from a determination at 293K.
+
+The very small mz component of the Co2 atoms, correlated with the mx component such that it yields a collinear spin arrangement, breaks further the magnetic symmetry from orthorhombic to monoclinic. 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep along a general direction as primary (the irrep star includes k and -k as not equivalent vectors).
+The assumption of a collinear spin arrangement with a small, nearly negligible, mz component forces a general direction for the active irrep, and it lowers the symmetry of the structure.
+A higher orthorhombic MSG would be possible for the structure if the small mz component were either zero or it had a different sign sequence than the mx component resulting in a slight non-collinear arrangement.
+;
+
+_parent_space_group.name_H-M_alt  'C m m 2'
+_parent_space_group.IT_number                       35
+_parent_space_group.transform_Pp_abc  'b,c,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a-1/2c,b,c;0,0,0'
+
+_space_group_magn.number_BNS  7.28
+_space_group_magn.name_BNS  "P_c c"
+_cell_length_a             10.83200
+_cell_length_b             5.40200
+_cell_length_c             24.62600
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1_1 Co 0.00000 0.00000 0.00000 1.
+Co1_2 Co  0.00000 0.50000 0.25000 1.
+Co2_1 Co 0.25150 0.50000 0.00000 1.
+Co2_2 Co  0.25150 0.00000 0.25000 1.
+O1_1 O 0.12100 0.24940 0.00000 1.
+O1_2 O  0.12100 0.74940 0.25000 1.
+O2_1 O 0.37550 0.75420 0.00000 1.
+O2_2 O  0.37550 0.25420 0.25000 1.
+O3_1 O 0.00000 0.00000 0.08341 1.
+O3_2 O  0.00000 0.00000 0.91660 1.
+O3_3 O  0.00000 0.50000 0.33341 1.
+O3_4 O  0.00000 0.50000 0.16659 1.
+O4_1 O 0.24950 0.00000 0.33687 1.
+O4_2 O  0.24950 0.00000 0.66312 1.
+O4_3 O  0.24950 0.50000 0.58688 1.
+O4_4 O  0.24950 0.50000 0.91312 1.
+La1_1 La 0.00150 0.00000 0.18072 0.75
+La1_2 La  0.00150 0.00000 0.81927 0.75
+La1_3 La  0.00150 0.50000 0.43073 0.75
+La1_4 La  0.00150 0.50000 0.06928 0.75
+Ca1_1 Ca 0.00150 0.00000 0.18072 0.25
+Ca1_2 Ca  0.00150 0.00000 0.81927 0.25
+Ca1_3 Ca  0.00150 0.50000 0.43073 0.25
+Ca1_4 Ca  0.00150 0.50000 0.06928 0.25
+La2_1 La 0.25150 0.00000 0.43111 0.75
+La2_2 La  0.25150 0.00000 0.56889 0.75
+La2_3 La  0.25150 0.50000 0.68111 0.75
+La2_4 La  0.25150 0.50000 0.81889 0.75
+Ca2_1 Ca 0.25150 0.00000 0.43111 0.25
+Ca2_2 Ca  0.25150 0.00000 0.56889 0.25
+Ca2_3 Ca  0.25150 0.50000 0.68111 0.25
+Ca2_4 Ca  0.25150 0.50000 0.81889 0.25
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1_1 0.00000 0.00000 0.00000 mx,0,mz   0.0
+Co1_2 0.00000 0.00000 0.00000 mx,0,mz   0.0
+Co2_1 2.35(5) 0.00000 0.13(6) mx,0,mz   2.35(5)
+Co2_2 2.35(5) 0.00000 0.13(6) mx,0,mz   2.35(5)
+

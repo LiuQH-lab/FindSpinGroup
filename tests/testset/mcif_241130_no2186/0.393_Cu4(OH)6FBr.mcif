@@ -1,0 +1,191 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "npj Quantum Materials"
+_citation_journal_volume        5
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            23
+_citation_year                  2020
+_citation_DOI                   10.1038/s41535-020-0222-8
+
+loop_
+_citation_author_name
+"R.W. Smaha"
+"W. He"
+"J.M. Jiang"
+"J. Wen"
+"Y.-F. Jiang"
+"J.P. Sheckelton"
+"C.J. Titus"
+"S.G. Wang"
+"Y.-S. Chen"
+"S.J. Teat"
+"A.A. Aczel"
+"Y. Zhao"
+"G. Xu"
+"J.W. Lynn"
+"H.-C. Jiang"
+"Y.S. Lee"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     6
+_experiment_temperature     2.7
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+GM6+ 2  2 general primary ? .
+mGM2+ 1  1   .  secondary? ? yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Hexagonal Polymorph
+Position structure from a determination at 15K
+The moments of Cu split sites with partial occupancies, are assumed equal
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+FM on the ab plane
+Except for some signs of the spin cantings out of the ab plane and the moments at the Cu3 sites, the structure has the higher symmetry P6_3'/m', which corresponds to the irrep mGM2+. A model constrained to this higher symmetry was apparently not tried in the refinement, as FM was observed in macroscopic measurements.
+The small deviation from P6_3'/m' symmetry is associated with the (physically irreducible) irrep mGM4+GM6+, which lowers the symmetry to the monoclinic MSG P2_1'/m'.
+Although formally mGM4+GM6+ is the primary irrep yielding the observed symmetry break with respect to the paramagnetic symmetry, the mGM2+ distortion cannot be considered a secondary effect, but rather an independent primary order parameter distortion, as it is dominant in the model.
+The prevalence of the P6_3'/m' arrangement in the structure suggests the existence of a previous phase transition into this higher symmetry. The  existence of two phase transitions separated by a few degrees, mentioned in the reference, could be related with this possible two order parameters mechanism with two transitions.
+;
+
+_parent_space_group.name_H-M_alt  "P 63/m"
+_parent_space_group.IT_number                      176
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  "a,b,c;0,0,0"
+_space_group_magn.transform_BNS_Pp_abc  "b,c,a;0,0,0"
+
+
+_space_group_magn.number_BNS   11.54
+_space_group_magn.name_BNS     "P 2_1'/m'"
+_cell_length_a                 13.3208
+_cell_length_b                 13.3208
+_cell_length_c                 9.2662
+_cell_angle_alpha              90
+_cell_angle_beta               90
+_cell_angle_gamma              120
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,-y,z+1/2,-1
+4 x,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cu1_1 Cu 0.50001 0.25046 0.5 1
+Cu1_2 Cu -0.25046 0.24955 0.5 1
+Cu1_3 Cu -0.24955 -0.50001 0.5 1
+Cu2_1 Cu 0.24982 0.25019 0.49711 1
+Cu2_2 Cu -0.25019 -0.00037 0.49711 1
+Cu2_3 Cu 0.00037 -0.24982 0.49711 1
+Cu3_1 Cu 0.37139 0.68572 0.25 0.3333
+Cu3_2 Cu -0.68572 -0.31433 0.25 0.3333
+Cu3_3 Cu 0.31433 -0.37139 0.25 0.3333
+Cu4_1 Cu 0.31422 0.18552 0.25 0.2396
+Cu4_2 Cu -0.18552 0.1287 0.25 0.2396
+Cu4_3 Cu -0.1287 -0.31422 0.25 0.2396
+Cu5_1 Cu 0.31438 0.12857 0.25 0.4274
+Cu5_2 Cu -0.12857 0.18581 0.25 0.4274
+Cu5_3 Cu -0.18581 -0.31438 0.25 0.4274
+Cu6_1 Cu 0.37143 0.18552 0.25 0.334
+Cu6_2 Cu -0.18552 0.18591 0.25 0.334
+Cu6_3 Cu -0.18591 -0.37143 0.25 0.334
+Br1_1 Br 0.66668 0.83382 0.25 1
+Br1_2 Br -0.83382 -0.16714 0.25 1
+Br1_3 Br 0.16714 -0.66668 0.25 1
+Br2 Br 0.666667 0.333333 0.25 1
+F1_1 F 0.50082 0.50085 0.25 1
+F1_2 F -0.50085 -0.00003 0.25 1
+F1_3 F 0.00003 -0.50082 0.25 1
+F2 F 0 0 0.25 1
+O1_1 O 0.60111 0.39932 0.59179 1
+O1_2 O -0.39932 0.20179 0.59179 1
+O1_3 O -0.20179 -0.60111 0.59179 1
+O2_1 O 0.3989 0.10113 0.40759 1
+O2_2 O -0.10113 0.29777 0.40759 1
+O2_3 O -0.29777 -0.3989 0.40759 1
+O3_1 O 0.39919 0.29845 0.40882 1
+O3_2 O -0.29845 0.10074 0.40882 1
+O3_3 O -0.10074 -0.39919 0.40882 1
+O4_1 O 0.20187 0.10024 0.40823 1
+O4_2 O -0.10024 0.10163 0.40823 1
+O4_3 O -0.10163 -0.20187 0.40823 1
+H1_1 H 0.5527 0.4272 0.628 1
+H1_2 H -0.4272 0.1255 0.628 1
+H1_3 H -0.1255 -0.5527 0.628 1
+H2_1 H 0.4502 0.072 0.377 1
+H2_2 H -0.072 0.3782 0.377 1
+H2_3 H -0.3782 -0.4502 0.377 1
+H3_1 H 0.428 0.3754 0.375 1
+H3_2 H -0.3754 0.0526 0.375 1
+H3_3 H -0.0526 -0.428 0.375 1
+H4_1 H 0.1243 0.0516 0.37 1
+H4_2 H -0.0516 0.0727 0.37 1
+H4_3 H -0.0727 -0.1243 0.37 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1_1 -0.03 0.12 0.08 mx,my,mz
+Cu1_2 -0.14 -0.17 0.0 mx,my,mz
+Cu1_3 0.15 0.03 -0.08 mx,my,mz
+Cu2_1 -0.10 -0.26 0.0 mx,my,mz
+Cu2_2 0.23 0.14 -0.11 mx,my,mz
+Cu2_3 -0.14 0.09 0.11 mx,my,mz
+Cu3_1 -0.14 -0.12 0.0 mx,my,0
+Cu3_2 -0.14 -0.12 0.0 mx,my,0
+Cu3_3 -0.14 -0.12 0.0 mx,my,0
+Cu4_1 0.15 0.075 0.0 mx,my,0
+Cu4_2 -0.075 0.075 0.0 mx,my,0
+Cu4_3 -0.075 -0.15 0.0 mx,my,0
+Cu5_1 0.15 0.075 0.0 mx,my,0
+Cu5_2 -0.075 0.075 0.0 mx,my,0
+Cu5_3 -0.075 -0.15 0.0 mx,my,0
+Cu6_1 0.15 0.075 0.0 mx,my,0
+Cu6_2 -0.075 0.075 0.0 mx,my,0
+Cu6_3 -0.075 -0.15 0.0 mx,my,0
+
+

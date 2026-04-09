@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 24/05/2020 
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        15
+_citation_page_first            8691
+_citation_page_last             8701
+_citation_article_id            ?
+_citation_year                  2003
+_citation_DOI                   10.1088/0953-8984/15/50/0032003
+
+loop_
+_citation_author_name
+"M Schmidt"
+"M Hofmann"
+"S J Campbell"
+
+_atomic_positions_source_database_code_ICSD  190551
+_atomic_positions_source_other               .
+
+_transition_temperature  232(4)
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1-  1  1  .  primary 1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Another quite different model with MSG Cmm'm'(a,b,c;0,0,0, Fe1 zero moment and non-zero Fe2 moment equally fits the data (see #0.402)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+1-dim irrep as primary
+The magnetic point group m'm'm' of the structure allows linear magnetoelectricity, which is forbidden for the  alternative Cmm'm' structure.
+;
+
+_parent_space_group.name_H-M_alt  'C m m m'
+_parent_space_group.IT_number                       65
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  65.487
+_space_group_magn.name_BNS  "C m' m' m'"
+_cell_length_a             10.94300
+_cell_length_b             7.67950
+_cell_length_c             5.45490
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,-z,+1 
+3 -x,y,-z,+1 
+4 -x,-y,z,+1 
+5 -x,-y,-z,-1 
+6 -x,y,z,-1 
+7 x,-y,z,-1 
+8 x,y,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Sr1 Sr 0.50000 0.00000 0.50000
+Sr2 Sr 0.00000 0.00000 0.50000
+Sr3 Sr 0.26000 0.00000 0.00000
+Fe1 Fe 0.00000 0.74100 0.00000
+Fe2 Fe 0.25000 0.25000 0.50000
+O1 O 0.50000 0.00000 0.00000
+O2 O 0.26800 0.00000 0.50000
+O3 O 0.38100 0.27260 0.24100
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.00000 3.55(5) 0.00000 0,my,0
+Fe2 0.00000 0.00000 0.00000 0,0,0
+

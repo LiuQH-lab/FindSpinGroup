@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:19:55
+# Database entry: 2.8 SrHo2O4
+# Cif-like file for the case 2.8
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Sr Ho2 O4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        89
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            224511
+_citation_year                  2014
+_citation_DOI                   10.1103/PhysRevB.89.224511
+
+loop_
+_citation_author_name
+"A. Fennell"
+"V.Y. Pomjakushin"
+"A. Uldry"
+"B. Delley"
+"B. Prevost"
+"A. Desilets-Benoit"
+"A.D. Bianchi"
+"R.I. Bewley"
+"B.R. Hansen"
+"T. Klimczuk"
+"R.J. Cava"
+"M. Kenzelmann"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   246550
+_atomic_positions_source_other               .
+
+_transition_temperature     0.66
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2- 1 1 . primary 2 .
+mY1 2 2 special primary 6 .
+mGM1- 1 1 . secondary 4 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+k=0 ordering is mainly associated with Ho1, and k different from zero with Ho2.
+Relative sign of the weak mz component of Ho2 atoms with respect to that in Ho1 atoms is not reported. An arbitrary one has been taken.
+Quasi-long range magnetic structure.
+Non-standard parent setting Pnam.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k-maximal magnetic symmetry
+2 primary irreps
+Symmetry allows linear magnetolelectricity
+;
+
+_parent_space_group.name_H-M_alt  'P  n  a  m'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,c,-b;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;0,0,0'
+
+
+_space_group_magn.number_BNS  14.78
+_space_group_magn.name_BNS  "P  2_1/c'  "
+_space_group_magn.point_group_name  "2/m'"
+_space_group_magn.point_group_number  "5.4.15"
+_cell_length_a                 10.06740
+_cell_length_b                 11.91040
+_cell_length_c                 6.81740
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z,+1
+3 -x,-y,-z,-1
+4 x+1/2,-y+1/2,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1_1 Sr 0.75250 0.64980 0.12500 1
+Sr1_2 Sr 0.74750 0.14980 0.37500 1
+Ho1_1 Ho 0.42330 0.11040 0.12500 1
+Ho1_2 Ho 0.07670 0.61040 0.37500 1
+Ho2_1 Ho 0.42210 0.61260 0.12500 1
+Ho2_2 Ho 0.07790 0.11260 0.37500 1
+O1_1 O 0.21180 0.17550 0.12500 1
+O1_2 O 0.28820 0.67550 0.37500 1
+O2_1 O 0.12540 0.48100 0.12500 1
+O2_2 O 0.37460 0.98100 0.37500 1
+O3_1 O 0.51420 0.78400 0.12500 1
+O3_2 O 0.98580 0.28400 0.37500 1
+O4_1 O 0.42540 0.42230 0.12500 1
+O4_2 O 0.07460 0.92230 0.37500 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ho1_1 0.0 0.0 6.08(3) mx,my,mz
+Ho1_2 0.0 0.0 -6.08(3) mx,my,mz
+Ho2_1 0.0 -7.74(3) 0.13(3) mx,my,mz
+Ho2_2 0.0 7.74(3) -0.13(3) mx,my,mz
+

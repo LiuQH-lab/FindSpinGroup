@@ -1,0 +1,131 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Scr."
+_citation_journal_volume        44
+_citation_page_first            27
+_citation_page_last             32
+_citation_article_id            .
+_citation_year                  1991
+_citation_DOI                   10.1088/0031-8949/44/1/002
+
+loop_
+_citation_author_name
+"F. Bouree-Vigneron"
+
+_atomic_positions_source_database_code_ICSD  150834
+_atomic_positions_source_other               .
+
+_transition_temperature  17
+_experiment_temperature  12
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD4(k1)  2  1  special  primary  1  .
+mLD4(3k1) 2  1  special  secondary 1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Below 10.25K a more complex phase with an additional propagation vector (1/2,1/2,1/2) exists, and it is not fully characterised.
+The propagation vector of the structure is incorrectly identified in the article as (0,0,1/4), but the correct one is (0,0,3/4) or (1,0,1/4), which for this parent centred lattice is NOT equivalent.
+The structure is modelled by means of a longitudinal sinusoidal wave with a specific initial phase. Probably the data is unsensitive to this phase and other alternative models with different phases could also fit the data. The phase chosen is one of those that keep maximal symmetry.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+A secondary irrep (third harmonic) is symmetry allowed. Its absence makes the two independent moments to be correlated by a factor 2^0.5 through the primary irrep modulation.
+At lower temperatures third order satellites are detected, indicating the presence of the secondary irrep and the squaring up of the modulation.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 3/4]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,4c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,1/4'
+
+
+
+_space_group_magn.number_BNS  124.360
+_space_group_magn.name_BNS  "P_c 4/m c c"
+_cell_length_a             4.03620
+_cell_length_b             4.03620
+_cell_length_c             39.11160
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x,z,+1 
+3 y,-x,z,+1 
+4 x,-y,-z,+1 
+5 -x,y,-z,+1 
+6 -x,-y,z,+1 
+7 y,x,-z,+1 
+8 -y,-x,-z,+1 
+9 -x,-y,-z+1/2,+1 
+10 y,-x,-z+1/2,+1 
+11 -y,x,-z+1/2,+1 
+12 -x,y,z+1/2,+1 
+13 x,-y,z+1/2,+1 
+14 x,y,-z+1/2,+1 
+15 -y,-x,z+1/2,+1 
+16 y,x,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Tb1_1 Tb 0.00000 0.00000 0.00000
+Tb1_2 Tb  0.50000 0.50000 0.12500
+Tb1_3 Tb  0.00000 0.00000 0.25000
+Ni1_1 Ni 0.00000 0.50000 0.06250
+Ni1_2 Ni  0.50000 0.00000 0.18750
+Ge1_1 Ge 0.00000 0.00000 0.09200
+Ge1_2 Ge  0.50000 0.50000 0.21700
+Ge1_3 Ge  0.50000 0.50000 0.03300
+Ge1_4 Ge  0.00000 0.00000 0.34200
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Tb1_1 0.00000 0.00000 0.00000 0,0,0   0.0
+Tb1_2 0.00000 0.00000 6.22 0,0,mz     6.22
+Tb1_3 0.00000 0.00000 -8.8 0,0,mz     8.8
+

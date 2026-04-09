@@ -1,0 +1,115 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 29/03/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-29
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        “J. Phys. C: Solid State Phys.”
+_citation_journal_volume        21
+_citation_page_first            2005
+_citation_page_last             2013
+_citation_article_id            ?
+_citation_year                  1988
+_citation_DOI                   10.1088/0022-3719/21/10/018
+
+loop_
+_citation_author_name
+"J.B. Forsyth"
+"C. Wilkinson"
+"S. Paster"
+"B.M. Wanklyn"
+
+
+
+_atomic_positions_source_database_code_ICSD  4268
+_atomic_positions_source_other               .
+
+_transition_temperature  30
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY2+ 1  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD and NSD
+Positional structure from a room temperature determination
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-2c,b,a-c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.80
+_space_group_magn.name_BNS  "P_a 2_1/c"
+_cell_length_a             10.12600
+_cell_length_b             8.36100
+_cell_length_c             8.78800
+_cell_angle_alpha          90.00
+_cell_angle_beta           121.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1 Co 0.00000 0.00000 0.00000
+Co2 Co 0.01010 0.35910 0.11420
+P1 P 0.17020 0.69380 0.30240
+O1 O 0.13645 0.64220 0.44550
+O2 O 0.34405 0.69580 0.37500
+O3 O 0.09510 0.57860 0.14320
+O4 O 0.09515 0.86180 0.24350
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 0.61000 -3.63000 -0.80000 mx,my,mz
+Co2 1.03000 -2.42000 -2.29000 mx,my,mz
+

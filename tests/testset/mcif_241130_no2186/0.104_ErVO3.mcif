@@ -1,0 +1,151 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:55:41
+# Database entry: 0.104 ErVO3
+# Cif-like file for the case 0.104
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Er V O3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        83
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            064404
+_citation_year                  2011
+_citation_DOI                   10.1103/PhysRevB.83.064404
+
+loop_
+_citation_author_name
+"M. Reehuis"
+"C. Ulrich"
+"K. Prokes"
+"S. Mat'as"
+"J. Fujioka"
+"S. Miyasaka"
+"Y. Tokura"
+"B. Keimer"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   185838
+_atomic_positions_source_other               .
+
+_transition_temperature     112
+_experiment_temperature     85
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1 1 . primary 3 .
+mGM3+ 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Non standard parent setting Pbnm
+Only the V moments are ordered.
+The positional structure is supposed to have a monoclinic distortion reducing the symmetry to P21/b11. But it is not given in the reference.
+Below 60K, the system transforms to another phase (see entry #0.105)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2 irreps active.
+The action of two irreps lowers the symmetry to monoclinic (monoclinic axis c).
+The refined model includes constraints that are not forced by symmetry, or by the restriction to the two irreps.
+If the P21/b11 structural distortion is also taken into account, the actual MSG of this phase reduces to P-1
+number of irrep basis modes is only listed for the V atoms
+;
+
+_parent_space_group.name_H-M_alt  'P  b  n  m'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'b,c,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,b;0,0,0'
+
+
+_space_group_magn.number_BNS  11.54
+_space_group_magn.name_BNS  "P  2_1'/m'  "
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 5.26440
+_cell_length_b                 5.58560
+_cell_length_c                 7.57160
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,-y,z+1/2,-1
+4 x,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Er1_1 Er 0.97980 0.06940 0.25000 1
+Er1_2 Er 0.47980 0.43060 0.75000 1
+V1_1 V 0.50000 0.00000 0.00000 1
+V1_2 V 0.00000 0.50000 0.00000 1
+O1_1 O 0.11240 0.45960 0.25000 1
+O1_2 O 0.61240 0.04040 0.75000 1
+O2_1 O 0.69000 0.30430 0.05660 1
+O2_2 O 0.19000 0.19570 0.94340 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Er1_1 0.0 0.0 0.0 mx,my,0
+Er1_2 0.0 0.0 0.0 mx,my,0
+V1_1 0.56(4) 1.04(5) 0.15(3) mx,my,mz
+V1_2 -0.56 -1.04 -0.15 mx,my,mz
+

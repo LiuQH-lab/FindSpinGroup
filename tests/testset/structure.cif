@@ -1,0 +1,91 @@
+# CIF file created by FINDSYM, version 7.1.3
+
+data_findsym-output
+_audit_creation_method FINDSYM
+
+_cell_length_a     5.7400000000
+_cell_length_b     9.9392253220
+_cell_length_c     48.4328000000
+_cell_angle_alpha  90.0000000000
+_cell_angle_beta   90.0000000000
+_cell_angle_gamma  90.0000000000
+_cell_volume       2763.1470998948
+
+_space_group_magn.number_BNS "5.16"
+_space_group_magn.name_UNI "C2.1'_c[C2]"
+_space_group_magn.name_BNS "C_c2"
+_space_group_magn.number_OG "5.4.22"
+_space_group_magn.name_OG "C_2c2"
+_space_group_magn.point_group_number_Litvin "3.2.7"
+_space_group_magn.point_group_name_UNI "2.1'"
+
+loop_
+_space_group_magn_transforms.id
+_space_group_magn_transforms.Pp_abc
+_space_group_magn_transforms.source
+1 a,b,c;0,0,0 "BNS"
+2 a,b,1/2c;0,0,0 "OG"
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+3 x+1/2,y+1/2,z,+1 
+4 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_type_symbol
+Cr    
+Nb    
+S     
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_symmetry_multiplicity
+_atom_site_Wyckoff_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+_atom_site_fract_symmform
+Cr1 Cr   4 a  0.0000000000  0.3333350000  0.0000000000  0.3333300000 0,Dy,0   
+Cr2 Cr   8 c  0.5000000000  0.1666650000  0.6250000000  0.3333300000 Dx,Dy,Dz 
+Cr3 Cr   4 b  0.0000000000  0.3333350000  0.2500000000  0.3333300000 0,Dy,0   
+Nb1 Nb   8 c  0.0000000000  0.0000000000  0.4375000000  1.0000000000 Dx,Dy,Dz 
+Nb2 Nb   8 c  0.0000000000  0.3333350000  0.5632100000  1.0000000000 Dx,Dy,Dz 
+Nb3 Nb   8 c  0.0000000000  0.3333350000  0.6867900000  1.0000000000 Dx,Dy,Dz 
+Nb4 Nb   8 c  0.5000000000  0.1666650000  0.4382100000  1.0000000000 Dx,Dy,Dz 
+Nb5 Nb   8 c  0.0000000000  0.0000000000  0.6875000000  1.0000000000 Dx,Dy,Dz 
+Nb6 Nb   8 c  0.5000000000  0.1666650000  0.6882100000  1.0000000000 Dx,Dy,Dz 
+S1  S    8 c  0.8342500000  0.1662500000  0.5297825000  1.0000000000 Dx,Dy,Dz 
+S2  S    8 c  0.6665000000  0.3340000000  0.4702175000  1.0000000000 Dx,Dy,Dz 
+S3  S    8 c  0.8322500000  0.4997500000  0.5297825000  1.0000000000 Dx,Dy,Dz 
+S4  S    8 c  0.3322500000  0.0002500000  0.5952150000  1.0000000000 Dx,Dy,Dz 
+S5  S    8 c  0.1665000000  0.1660000000  0.6547850000  1.0000000000 Dx,Dy,Dz 
+S6  S    8 c  0.6677500000  0.0002500000  0.6547850000  1.0000000000 Dx,Dy,Dz 
+S7  S    8 c  0.3342500000  0.3337500000  0.5952150000  1.0000000000 Dx,Dy,Dz 
+S8  S    8 c  0.8335000000  0.1660000000  0.5952150000  1.0000000000 Dx,Dy,Dz 
+S9  S    8 c  0.6657500000  0.3337500000  0.6547850000  1.0000000000 Dx,Dy,Dz 
+S10 S    8 c  0.8342500000  0.1662500000  0.7797850000  1.0000000000 Dx,Dy,Dz 
+S11 S    8 c  0.6665000000  0.3340000000  0.7202150000  1.0000000000 Dx,Dy,Dz 
+S12 S    8 c  0.8322500000  0.4997500000  0.7797850000  1.0000000000 Dx,Dy,Dz 
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1  0.0000000000 -2.9997931924  0.0000000000 0,My,0   
+Cr2 -2.1213203500  2.1211740807  0.0000000000 Mx,My,Mz 
+Cr3  3.0000000000  0.0000000000  0.0000000000 Mx,0,Mz  
+
+# end of cif

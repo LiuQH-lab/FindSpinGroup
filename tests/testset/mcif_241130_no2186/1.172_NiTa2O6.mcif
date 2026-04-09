@@ -1,0 +1,150 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:18:30
+# Database entry: 1.172 NiTa2O6
+# Cif-like file for the case 1.172
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ni Ta2 O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        184
+_citation_page_first            111
+_citation_page_last             115
+_citation_article_id            .
+_citation_year                  1998
+_citation_DOI                   10.1016/S0304-8853(97)01122-0
+
+loop_
+_citation_author_name
+"H. Ehrenberg"
+"G. Wltschek"
+"J. Rodriguez-Carvajal"
+"T. Vogt"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     10.55
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mS2 4 1 special primary 2 .
+mS4 4 1 special primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a 50K measurement
+Another model has been reported in 2014 (see entry #1.112), which apparently has a different MSSG, and therefore is essentially different, although the active irreps are the same.
+The propagation vector has been changed here to the equivalent (1/4,1/4,1/2), instead of (1/4,-1/4,1/2) to make it consistent with the figures in the article. The model has been extracted from these figures.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two different primary irreps active. Each consecutive spin layer arrangement along the z axis corresponds to a different primary irrep.
+2-dim extended small irrep.
+If insulator, magnetically induced ferroelectricity along c is to be expected (type II multiferroic)
+;
+
+_parent_space_group.name_H-M_alt  'P  4_2/m  n  m'
+_parent_space_group.IT_number                       136
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 1/4 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,2a+2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;-1/4,1/8,0'
+
+
+_space_group_magn.number_BNS  41.217
+_space_group_magn.name_BNS  "A_b  b  a  2"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 6.67780
+_cell_length_b                 13.35560
+_cell_length_c                 18.30000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y+1/4,z,+1
+3 -x,y,z+1/2,+1
+4 x+1/2,-y+1/4,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x,y,z+1/2,-1
+4 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ni1_1 Ni 0.00000 0.00000 0.00000 1
+Ni1_2 Ni 0.00000 0.25000 0.25000 1
+Ta1_1 Ta 0.00000 0.00000 0.16580 1
+Ta1_2 Ta 0.00000 0.25000 0.41580 1
+Ta1_3 Ta 0.00000 0.25000 0.08420 1
+Ta1_4 Ta 0.00000 0.00000 0.83420 1
+O1_1 O 0.00000 0.15350 0.00000 1
+O1_2 O 0.00000 0.84650 0.00000 1
+O1_3 O 0.69300 0.25000 0.25000 1
+O2_1 O 0.00000 0.14850 0.16350 1
+O2_2 O 0.00000 0.85150 0.16350 1
+O2_3 O 0.70300 0.25000 0.41350 1
+O2_4 O 0.70300 0.25000 0.08650 1
+O2_5 O 0.00000 0.14850 0.83650 1
+O2_6 O 0.00000 0.85150 0.83650 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1_1 0.0 -1.6(1) 0.0 0,my,mz
+Ni1_2 0.0 1.6 0.0 0,my,mz
+

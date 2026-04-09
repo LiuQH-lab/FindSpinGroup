@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 06/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        16
+_citation_page_first            8923
+_citation_page_last             8935
+_citation_article_id            ?
+_citation_year                  2004
+_citation_DOI                   10.1088/0953-8984/16/49/009
+
+loop_
+_citation_author_name
+"Y. Doi"
+"Y. Hinatsu"
+"K. Ohoyama"
+
+_atomic_positions_source_database_code_ICSD  151441
+_atomic_positions_source_other               .
+
+_temperature_position_structure         20
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  10.0
+_experiment_temperature  2.3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mB1  2  1  special  primary  3  .
+mB2  2  1  special  primary  3  .
+mGM1+ 1  1   .    secondary  3  no  
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 20K
+The absolute orientation of the spin arrangement on the ab plabe is not specified. Here an orientation with maximal symmetry has been assumed.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+two irreps along a special direction as primary: two order parameters in the sense of Landau theory are involved.
+Polar along b: if insulator, magnetic induced ferroelectricity is possible.
+FM along b is symmetry allowed: weak FM is possible.
+;
+
+_parent_space_group.name_H-M_alt  'C 2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [2/3 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,1/4'
+
+_space_group_magn.number_BNS  5.13
+_space_group_magn.name_BNS  "C 2"
+_cell_length_a             17.65260
+_cell_length_b             10.18630
+_cell_length_c             14.55220
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.43
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ba1_1 Ba 0.00000 0.99890 0.25000
+Ba1_2 Ba  0.00000 0.00110 0.75000
+Ba1_3 Ba  0.16667 0.49890 0.25000
+Ba1_4 Ba  0.16667 0.50110 0.75000
+Ba2_1 Ba 0.00177 0.33330 0.09010
+Ba2_2 Ba  0.99823 0.66670 0.90990
+Ba2_3 Ba  0.16843 0.83330 0.09010
+Ba2_4 Ba  0.16490 0.83330 0.40990
+Ba2_5 Ba  0.16490 0.16670 0.90990
+Ba2_6 Ba  0.16843 0.16670 0.59010
+Mn1_1 Mn 0.00000 0.00000 0.00000
+Mn1_2 Mn  0.16667 0.50000 0.00000
+Mn1_3 Mn  0.16667 0.50000 0.50000
+Sb1_1 Sb 0.33070 0.33380 0.84740
+Sb1_2 Sb  0.66930 0.66620 0.15260
+Sb1_3 Sb  0.49737 0.83380 0.84740
+Sb1_4 Sb  0.83597 0.83380 0.65260
+Sb1_5 Sb  0.83597 0.16620 0.15260
+Sb1_6 Sb  0.49737 0.16620 0.34740
+O1_1 O 0.00000 0.51600 0.25000
+O1_2 O  0.00000 0.48400 0.75000
+O1_3 O  0.16667 0.01600 0.25000
+O1_4 O  0.16667 0.98400 0.75000
+O2_1 O 0.09320 0.23940 0.24700
+O2_2 O  0.90680 0.76060 0.75300
+O2_3 O  0.25987 0.73940 0.24700
+O2_4 O  0.07347 0.73940 0.25300
+O2_5 O  0.07347 0.26060 0.75300
+O2_6 O  0.25987 0.26060 0.74700
+O3_1 O 0.00307 0.83020 0.08620
+O3_2 O  0.99693 0.16980 0.91380
+O3_3 O  0.16973 0.33020 0.08620
+O3_4 O  0.16360 0.33020 0.41380
+O3_5 O  0.16360 0.66980 0.91380
+O3_6 O  0.16973 0.66980 0.58620
+O4_1 O 0.08947 0.08390 0.08010
+O4_2 O  0.91053 0.91610 0.91990
+O4_3 O  0.25613 0.58390 0.08010
+O4_4 O  0.07720 0.58390 0.41990
+O4_5 O  0.07720 0.41610 0.91990
+O4_6 O  0.25613 0.41610 0.58010
+O5_1 O 0.25143 0.08510 0.09090
+O5_2 O  0.74857 0.91490 0.90910
+O5_3 O  0.41810 0.58510 0.09090
+O5_4 O  0.91523 0.58510 0.40910
+O5_5 O  0.91523 0.41490 0.90910
+O5_6 O  0.41810 0.41490 0.59090
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1_1 4.08(2) 0.00000 0.00000 mx,my,mz  4.08(2)
+Mn1_2 -2.04 3.53 0.00000 mx,my,mz       4.08
+Mn1_3 2.04 -3.53 0.00000 mx,my,mz       4.08
+

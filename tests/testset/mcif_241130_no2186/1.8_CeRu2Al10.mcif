@@ -1,0 +1,147 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:05:36
+# Database entry: 1.8 CeRu2Al10
+# Cif-like file for the case 1.8
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ce Ru2 Al1 0'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        82
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            100405(R)
+_citation_year                  2010
+_citation_DOI                   10.1103/physrevb.82.100405
+
+loop_
+_citation_author_name
+"D.D. Khalyavin"
+"A.D. Hillier"
+"D.T. Adroja"
+"A.M. Strydom"
+"P. Manuel"
+"L.C. Chapon"
+"P. Peratheepan"
+"K. Knight"
+"P. Deen"
+"C. Ritter"
+"Y. Muro"
+"T. Takabatake"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   59912
+_atomic_positions_source_other               .
+
+_transition_temperature     27
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY3- 1 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+origin of structure is shifted (0,0,1/2) with respect to that used in icsd 59912
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (from 8 possible)
+;
+
+_parent_space_group.name_H-M_alt  'C  m  c  m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,1/4,0'
+
+
+_space_group_magn.number_BNS  57.391
+_space_group_magn.name_BNS  "P_C  b  c  m"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 9.1272
+_cell_length_b                 10.2820
+_cell_length_c                 9.1902
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,-z,+1
+3 -x+1/2,y+1/2,-z+1/2,+1
+4 -x+1/2,-y+1/2,z+1/2,+1
+5 -x+1/2,-y+1/2,-z,+1
+6 -x+1/2,y+1/2,z,+1
+7 x,-y,z+1/2,+1
+8 x,y,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Al1_1 Al 0.22480 0.36410 0.75000 1
+Al2_1 Al 0.35090 0.13040 0.75000 1
+Al3_1 Al 0.00000 0.16070 0.10110 1
+Al4_1 Al 0.00000 0.37740 0.55040 1
+Al5_1 Al 0.22760 0.00000 0.50000 1
+Ru1_1 Ru 0.25000 0.25000 0.50000 1
+Ce1_1 Ce 0.00000 0.12381 0.75000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ce1_1 0.0 0.0 -0.34(2) 0,0,mz
+

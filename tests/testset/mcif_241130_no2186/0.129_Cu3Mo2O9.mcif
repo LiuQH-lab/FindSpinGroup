@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:59:53
+# Database entry: 0.129 Cu3Mo2O9
+# Cif-like file for the case 0.129
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Cu3 Mo2 O9'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Inorganic Chemistry"
+_citation_journal_volume        48
+_citation_page_first            2687
+_citation_page_last             2692
+_citation_article_id            .
+_citation_year                  2009
+_citation_DOI                   10.1021/ic802410p
+
+loop_
+_citation_author_name
+"S. Vilminot"
+"G. Andre"
+"M. Kurmoo"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   173779
+_atomic_positions_source_other               .
+
+_transition_temperature     9.5
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+ 1 1 . primary 4 .
+mGM4- 1 1 . primary 5 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Cu2 moment is disordered
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim irreps active.
+Expected weak FM along b according to the phase symmetry.
+Non polar
+This model is not consistent with properties reported for this phase (see Kuroe et al. J. Phys. Soc. Japan 80 (2011) 083705), and alternative magnetic structures have been proposed for this phase (see entry #0.130).
+Linear magnetoelectric (alpha13 and alpha31)
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,b;1/4,1/4,0'
+
+
+_space_group_magn.number_BNS  19.27
+_space_group_magn.name_BNS  "P  2_1'2_1'2_1"
+_space_group_magn.point_group_name  "2'2'2"
+_space_group_magn.point_group_number  "6.3.19"
+_cell_length_a                 7.64760
+_cell_length_b                 6.88550
+_cell_length_c                 14.60580
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,-z,+1
+3 x+1/2,-y+1/2,-z+1/2,-1
+4 -x+1/2,-y,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mo1 Mo 0.26570 0.25000 0.16880 1
+Mo2 Mo 0.34320 0.25000 0.88590 1
+Cu1 Cu 0.00000 0.00000 0.00000 1
+Cu2 Cu 0.33860 0.25000 0.64260 1
+Cu3 Cu 0.20550 0.25000 0.43720 1
+O1 O 0.41140 0.25000 0.51490 1
+O2 O 0.29200 0.25000 0.77010 1
+O3 O 0.06390 0.25000 0.59570 1
+O4_1 O 0.24900 0.96360 0.43940 1
+O4_2 O 0.75100 0.03640 0.56060 1
+O5_1 O 0.14070 0.03960 0.13750 1
+O5_2 O 0.85930 0.96040 0.86250 1
+O6 O 0.30370 0.25000 0.28520 1
+O7 O 0.46990 0.25000 0.11040 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1 0.7(2) 0.0 0.7(2) mx,my,mz
+Cu2 0.0 0.0 0.0 mx,my,mz
+Cu3 0.7(2) 0.0 0.7(2) mx,my,mz
+

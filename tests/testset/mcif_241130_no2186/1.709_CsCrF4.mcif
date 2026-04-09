@@ -1,0 +1,147 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/01/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Cs1 Cr1 F4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Quantum Materials"
+_citation_journal_volume        4
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            14
+_citation_year                  2019
+_citation_DOI                   10.1038/s41535-019-0152-5
+
+loop_
+_citation_author_name
+"M. Hagihala"
+"S. Hayashida"
+"M. Avdeev"
+"H. Manaka"
+"H. Kikuchi"
+"T. Masuda"
+
+_temperature_position_structure         10
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     2.8
+_experiment_temperature     1.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL2 3 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at 10K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim small irrep
+The active irrep has 3 k-vectors. Multi-k arrangements that could also fit the available data were not considered.
+Only an approximate value 1.4-1.5 muB is reported for the Cr moments, and the deviations from 120 degrees of the reported relative angles are within their standard deviations. Without a precise value of the moment modulus these deviations cannot be translated in the format used here, and they have been neglected.
+;
+
+_parent_space_group.name_H-M_alt  'P -6 2 m'
+_parent_space_group.IT_number                       189
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a+b,b;0,0,0'
+
+_space_group_magn.number_BNS  46.247
+_space_group_magn.name_BNS  "I_a m a 2"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 19.12600
+_cell_length_b                 9.56300
+_cell_length_c                 7.71040
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-2x+y,-z,+1 
+3 x,y,-z+1/2,+1 
+4 -x,-2x+y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cs1_1 Cs 0.28640 0.00000 0.25000 1
+Cs1_2 Cs 0.00000 0.57280 0.25000 1
+Cr1_1 Cr 0.11215 0.00000 0.00000 1
+Cr1_2 Cr 0.00000 0.22430 0.00000 1
+F1_1 F 0.41570 0.00000 0.00000 1
+F1_2 F 0.00000 0.83140 0.00000 1
+F2_1 F 0.10995 0.00000 0.25000 1
+F2_2 F 0.00000 0.21990 0.25000 1
+F3_1 F 0.08060 0.43890 0.00000 1
+F3_2 F 0.78055 0.72230 0.00000 1
+F3_3 F 0.13885 0.83880 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Cr1_1 1.5 0.0 0.0 mx,my,0 1.5 ? ?
+Cr1_2 0.0 1.5 0.0 0,my,0 1.5 ? ?
+

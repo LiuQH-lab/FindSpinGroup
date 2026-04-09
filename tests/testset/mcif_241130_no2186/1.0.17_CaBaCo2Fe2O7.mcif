@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 21/05/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-05-21
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        97
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            144402
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.97.144402
+
+loop_
+_citation_author_name
+"J.D. Reim"
+"E. Rosen"
+"O. Zaharko"
+"M. Mostovoy"
+"J. Robert"
+"M. Valldor"
+"W. Schweika"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  239327
+_atomic_positions_source_other               .
+
+_transition_temperature  160
+_experiment_temperature  80
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK3  4  2  special  primary  8   .
+mGM3 1  1   .       secondary 3 yes
+mGM2 1  1   .       secondary 3 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+A model under the MSG P31m could also be fit to the data. This MSG is another epikernel of the same irrep mK3, for another special direction.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+A single 4-dim irrep active as primary, but restricted to a special direction.
+Magnetic modes corresponding to the two possible secondary irreps (3rd order harmonics compatible with the MSG) are also present, with smaller amplitudes than the primary mK3 distortion.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3 m c'
+_parent_space_group.IT_number                       186
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/3a-1/3b,1/3a+2/3b,c;8/9,7/9,0'
+
+
+
+_space_group_magn.number_BNS  157.55
+_space_group_magn.name_BNS  "P 3 1 m'"
+_cell_length_a             19.20000
+_cell_length_b             19.20000
+_cell_length_c             10.35000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+2/3,x-y+2/3,z,+1
+3 -x+y,-x+2/3,z,+1
+4 -x+y,y,z,-1
+5 -y+2/3,-x+2/3,z,-1
+6 x,x-y+2/3,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z,+1
+3 x+2/3,y+1/3,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ca1_1 Ca  0.11111 0.22222 0.37030 1.
+Ca1_2 Ca  0.22222 0.11111 0.87030 1.
+Ca1_3 Ca  0.22222 0.44444 0.87030 1.
+Ba1_1 Ba  0.11111 0.22222 0.00000 1.
+Ba1_2 Ba  0.22222 0.11111 0.50000 1.
+Ba1_3 Ba  0.22222 0.44444 0.50000 1.
+Co1_1 Co  0.94306 0.05694 0.18060 0.7
+Co1_2 Co  0.94306 0.88611 0.18060 0.7
+Co1_3 Co  0.05694 0.94306 0.68060 0.7
+Co1_4 Co  0.05694 0.11389 0.68060 0.7
+Fe1_1 Fe  0.00000 0.00000 0.43500 0.872
+Fe1_2 Fe  0.00000 0.00000 0.93500 0.872
+O1_1 O  0.83488 0.16512 0.23750 1.
+O1_2 O  0.16822 0.33644 0.23750 1.
+O1_4 O  0.66977 0.83488 0.73750 1.
+O1_5 O  0.16512 0.33024 0.73750 1.
+O2_1 O  0.00000 0.00000 0.24730 1.
+O2_2 O  0.00000 0.00000 0.74730 1.
+O3_1 O  0.10407 0.03327 0.99660 0.5
+O3_2 O  0.10407 0.36660 0.99660 0.5
+O3_3 O  0.77073 0.03327 0.99660 0.5
+O3_4 O  0.07080 0.10407 0.49660 0.5
+O3_5 O  0.07080 0.43740 0.49660 0.5
+O3_6 O  0.40413 0.43740 0.49660 0.5
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1_1 -1.58 -2.44 -0.46 mx,my,mz
+Co1_2 -0.95 -1.90 1.45 mx,2mx,mz
+Co1_3 -1.24 -2.48 0.42 mx,my,mz
+Co1_4 -0.99 -1.98 -1.37 mx,2mx,mz
+Fe1_1 1.575 3.15 0.0 mx,2mx,mz
+Fe1_2 1.575 3.15 0.0 mx,2mx,mz
+

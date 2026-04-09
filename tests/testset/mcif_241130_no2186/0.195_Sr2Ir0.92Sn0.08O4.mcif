@@ -1,0 +1,124 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 18/09/2018 11:56:37
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-09-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. Materials"
+_citation_journal_volume        2
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            094406
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevMaterials.2.094406
+
+loop_
+_citation_author_name
+"A.F. May"
+"H. Cao"
+"S. Calder"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  75154
+_atomic_positions_source_other               .
+
+_transition_temperature  195
+_experiment_temperature  5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5+  2  2  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Small substitution of Ir by Sn produces a drastic change of the structure, with a switch of the orientation of half of the spins with respect to the pure Sr2IrO4, similar to the effect of a magnetic field.
+Positional structure not provided. A structure from the icsd for pure Sr2IrO4 has been taken instead.
+Refined Ir moment modulus: 0.20(5). Magnitude of the canting is not provided, an approximate one similar to the one of pure Sr2IrO4 (see #1.77) has been taken.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+Weak FM along the a or b directions.
+2-dim irrep active, special OP direction
+Component along z is NOT symmetry allowed
+;
+
+_parent_space_group.name_H-M_alt  'I 4_1/a c d'
+_parent_space_group.IT_number                       142
+_parent_space_group.transform_Pp_abc  'a,b,c;0,-1/4,1/8'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,b,-a;1/4,0,3/8'
+
+
+
+_space_group_magn.number_BNS  73.551
+_space_group_magn.name_BNS  "I b' c' a"
+_cell_length_a             5.48460
+_cell_length_b             5.48460
+_cell_length_c             25.79770
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y+1/2,-z+3/4,+1
+3 -x+1/2,-y,-z+3/4,+1
+4 -x+1/2,y+1/2,z,+1
+5 -x,-y,z,-1
+6 -x+1/2,y,-z+1/4,-1
+7 x+1/2,y,-z+3/4,-1
+8 x,-y,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1_1 Sr 0.00000 0.00000 0.17573 1.
+Sr1_2 Sr  0.00000 0.50000 0.42573 1.
+Ir1 Ir 0.00000 0.00000 0.00000 0.92
+Sn1 Sn 0.00000 0.00000 0.00000 0.08
+O1 O 0.19810 0.19810 0.25000 0.861
+O2 O 0.30190 0.30190 0.25000 0.139
+O3_1 O 0.00000 0.00000 0.07974 1.
+O3_2 O  0.00000 0.50000 0.32974 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ir1 0.05 0.19 0.00000 mx,my,0

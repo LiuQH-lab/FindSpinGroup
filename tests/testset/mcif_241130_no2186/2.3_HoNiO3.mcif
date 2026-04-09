@@ -1,0 +1,157 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:19:41
+# Database entry: 2.3 HoNiO3
+# Cif-like file for the case 2.3
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ho Ni O3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        64
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            144417
+_citation_year                  2001
+_citation_DOI                   10.1103/physrevb.64.144417
+
+loop_
+_citation_author_name
+"M.T. Fernandez-Diaz"
+"J.A. Alonso"
+"M.J. Martinez-Lope"
+"M.T. Casais"
+"J.L. Garcia-Munoz"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   88042
+_atomic_positions_source_other               .
+
+_transition_temperature     3
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? . .
+
+_exptl_crystal_magnetic_properties_details
+;
+parent setting non-standard P21/n
+parent is a charge ordered distorted phase with respect to a Pbnm structure. insulator phase. Posible ferrolectricity (polarization along b).
+Possible multiferroic.
+;
+
+_active_magnetic_irreps_details
+;
+many irreps active if P21/n considered as parent
+If Pnma phase taken as parent, only one irrep mT1 for k1 (Ni) plus for k2 (Ho) irreps mGM1- (mx,my) and mGM3- (weak mz).
+previous phase with only mT1 (Ni) active
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a/2+c/2,-b,a/2-c/2;7/8,0,1/8'
+
+
+_space_group_magn.number_BNS  4.7
+_space_group_magn.name_BNS  "P  2_1"
+_space_group_magn.point_group_name  "2"
+_space_group_magn.point_group_number  "3.1.6"
+_cell_length_a                 10.3640
+_cell_length_b                 5.5105
+_cell_length_c                 14.8467
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0840
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+3/4,y+1/2,-z+1/4,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ho1_1 Ho -0.00909 0.07177 0.12515 1
+Ho1_2 Ho 0.49091 0.07177 0.12515 1
+Ho1_3 Ho 0.50909 -0.07177 0.37485 1
+Ho1_4 Ho 0.50909 -0.07177 -0.12515 1
+Ni1_1 Ni 0.25000 0.00000 0.00000 1
+Ni1_2 Ni 0.25000 0.00000 0.50000 1
+Ni2_1 Ni 0.25000 0.00000 0.25000 1
+Ni2_2 Ni 0.25000 0.00000 -0.25000 1
+O1_1 O 0.04915 -0.53000 0.12235 1
+O1_2 O 0.54915 -0.53000 0.12235 1
+O1_3 O 0.45085 -0.47000 0.37765 1
+O1_4 O 0.45085 -0.47000 -0.12235 1
+O2_1 O 0.35000 -0.69000 0.52470 1
+O2_2 O 0.35000 -0.69000 0.02470 1
+O2_3 O 0.15000 -0.31000 -0.02470 1
+O2_4 O 0.15000 -0.31000 0.47530 1
+O3_1 O 0.09350 -0.79400 -0.02590 1
+O3_2 O 0.59350 -0.79400 -0.02590 1
+O3_3 O -0.09350 -0.20600 0.02590 1
+O3_4 O 0.40650 -0.20600 0.02590 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ho1_1 -3.14 -6.71 -1.5 mx,my,mz
+Ho1_2 -3.14 -6.71 -1.5 mx,my,mz
+Ho1_3 3.14 6.71 1.5 mx,my,mz
+Ho1_4 3.14 6.71 1.5 mx,my,mz
+Ni1_1 0.9 0.0 1.1 mx,my,mz
+Ni1_2 -0.9 0.0 -1.1 mx,my,mz
+Ni2_1 0.35 0.0 -0.4 mx,my,mz
+Ni2_2 -0.35 0.0 0.4 mx,my,mz
+

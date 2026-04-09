@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 19/03/2018 12:40:46
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Eur. Phys. J. B"
+_citation_journal_volume        24
+_citation_page_first            59
+_citation_page_last             70
+_citation_article_id            ?
+_citation_year                  2001
+_citation_DOI                   10.1007/s100510170022
+
+loop_
+_citation_author_name
+"E. Garcia-Matres"
+"J. Martinez"
+"J. Rodriguez-Carvajal"
+
+
+
+_atomic_positions_source_database_code_ICSD  72631
+_atomic_positions_source_other               .
+
+_transition_temperature  15
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mR1+  2  1  .  primary  2  .
+mR2+  2  1  .  primary  4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+two irreps active for the same k-vector. The irrep star has 2 wave vectors. Possible alternative 2k spin arrangements not checked
+The mR2+ contribution to the spin arrangement (spin components x and z) is very close to zero. If nullified, the magnetic symmetry is higher and the spins (mR1+ irrep) are forced to be along the b direction.
+;
+
+_parent_space_group.name_H-M_alt  'I  m  m  m'
+_parent_space_group.IT_number                       71
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/4a+1/2b-1/4c,-1/4a+1/2b+1/4c,1/2a+b+1/2c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S-1"
+_cell_length_a             7.50250
+_cell_length_b             5.72140
+_cell_length_c             22.49120
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/4,y+1/2,z+3/4,+1
+3 x+1/2,y,z+1/2,+1
+4 x+3/4,y+1/2,z+1/4,+1
+5 x+1/4,y+1/2,z+1/4,-1
+6 x+1/2,y,z,-1
+7 x+3/4,y+1/2,z+3/4,-1
+8 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Tm1 Tm 0.25000 0.00000 0.10165
+Ba1 Ba 0.25000 0.50000 0.00000
+Ni1 Ni 0.00000 0.00000 0.00000
+O1_1 O 0.00000 0.23990 0.07495
+O1_2 O  0.00000 0.76010 0.07495
+O2 O 0.00000 0.50000 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Tm1 -0.6(2) 3.24(7) -0.5(4) mx,my,mz
+Ni1 0.3(5) -1.1(1) 0.14(5) mx,my,mz
+
+

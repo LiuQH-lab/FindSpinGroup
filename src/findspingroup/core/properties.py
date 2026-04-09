@@ -5,6 +5,7 @@ import numpy as np
 from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs
 from findspingroup.structure import *
 from findspingroup.utils.matrix_utils import rref_with_tolerance
+from findspingroup.utils.symbolic_format import format_symbolic_scalar
 
 
 
@@ -16,7 +17,7 @@ def combine_parametric_solutions(rref_matrix, tol=1e-3):
     pivot_cols = []
     free_vars = []
 
-    # 找出主元列
+    # Find pivot columns.
     for i in range(rows):
         for j in range(cols):
             if abs(A[i, j]) > tol:
@@ -26,12 +27,11 @@ def combine_parametric_solutions(rref_matrix, tol=1e-3):
     pivot_cols = set(pivot_cols)
     free_vars = [j for j in range(cols) if j not in pivot_cols]
 
-    # 构造每个自由变量对应的解向量
+    # Build the solution vector for each free variable.
     symbols = ['Sx', 'Sy', 'Sz']
     vector_expr = ['0'] * cols
 
     for free_idx, var_col in enumerate(free_vars):
-        var_name = symbols[free_idx]
         coeffs = [0] * cols
         coeffs[var_col] = 1
         for row_idx in range(rows):
@@ -40,7 +40,13 @@ def combine_parametric_solutions(rref_matrix, tol=1e-3):
             if pivot_col is not None and abs(row[var_col]) > tol:
                 coeffs[pivot_col] = -row[var_col]
 
-        # 累加表达式向量
+        if len(free_vars) == 1:
+            first_nonzero_component = next(i for i, value in enumerate(coeffs) if abs(value) > tol)
+            var_name = symbols[first_nonzero_component]
+        else:
+            var_name = symbols[free_idx]
+
+        # Accumulate the symbolic vector expression.
         for i in range(cols):
             c = coeffs[i]
             if abs(c) < tol:
@@ -51,16 +57,16 @@ def combine_parametric_solutions(rref_matrix, tol=1e-3):
                 elif abs(c + 1) < tol:
                     vector_expr[i] = f"-{var_name}"
                 else:
-                    vector_expr[i] = f"{round(c, 3)}*{var_name}"
+                    vector_expr[i] = f"{format_symbolic_scalar(c)}*{var_name}"
             else:
                 if abs(c - 1) < tol:
                     vector_expr[i] += f" + {var_name}"
                 elif abs(c + 1) < tol:
                     vector_expr[i] += f" - {var_name}"
                 elif c > 0:
-                    vector_expr[i] += f" + {round(c, 3)}*{var_name}"
+                    vector_expr[i] += f" + {format_symbolic_scalar(c)}*{var_name}"
                 else:
-                    vector_expr[i] += f" - {abs(round(c, 3))}*{var_name}"
+                    vector_expr[i] += f" - {format_symbolic_scalar(abs(c))}*{var_name}"
 
     return vector_expr
 
@@ -234,7 +240,7 @@ class SymmetryProperties:
             spinmatrices = np.vstack(deduplicate_matrix_pairs([op[0]-np.eye(3) for op in little_group],tol=self.tol))
 
             if all(abs(x) > 1e-3 for x in np.linalg.svd(spinmatrices.astype(np.float32))[1]):
-                # 无自旋极化，故无ss
+                # No spin polarization means no spin splitting.
                 spinsplitting.append('no spin splitting')
             else:
                 spinsplitting.append('spin splitting')

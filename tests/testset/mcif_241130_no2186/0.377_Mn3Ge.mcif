@@ -1,0 +1,123 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 06/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        101
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            ?
+_citation_year                  140411(R)
+_citation_DOI                   10.1103/PhysRevB.101.140411
+
+loop_
+_citation_author_name
+"J.-R. Soh"
+"F. de Juan"
+"N. Qureshi"
+"H. Jacobsen"
+"H.-Y. Wang"
+"Y.-F. Guo"
+"A.T. Boothroyd"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  380
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM6+  2  2  special  primary  2  .
+mGM4+  1  1  .    secondary   1   no
+
+_exptl_crystal_magnetic_properties_details
+;
+Spherical neutron polarimetry
+Position structure from a determination at room temperature
+The model agrees with one of the two alternative models proposed in previous literature for the similar compound Mn3Sn (see #0.199 and #0.200), namely the one in #0.200.
+Mn moment: 2.65(2)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep along a special direction as primary
+The MSG allows FM along the direction (-1,1.0), for the domain orientation chosen in the present description, and along symmetry equivalent directions for the other domains.
+Weak FM is detected with macroscopic measurements.
+The FM on the ab plane is associated with the same irrep mGM6+ as the observed AFM arrangement
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,-a+b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  63.464
+_space_group_magn.name_BNS  "C m' c m'"
+_cell_length_a             5.30200
+_cell_length_b             5.30200
+_cell_length_c             4.28900
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,-x,-z+1/2,+1
+3 -x,-y,-z,+1
+4 y,x,z+1/2,+1
+5 y,x,-z,-1
+6 -x,-y,z+1/2,-1
+7 -y,-x,z,-1
+8 x,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ge1 Ge 0.33333 0.66667 0.25000
+Mn1_1 Mn 0.83400 0.66800 0.25000
+Mn1_2 Mn  0.83400 0.16600 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1_1 3.06 1.53 0.0 mx,my,0
+Mn1_2 -1.53 1.53 0.0 mx,-mx,0
+
+

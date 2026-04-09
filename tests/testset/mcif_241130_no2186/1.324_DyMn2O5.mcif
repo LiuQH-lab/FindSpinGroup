@@ -1,0 +1,128 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 17/03/2020
+
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys. C: Solid State Phys."
+_citation_journal_volume        14
+_citation_page_first            1671
+_citation_page_last             1683
+_citation_article_id            ?
+_citation_year                  1981
+_citation_DOI                   10.1088/0022-3719/14/11/027
+
+loop_
+_citation_author_name
+"C. Wilkinson"
+"F. Sinclair"
+"P. Gardner"
+"J.B. Forsyth"
+"B.M.R. Wanklyn"
+
+
+
+_atomic_positions_source_database_code_ICSD  18308
+_atomic_positions_source_other               .
+
+_transition_temperature  8.4
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2  2  2  special  primary  11  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure from a room temperature determination
+See #1.76 for a different model of the same structure, having the same symmetry, but quite different magnetic moments.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+2-dim irrep along a special direction as primary
+magnetic symmetry break into a polar group with polarity along b in the parent setting
+magnetically induced ferroelectricity to be expected along b in the parent setting (multiferroic of type II)
+;
+
+_parent_space_group.name_H-M_alt  'P b a m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;7/8,0,0'
+
+
+
+_space_group_magn.number_BNS  29.104
+_space_group_magn.name_BNS  "P_a c a 2_1"
+_cell_length_a             14.58800
+_cell_length_b             8.55510
+_cell_length_c             5.68750
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+3/4,y+1/2,-z,+1
+3 -x+1/4,y+1/2,z,+1
+4 x+1/2,y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Dy1_1 Dy 0.06937 0.17169 0.00000
+Dy1_2 Dy  0.93063 0.82831 0.00000
+Mn1 Mn 0.00000 0.50000 0.25480
+Mn2_1 Mn 0.20595 0.35000 0.50000
+Mn2_2 Mn  0.79405 0.65000 0.50000
+O1 O 0.00000 0.00000 0.27410
+O2_1 O 0.08235 0.44520 0.00000
+O2_2 O  0.91765 0.55480 0.00000
+O3_1 O 0.07685 0.43540 0.50000
+O3_2 O  0.92315 0.56460 0.50000
+O4_1 O 0.19755 0.20820 0.24140
+O4_2 O  0.80245 0.79180 0.24140
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Dy1_1 4.51(3) -8.02(1) 0.0 mx,my,0
+Dy1_2 -4.51 8.02 0.0 mx,my,0
+Mn1 -1.44(4) -1.35(1) 0.0 mx,my,mz
+Mn2_1 2.10(4) 1.26(1) 0.0 mx,my,0
+Mn2_2 2.10 1.26 0.0 mx,my,0
+

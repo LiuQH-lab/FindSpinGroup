@@ -1,0 +1,117 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 14/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "JOURNAL OF SOLID STATE CHEMISTRY"
+_citation_journal_volume        66
+_citation_page_first            242
+_citation_page_last             250
+_citation_article_id            .
+_citation_year                  1987
+_citation_DOI                   10.1016/0022-4596(87)90193-9
+
+loop_
+_citation_author_name
+"Y. Laligant"
+"J. Pannetier"
+"G. Ferey"
+
+_atomic_positions_source_database_code_ICSD  202194
+_atomic_positions_source_other               .
+
+_position_structure_temperature 3.5
+_transition_temperature  9(2)
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1  1  1  .  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 3.5K
+The parent space group is probably wrong. It was corrected by some of the authors in a subsequent paper for the similar compound MnFeF5(H2O)2 (see Lagigant et al., Zeitschrift für Kristallographie (1987) 181, 1) and reported to be Imma.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'I m m 2'
+_parent_space_group.IT_number                       44
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  44.229
+_space_group_magn.name_BNS  "I m m 2"
+_cell_length_a             7.45100
+_cell_length_b             10.74700
+_cell_length_c             6.52400
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z,+1 
+3 -x,y,z,+1 
+4 x,-y,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Zn1 Zn 0.00000 0.25000 0.75000
+Fe1 Fe 0.25000 0.00000 0.00000
+F1 F 0.27400 0.87200 0.22200
+F2 F 0.68700 0.62400 0.31600
+F3 F 0.00000 0.00000 0.06500
+F4 F 0.00000 0.50000 0.40100
+O1 O 0.00000 0.80700 0.46800
+O2 O 0.00000 0.68300 0.06600
+H1 H 0.12000 0.84300 0.38900
+H2 H 0.90800 0.66900 0.13100
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1 0.00000 3.78(5) 0.00000 0,my,0   3.78(5)
+

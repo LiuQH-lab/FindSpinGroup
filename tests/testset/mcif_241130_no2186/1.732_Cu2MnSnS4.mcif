@@ -1,0 +1,141 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/11/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-01-11
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Cu2 Mn1 Sn1 S4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Bull. Soc. fr. Mineral."
+_citation_journal_volume        93
+_citation_page_first            141
+_citation_page_last             145
+_citation_article_id            .
+_citation_year                  1970
+_citation_DOI                   10.3406/bulmi.1970.6446
+
+loop_
+_citation_author_name
+"J. Allemand"
+"M. Wintenberger"
+
+_temperature_position_structure         300
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  42489
+_atomic_positions_source_other               .
+
+_transition_temperature     ?
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mN2 4 1 . primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at room temperature
+Transition temperature is not provided
+The MSG assigned in the article to the reported structure is incorrect
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim small irrep as primary
+The active irrep has 4 k-vectors in its star. Multi-k orderings, which could equally fit the data are not discussed.
+Mn moment forms 130 degrees with the Ox axis. Moment modulus: 4.3 muB. Moment components given here are only approximate. 
+;
+
+_parent_space_group.name_H-M_alt  'I -4 2 m'
+_parent_space_group.IT_number                       121
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a-1/2c,b,a;1/4,0,0'
+
+
+_space_group_magn.number_BNS  5.16
+_space_group_magn.name_BNS  "C_c 2"
+_space_group_magn.point_group_name  "21'"
+_space_group_magn.point_group_number  "3.2.7"
+_cell_length_a                 10.98000
+_cell_length_b                 5.49000
+_cell_length_c                 21.44000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/4,y+1/2,z+3/4,+1 
+3 x+1/2,y,z+1/2,+1 
+4 x+3/4,y+1/2,z+1/4,+1 
+5 x+1/2,y,z,-1 
+6 x+3/4,y+1/2,z+3/4,-1 
+7 x,y,z+1/2,-1 
+8 x+1/4,y+1/2,z+1/4,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.00000 0.00000 1
+Sn1 Sn 0.00000 0.00000 0.25000 1
+Cu1 Cu 0.00000 0.50000 0.12500 1
+S1_1 S 0.12510 0.25020 0.31535 1
+S1_2 S 0.87490 0.74980 0.31535 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1 -2.8 0.0 3.3 mx,0,mz 4.3 ? ?
+

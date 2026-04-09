@@ -1,0 +1,112 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "phys. stat. sol. (a)"
+_citation_journal_volume        72
+_citation_page_first            161
+_citation_page_last             168
+_citation_article_id            ?
+_citation_year                  1982
+_citation_DOI                   p10.1002/pssa.2210720116
+
+loop_
+_citation_author_name
+"B. Kuhlow"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  22081
+_atomic_positions_source_other               .
+
+_transition_temperature  15.5
+_experiment_temperature  ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT2+T3+  2  2  general  primary  2  .
+mT1+     1  1    .      secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD, NSD
+see also (Cable et al., J. Phys. Chem. Solids 1961, 19, 29–34)
+The direction of the spins on the ab plane is not determined.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep active
+A possible secondary irrep spin component (mz component) is not present.
+;
+
+_parent_space_group.name_H-M_alt  'R -3'
+_parent_space_group.IT_number                       148
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 3/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-1/3a+1/3b-1/3c,-2/3a+2/3b+1/3c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             5.94200
+_cell_length_b             5.94200
+_cell_length_c             34.66600
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z+1/3,+1
+3 x+2/3,y+1/3,z+2/3,+1
+4 x+2/3,y+1/3,z+1/6,-1
+5 x,y,z+1/2,-1
+6 x+1/3,y+2/3,z+5/6,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cr1 Cr 0.00000 0.00000 0.16615
+Cl1_1 Cl 0.65070 0.99250 0.03785
+Cl1_2 Cl  0.00750 0.65820 0.03785
+Cl1_3 Cl  0.34180 0.34930 0.03785
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1 3.00000 0.00000 0.00000 mx,my,mz

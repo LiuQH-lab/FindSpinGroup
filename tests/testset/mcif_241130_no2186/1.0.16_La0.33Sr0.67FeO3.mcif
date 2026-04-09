@@ -1,0 +1,131 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        97
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            174417
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.97.174417
+
+loop_
+_citation_author_name
+"F. Li"
+"V. Pomjakushin"
+"T. Mazet"
+"R. Sibille"
+"B. Malaman"
+"R. Yadav"
+"L. Keller"
+"M. Medarde"
+"K. Conder"
+"E. Pomjakushina"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  200
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD3  4  2  special  primary  2  ?
+mLD2  2  1  special  secondary 1 no
+mGM1+ 1  1    .      secondary 1  no
+mGM3+ 2  2  special  secondary 2  yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The collinear direction of the spins on the xy plane cannot be fully determined and a model with the spin along the b direction of the orthorhombic basis used here (with MSG C2'/c') fits equally well the data.
+A trigonal non-collinear model with MSG P3_221 (or domain equivalent MSG P3_121) fits equally well the experimental data (see #1.0.15). Mossbauer experiments favor the collinear model, but they are not conclusive.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+4-dim irrep active. 14 non-equivalent MSGs are possible for this irrep.
+The magnetic structure is described using a basis different of the paramagnetic structure, where the MSG is in standard setting.
+Despite its simplicity, this collinear spin arragnement requires the presence with very large amplitude of a secondary spin mode associated with the irrep mGM3+. It is required in order to make the spin moduli approximately equal in all layers.
+;
+
+_parent_space_group.name_H-M_alt  'R -3c'
+_parent_space_group.IT_number                       167
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  15.85
+_space_group_magn.name_BNS  "C 2/c"
+_cell_length_a             9.49540
+_cell_length_b             5.48220
+_cell_length_c             13.40520
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x,-y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1_1 La 0.00000 0.00000 0.25000 0.333
+La1_2 La  0.16667 0.50000 0.58333 0.333
+Sr1_1 Sr 0.00000 0.00000 0.25000 0.667
+Sr1_2 Sr  0.16667 0.50000 0.58333 0.667
+Fe1_1 Fe 0.00000 0.00000 0.00000 1.
+Fe1_2 Fe  0.16667 0.50000 0.33333 1.
+O1_1 O 0.25906 0.25906 0.25000 1.
+O1_2 O  0.00000 0.48188 0.25000 1.
+O1_3 O  0.42573 0.75906 0.58333 1.
+O1_4 O  0.90761 0.75906 0.58333 1.
+O1_5 O  0.16667 0.98188 0.58333 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1_1 3.26(3) 0.00000 0.00000 mx,my,mz
+Fe1_2 -3.67(2) 0.00000 0.00000 mx,my,mz

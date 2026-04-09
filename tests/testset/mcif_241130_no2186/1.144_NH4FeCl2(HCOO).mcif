@@ -1,0 +1,137 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:15:40
+# Database entry: 1.144 NH4FeCl2(HCOO)
+# Cif-like file for the case 1.144
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'N H4 Fe Cl2 (H C O O )'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Solid State Chem."
+_citation_journal_volume        236
+_citation_page_first            222
+_citation_page_last             229
+_citation_article_id            .
+_citation_year                  2016
+_citation_DOI                   10.1016/j.jssc.2015.09.016
+
+loop_
+_citation_author_name
+"J.T. Greenfield"
+"V.O. Garlea"
+"S. Kamali"
+"M. Chen"
+"K. Kovnir"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "Inorg. Chem. 53, 3162 (2014)"
+
+_transition_temperature     6
+_experiment_temperature     4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+positional structure from a 90K measurement
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'C  2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-2c,-b,-a+c;0,0,0'
+
+
+_space_group_magn.number_BNS  14.84
+_space_group_magn.name_BNS  "P_C  2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 7.888
+_cell_length_b                 11.156
+_cell_length_c                 6.920
+_cell_angle_alpha              90.00
+_cell_angle_beta               108.07
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.00000 0.00000 0.00000 1
+Cl1 Cl 0.76954 0.04660 0.16846 1
+N1 N 0.00000 0.32934 0.25000 1
+O1 O 0.00648 0.82170 0.08952 1
+C1 C 0.00000 0.77094 0.25000 1
+H1 H 0.00000 0.68600 0.25000 1
+H2 H 0.40400 0.87420 0.23100 1
+H3 H 0.48800 0.78450 0.13900 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 2.64 0.0 -2.15 mx,my,mz
+

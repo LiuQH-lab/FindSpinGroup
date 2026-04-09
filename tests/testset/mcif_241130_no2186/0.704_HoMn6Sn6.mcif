@@ -1,0 +1,125 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 22/05/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-05-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of the Less-Common Metals"
+_citation_journal_volume        175
+_citation_page_first            143
+_citation_page_last             154
+_citation_article_id            .
+_citation_year                  1991
+_citation_DOI                   10.1016/0022-5088(91)90359-C
+
+loop_
+_citation_author_name
+"B. Chafik"
+"E. Idrissi"
+"G. Venturini"
+"B. Malaman"
+"D. Fruchart"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_temperature_position_structure         .
+_temperature_atom_positions             171             
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            300
+
+_transition_temperature  175
+_experiment_temperature  171
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  2  .
+mGM6+  2  2  special primary 3 .
+mGM3+  1  1  .  secondary 1  no
+mGM5+  2  2  special secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Angle of the spins direction with the c axis: 76(3) degrees
+Cell parameters from a determination at an unspecified temperature, probably 300K
+Atomic positions from a determination at 171K
+The direction of the spin on the basal ab plane is undetermined. Here a direction of maximal symmetry has been taken arbitrarily.
+The spins order collinearly in a ferrimagnetic arrangement on the basal plane below 376K (see #0.705). Below about 175K a phase transition takes place and the spins direction changes to an oblique direction with a component along c.
+FM on the ac plane. Ferrimagnetic
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps as primary. This means that two order parameters in the sense of Landau theory are present.
+Two secondary irreps allowed by the MSG, but not present in the model. They add two additional degrees of freedom to the spin arrangement under its MSG.
+;
+
+_parent_space_group.name_H-M_alt  'P 6/m m m'
+_parent_space_group.IT_number                       191
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,a+2b,c;0,0,0'
+
+_space_group_magn.number_BNS  12.62
+_space_group_magn.name_BNS  "C 2'/m'"
+_cell_length_a             5.50500
+_cell_length_b             5.50500
+_cell_length_c             8.99100
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+3 -x+y,y,-z,-1 
+4 x-y,-y,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ho1 Ho 0.00000 0.00000 0.50000
+Mn1_1 Mn 0.50000 0.00000 0.255(1)
+Mn1_2 Mn  0.00000 0.50000 0.255
+Sn1 Sn 0.33333 0.66667 0.00000
+Sn2 Sn 0.33333 0.66667 0.50000
+Sn3 Sn 0.00000 0.00000 0.171(2)
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Ho1 5.11 0.00000 1.27 mx,0,mz        5.27(9)
+Mn1_1 -2.11 0.00000 -0.53 mx,0,mz    2.18(6)
+Mn1_2 -2.11 0.00000 -0.53 mx,my,mz   2.18(6)
+

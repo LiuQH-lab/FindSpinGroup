@@ -1,0 +1,133 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/11/2020 22:59:41
+# parent_50K.cif
+
+data_5yOhtAoR
+_audit_creation_date            2020-11-03
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        98
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            224405
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.98.224405
+
+loop_
+_citation_author_name
+"S. Hayashida"
+"S. Asai"
+"D. Kato"
+"S. Hasegawa"
+"M. Avdeev"
+"H. Cao"
+"T. Masuda"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  29
+_experiment_temperature  3.7
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT3  2  2  special  primary   4  .
+mT2  1  1   .       secondary 3  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 50K
+Coexistence with an incommensurate phase with k=(0 0 3/2+delta)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep along a special direction as primary.
+The direction of the spins on the basal plane is undetermined, and a direction has been arbitrarily chosen. This direction for the moments keeps a binary axis on the basal plane along b (not a*, contrary to what it is stated in the article). Symmetry related domains will be polar along the equivalent a and (a+b) directions.
+From the 7 degrees of freedom of the moments within the MSG of the model, 3 correspond to a secondary irrep mT2, which is not present in the spin arrangement.
+The primary irrep mT3 includes a spin basis function along c which is also not present. This, together with the assumption of collinearity and equal modulus of all Fe moments, despite being split, reduces the number of mT3 degrees of freedom from 4 to 2.
+;
+
+_parent_space_group.name_H-M_alt  'R 3 2'
+_parent_space_group.IT_number                       155
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 3/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2/3a+1/3b+2/3c,b,c;0,0,1/4'
+
+
+
+_space_group_magn.number_BNS  5.16
+_space_group_magn.name_BNS  "C_c 2"
+_cell_length_a             9.60230
+_cell_length_b             9.60230
+_cell_length_c             15.26260
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/3,-x+y+2/3,-z+5/6,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z+1/3,+1
+3 x+2/3,y+1/3,z+2/3,+1
+4 x+1/3,y+2/3,z+5/6,-1
+5 x+2/3,y+1/3,z+1/6,-1
+6 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ce1 Ce 0.00000 0.00000 0.00000
+Fe1_1 Fe 0.55250 0.00000 0.00000
+Fe1_2 Fe  0.00000 0.55250 0.00000
+O1_1 O 0.85660 0.00000 0.25000
+O1_2 O  0.00000 0.85660 0.25000
+O2_1 O 0.58920 0.00000 0.25000
+O2_2 O  0.00000 0.58920 0.25000
+O3_1 O 0.44990 0.14280 0.25965
+O3_2 O  0.85720 0.30710 0.25965
+O3_3 O  0.69290 0.55010 0.25965
+B1 B 0.00000 0.00000 0.25000
+B2_1 B 0.44730 0.00000 0.25000
+B2_2 B  0.00000 0.44730 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Ce1 0.254 0.127 0.00000 2my,my,mz   0.22(3)
+Fe1_1 4.82 2.41 0.00000 mx,my,mz    4.17(11)
+Fe1_2 4.82 2.41 0.00000 2my,my,mz   4.17
+

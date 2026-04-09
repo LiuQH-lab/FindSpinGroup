@@ -1,0 +1,119 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 04/02/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-02-04
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        2
+_citation_page_first            9409
+_citation_page_last             9422
+_citation_article_id            ?
+_citation_year                  1990
+_citation_DOI                   10.1088/0953-8984/2/47/015
+
+loop_
+_citation_author_name
+"P.J. Brown"
+"V. Nunez"
+"F. Tasset"
+"J.B. Forsyth"
+"P. Radhakrishna"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  420
+_experiment_temperature  200
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM6+  2  2  special  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD with polarization analysis
+Positional structure from a RT model of a material with slightly different stoichiometry.
+;
+
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+The MSG corresponding to the model reported in the original reference is corrected here.
+2-dim irrep along a special direction.
+Another model with MSG Cmc'm'(-b,2a+b,c) is reported to have a similar goodness of fit (see #0.279). It corresponds to the other possible special direction with higher symmetry of the same 2-dim irrep.
+weak FM is expected along the direction 2a+b
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,2a+b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  63.464
+_space_group_magn.name_BNS  "C m' c m'"
+_cell_length_a             5.66500
+_cell_length_b             5.66500
+_cell_length_c             4.53100
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,x-y,-z+1/2,+1
+3 -x,-y,-z,+1
+4 -x,-x+y,z+1/2,+1
+5 -x,-x+y,-z,-1
+6 -x,-y,z+1/2,-1
+7 x,x-y,z,-1
+8 x,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1_1 Mn 0.83880 0.67760 0.25000
+Mn1_2 Mn  0.32240 0.16120 0.25000
+As1 As 0.33333 0.66667 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1_1 -3.00(1) 3.00 0.00000 mx,my,0
+Mn1_2 6.00 3.00 0.00000 2my,my,0
+

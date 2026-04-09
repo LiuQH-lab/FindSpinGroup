@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        79
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            144408
+_citation_year                  2009
+_citation_DOI                   10.1103/PhysRevB.79.144408
+
+loop_
+_citation_author_name
+"P. Bordet"
+"E. Suard"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  164816
+_atomic_positions_source_other               .
+
+_transition_temperature  70
+_experiment_temperature  10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4-  1   1  .  primary  9  .
+mGM2+  1   1  .  primary  12  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 110K
+Non-standard setting Pbnm of the parent space group
+Above 70K and up to 112K, only moments of Fe2, Fe4 and Fe5 are ordered (see #0.386)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic stucture
+Two different irreps are as primary: two order parameters are involved
+Irrep mGM4- refers to the arrangement of Fe2,Fe4 and Fe5 moments, already existing above 70K, while irrep mGM2- describes the symmetry properties of the Fe1 and Fe3 ordering, which takes place in the second transition at 70K.
+Irrep labels refer to the parent setting Pnma of the parent space group
+Polar MSG along b (Pbnm setting), so that magnetically induced ferroelectricity (multiferroic of type II) can be expected.
+FM along a (Pbnm setting).
+;
+
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'b,c,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a,b;1/4,0,1/4'
+
+
+
+_space_group_magn.number_BNS  26.68
+_space_group_magn.name_BNS  "P m' c 2_1'"
+_cell_length_a             9.46500
+_cell_length_b             12.31000
+_cell_length_c             6.15400
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,z,+1
+3 -x+1/2,y+1/2,-z+1/2,-1
+4 x,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Fe1 Fe 0.00000 0.00000 0.00000
+Fe2_1 Fe 0.01174 0.50266 0.75000
+Fe2_2 Fe  0.51174 0.99734 0.25000
+Fe3_1 Fe 0.50017 0.22596 0.00257
+Fe3_2 Fe  0.00017 0.27404 0.99743
+Fe4_1 Fe 0.24924 0.10929 0.75000
+Fe4_2 Fe  0.74924 0.39071 0.25000
+Fe5_1 Fe 0.75988 0.88487 0.75000
+Fe5_2 Fe  0.25988 0.61513 0.25000
+B1_1 B 0.76520 0.13710 0.75000
+B1_2 B  0.26520 0.36290 0.25000
+B2_1 B 0.22920 0.86000 0.75000
+B2_2 B  0.72920 0.64000 0.25000
+O1_1 O 0.34510 0.45630 0.75000
+O1_2 O  0.84510 0.04370 0.25000
+O2_1 O 0.65850 0.54170 0.75000
+O2_2 O  0.15850 0.95830 0.25000
+O3_1 O 0.88800 0.42180 0.99040
+O3_2 O  0.38800 0.07820 0.00960
+O4_1 O 0.12550 0.36130 0.75000
+O4_2 O  0.62550 0.13870 0.25000
+O5_1 O 0.88090 0.63720 0.75000
+O5_2 O  0.38090 0.86280 0.25000
+O6_1 O 0.61330 0.35910 0.99750
+O6_2 O  0.11330 0.14090 0.00250
+O7_1 O 0.34350 0.26240 0.75000
+O7_2 O  0.84350 0.23760 0.25000
+O8_1 O 0.66200 0.73500 0.75000
+O8_2 O  0.16200 0.76500 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 -3.3(2) 0.00000 0.00000 mx,my,mz
+Fe2_1 0.0 3.9(1) 0.0 mx,my,0
+Fe2_2 0.0 3.9 0.0 mx,my,0
+Fe3_1 4.0(1) 0.0 0.0 mx,my,mz
+Fe3_2 4.0  0.0 0.0 mx,my,mz
+Fe4_1 0.0 -2.74(7) 0.0 mx,my,0
+Fe4_2 0.0 -2.74 0.0 mx,my,0
+Fe5_1 0.0 -2.74 0.0 mx,my,0
+Fe5_2 0.0 -2.74 0.0 mx,my,0
+

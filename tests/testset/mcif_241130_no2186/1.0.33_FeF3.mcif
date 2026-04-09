@@ -1,0 +1,125 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        58
+_citation_page_first            171
+_citation_page_last             176
+_citation_article_id            .
+_citation_year                  1986
+_citation_DOI                   10.1016/0038-1098(86)90836-7
+
+loop_
+_citation_author_name
+"M. Leblanc"
+"R. De Pape"
+"G. Ferey"
+"J. Pannetier"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  97
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA3+  1  1  .  primary  1  .
+A3+   1  1  .  primary  2  .
+A4+   1  1  .  primary  1  .
+GM1+  1  1  .  secondary 3  yes
+mA4+  1  1  .  secondary 1  no
+mGM2+ 1  1  .  secondary 1  no
+GM2+  1  1  .  secondary 1  no
+
+ 
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+The reported position structure includes a very small structural distortion with respect to the parent structure which reduces its space group from P6/mmm to P6_3/m, with duplication of the unit cell along c. 
+This structural distortion cannot be induced by the reported magnetic ordering, as it breaks further the system symmetry.
+The structural distortion included in the model implies the presence of two addi tionalnon-magnetic primary order parameters with wave vector (0,0,1/2).
+If the model is correct, some structural phase transition(s), independent of the magnetic ordering, must take place between the reported P6/mmm paramagnetic structure and this phase.
+The reported magnetic ordering reduces the symmetry only to the much higher MSG P_c6_3/mmc (194.272), which implies for the atomic positions the space group P6/mmmm(a,b,2c;0,0,0), with the three independent sites being at special positions with the same constraints as in the parent structure. The model however breaks these constrains for the F1 position, and this reduces further the MSG in the way indicated above.
+;
+
+_parent_space_group.name_H-M_alt  'P 6/m m m'
+_parent_space_group.IT_number                       191
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  176.143
+_space_group_magn.name_BNS  "P 6_3/m"
+_cell_length_a             7.402(1)
+_cell_length_b             7.402
+_cell_length_c             7.5690(3)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x-y,x,z+1/2,+1 
+3 -y,x-y,z,+1 
+4 -x,-y,z+1/2,+1 
+5 -x+y,-x,z,+1 
+6 y,-x+y,z+1/2,+1 
+7 -x,-y,-z,+1 
+8 -x+y,-x,-z+1/2,+1 
+9 y,-x+y,-z,+1 
+10 x,y,-z+1/2,+1 
+11 x-y,x,-z,+1 
+12 -y,x-y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Fe1 Fe 0.50000 0.00000 0.00000
+F1 F 0.496(3) 0.029(2) 0.25000
+F2 F 0.2111(2) -0.2111 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1 4.07(8) 0.00000 0.00000 mx,my,mz 4.07(8)
+

@@ -1,0 +1,179 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:20:13
+# Database entry: 2.16 Ce2PdGe3
+# Cif-like file for the case 2.16
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ce2 Pd Ge3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        94
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            014418
+_citation_year                  2016
+_citation_DOI                   10.1103/PhysRevB.94.014418
+
+loop_
+_citation_author_name
+"J. Cedervall"
+"P. Beran"
+"M. Vennstrom"
+"T. Danielsson"
+"S. Ronneteg"
+"V. Hoglin"
+"D. Lindell"
+"O. Eriksson"
+"G. Andre"
+"Y. Andersson"
+"P. Nordblad"
+"M. Sahlberg"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   427680
+_atomic_positions_source_other               .
+
+_transition_temperature     2.3
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mR1- 2 1 . primary 3 .
+mGM2- 1 1 . primary 1 .
+mGM5+ 2 2 special primary 3 .
+mGM4+ 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Several models are reported undistinguishable. The model here corresponds to the one represented in Fig. 7 of the reference. The parameters given in the article required some reintepretation, which may not be correct.
+A previous phase at higher temperatures with only the 1-dim irrep mGM2- as active order parameter is also reported in the same reference (see entry #0.166).
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Despite its apparent simplicity this structure involves four different magnetic irreps, all of them acting as primary and present in the spin configuration, i.e. they all break the symmetry further, and none of them can be considered an induced effect.
+Many other magnetic irreps are symmetry allowed as secondary, but not present.
+Alternative more simple models with only two primary irreps, as usually expected, were not fully discussed and characterized in the reference.
+;
+
+_parent_space_group.name_H-M_alt  'P  4_2/m  m  c'
+_parent_space_group.IT_number                       131
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2c,b,-1/2a+1/2c;0,0,0'
+
+
+_space_group_magn.number_BNS  6.20
+_space_group_magn.name_BNS  "P  m'  "
+_space_group_magn.point_group_name  "m'"
+_space_group_magn.point_group_number  "4.3.11"
+_cell_length_a                 8.48880
+_cell_length_b                 4.24440
+_cell_length_c                 29.58560
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ce1_1 Ce 0.00000 0.50000 0.00000 1.
+Ce1_2 Ce 0.25000 0.00000 0.25000 1.
+Ce1_3 Ce 0.00000 0.50000 0.50000 1.
+Ce1_4 Ce 0.25000 0.00000 0.75000 1.
+Ce2_1 Ce 0.25000 0.50000 0.12500 1.
+Ce2_2 Ce 0.25000 0.50000 0.37500 1.
+Ce2_3 Ce 0.25000 0.50000 0.62500 1.
+Ce2_4 Ce 0.25000 0.50000 0.87500 1.
+Ge1_1 Ge 0.00000 0.00000 0.16662 1.
+Ge1_2 Ge 0.00000 0.00000 0.41662 1.
+Ge1_3 Ge 0.00000 0.00000 0.83339 1.
+Ge1_4 Ge 0.00000 0.00000 0.08338 1.
+Ge1_5 Ge 0.00000 0.00000 0.66661 1.
+Ge1_6 Ge 0.00000 0.00000 0.91661 1.
+Ge1_7 Ge 0.00000 0.00000 0.33338 1.
+Ge1_8 Ge 0.00000 0.00000 0.58339 1.
+Ge2_1 Ge 0.00000 0.50000 0.20938 0.458
+Ge2_2 Ge 0.25000 0.00000 0.45938 0.458
+Ge2_3 Ge 0.00000 0.50000 0.79062 0.458
+Ge2_4 Ge 0.25000 0.00000 0.04062 0.458
+Ge2_5 Ge 0.00000 0.50000 0.70938 0.458
+Ge2_6 Ge 0.25000 0.00000 0.95938 0.458
+Ge2_7 Ge 0.00000 0.50000 0.29062 0.458
+Ge2_8 Ge 0.25000 0.00000 0.54062 0.458
+Pd1_1 Pd 0.00000 0.50000 0.20938 0.542
+Pd1_2 Pd 0.25000 0.00000 0.45938 0.542
+Pd1_3 Pd 0.00000 0.50000 0.79062 0.542
+Pd1_4 Pd 0.25000 0.00000 0.04062 0.542
+Pd1_5 Pd 0.00000 0.50000 0.70938 0.542
+Pd1_6 Pd 0.25000 0.00000 0.95938 0.542
+Pd1_7 Pd 0.00000 0.50000 0.29062 0.542
+Pd1_8 Pd 0.25000 0.00000 0.54062 0.542
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ce1_1 -0.63(1) 0.0 0.69(2) mx,0,mz
+Ce1_2 -0.63 0.0 -0.69 mx,0,mz
+Ce1_3 -0.63 0.0 0.69 mx,0,mz
+Ce1_4 -0.63 0.0 -0.69 mx,0,mz
+Ce2_1 0.74(1) 0.0 -1.69 mx,0,mz
+Ce2_2 0.74 0.0 1.69 mx,0,mz
+Ce2_3 -0.74 0.0 -1.69 mx,0,mz
+Ce2_4 -0.74 0.0 1.69 mx,0,mz
+

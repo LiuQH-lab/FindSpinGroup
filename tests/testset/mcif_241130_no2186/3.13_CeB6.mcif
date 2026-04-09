@@ -1,0 +1,145 @@
+##CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/03/2018 23:27:30
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-03
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        47-48
+_citation_page_first            145
+_citation_page_last             148
+_citation_article_id            ?
+_citation_year                  1985
+_citation_DOI                   10.1016/0304-8853(85)90382-8
+
+loop_
+_citation_author_name
+"J. Effantin"
+"J. Rossat-Mignod"
+"P. Burlet"
+"H. Bartholin"
+"S. Kunii"
+"T. Kasuya"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  67404
+_atomic_positions_source_other               .
+
+_transition_temperature  2.4
+_experiment_temperature  1.3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM3  12  1  special  primary  1  .
+mS3   12  1  special  primary  1  .
+mSM4  12  1  special  secondary 1 no
+mS4   12  1  special  secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+So-called Phase III observed below 2.4K
+More recently, a more complex structure has been proposed for this phase III (Zaharko et al., Phys. Rev. B 68, 214401 (2003))
+Below 3.2 and above 2.4K, a phase, called phase II, with antiferro-quadrupolar (AFQ) ordering is reported. The wave vector of its order parameter is R(1/2,1/2 1/2).
+;
+
+_active_magnetic_irreps_details
+;
+4k magnetic structure
+2 different irreps, with different propagation vectors, are active as primary ones, and their amplitude is equal.
+Despite involving two different irreps, the transition from the AFQ phase is reported to be continuous. But these irreps and propagation vectors are defined with respect to the cubic phase of symmetry Pm-3m, as parent. and not with respect to the AFQ phase inmediate above in temperature.
+Among the secondary irreps allowed by the magnetic ordering of the present model two irreps with wave vector R exist: R5+ and R4+. The irrep R5+ describes the transformation properties of the quadrupolar components (Qxy,Qxz,Qyz) and for the reported magnetic ordering it must be restricted to (Qxy,0,0), with a symmetry I4/mmm(a+b,-a+b,2c;1/2,1/2,0).
+Hence, from this magnetic structure one can infer that the space group of the AFQ phase is I4/mmm, with its order parameter being the QP component Qxy (and domain-related equivalent components Qxz and Qyz). In this AFQ tetragonal phase the Ce site does not split but its primitive unit cell contains two sites, related by the 4-fold rotation and with opposite Qxy spontaneous values.
+If the AFQ phase of symmetry I4/mmmm is taken as parent, the spin arrangement involves a single irrep of I4/mmmm, with only 2 propagation vectors active, namely: (1/2,0,0), (0,1/2,0), and from this viewpoint the structure can be considered a 2k-magnetic structure. Using this AFQ phase as parent, a single irrep is active, and it has two basis modes, i.e. two free parameters, which allow the spin arrangement to change the global orientation, while keeping the relative ortogonal directions of the spins.
+The other two degrees of freedom for the spins within the MSG, correspond to a secondary irrep allowed by the magnetic symmetry.
+;
+
+_parent_space_group.name_H-M_alt  'P  m  -3  m'
+_parent_space_group.IT_number                       221
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 1/4 0]
+k2 [1/4 -1/4 0]
+k3 [1/4 1/4 1/2]
+k4 [1/4 -1/4 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '4a,4b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,-a,c;0,1/8,1/4'
+
+
+
+_space_group_magn.number_BNS  64.479
+_space_group_magn.name_BNS  "C_amca"
+_cell_length_a             16.55840
+_cell_length_b             16.55840
+_cell_length_c             8.27920
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z+1/2,+1
+3 x,-y+3/4,-z,+1
+4 -x,-y+3/4,z+1/2,+1
+5 -x,-y+1/4,-z+1/2,+1
+6 x,-y+1/4,z,+1
+7 -x,y+1/2,z+1/2,+1
+8 x,y+1/2,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x,y+1/2,z,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ce1_1 Ce 0.00000 0.00000 0.00000
+Ce1_2 Ce  0.25000 0.00000 0.00000
+B1_1 B 0.04981 0.12500 0.25000
+B1_2 B  0.12500 0.04981 0.25000
+B1_3 B  0.12500 0.95019 0.25000
+B1_4 B  0.12500 0.12500 0.09963
+B1_5 B  0.12500 0.12500 0.59962
+B1_6 B  0.04981 0.37500 0.25000
+B1_7 B  0.12500 0.37500 0.09963
+B1_8 B  0.12500 0.37500 0.59962
+B1_9 B  0.29981 0.12500 0.25000
+B1_10 B  0.29981 0.37500 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ce1_1 -0.20 0.20 0.00000 mx,my,0
+Ce1_2 -0.20 -0.20 0.00000 mx,my,0
+
+
+
+

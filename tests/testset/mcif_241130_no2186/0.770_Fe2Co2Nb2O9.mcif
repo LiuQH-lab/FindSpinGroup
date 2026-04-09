@@ -1,0 +1,154 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/10/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-11-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Fe2 Co2 Nb2 O9"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Mater. Chem. C"
+_citation_journal_volume        9
+_citation_page_first            14236
+_citation_page_last             14246
+_citation_article_id            .
+_citation_year                  2021
+_citation_DOI                   10.1039/d1tc02950a
+
+loop_
+_citation_author_name
+"A. Maignan"
+"C. Martin"
+"E. Tailleur"
+"F. Damay"
+"M. Mostovoy"
+"X. Wang"
+"Z. Hu"
+"H.-J. Lin"
+"C.-T. Chen"
+"L. H. Tjeng"
+"E. Suard"
+"F. Fauth"
+
+_temperature_position_structure         12
+_temperature_atom_positions             ?
+_temperature_non-magn_atom_positions    ?
+_temperature_cell_parameters            ?
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     58
+_experiment_temperature     .
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3- 2 2 special primary 4 .
+mGM1- 1 1 . secondary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 12K
+The C2/c structural distortion with respect to the P-3c1 paramagnetic structure, which is present in the reported structure, becomes observable below 50K and is being reported as an independent transition. The evidence presented however does not discard the possibility that this structural distortion is a magneto-structural effect induced by the magnetic ordering, with C2/c being in fact the actual effective space group that results for the positional structure from the MSG of the structure.
+The reported moments are associated to the mixed Fe/Co sites, without distinction between the two atomic species. Here, because of the format employed, the moment is associated to each atom with 0.5 occupancy of the site, as separate moments.
+From the MSG linear magnetolectrocity is to be expected.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep along a special direction as primary irrep
+A secondary irrep is allowed by the MSG (mz components), but no present.
+;
+
+_parent_space_group.name_H-M_alt  'P -3 1 c'
+_parent_space_group.IT_number                       165
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a+b,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  15.88
+_space_group_magn.name_BNS  "C 2/c'"
+_space_group_magn.point_group_name  "2/m'"
+_space_group_magn.point_group_number  "5.4.15"
+_cell_length_a                 8.99540
+_cell_length_b                 5.19400
+_cell_length_c                 14.14460
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z+1/2,+1 
+3 -x,-y,-z,-1 
+4 x,-y,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.16500 0.50500 0.98640 0.5
+Co1 Co 0.16500 0.50500 0.98640 0.5
+Fe2 Fe 0.16100 0.51000 0.19350 0.5
+Co2 Co 0.16100 0.51000 0.19350 0.5
+Nb1 Nb -0.00080 0.00670 0.14230 1.
+O1 O 0.14200 0.87500 0.24900 1.
+O2 O 0.50000 0.80000 0.25000 1.
+O3 O 0.15900 0.17900 0.08300 1.
+O4 O 0.82800 0.13800 0.08600 1.
+O5 O 0.99800 0.66100 0.08800 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 2.6(2) 0.0 0.0 mx,my,mz 2.6(2) ? ?
+Co1 2.6(2) 0.0 0.0 mx,my,mz 2.6(2) ? ?
+Fe2 3.4(1) 0.0 0.0 mx,my,mz 3.4(1) ? ?
+Co2 3.4(1) 0.0 0.0 mx,my,mz 3.4(1) ? ?
+

@@ -1,0 +1,125 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 22/05/2019 
+# icsd_68174.cif
+
+data_5yOhtAoR
+_audit_creation_date            2019-05-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys. C: Solid State Phys."
+_citation_journal_volume        7
+_citation_page_first            409
+_citation_page_last             424
+_citation_article_id            ?
+_citation_year                  1974
+_citation_DOI                   10.1088/0022-3719/7/2/019
+
+loop_
+_citation_author_name
+"Jensen, G.B."
+"Nielsen,O.V."
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  33
+_experiment_temperature  4.7
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5+ 2  2  special  primary 4 .
+mSM3  4  2  special  primary  4  .
+mM2   2  2  special  secondary  3  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+above 33K, up to 39K an incommensurate spiral structure is reported
+Neel temperature: 41K
+Between 41K and 39K a k=0 magnetic phase is observed
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+2k maximal symmetry
+2 primary irreps involved
+The second irrep mSM3 is only responsible of the z component of the Mn2_2 spins. The rest of the spin arrangement is a k=0 (mGM5+) ordering.
+A secondary irrep with a third propagation vector: k=(1,1,1) ( or equivalently (0,0,1)) is possible, but it is negligible in the reported structure. 
+;
+
+_parent_space_group.name_H-M_alt  'I4_1/a m d'
+_parent_space_group.IT_number                       141
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-a,b;0,1/4,0'
+
+
+
+_space_group_magn.number_BNS  60.422
+_space_group_magn.name_BNS  "P b' c' n"
+_cell_length_a             5.71000
+_cell_length_b             11.42000
+_cell_length_c             9.35000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,y+1/2,-z+1/2,+1 
+3 -x,-y+1/2,-z,+1 
+4 x+1/2,-y,z+1/2,+1 
+5 -x+1/2,-y+1/2,z+1/2,-1 
+6 x,-y,-z,-1 
+7 x+1/2,y,-z+1/2,-1 
+8 -x,y+1/2,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.00000 0.37500 0.12500
+Mn2_1 Mn 0.00000 0.00000 0.50000
+Mn2_2 Mn  0.25000 0.37500 0.75000
+Mn2_3 Mn  0.50000 0.25000 0.00000
+O1_1 O 0.00000 0.23540 0.25840
+O1_2 O  0.77920 0.37500 0.50840
+O1_3 O  0.72080 0.37500 0.99160
+O1_4 O  0.50000 0.48540 0.75840
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.00000 4.34000 0.00000 mx,my,mz
+Mn2_1 0.00000 -1.38000 3.37000 0,my,mz
+Mn2_2 0.00000 -1.08000 3.07000 mx,my,mz
+Mn2_3 0.00000 -1.38000 3.37000 mx,my,mz

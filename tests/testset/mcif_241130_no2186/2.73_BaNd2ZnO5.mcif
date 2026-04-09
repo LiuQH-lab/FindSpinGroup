@@ -1,0 +1,165 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# preliminary mcif file provided by O. Garlea
+# Date: 11/02/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-11-02
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ba Nd2 Zn O5"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Phys. Rev. Materials"
+_citation_journal_volume        5
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            064418
+_citation_year                  2021
+_citation_DOI                   10.1103/PhysRevMaterials.5.064418
+
+loop_
+_citation_author_name
+"Y. Ishii"
+"G. Sala"
+"M. B. Stone"
+"V. O. Garlea"
+"S. Calder"
+"J. Chen"
+"H. K. Yoshida"
+"S. Fukuoka"
+"J. Yan"
+"C. dela Cruz"
+"M.-H. Du"
+"D. S. Parker"
+"H. Zhang"
+"C. D. Batista"
+"K. Yamaura"
+"A. D. Christianson"
+
+_temperature_position_structure         2.1
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            0.75
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     1.80
+_experiment_temperature     0.75
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2- 2 1 special-2 primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+A single-k can also describe the data. With a single k1 = (0.5 0.5 0), symmetry requires that the single Nd site of the parent structure split into two orbits. 
+The single-k structure is described by the magnetic space group C_A m c a.  Refinements indicated a spin configuration with large moments on one Nd orbit, whereas the other had essentially a zero moment. Solutions of this type were rejected because no crystallographic distortion was detected in the neutron diffraction data indicating that the two Nd sites remain in identical chemical environments.
+;
+
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k-maximal magnetic symmetry
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m c m'
+_parent_space_group.IT_number                       140
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+k2 [1/2 -1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,-1/2a+1/2b,c;0,1/4,0'
+
+_space_group_magn.number_BNS  130.433
+_space_group_magn.name_BNS  "P_C 4/n c c"
+_space_group_magn.point_group_name  "4/mmm1'"
+_space_group_magn.point_group_number  "15.2.54"
+_cell_length_a                 13.48220
+_cell_length_b                 13.48220
+_cell_length_c                 11.52960
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y+1/2,x+1/2,z,+1 
+3 y+1/2,-x+1/2,z,+1 
+4 y,x+1/2,-z+1/2,+1 
+5 -y,-x+1/2,-z+1/2,+1 
+6 -x,-y,z,+1 
+7 -x,y+1/2,-z+1/2,+1 
+8 x,-y+1/2,-z+1/2,+1 
+9 -x,-y+1/2,-z,+1 
+10 y,-x+1/2,-z,+1 
+11 -y,x+1/2,-z,+1 
+12 -y+1/2,-x+1/2,z+1/2,+1 
+13 y+1/2,x+1/2,z+1/2,+1 
+14 x,y+1/2,-z,+1 
+15 x,-y,z+1/2,+1 
+16 -x,y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y+1/2,z,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba_1 Ba 0.00000 0.00000 0.25000 1
+Ba_2 Ba 0.25000 0.25000 0.75000 1
+Nd Nd 0.08680 0.33680 0.00000 1
+Zn Zn 0.00000 0.25000 0.25000 1
+O1_1 O 0.00000 0.00000 0.00000 1
+O1_2 O 0.25000 0.25000 0.50000 1
+O2 O 0.17735 0.42735 0.13120 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Nd 1.34 -1.34 0.0 mx,my,0 1.9 ? ?
+

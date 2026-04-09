@@ -1,0 +1,141 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:10:10
+# Database entry: 1.64 BaNiF4
+# Cif-like file for the case 1.64
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ba Ni F4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Applied Phys."
+_citation_journal_volume        41
+_citation_page_first            943
+_citation_page_last             ?
+_citation_article_id            .
+_citation_year                  1970
+_citation_DOI                   10.1063/1.1659035
+
+loop_
+_citation_author_name
+"D.E. Cox"
+"M. Eibschutz"
+"H.J. Guggenheim"
+"L. Holmes"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   23141
+_atomic_positions_source_other               .
+
+_transition_temperature     ?
+_experiment_temperature     4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mS2 2 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+A small canting caused by a non-zero mz component has been reported in Ederer et al., PHYSICAL REVIEW B 74, 020401R 2006.
+Ferroelectric parent phase. Multiferroic
+Virtual parent paraelectric phase with Cmcm space group
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible).
+when considered from the parent Cmcm symmetry, the  weak mz component is a secondary irrep component, which is switchable with the polarization.
+The allowed mz component is caused by the structural polar distortion reducing the symmetry to Cmc21.
+;
+
+_parent_space_group.name_H-M_alt  'C  m  c  2_1'
+_parent_space_group.IT_number                       36
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,c,1/4a-1/4b;1/8,1/8,0'
+
+
+_space_group_magn.number_BNS  4.10
+_space_group_magn.name_BNS  "P_a  2_1"
+_space_group_magn.point_group_name  "21'"
+_space_group_magn.point_group_number  "3.2.7"
+_cell_length_a                 8.27800
+_cell_length_b                 28.73800
+_cell_length_c                 5.77500
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/4,y+3/4,z,+1
+3 x+1/2,y+1/2,z,+1
+4 x+3/4,y+1/4,z,+1
+5 x+1/4,y+1/4,z,-1
+6 x+1/2,y,z,-1
+7 x+3/4,y+3/4,z,-1
+8 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0.00000 0.07350 0.96300 1
+Ni1 Ni2+ 0.00000 0.20700 0.00000 1
+F1 F 0.00000 0.23750 0.28700 1
+F2 F 0.00000 0.15000 0.20100 1
+F3 F 0.00000 0.16450 0.74500 1
+F4 F 0.00000 0.45850 0.02300 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1 0.0 2. 0.0 mx,my,mz
+

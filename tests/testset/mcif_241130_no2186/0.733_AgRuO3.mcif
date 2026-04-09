@@ -1,0 +1,153 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-10-03
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ag Ru O3"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        103
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            214413
+_citation_year                  2021
+_citation_DOI                   10.1103/PhysRevB.103.214413
+
+loop_
+_citation_author_name
+"W. Schnelle"
+"B.E. Prasad"
+"C. Felser"
+"M. Jansen"
+"E.V. Komleva"
+"S.V. Streltsov"
+"I.I. Mazin"
+"D. Khalyavin"
+"P. Manuel"
+"S. Pal"
+"D.V.S. Muthu"
+"A.K. Sood"
+"E.S. Klyushina"
+"B. Lake"
+"J.C. Orain"
+"H. Luetkens"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     342
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1- 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Both magnetic structure and atomic positions were determined together using the same experimental data set.
+The material was erroneously reported as "Lacking Long-Range Magnetic Order" by Prasad et al Chem. Eur. J. 23, 4680 (2017).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+1-dim irrep as primary irrep
+;
+
+_parent_space_group.name_H-M_alt  "R -3 c"
+_parent_space_group.IT_number                       167
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  "a,b,c;0,0,0"
+_space_group_magn.transform_BNS_Pp_abc  "a,b,c;0,0,0"
+
+_space_group_magn.number_BNS  167.106
+_space_group_magn.name_BNS  "R -3' c'"
+_space_group_magn.point_group_name  "-3'm'"
+_space_group_magn.point_group_number  "20.4.74"
+_cell_length_a                 5.23029
+_cell_length_b                 5.23029
+_cell_length_c                 32.19490
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              120.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x-y,z,+1 
+3 -x+y,-x,z,+1 
+4 y,x,-z+1/2,+1 
+5 -x,-x+y,-z+1/2,+1 
+6 x-y,-y,-z+1/2,+1 
+7 -x,-y,-z,-1 
+8 y,-x+y,-z,-1 
+9 x-y,x,-z,-1 
+10 -y,-x,z+1/2,-1 
+11 x,x-y,z+1/2,-1 
+12 -x+y,y,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/3,y+2/3,z+2/3,+1 
+3 x+2/3,y+1/3,z+1/3,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ru1 Ru 0.00000 0.00000 0.16799 1
+Ag1 Ag 0.00000 0.00000 0.43001 1
+O1 O 0.71653 0.04427 0.13324 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ru1 0.0 0.0 1.85(5) 0,0,mz 1.85(5) 0 0
+

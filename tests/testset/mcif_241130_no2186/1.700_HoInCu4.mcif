@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/26/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-10-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ho1 In1 Cu4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW RESEARCH"
+_citation_journal_volume        2
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            013183
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevResearch.2.013183
+
+loop_
+_citation_author_name
+"O. Stockert"
+"J.-U. Hoffmann"
+"M. Muhlbauer"
+"A. Senyshyn"
+"M. M. Koza"
+"A. A. Tsirlin"
+"F. M. Wolf"
+"S. Bachus"
+"P. Gegenwart"
+"R. Movshovich"
+"S. Bobev"
+"V. Fritsch"
+
+_temperature_position_structure         120
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     0.76
+_experiment_temperature     0.065
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mW3 6 1 special primary 1 .
+mW4 6 1 special primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at 120K
+The propagation vector (1,1/2,0) considered in the paper is equivalent to (0,-1/2,-1). Therefore we take here the standard one (0,1/2,1).
+See #1.699 for a similar compound with the same propagation vector, but with the moments along b, instead of c, which makes that only one irrep is active (see below).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two extended (k,-k) small irreps along a special direction are involved as primary. 
+The null moment on one of the split Ho sites requires a very particular combination of the two basis modes corresponding to the two different primary irreps involved. This makes this structure rather dubious.
+;
+
+_parent_space_group.name_H-M_alt  'F -4 3 m'
+_parent_space_group.IT_number                       216
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;1/4,0,0'
+
+_space_group_magn.number_BNS  24.56
+_space_group_magn.name_BNS  "I_c 2_1c2_1c2_1"
+_space_group_magn.point_group_name  "2221'"
+_space_group_magn.point_group_number  "6.2.18"
+_cell_length_a                 7.17810
+_cell_length_b                 14.35620
+_cell_length_c                 7.17810
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y+1/2,-z,+1 
+3 -x,-y,z,+1 
+4 -x+1/2,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+3 x,y+1/2,z,-1 
+4 x+1/2,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cu1_1 Cu 0.62456 0.31228 0.62456 1
+Cu1_2 Cu 0.62457 0.56228 0.12457 1
+Ho1_1 Ho 0.00000 0.00000 0.00000 1
+Ho1_2 Ho 0.00000 0.25000 0.50000 1
+In1 In 0.25000 0.12500 0.25000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ho1_1 0.0 0.0 4.57(6) 0,0,mz 4.57(6) ? ?
+Ho1_2 0.0 0.0 0.0 mx,0,0 0.0 ? ?
+

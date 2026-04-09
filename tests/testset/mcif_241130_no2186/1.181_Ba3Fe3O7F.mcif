@@ -1,0 +1,144 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:18:57
+# Database entry: 1.181 Ba3Fe3O7F
+# Cif-like file for the case 1.181
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ba3 Fe3 O7 F'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Solid State Chemistry"
+_citation_journal_volume        243
+_citation_page_first            31
+_citation_page_last             37
+_citation_article_id            .
+_citation_year                  2016
+_citation_DOI                   10.1016/j.jssc.2016.07.033
+
+loop_
+_citation_author_name
+"O. Clemens"
+"C. Reitz"
+"R. Witte"
+"R. Kruk"
+"R.I. Smith"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     ?
+_experiment_temperature     290
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mB2- 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep active. The irrep label has been changed here to make it consistent with the irrep labeling employed in ISODISTORT and in our server.
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/m'
+_parent_space_group.IT_number                       11
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,b,-a;0,0,1/4'
+
+
+_space_group_magn.number_BNS  11.55
+_space_group_magn.name_BNS  "P_a  2_1/m"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 10.10970
+_cell_length_b                 5.71230
+_cell_length_c                 13.96320
+_cell_angle_alpha              90.00
+_cell_angle_beta               93.07
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,-z+1/2,+1
+3 -x,-y,-z+1/2,+1
+4 x,-y+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0.26500 0.25000 0.49055 1.
+Ba2 Ba 0.91670 0.25000 0.35465 1.
+Ba3 Ba 0.57400 0.25000 0.17135 1.
+Fe1 Fe 0.26360 0.25000 0.24760 1.
+Fe2 Fe 0.88080 0.25000 0.11165 1.
+Fe3 Fe 0.60030 0.25000 0.41435 1.
+X11 X 0.75600 0.25000 0.00400 0.4
+X12 X 0.74000 0.25000 0.01550 0.6
+X2 X 0.50000 0.00000 0.00000 1.
+X3 X 0.42400 0.25000 0.33465 1.
+X41 X 0.03670 0.25000 0.06090 0.69
+X42 X 0.06890 0.25000 0.12400 0.31
+X5 X 0.67270 0.99650 0.33765 1.
+X6 X 0.84250 0.98950 0.18735 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.0 3.7(1) 0.0 0,my,0
+Fe2 0.0 -3.5(1) 0.0 0,my,0
+Fe3 0.0 -3.8(1) 0.0 0,my,0
+

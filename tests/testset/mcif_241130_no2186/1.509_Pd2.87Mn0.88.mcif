@@ -1,0 +1,115 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        78
+_citation_page_first            767
+_citation_page_last             772
+_citation_article_id            .
+_citation_year                  1991
+_citation_DOI                   10.1016/0038-1098(91)90861-O
+
+loop_
+_citation_author_name
+"D. Rodic"
+"P.-J. Ahlzen"
+"Y. Andersson"
+"R. Tellgren"
+“F.Bouree-Vigneron”
+
+_atomic_positions_source_database_code_ICSD  54369
+_atomic_positions_source_other               .
+
+_transition_temperature  200(2)
+_experiment_temperature  10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM3+  1  1  .  primary  1  .
+mM5+  2  2  special  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Probably the data is unsensitive to the direction of the moment component on the ab plane and the x direction has been chosen arbitrarily.
+Moment components given here with non-significant digits to yield the reported moment magnitude and canting angle (10 degrees)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps involved as primary, i.e. two order parameters are present in the magnetic ordering. One for the magnetic ordering along z and another one for the ordering on the basal plane.
+The small x component of the moments, according to a second irrep mM5+, breaks further the symmetry of the system, which would tetragonal with only the mM3+ ordering of the z moment components.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-a+c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.83
+_space_group_magn.name_BNS  "P_A 2_1/c"
+_cell_length_a             3.88060
+_cell_length_b             3.88060
+_cell_length_c             15.54500
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,y+1/2,-z+1/2,+1 
+3 -x,-y,-z,+1 
+4 x+1/2,-y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Pd1_1 Pd 0.00000 0.50000 0.00000 0.958
+Pd1_2 Pd  0.50000 0.00000 0.00000 0.958
+Pd2 Pd 0.00000 0.50000 0.25000 0.958
+Mn1 Mn 0.00000 0.00000 0.11800 0.876
+Pd3 Pd 0.00000 0.00000 0.62760 0.958
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 0.90 0.00000 5.12 mx,0,mz 5.2(1)
+

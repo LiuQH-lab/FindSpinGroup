@@ -1,0 +1,135 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/09/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-09-07
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        56
+_citation_page_first            197
+_citation_page_last             207
+_citation_article_id            ?
+_citation_year                  2017
+_citation_DOI                   10.1021/acs.inorgchem.6b01866
+
+loop_
+_citation_author_name
+"L. Mazzuca"
+"L. Canadillas-Delgado"
+"J.A. Rodriguez-Velamazan"
+"O. Fabelo"
+"M. Scarrozza"
+"A. Stroppa"
+"S. Picozzi"
+"J.-P. Zhao"
+"X.-H. Bu"
+"J. Rodriguez-Carvajal"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  32
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3+  2  2  special  primary  3  .
+mGM2+  1  1    .      secondary 2 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure of non-magnetic atoms (except for the unit cell parameters) from a measurement at 45K. This reported 45K nuclear structure has been transformed to an equivalent different description, to be consistent with the different Wyckoff position considered for the Co site in the report of the magnetic structure with only the magnetic atoms.
+Some H positions absent in the 45K structure
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep along special direction as SINGLE primary irrep
+1-dim irrep possible as secondary, and present in the model
+;
+
+_parent_space_group.name_H-M_alt  'P -3 c 1'
+_parent_space_group.IT_number                       163
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,-a+b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  15.89
+_space_group_magn.name_BNS  "C 2'/c'"
+_cell_length_a             8.2501(9)
+_cell_length_b             8.2501
+_cell_length_c             13.7188(12)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -y,-x,-z+1/2,-1
+4 y,x,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1 Co 0.33333 0.66667 0.25000
+Fe1 Fe 0.00000 0.00000 0.00000
+O1_1 O 0.11663 0.65642 0.16805
+O1_2 O  0.34358 0.46021 0.16805
+O1_3 O  0.53979 0.88337 0.16805
+O2_1 O 0.98677 0.79113 0.08294
+O2_2 O  0.20887 0.19564 0.08294
+O2_3 O  0.80436 0.01323 0.08294
+C1_1 C 0.12675 0.78982 0.12015
+C1_2 C  0.21018 0.33693 0.12015
+C1_3 C  0.66307 0.87325 0.12015
+H1_1 H 0.24470 0.89520 0.11120
+H1_2 H  0.10480 0.34950 0.11120
+H1_3 H  0.65050 0.75530 0.11120
+C2 C 0.33333 0.66667 0.84420
+N1_1 N 0.72240 0.44470 0.25000
+N1_2 N  0.55530 0.27770 0.25000
+N1_3 N  0.72230 0.27760 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 -2.2(3) -2.2 -1.0(7) mx,mx,mz
+Fe1 3.2(3) 4.6(2) 1.5(6) mx,my,mz
+

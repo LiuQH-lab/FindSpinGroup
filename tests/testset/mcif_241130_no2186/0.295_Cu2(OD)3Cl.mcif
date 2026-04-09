@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/03/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        20
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            472206
+_citation_year                  2008
+_citation_DOI                   10.1088/0953-8984/20/47/472206
+
+loop_
+_citation_author_name
+"A.S. Wills"
+"J.-Y. Henry"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  163214
+_atomic_positions_source_other               .
+
+_transition_temperature  6
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+  1  1  .  primary  9  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep primary
+non-standard setting P2_1/n
+weak FM along b symmetry allowed
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-a+c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.75
+_space_group_magn.name_BNS  "P 2_1/c"
+_cell_length_a             6.15170
+_cell_length_b             6.81610
+_cell_length_c             9.10540
+_cell_angle_alpha          90.00
+_cell_angle_beta           99.84
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cu1 Cu 0.24130 0.76560 0.25141
+Cu2 Cu 0.50000 0.00000 0.00000
+Cu3 Cu 0.00000 0.00000 0.00000
+O1 O 0.07940 0.01920 0.22345
+O2 O 0.25900 0.82040 0.03972
+O3 O 0.30970 0.20920 0.04964
+Cl1 Cl 0.61199 0.99559 0.30733
+D1 D 0.72018 0.68540 0.02134
+D2 D 0.76153 0.29200 0.02739
+D3 D 0.55273 0.52200 0.23068
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1 0.00000 0.00000 -0.58 mx,my,mz
+Cu2 -0.57000 0.00000 0.00000 mx,my,mz
+Cu3 -0.57000 0.00000 0.00000 mx,my,mz
+

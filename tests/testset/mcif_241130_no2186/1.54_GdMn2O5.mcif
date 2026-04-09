@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:09:38
+# Database entry: 1.54 GdMn2O5
+# Cif-like file for the case 1.54
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Gd Mn2 O5'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW LETTERS"
+_citation_journal_volume        110
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            137203
+_citation_year                  2013
+_citation_DOI                   10.1103/physrevlett.110.137203
+
+loop_
+_citation_author_name
+"N. Lee"
+"C. Vecchini"
+"Y.J. Choi"
+"L.C. Chapon"
+"A. Bombardi"
+"P.G. Radaelli"
+"S.-W. Cheong"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   97046
+_atomic_positions_source_other               .
+
+_transition_temperature     26
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2 2 2 special primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+XRMS
+Mn spins assumed saturated. Gd spins refined. Only moduli given in reference. Directions taken from similar compound (PrMn2O5, PhysRev B 86, 174417 (2012) and figure in reference.
+Multiferroic with ferroelectricity along b (parent setting).
+Flopped spin phase for H along a above 4.7 T with switching of polarization
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+;
+
+_parent_space_group.name_H-M_alt  'P  b  a  m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;-1/8,0,0'
+
+
+_space_group_magn.number_BNS  29.104
+_space_group_magn.name_BNS  "P_a  c  a  2_1"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 14.70620
+_cell_length_b                 8.53710
+_cell_length_c                 5.68070
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+3/4,y+1/2,-z,+1
+3 -x+1/4,y+1/2,z,+1
+4 x+1/2,y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Gd1_1 Gd 0.06975 0.17160 0.00000 1
+Gd1_2 Gd 0.93025 0.82840 0.00000 1
+Mn1 Mn 0.00000 0.50000 0.25510 1
+Mn2_1 Mn 0.20590 0.35180 0.50000 1
+Mn2_2 Mn 0.79410 0.64820 0.50000 1
+O1 O 0.00000 0.00000 0.26970 1
+O2_1 O 0.07630 0.44860 0.00000 1
+O2_2 O 0.92370 0.55140 0.00000 1
+O3_1 O 0.07270 0.43560 0.50000 1
+O3_2 O 0.92730 0.56440 0.50000 1
+O4_1 O 0.19970 0.20760 0.24500 1
+O4_2 O 0.80030 0.79240 0.24500 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Gd1_1 4.87 1.63 0.0 mx,my,0
+Gd1_2 -4.51 -1.5 0.0 mx,my,0
+Mn1 -2.85 0.95 0.0 mx,my,mz
+Mn2_1 3.8 -1.27 0.0 mx,my,0
+Mn2_2 3.8 -1.27 0.0 mx,my,0
+

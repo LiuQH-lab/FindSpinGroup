@@ -1,0 +1,146 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:18:58
+# Database entry: 1.182 TlMnO3
+# Cif-like file for the case 1.182
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Tl Mn O3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        94
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            134412
+_citation_year                  2016
+_citation_DOI                   10.1103/PhysRevB.94.134412
+
+loop_
+_citation_author_name
+"D.D. Khalyavin"
+"P. Manuel"
+"W. Yi"
+"A.A. Belik"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     92
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX3+ 3 1 special primary 2 .
+mX5+ 2 2 special primary 4 .
+mM3+ 3 1 special secondary 2 no
+mX5+ 6 2 special secondary 4 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD, WISH-beamline, ISIS Facility, UK
+The crystal structure is a distorted variant of perovskite structure, where the primary structural order parameters are out-of-phase and in-phase octahedral tilting (a+b-b- tilting pattern) combined with Jahn-Teller distortions in the plane, which includes the axis of the in-phase octahedral tilting. The common action of these three structural order parameters reduces the symmetry down to triclinic P-1 above the magnetic transition.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two magnetic irreps are active with respect to the cubic parent symmetry.
+The symmetry allows admixture of the second arm of the star (1/2,0,0) which has not been detected experimentally.
+The magnetic propagation vector, specified with respect to the paramagnetic triclinic structure also provided in the original source, is (1/2,0,1/2)
+;
+
+_parent_space_group.name_H-M_alt  'P  m  -3m'
+_parent_space_group.IT_number                       221
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '-2c,-2b,-2a-2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S  -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 7.35060
+_cell_length_b                 7.92500
+_cell_length_c                 10.55370
+_cell_angle_alpha              87.93290
+_cell_angle_beta               47.40810
+_cell_angle_gamma              89.00470
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 x,y,z+1/2,-1
+4 -x,-y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tl1 Tl 0.55086 0.74197 0.71897 1
+Tl2 Tl 0.05246 0.75673 0.73568 1
+Mn1 Mn 0.50000 0.00000 0.00000 1
+Mn2 Mn 0.50000 0.50000 0.00000 1
+Mn3 Mn 0.00000 0.00000 0.00000 1
+Mn4 Mn 0.00000 0.50000 0.00000 1
+O1 O -0.05152 0.76541 0.58698 1
+O2 O 0.44364 0.73056 -0.03057 1
+O3 O 0.20426 0.42656 0.04622 1
+O4 O 0.80260 -0.05337 0.44350 1
+O5 O 0.28260 0.56245 0.76388 1
+O6 O 0.68610 0.07176 0.76401 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 2.038 -2.446 -3.625 mx,my,mz
+Mn2 2.038 -2.446 -3.625 mx,my,mz
+Mn3 -2.038 2.446 3.625 mx,my,mz
+Mn4 -2.038 2.446 3.625 mx,my,mz
+

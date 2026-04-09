@@ -1,0 +1,158 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/24/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Na1 Mn2 O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW RESEARCH"
+_citation_journal_volume        2
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            043143
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevResearch.2.043143
+
+loop_
+_citation_author_name
+"N. Matsubara"
+"E. Nocerino"
+"K. Kamazawa""
+"O. K. Forslund"
+"Y. Sassa"
+"L. Keller"
+"V. V. Sikolenko"
+"V. Pomjakushin"
+"H. Sakurai"
+"J. Sugiyama"
+"M. Mansson"
+
+_temperature_position_structure         1.5
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     35
+_experiment_temperature     15
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mR1R2 4 4 special primary 12 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at 1.5K
+Below 11K the ordering of Mn2 spins takes place according to an incommensurate propagation vector. 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+4-dim physically irreducible irrep along a special direction
+;
+
+_parent_space_group.name_H-M_alt  'P n a m'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,-c,b;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a,1/2b+1/2c;7/8,0,0'
+
+_space_group_magn.number_BNS  9.41
+_space_group_magn.name_BNS  "C_a c"
+_space_group_magn.point_group_name  "m1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 17.72200
+_cell_length_b                 22.39400
+_cell_length_c                 5.68200
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+3/4,y+1/4,z+1/4,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x+1/2,y,z+1/2,+1 
+4 x+1/2,y+1/2,z,+1 
+5 x,y,z+1/2,-1 
+6 x,y+1/2,z,-1 
+7 x+1/2,y,z,-1 
+8 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1_1 Mn 0.21420 0.30440 0.37500 1
+Mn1_2 Mn 0.78580 0.69560 0.12500 1
+Mn2_1 Mn 0.20965 0.04780 0.37500 1
+Mn2_2 Mn 0.79035 0.95220 0.12500 1
+Na1_1 Na 0.12640 0.41760 0.37500 1
+Na1_2 Na 0.87360 0.58240 0.12500 1
+O1_1 O 0.10650 0.07390 0.37500 1
+O1_2 O 0.89350 0.92610 0.12500 1
+O2_1 O 0.05755 0.24010 0.37500 1
+O2_2 O 0.94245 0.75990 0.12500 1
+O3_1 O 0.01275 0.34710 0.37500 1
+O3_2 O 0.98725 0.65290 0.12500 1
+O4_1 O 0.21555 0.20675 0.37500 1
+O4_2 O 0.78445 0.79325 0.12500 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1_1 0.0 -2.6(1) -0.4(1) mx,my,mz 2.63 ? ?
+Mn1_2 0.0 2.6(1) 0.4(1) mx,my,mz 2.63 ? ?
+Mn2_1 0.0 0.0 0.0 mx,my,mz ? ? ?
+Mn2_2 0.0 0.0 0.0 mx,my,mz ? ? ?
+

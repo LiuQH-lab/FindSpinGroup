@@ -1,0 +1,133 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-12
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        3
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            044411
+_citation_year                  2019
+_citation_DOI                   10.1103/PhysRevMaterials.3.044411
+
+loop_
+_citation_author_name
+"A. Virtue"
+"X. Zhou"
+"B. Wilfong"
+"J.W. Lynn"
+"K. Taddei"
+"P. Zavalij"
+"L. Wang"
+"E.E. Rodriguez"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  160
+_experiment_temperature  3.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1+  2  1  special-2  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 110K
+Moment modulus at Mn site: 0.462(9)
+This is one of two possible models that equally fit the data. The second one is a 1k collinear model (see #1.392). A third alternate non-collinear model, with assumedly lower symmetry, proposed in the reference as it equally fit the data, is in fact a domain-related arrangement equivalent to the one here, having the same symmetry (with a different location of its standard origin with respect to the parent structure).
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+2-dim irrep as primary involving with equal weights the two k-vectors of the irrep
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+k2 [1/2 -1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a+b,-a+b,c;1/2,1/2,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  123.349
+_space_group_magn.name_BNS  "P_C 4/m m m"
+_cell_length_a             5.57790
+_cell_length_b             5.57790
+_cell_length_c             13.23900
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x,z,+1
+3 y,-x,z,+1
+4 x,-y,-z,+1
+5 -x,y,-z,+1
+6 -x,-y,z,+1
+7 y,x,-z,+1
+8 -y,-x,-z,+1
+9 -x,-y,-z,+1
+10 y,-x,-z,+1
+11 -y,x,-z,+1
+12 -x,y,z,+1
+13 x,-y,z,+1
+14 x,y,-z,+1
+15 -y,-x,z,+1
+16 y,x,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.75000 0.25000 0.25000 0.5
+Cu1 Cu 0.75000 0.25000 0.25000 0.5
+K1_1 K 0.00000 0.50000 0.50000 1.
+K1_2 K  0.00000 0.00000 0.00000 1.
+S1_1 S 0.00000 0.50000 0.85607 1.
+S1_2 S  0.00000 0.00000 0.35607 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.327 0.327 0.00000 mx,mx,0
+

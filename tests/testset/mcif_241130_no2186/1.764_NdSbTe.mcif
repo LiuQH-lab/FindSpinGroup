@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/19/2023
+# From a file provided by I. Plokhikh
+
+data_5yOhtAoR
+_audit_creation_date            2023-09-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Nd8 Sb8 Te8"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Magn. Magn. Mater."
+_citation_journal_volume        583
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            171009
+_citation_year                  2023
+_citation_DOI                   10.1016/j.jmmm.2023.171009
+
+loop_
+_citation_author_name
+"I. Plokhikh" 
+"V. Pomjakushin"
+"D. J. Gawryluk"
+"O. Zaharko"
+"E. Pomjakushina"
+
+
+_temperature_position_structure         5
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     3.1
+_experiment_temperature     1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mW2W4 8 4 general primary 8 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD, HRPT PSI 2.45A
+Positional structure from 5K data
+Lower symmetry solution allowing a constant moment structure
+Refinements with MSGs of higher symmetry for the same active irrep did not result in constant magnitude for all the Nd moments 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+4-dim small irrep along a general direction
+The active irrep has two pairs of (k,-k) wave vectors. It seems that 2k models, which could also fit the data were not explored.
+;
+
+_parent_space_group.name_H-M_alt  "P4/nmm"
+_parent_space_group.IT_number     129
+_parent_space_group.transform_Pp_abc 'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k2 [1/2 0 1/4]
+
+_parent_space_group.child_transform_Pp_abc  'b+2c,-a,-2b;3/4,1/4,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  7.28
+_space_group_magn.name_BNS  'P_c c'
+_space_group_magn.point_group_name  "m.1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 19.2813(15)
+_cell_length_b                 4.3053(2)
+_cell_length_c                 8.6106(5)
+_cell_angle_alpha              90
+_cell_angle_beta               102.902(14)
+_cell_angle_gamma              90
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Nd1_1 Nd 0.86174 0 0.68087 1
+Nd1_2 Nd 0.36174 0 -0.06913 1
+Nd1_3 Nd 0.13826 0.5 0.06913 1
+Nd1_4 Nd 0.63826 0.5 0.31913 1
+Sb1_1 Sb 0 0 0 1
+Sb1_2 Sb 0.5 0 0.25 1
+Sb1_3 Sb 0 0.5 0.75 1
+Sb1_4 Sb 0.5 0.5 0 1
+Te1_1 Te 0.18712 0 0.84356 1
+Te1_2 Te 0.68712 0 0.09356 1
+Te1_3 Te 0.81288 0.5 -0.09356 1
+Te1_4 Te 0.31288 0.5 0.15644 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Nd1_1 0.4(3) 0.0 1.73(2) mx,0,mz 1.7(3) ? ?
+Nd1_2 -0.67(9) 0.0 1.41(6) mx,0,mz 1.7(1) ? ?
+Nd1_3 0.78(8) 0.0 -1.33(6) mx,0,mz 1.7(1) ? ?
+Nd1_4 0.28(16) 0.0 1.73(3) mx,0,mz 1.7(2) ? ?
+

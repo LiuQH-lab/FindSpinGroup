@@ -1,0 +1,143 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:03:56
+# Database entry: 1.0.3 CsCoBr3
+# Cif-like file for the case 1.0.3
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Cs Co Br3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        12
+_citation_page_first            5007
+_citation_page_last             5015
+_citation_article_id            .
+_citation_year                  1975
+_citation_DOI                   10.1103/physrevb.12.5007
+
+loop_
+_citation_author_name
+"W.B. Yelon"
+"D.E. Cox"
+"M. Eibschutz"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     10
+_experiment_temperature     4.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK3(k1) 2 1 . primary ? ?
+mK5(k1) 4 2 special primary ? ?
+mGM4+(k2) 1 1 . secondary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+polar phase
+if insulator, possible magnetic induced ferroelectricity.
+model assumes equal moments (3.02) that rotate around x
+symmetry allows arbitrary moment direction on the xy plane for Co1_2
+symmetry allows a non-zero component of the moment of Co1_1 along (1,2,0)
+;
+
+_active_magnetic_irreps_details
+;
+Two secondary irreps, mK6(k1) and mGM6+, are also allowed (but not present). They correspond to the symmetry-allowed moment components put to zero in the model.
+;
+
+_parent_space_group.name_H-M_alt  'P  6_3/m  m  c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,a/3+2b/3,c;0,0,0'
+
+
+_space_group_magn.number_BNS  36.174
+_space_group_magn.name_BNS  "C  m'  c  2_1'"
+_space_group_magn.point_group_name  "m'm2'"
+_space_group_magn.point_group_number  "7.3.22"
+_cell_length_a                 22.56000
+_cell_length_b                 22.56000
+_cell_length_c                 6.32000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x-y,-y,z+1/2,+1
+3 -x,-y,z+1/2,-1
+4 -x+y,y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z,+1
+3 x+2/3,y+1/3,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Br1_1 Br 0.05357 0.10713 0.25000 1
+Br1_2 Br 0.89287 0.94643 0.25000 1
+Br1_3 Br 0.05357 0.44047 0.25000 1
+Br1_4 Br 0.89287 0.27977 0.25000 1
+Br1_5 Br 0.05357 0.27977 0.25000 1
+Cs1_1 Cs 0.11111 0.22222 0.75000 1
+Cs1_2 Cs 0.22222 0.11111 0.25000 1
+Co1_1 Co 0.00000 0.00000 0.00000 1
+Co1_2 Co 0.00000 0.33333 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1_1 0.0 0.0 -3.02 mx,2mx,mz
+Co1_2 0.51 0.0 2.98 mx,my,mz
+

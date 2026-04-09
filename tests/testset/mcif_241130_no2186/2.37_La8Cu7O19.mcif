@@ -1,0 +1,194 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-03
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        95
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            024405
+_citation_year                  2017
+_citation_DOI                   10.1103/PhysRevB.95.024405
+
+loop_
+_citation_author_name
+"K. Prokes"
+"E. Ressouche"
+"A. Mohan"
+"A.U.B. Wolter"
+"B. Buchner"
+"C. Hess"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  103
+_experiment_temperature  10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mV1+  2  1  general-2  primary  42  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+The original reference only mentions the propagation vector (1/2,1/2,0), but the reported spin arrangement necessarily involves the symmetry-related non-equivalent wave vector (-1/2,1/2,0), meaning that the structure is in fact a multi-k structure.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+2-dim irrep as primary involving the two k-vectors of the irrep star.
+The combination of the two spin waves corresponding to the two wave vectors is a general one, yielding the minimal possible symmetry for a 2k structure according to this irrep.
+Spin arrangements of higher symmetry, keeping the monoclinic symmetry, are possible for this irrep if the spin waves of the two propagation vectors were combined with equal weights. Only a few moments of the Cu3 and Cu4 sites deviate from one of these possible MSGs of higher symmetry.
+It seems that these 2k models of higher symmetry for the same irrep were not tried in the refinement.
+;
+
+_parent_space_group.name_H-M_alt  'C 2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+k2 [-1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-1/2a+1/2b,b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             27.66200
+_cell_length_b             7.51600
+_cell_length_c             34.59200
+_cell_angle_alpha          90.00
+_cell_angle_beta           99.30
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x,y+1/2,z,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+La1_1 La 0.21815 0.48480 0.31780
+La1_2 La  0.78185 0.48480 0.18220
+La1_3 La  0.46815 0.73480 0.31780
+La1_4 La  0.03185 0.73480 0.18220
+La2_1 La 0.14980 0.23255 0.39330
+La2_2 La  0.85020 0.23255 0.10670
+La2_3 La  0.39980 0.48255 0.39330
+La2_4 La  0.10020 0.48255 0.10670
+La3_1 La 0.27480 0.49985 0.42280
+La3_2 La  0.72520 0.49985 0.07720
+La3_3 La  0.52480 0.74985 0.42280
+La3_4 La  0.97520 0.74985 0.07720
+La4_1 La 0.09080 0.23735 0.28770
+La4_2 La  0.90920 0.23735 0.21230
+La4_3 La  0.34080 0.48735 0.28770
+La4_4 La  0.15920 0.48735 0.21230
+Cu1_1 Cu 0.00000 0.47550 0.25000
+Cu1_2 Cu  0.25000 0.22550 0.25000
+Cu2_1 Cu 0.30960 0.25925 0.35820
+Cu2_2 Cu  0.19040 0.25925 0.14180
+Cu2_3 Cu  0.05960 0.00925 0.35820
+Cu2_4 Cu  0.44040 0.00925 0.14180
+Cu3_1 Cu 0.36645 0.25450 0.46910
+Cu3_2 Cu  0.13355 0.25450 0.03090
+Cu3_3 Cu  0.11645 0.00450 0.46910
+Cu3_4 Cu  0.38355 0.00450 0.03090
+Cu4_1 Cu 0.29390 0.18675 0.52430
+Cu4_2 Cu  0.20610 0.18675 0.97570
+Cu4_3 Cu  0.04390 0.43675 0.52430
+Cu4_4 Cu  0.45610 0.43675 0.97570
+O1_1 O 0.00000 0.21300 0.25000
+O1_2 O  0.25000 0.46300 0.25000
+O2_1 O 0.28080 0.24060 0.30400
+O2_2 O  0.71920 0.24060 0.19600
+O2_3 O  0.53080 0.49060 0.30400
+O2_4 O  0.96920 0.49060 0.19600
+O3_1 O 0.33945 0.24530 0.41380
+O3_2 O  0.66055 0.24530 0.08620
+O3_3 O  0.58945 0.49530 0.41380
+O3_4 O  0.91055 0.49530 0.08620
+O4_1 O 0.31010 0.00735 0.35860
+O4_2 O  0.68990 0.00735 0.14140
+O4_3 O  0.56010 0.25735 0.35860
+O4_4 O  0.93990 0.25735 0.14140
+O5_1 O 0.36725 0.24935 0.52710
+O5_2 O  0.63275 0.24935 0.97290
+O5_3 O  0.61725 0.49935 0.52710
+O5_4 O  0.88275 0.49935 0.97290
+O6_1 O 0.38850 0.23685 0.33660
+O6_2 O  0.61150 0.23685 0.16340
+O6_3 O  0.63850 0.48685 0.33660
+O6_4 O  0.86150 0.48685 0.16340
+O7_1 O 0.30645 0.01975 0.56800
+O7_2 O  0.69355 0.01975 0.93200
+O7_3 O  0.55645 0.26975 0.56800
+O7_4 O  0.94355 0.26975 0.93200
+O8_1 O 0.27360 0.26100 0.46990
+O8_2 O  0.72640 0.26100 0.03010
+O8_3 O  0.52360 0.51100 0.46990
+O8_4 O  0.97640 0.51100 0.03010
+O9_1 O 0.22765 0.22825 0.37160
+O9_2 O  0.77235 0.22825 0.12840
+O9_3 O  0.47765 0.47825 0.37160
+O9_4 O  0.02235 0.47825 0.12840
+O10_1 O 0.16915 0.23590 0.26890
+O10_2 O  0.83085 0.23590 0.23110
+O10_3 O  0.41915 0.48590 0.26890
+O10_4 O  0.08085 0.48590 0.23110
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1_1 0.0 0.69 0.0 mx,my,mz-
+Cu1_2 -0.69 0.0 0.0 mx,my,mz
+Cu2_1 0.73 0.0 0.0 mx,my,mz
+Cu2_2 0.73 0.0 0.0 mx,my,mz
+Cu2_3 0.0 -0.73 0.0 mx,my,mz
+Cu2_4 0.0 0.73 0.0 mx,my,mz
+Cu3_1 -1.15 -0.20 0.0 mx,my,mz
+Cu3_2 -0.26 0.30 1.06 mx,my,mz
+Cu3_3 0.66 0.96 0.25 mx,my,mz
+Cu3_4 0.08 -1.16 -0.10 mx,my,mz
+Cu4_1 0.24 -1.29 0.21 mx,my,mz
+Cu4_2 0.19 1.12 -0.65 mx,my,mz
+Cu4_3 -0.68 -1.13 -0.16 mx,my,mz
+Cu4_4 -0.62 1.17 -0.14 mx,my,mz
+

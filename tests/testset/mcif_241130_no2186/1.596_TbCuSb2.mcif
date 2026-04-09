@@ -1,0 +1,112 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/09/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-09-05
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Alloys and Compounds"
+_citation_journal_volume        322
+_citation_page_first            55
+_citation_page_last             58
+_citation_article_id            .
+_citation_year                  2001
+_citation_DOI                   10.1016/S0925-8388(01)01194-X
+
+loop_
+_citation_author_name
+"M. Kolenda"
+"A. Oles"
+"A. Szytula"
+
+_atomic_positions_source_database_code_ICSD  93339
+_atomic_positions_source_other               .
+
+_temperature_position_structure         18
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  5
+_experiment_temperature  1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1  4  2  special  primary  1  .
+mX2  4  2  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Other magnetic phases above 5K
+Moment component given here with non-significant digits for conistency with the reported moment modulus.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 2-dim small irreps as primary
+The irrep star has to k-vectors. Possible alternative multi-k arrangements involving both k-vectors were not considered.
+;
+
+_parent_space_group.name_H-M_alt  'P 4/n m m'
+_parent_space_group.IT_number                       129
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;1/4,0,0'
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             8.50500
+_cell_length_b             4.25250
+_cell_length_c             9.87910
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Tb1 Tb 0.12500 0.25000 0.74480
+Cu1 Cu 0.37500 0.25000 0.00000
+Sb1 Sb 0.37500 0.25000 0.50000
+Sb2 Sb 0.12500 0.25000 0.16450
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Tb1 5.515 5.515 0.00000 mx,my,mz 7.80(5)
+

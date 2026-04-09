@@ -1,0 +1,146 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:17:59
+# Database entry: 1.162 NdMg
+# Cif-like file for the case 1.162
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Nd Mg'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter."
+_citation_journal_volume        10
+_citation_page_first            165
+_citation_page_last             174
+_citation_article_id            .
+_citation_year                  1998
+_citation_DOI                   10.1088/0953-8984/10/1/018
+
+loop_
+_citation_author_name
+"M. Deldem"
+"M. Amara"
+"R.M. Galera"
+"P. Morin"
+"D. Schmitt"
+"B. Ouladdiaf"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     61
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX3+ 3 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD and NSD
+2k-structure distinguished from 1k and 3k alternative models through the dependence of reflections on applied magnetic field.
+room-temperature unit cell
+Below 35K a 2k magnetic structure is observed (see entry #2.14)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic structure
+3-dim active irrep - 3k star- (1-dim small irrep)
+;
+
+_parent_space_group.name_H-M_alt  'P  m  -3m'
+_parent_space_group.IT_number                       221
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  124.360
+_space_group_magn.name_BNS  "P_c  4/m  c  c"
+_space_group_magn.point_group_name  "4/mmm1'"
+_space_group_magn.point_group_number  "15.2.54"
+_cell_length_a                 3.87000
+_cell_length_b                 3.87000
+_cell_length_c                 7.74000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x,z,+1
+3 y,-x,z,+1
+4 x,-y,-z+1/2,+1
+5 -x,y,-z+1/2,+1
+6 -x,-y,z,+1
+7 y,x,-z+1/2,+1
+8 -y,-x,-z+1/2,+1
+9 -x,-y,-z,+1
+10 y,-x,-z,+1
+11 -y,x,-z,+1
+12 -x,y,z+1/2,+1
+13 x,-y,z+1/2,+1
+14 x,y,-z,+1
+15 -y,-x,z+1/2,+1
+16 y,x,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mg1 Mg 0.50000 0.50000 0.25000 1
+Nd1 Nd 0.00000 0.00000 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd1 0.0 0.0 2.6 0,0,mz
+

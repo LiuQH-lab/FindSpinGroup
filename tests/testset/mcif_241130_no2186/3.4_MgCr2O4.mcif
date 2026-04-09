@@ -1,0 +1,154 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:20:27
+# Database entry: 3.4 MgCr2O4
+# Cif-like file for the case 3.4
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Mg Cr2 O4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        1
+_citation_page_first            3116
+_citation_page_last             3124
+_citation_article_id            .
+_citation_year                  1970
+_citation_DOI                   10.1103/PhysRevB.1.3116
+
+loop_
+_citation_author_name
+"H. Shaked"
+"J.M. Hastings"
+"L.M. Corliss"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     16
+_experiment_temperature     14
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2 6 2 special-2 primary 2 .
+mX4 6 2 special-2 primary 2 .
+mX3 6 2 special-2 secondary 1 no
+mGM4+ 3 3 special secondary 2 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD and NSD
+The orientation of the basal component on the moment on the plane ab is undetermined, and has been chosen along a direction that maximizes the symmetry.
+Modulus of the magnetic moment forced equal on the three sites: 0.7
+cubic setting with origin choice 1
+Later (J. Phys.: Condens. Matter 20 (2008) 104238), a structural phase transition has been reported  to happen simultaneously with the magnetic ordering, with a different propagation vector, which refutes this model.
+;
+
+_active_magnetic_irreps_details
+;
+3k magnetic structure
+The model includes correlations among the spins of the three independent sites that are not symmetry forced.
+Superposition of two irreps acting as primary (mX2 with k=(0,0,1) and mX4 for k=(0,1,0) and (1,0,0). The model also correlates the amplitudes of the two irreps.
+Not clear if more simple models associated with a single active irrep for the three k-vectors have been tried.
+;
+
+_parent_space_group.name_H-M_alt  'F  d  -3m'
+_parent_space_group.IT_number                       227
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1]
+k2 [0 1 0]
+k3 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;-1/8,-1/8,-1/8'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/2,1/2,1/2'
+
+
+_space_group_magn.number_BNS  111.255
+_space_group_magn.name_BNS  "P  -42'm'  "
+_space_group_magn.point_group_name  "-42'm'"
+_space_group_magn.point_group_number  "14.5.52"
+_cell_length_a                 8.33500
+_cell_length_b                 8.33500
+_cell_length_c                 8.33500
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z,+1
+3 y,-x,-z,+1
+4 -y,x,-z,+1
+5 x,-y,-z,-1
+6 -x,y,-z,-1
+7 -y,-x,z,-1
+8 y,x,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mg1_1 Mg 0.25000 0.25000 0.25000 1
+Mg1_2 Mg 0.00000 0.50000 0.50000 1
+Mg1_3 Mg 0.00000 0.00000 0.00000 1
+Mg1_4 Mg 0.50000 0.50000 0.00000 1
+Cr1_1 Cr 0.12500 0.12500 0.12500 1
+Cr1_2 Cr 0.87500 0.37500 0.62500 1
+Cr1_3 Cr 0.37500 0.62500 0.87500 1
+O1_1 O 0.38900 0.38900 0.38900 1
+O1_2 O 0.61100 0.11100 0.88900 1
+O1_3 O 0.11100 0.88900 0.61100 1
+O1_4 O 0.13900 0.63900 0.36100 1
+O1_5 O 0.86100 0.86100 0.86100 1
+O1_6 O 0.63900 0.36100 0.13900 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1_1 0.4 0.4 0.4 mx,mx,mz
+Cr1_2 -0.4 0.4 -0.4 mx,my,mz
+Cr1_3 -0.4 0.4 0.4 mx,-mx,mz
+

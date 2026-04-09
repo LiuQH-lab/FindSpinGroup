@@ -1,0 +1,164 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/10/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        68
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            024405
+_citation_year                  2003
+_citation_DOI                   10.1103/PhysRevB.68.024405
+
+loop_
+_citation_author_name
+"M. Boehm"
+"B. Roessli"
+"J. Schefer"
+"A.S. Wills"
+"B. Ouladdiaf"
+"E. Lelievre-Berna"
+"U. Staub"
+"G.A. Petrakovskii"
+
+
+
+_atomic_positions_source_database_code_ICSD  191850
+_atomic_positions_source_other               .
+
+_transition_temperature  21
+_experiment_temperature  12
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5  2   2   general  primary  10  .
+mGM1  1   1     .      primary   2  .
+mGM2  1   1     .      secondary 1  no
+mGM3  1   1     .      secondary 2  no
+mGM4  1   1     .      secondary 3  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a measurement at 45K
+The sign of the moments of Cu2_1 and Cu2_2 tabulated in the reference are inconsistent with those in the Figure of the the same reference. The values in  the Table have been assumed correct.
+An incommensurate phase is reported below 10K.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Despite the ad-hoc spin correlations assumed in the model, this structure has minimal symmetry, its MSG being only P1, due to a very small component along z of the Cu1 spins.
+The proposed spin model corresponds mostly to an arrangement according to the irrep mGM5 with MSG C2', but the small z component attibuted to the Cu1 moments is forbidden by this irrep, and corresponds to the irrep mGM1. Its presence reduces the MSG of the system to P1. Possible higher symmetries that can be realized under the prevailing mGM5 irrep were not checked in the refinement.
+If this small mz component associated to the Cu1_1 and Cu1_2 atoms is nullified, and the small difference of the mx and my components (0.023 and 0.024) of the Cu2 atoms, being within their standard deviation, is disregarded, th¡s slightly  modified structure would have then the symmetry given by one of the epikernels of the irrep mGM5, namely Fd'd2'.
+;
+
+_parent_space_group.name_H-M_alt  'I -4 2 d'
+_parent_space_group.IT_number                       122
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b+1/2c,-1/2a+1/2b-1/2c,-1/2a-1/2b+1/2c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  1.1
+_space_group_magn.name_BNS  "P 1"
+_cell_length_a             11.484
+_cell_length_b             11.484
+_cell_length_c             5.62
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cu1_1 Cu 0.00000 0.00000 0.50000
+Cu1_2 Cu  0.50000 0.00000 0.25000
+Cu2_1 Cu 0.08300 0.25000 0.12500
+Cu2_2 Cu  0.91700 0.75000 0.12500
+Cu2_3 Cu  0.25000 0.91700 0.87500
+Cu2_4 Cu  0.75000 0.08300 0.87500
+O1_1 O 0.15600 0.06600 0.49800
+O1_2 O  0.84400 0.93400 0.49800
+O1_3 O  0.06600 0.84400 0.50200
+O1_4 O  0.93400 0.15600 0.50200
+O1_5 O  0.34400 0.06600 0.25200
+O1_6 O  0.65600 0.93400 0.25200
+O1_7 O  0.43400 0.84400 0.24800
+O1_8 O  0.56600 0.15600 0.24800
+O2_1 O 0.24700 0.25000 0.12500
+O2_2 O  0.75300 0.75000 0.12500
+O2_3 O  0.25000 0.75300 0.87500
+O2_4 O  0.75000 0.24700 0.87500
+O3_1 O 0.91600 0.25000 0.12500
+O3_2 O  0.08400 0.75000 0.12500
+O3_3 O  0.25000 0.08400 0.87500
+O3_4 O  0.75000 0.91600 0.87500
+O4_1 O 0.07100 0.18900 0.78900
+O4_2 O  0.92900 0.81100 0.78900
+O4_3 O  0.18900 0.92900 0.21100
+O4_4 O  0.81100 0.07100 0.21100
+O4_5 O  0.42900 0.18900 0.96100
+O4_6 O  0.57100 0.81100 0.96100
+O4_7 O  0.31100 0.92900 0.53900
+O4_8 O  0.68900 0.07100 0.53900
+B1_1 B 0.18300 0.14600 0.70200
+B1_2 B  0.81700 0.85400 0.70200
+B1_3 B  0.14600 0.81700 0.29800
+B1_4 B  0.85400 0.18300 0.29800
+B1_5 B  0.31700 0.14600 0.04800
+B1_6 B  0.68300 0.85400 0.04800
+B1_7 B  0.35400 0.81700 0.45200
+B1_8 B  0.64600 0.18300 0.45200
+B2_1 B 0.50300 0.25000 0.12500
+B2_2 B  0.49700 0.75000 0.12500
+B2_3 B  0.25000 0.49700 0.87500
+B2_4 B  0.75000 0.50300 0.87500
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Cu1_1 0.601(4) 0.601(4) 0.15(2) mx,my,mz    0.863(5)
+Cu1_2 -0.601 -0.601 -0.15 mx,my,mz          0.863
+Cu2_1 -0.023(3) -0.024(3) 0.20000 mx,my,mz  0.20(1)
+Cu2_2 -0.023 -0.024 -0.20000 mx,my,mz       0.20
+Cu2_3 0.023 0.024 0.20000 mx,my,mz          0.20
+Cu2_4 0.023 0.024 -0.20000 mx,my,mz         0.20
+
+

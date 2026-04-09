@@ -1,0 +1,125 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 18/05/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-05-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev Let."
+_citation_journal_volume        122
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            197203
+_citation_year                  2019
+_citation_DOI                   10.1103/PhysRevLett.122.197203
+
+loop_
+_citation_author_name
+"S. Wu"
+"W. Phelan"
+"L. Liu"
+"J. Morey"
+"J. Tutmaher"
+"J. Neuefeind"
+"A. Huq"
+"M.B. Stone"
+"M. Feygenson"
+"D.W. Tam"
+"B.A. Frandsen"
+"B. Trump"
+"C. Wan"
+"S. Dunsiger"
+"T. McQueen"
+"Y. Uemura"
+"C. Broholm"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  7.6
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1  4  2  special  primary  1  .
+mX2  8  4  special  secondary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+muon spin rotation spectroscopy
+Between 8.7 and 7.6K, above this phase, an incommensurate magnetic structure with only mX2 involved is reported
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2 multi-dimensional irreps active
+It seems that not all possible much simpler spin arrangements compatible with a single irrep or with both were checked and constrasted with the experimental data. Apparently, the degrees of freedom allowed by the possible combination of the irrep independent spin basis functions were not considered.
+;
+
+_parent_space_group.name_H-M_alt  'P 4/n m m'
+_parent_space_group.IT_number                       129
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,0,0'
+
+
+
+_space_group_magn.number_BNS  4.10
+_space_group_magn.name_BNS  "P_a 2_1"
+_cell_length_a             8.12420
+_cell_length_b             4.06210
+_cell_length_c             8.10580
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ce1 Ce 0.12500 0.25000 0.14710
+Ni1 Ni 0.37500 0.25000 0.50000
+As1 As 0.12500 0.25000 0.64390
+O1 O 0.37500 0.25000 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ce1 0.30 -0.22 0.00000 mx,my,mz

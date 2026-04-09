@@ -1,0 +1,123 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 28/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-28
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Alloys and Compounds"
+_citation_journal_volume        420
+_citation_page_first            29
+_citation_page_last             33
+_citation_article_id            ?
+_citation_year                  2006
+_citation_DOI                   10.1016/j.jallcom.2005.10.073
+
+loop_
+_citation_author_name
+"Y. Xiao"
+"Q. Huang"
+"Z. Ouyang"
+"J. Lynn"
+"J. Liang"
+"G. Rao"
+
+
+
+_atomic_positions_source_database_code_ICSD  154737
+_atomic_positions_source_other               .
+
+_transition_temperature  42
+_experiment_temperature  9
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+  3  3  special primary  3  .
+mGM5+  3  3  special secondary 	1 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+FM phase
+Below 100K and up to 42K a tetragonal FM phase is observed (see #0.227). Below a spin reorientation transition takes place and the system becomes orthorhombic.
+This structure is a correction (by the same authors) of the structure reported in 2005 for this phase, where a spureous inconsistent strain, which reduced the magnetic symmetry to monoclinic was present (see #0.226).
+The structure exhibits a significant structural distortion with respect to the cubic parent phase, reducing the effective space group to Imma, consistently with the MSG defined by the spin arrangement.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+3-dim irrep along a special direction as primary
+A second  3-dim irrep along a special direction, yielding the same MSG, is active as a secondary irrep and is present in the model (weak difference of the two Co moments)
+The structure is also reported at other various temperatures.
+;
+
+_parent_space_group.name_H-M_alt  'F d -3 m'
+_parent_space_group.IT_number                       227
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '-1/2a+1/2b,1/2a+1/2b,-c;1/2,1/2,1/2'
+_space_group_magn.transform_BNS_Pp_abc  '-b,a,c;1/4,1/4,1/4'
+
+
+_space_group_magn.number_BNS  74.559
+_space_group_magn.name_BNS  "I m m' a'"
+_cell_length_a             5.1512(2)
+_cell_length_b             5.1431(2)
+_cell_length_c             7.2973(2)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y,-z+1/2,+1
+3 -x+1/2,-y+1/2,-z+1/2,+1
+4 x,-y+1/2,z,+1
+5 x+1/2,-y+1/2,-z+1/2,-1
+6 -x,-y+1/2,z,-1
+7 -x,y,z,-1
+8 x+1/2,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Nd1 Nd 0.00000 0.25000 0.3744(3)
+Co1_1 Co 0.00000 0.00000 0.00000
+Co1_2 Co 0.25000 0.25000 0.75000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd1    0.00000 2.38(7) 0.00000 mx,0,0
+Co1_1  0.00000 0.65(6) 0.00000 mx,0,mz
+Co1_2  0.00000 0.63(10) 0.00000 mx,0,0
+
+

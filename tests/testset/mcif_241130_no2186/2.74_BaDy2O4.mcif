@@ -1,0 +1,187 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/08/2021 14:16:55
+
+data_5yOhtAoR
+_audit_creation_date            2021-10-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ba Dy2 O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        103
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            134434
+_citation_year                  2021
+_citation_DOI                   10.1103/PhysRevB.103.134434
+
+loop_
+_citation_author_name
+"D.D. Khalyavin"
+"P. Manuel"
+"M. Ciomaga Hatnean"
+"O. A. Petrenko"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     0.48
+_experiment_temperature     0.05
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1 1 . primary 4 .
+mDT2 2 1 special primary 6 .
+mDT4 2 1 special primary 6 .
+mDT1 2 1 special secondary 6 yes
+mDT3 2 1 special secondary 6 yes
+mGM4+ 1 1 . secondary 2 no
+mGM2- 1 1 . secondary 2 no
+mGM4- 1 1 . secondary 4 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD in magnetic field (H=1.25 T)
+Both magnetic structure and atomic positions were determined together using the same experimental data set
+Magnetic structure observed on powder under magnetic field (12.5kOe)
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+The mGM2+, mDT2 and mDT4 irreps were chosen to be the primary ones because of their largest amplitudes in the reported magnetic structure. The same symmetry can be achieved by combining mGM2+, mDT3 and mDT4.
+;
+
+_parent_space_group.name_H-M_alt  "P n m a"
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [0 1/3 0]
+
+_parent_space_group.child_transform_Pp_abc  "3b,-a,c;0,1/4,1/4"
+_space_group_magn.transform_BNS_Pp_abc       "a,b,c;0,0,0"
+
+_space_group_magn.number_BNS  4.9
+_space_group_magn.name_BNS  "P 2_1'"
+_space_group_magn.point_group_name  "2'"
+_space_group_magn.point_group_number  "3.3.8"
+_cell_length_a                 10.40700
+_cell_length_b                 10.40750
+_cell_length_c                 12.11330
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y+1/2,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0.00000 0.75274 0.39875 1
+Ba2 Ba 0.16667 0.24726 0.10125 1
+Ba3 Ba 0.83333 0.24726 0.10125 1
+Ba4 Ba 0.33333 0.75274 0.39875 1
+Ba5 Ba 0.33333 0.25274 0.60125 1
+Ba6 Ba 0.50000 0.24726 0.10125 1
+Dy1 Dy 0.00000 -0.07781 0.14053 1
+Dy2 Dy 0.33333 -0.07781 0.14053 1
+Dy3 Dy 0.66667 -0.07781 0.14053 1
+Dy4 Dy 0.83333 0.57781 0.64053 1
+Dy5 Dy 0.16667 0.57781 0.64053 1
+Dy6 Dy 0.50000 0.57781 0.64053 1
+Dy7 Dy 0.00000 0.42530 0.36120 1
+Dy8 Dy 0.33333 0.42530 0.36120 1
+Dy9 Dy 0.66667 0.42530 0.36120 1
+Dy10 Dy 0.83333 0.07470 0.86120 1
+Dy11 Dy 0.16667 0.07470 0.86120 1
+Dy12 Dy 0.50000 0.07470 0.86120 1
+O1 O 0.00000 0.70860 0.08790 1
+O2 O 0.16667 0.29140 0.41210 1
+O3 O 0.83333 0.29140 0.41210 1
+O4 O 0.33333 0.70860 0.08790 1
+O5 O 0.33333 0.20860 -0.08790 1
+O6 O 0.50000 0.29140 0.41210 1
+O7 O 0.00000 0.61810 0.76660 1
+O8 O 0.16667 0.38190 0.73340 1
+O9 O 0.83333 0.38190 0.73340 1
+O10 O 0.33333 0.61810 0.76660 1
+O11 O 0.33333 0.11810 0.23340 1
+O12 O 0.50000 0.38190 0.73340 1
+O13 O 0.00000 0.51700 0.53250 1
+O14 O 0.16667 0.48300 -0.03250 1
+O15 O 0.83333 0.48300 -0.03250 1
+O16 O 0.33333 0.51700 0.53250 1
+O17 O 0.33333 0.01700 0.46750 1
+O18 O 0.50000 0.48300 -0.03250 1
+O19 O 0.00000 -0.07120 0.82510 1
+O20 O 0.16667 0.07120 0.67490 1
+O21 O 0.83333 0.07120 0.67490 1
+O22 O 0.33333 -0.07120 0.82510 1
+O23 O 0.33333 0.42880 0.17490 1
+O24 O 0.50000 0.07120 0.67490 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Dy1 0.0 0.0 5.8(1)  mx,my,mz 5.8(1) ? ?
+Dy2 0.0 0.0 -9.2(1) mx,my,mz 9.2(1) ? ?
+Dy3 0.0 0.0 -9.2(1) mx,my,mz 9.2(1) ? ?
+Dy4 0.0 0.0 -9.2(1) mx,my,mz 9.2(1) ? ?
+Dy5 0.0 0.0 5.8(1)  mx,my,mz 5.8(1) ? ?
+Dy6 0.0 0.0 -9.2(1) mx,my,mz 9.2(1) ? ?
+Dy7 0.0 0.0 0.0     mx,my,mz   0.0 ? ?
+Dy8 0.0 0.0 0.0     mx,my,mz   0.0 ? ?
+Dy9 0.0 0.0 0.0     mx,my,mz   0.0 ? ?
+Dy10 0.0 0.0 0.0    mx,my,mz   0.0 ? ?
+Dy11 0.0 0.0 0.0    mx,my,mz   0.0 ? ?
+Dy12 0.0 0.0 0.0    mx,my,mz   0.0 ? ?
+

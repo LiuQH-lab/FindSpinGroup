@@ -1,0 +1,162 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:04:00
+# Database entry: 1.0.5 Sr3CoIrO6
+# Cif-like file for the case 1.0.5
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Sr3 Co Ir O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        86
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            134409
+_citation_year                  2012
+_citation_DOI                   10.1103/physrevb.86.134409
+
+loop_
+_citation_author_name
+"D. Mikhailova"
+"B. Schwarz"
+"A. Senyshyn"
+"A.M.T. Bell"
+"Y. Skourski"
+"H. Ehrenberg"
+"A.A. Tsirlin"
+"S. Agrestini"
+"M. Rotter"
+"P. Reichel"
+"J.M. Chen"
+"Z. Hu"
+"Z.M. Li"
+"Z.F. Li"
+"L.H. Tjeng"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     73
+_experiment_temperature     4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD1 2 2 special primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+ferromagnetic along z.
+secondary mode is not present in the model, making the moments of Co1_2 and Co1_2 correlated by the primary mode mLD1 (the same for Ir1_1 and Ir1_2).
+The reference identifies incorrectly the magnetic symmetry as R-3.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k=0 spin wave (3rd harmonic) allowed
+k-maximal magnetic symmetry (8 possible)
+Null amplitude of secondary spin mode mGM2+ (ferromagnetic)
+;
+
+_parent_space_group.name_H-M_alt  'R  -3c'
+_parent_space_group.IT_number                       167
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  165.95
+_space_group_magn.name_BNS  "P  -3c'  1"
+_space_group_magn.point_group_name  "-3m'"
+_space_group_magn.point_group_number  "20.5.75"
+_cell_length_a                 9.6198
+_cell_length_b                 9.6198
+_cell_length_c                 11.1578
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              120.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x-y,z,+1
+3 -x+y,-x,z,+1
+4 -x,-y,-z,+1
+5 y,-x+y,-z,+1
+6 x-y,x,-z,+1
+7 x-y,-y,-z+1/2,-1
+8 y,x,-z+1/2,-1
+9 -x,-x+y,-z+1/2,-1
+10 -x+y,y,z+1/2,-1
+11 -y,-x,z+1/2,-1
+12 x,x-y,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr_1 Sr 0.36360 0.00000 0.25000 1
+Sr_2 Sr 0.03027 0.33333 0.58333 1
+Co_1 Co 0.00000 0.00000 0.25000 1
+Co_2 Co 0.66667 0.33333 0.58333 1
+Ir_1 Ir 0.00000 0.00000 0.00000 1
+Ir_2 Ir 0.66667 0.33333 0.33333 1
+O_1 O 0.17270 0.02030 0.11320 1
+O_2 O 0.83937 0.35363 0.44653 1
+O_3 O 0.68697 0.50603 0.72013 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co_1 0.0 0.0 3.6(1) 0,0,mz
+Co_2 0.0 0.0 -1.8 0,0,mz
+Ir_1 0.0 0.0 -0.6(1) 0,0,mz
+Ir_2 0.0 0.0 0.3 0,0,mz
+

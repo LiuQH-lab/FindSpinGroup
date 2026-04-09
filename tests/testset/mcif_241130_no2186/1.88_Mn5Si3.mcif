@@ -1,0 +1,144 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:11:26
+# Database entry: 1.88 Mn5Si3
+# Cif-like file for the case 1.88
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Mn5 Si3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Mater. Chem."
+_citation_journal_volume        22
+_citation_page_first            15275
+_citation_page_last             15284
+_citation_article_id            .
+_citation_year                  2012
+_citation_DOI                   10.1039/c2jm00154c
+
+loop_
+_citation_author_name
+"M. Gottschilch"
+"O. Gourdon"
+"J. Persson"
+"C. de la Cruz"
+"V. Petricek"
+"T. Brueckel"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     100
+_experiment_temperature     70
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM3+ 3 1 . primary 5 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+modulus moment Mn2_1 1.89(6)
+Atomic positions and unit cell from experiment at 90K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+The structure suffers a significant orthorhombic distortion with the magnetic ordering.
+The effective space group symmetry for the atomic positions is the group Cmcm (Ccmm in the setting used).
+another magnetic phase below 60K with monoclinic symmetry.
+Parent phase in icsd 185922
+;
+
+_parent_space_group.name_H-M_alt  'P  6_3/m  c  m'
+_parent_space_group.IT_number                       193
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,a+2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,-a,c;0,0,0'
+
+
+_space_group_magn.number_BNS  60.431
+_space_group_magn.name_BNS  "P_C  b  c  n"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 6.89695(2)
+_cell_length_b                 11.9085(3)
+_cell_length_c                 4.79666(3)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z,+1
+3 x,-y,-z+1/2,+1
+4 -x+1/2,-y+1/2,z+1/2,+1
+5 -x,-y,-z,+1
+6 x+1/2,-y+1/2,z,+1
+7 -x,y,z+1/2,+1
+8 x+1/2,y+1/2,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.33245(14) 0.00000 1
+Mn2_1 Mn 0.7363(3) 0.50000 0.25000 1
+Mn2_2 Mn 0.3825(2) 0.38271(11) 0.25000 1
+Si1_1 Si 0.1002(2) 0.50000 0.25000 1
+Si1_2 Si 0.70051(19) 0.70028(10) 0.25000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.0 0.0 0.0 mx,0,mz
+Mn2_1 0.0 0.0 0.0 mx,0,0
+Mn2_2 -0.26 1.87 0.0 mx,my,0
+

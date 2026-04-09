@@ -1,0 +1,138 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:18:20
+# Database entry: 1.169 CaCoGe2O6
+# Cif-like file for the case 1.169
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ca Co Ge2 O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Solid State Chemistry"
+_citation_journal_volume        181
+_citation_page_first            3163
+_citation_page_last             3176
+_citation_article_id            .
+_citation_year                  2008
+_citation_DOI                   10.1016/j.jssc.2008.08.014
+
+loop_
+_citation_author_name
+"G.J. Redhammer"
+"G. Roth"
+"W. Treutmann"
+"W. Paulus"
+"G. Andre"
+"C. Pietzonka"
+"G. Amthauer"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     18.1
+_experiment_temperature     1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY2+ 1 1 . primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Similar structures are reported for CaFeSi2O6 and CaNiGe2O6 in the same reference, but also a different structure (with k=0) for CaMnGe2O6 (see entry #0.155).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep active
+The point group symmetry of the structure forbids linear magnetoelectricity, in contrast with the magnetic phase of CaMnGe2O6 (see entries #0.155 and #0.156 - Phys. Rev. B (2016) 93, 064423)
+;
+
+_parent_space_group.name_H-M_alt  'C  2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-2c,-b,-a+c;0,0,0'
+
+
+_space_group_magn.number_BNS  14.84
+_space_group_magn.name_BNS  "P_C  2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 10.14770
+_cell_length_b                 8.95180
+_cell_length_c                 5.42740
+_cell_angle_alpha              90.00
+_cell_angle_beta               104.75
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1 Co 0.00000 0.91230 0.25000 1
+Ca1 Ca 0.00000 0.30680 0.25000 1
+Ge1 Ge 0.28600 0.09920 0.22800 1
+O1 O 0.11030 0.09100 0.13900 1
+O2 O 0.36320 0.26310 0.34090 1
+O3 O 0.35650 0.03010 0.98190 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 1.92(4) 0.0 2.75(5) mx,0,mz
+

@@ -1,0 +1,157 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/06/2022
+# From a file submitted by Kelly Rue, Susana Herrera and Navindra Keerthisinghe 
+
+data_5yOhtAoR
+_audit_creation_date            2022-10-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    "CdCu3(OH)6(NO3)2·H2O"
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Cd Cu3 O13 N2 H8"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Phys. Rev. B."
+_citation_journal_volume        106
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            024401
+_citation_year                  2022
+_citation_DOI                   10.1103/PhysRevB.106.024401
+
+loop_
+_citation_author_name
+"Y. Ihara"
+"R. Hiyoshi"
+"M. Shimohashi"
+"K. Hayashi"
+"R. Okuma"
+"F. Orlandi"
+"P. Manuel"
+"G.J. Nilsen"
+"Z. Hiroi"
+
+_temperature_position_structure         10
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "."
+
+_transition_temperature     4
+_experiment_temperature     1.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3+ 2 2 special primary 3 .
+mGM1+ 1 1 special secondary 1  no
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a 10K temperature determination
+Structure described in the standard setting of its MSG
+The monoclinic axis is along b (or symmetry equivalent directions), and therefore a FM component is possible along this direction.
+Weak FM is therefore possible and it is mentioned in the paper as experimentally observed
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep along a special direction
+A 1-dim secondary irrep is symmetry allowed and not present in the arrangement
+;
+
+_parent_space_group.name_H-M_alt  'P -3 m 1'
+_parent_space_group.IT_number                       164
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a+b,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  12.58
+_space_group_magn.name_BNS  "C 2/m"
+_space_group_magn.point_group_name  "2/m"
+_space_group_magn.point_group_number  "5.1.12"
+_cell_length_a                 11.30350
+_cell_length_b                 6.52610
+_cell_length_c                 6.99890
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z,+1 
+3 -x,-y,-z,+1 
+4 x,-y,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cu1_1 Cu 0.25000 0.25000 0.00000 1.
+Cu1_2 Cu 0.00000 0.50000 0.00000 1.
+Cd1 Cd 0.00000 0.00000 0.05800 0.5
+O1_1 O 0.09105 0.72685 0.12400 1.
+O1_2 O 0.81790 0.00000 0.12400 1.
+O2 O 0.66667 0.00000 0.78200 1.
+O3_1 O 0.12300 0.63100 0.51100 0.6667
+O3_2 O 0.75400 0.00000 0.51100 0.6667
+O4 O 0.00000 0.00000 0.40700 0.5
+N1 N 0.66667 0.00000 0.60400 1.
+D1_1 D 0.10080 0.69760 0.26100 0.82
+D1_2 D 0.79840 0.00000 0.26100 0.82
+H1_1 H 0.10080 0.69760 0.26100 0.18
+H1_2 H 0.79840 0.00000 0.26100 0.18
+H2_1 H 0.03500 0.89500 0.29000 0.3333
+H2_2 H 0.93000 0.00000 0.29000 0.3333
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Cu1_1 -0.181865 0.105 0.0 mx,my,mz 0.21(1) ? ?
+Cu1_2 0.0 -0.21. 0.0 0,my,0 0.21(1) ? ?
+

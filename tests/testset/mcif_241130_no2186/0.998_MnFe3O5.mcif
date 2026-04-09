@@ -1,0 +1,152 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/17/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-09-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Mn1 Fe3 O5"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Mater. Chem. C"
+_citation_journal_volume        6
+_citation_page_first            3271
+_citation_page_last             3275
+_citation_article_id            .
+_citation_year                  2018
+_citation_DOI                   10.1039/c8tc00053k
+
+loop_
+_citation_author_name
+"K. H. Hong"
+"A. M. Arevalo-Lopez"
+"M. Coduri"
+"G. M. McNallya"
+"J. P. Attfield"
+
+_temperature_position_structure         5
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature      ?
+_experiment_temperature      75
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+ 1 1 . primary 5 .
+mGM3- 1 1 . primary 3 .
+mGM1+ 1 1 . primary 2 .
+mGM2- 1 1 . secondary 2 no
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 5K.
+See #0.995, #0.996 and #0.997 for the structure at other higher temperature phases
+The relative signs of the Fe1, Fe2 and Mn spin components have been taken from the figure of the structure in the article.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+3 different irreps are active as primary irreps. This means three different order parameters are present in the sense of Landau theory
+A secondary irrep is also symmetry allowed, but not present.
+The MSG is polar on the plane ac. FM along b. 
+Ferrimagnetic along b
+Not clear in the article if this complex low symmetry model was contrasted with other simpler ones with less number of active irreps.
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  9.37
+_space_group_magn.name_BNS  "C c"
+_space_group_magn.point_group_name  "m.1"
+_space_group_magn.point_group_number  "4.1.9"
+_cell_length_a                 2.9017
+_cell_length_b                 9.8928
+_cell_length_c                 12.6083
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1_1 Fe 0.00000 0.73450 0.11310 1.
+Fe1_2 Fe  0.00000 0.73450 0.38690 1.
+Fe2 Fe 0.00000 0.00000 0.00000 0.995
+Mn2 Mn 0.00000 0.00000 0.00000 0.005
+Mn1 Mn 0.00000 0.48120 0.25000 0.937
+Fe3 Fe 0.00000 0.48120 0.25000 0.063
+O1 O 0.00000 0.81880 0.25000 1.
+O2_1 O 0.00000 0.34690 0.04730 1.
+O2_2 O  0.00000 0.34690 0.45270 1.
+O3_1 O 0.00000 0.09920 0.14100 1.
+O3_2 O  0.00000 0.09920 0.35900 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1_1 1.6(1) 1.5(2) 3.2(1) mx,my,mz 3.9(3) ? ?
+Fe1_2 -1.6(1) 1.5(2) -3.2(1) mx,my,mz 3.9(3) ? ?
+Fe2 -1.7(1) -1.0(2) -2.4(1) mx,my,mz 3.1(4) ? ?
+Mn1 0.0 -2.6(3) 1.7(4) mx,my,mz 3.1(6) ? ?
+

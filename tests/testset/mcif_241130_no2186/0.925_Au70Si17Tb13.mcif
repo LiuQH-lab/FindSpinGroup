@@ -1,0 +1,162 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/09/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-09
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Au70 Si17 Tb13"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        32
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            415802
+_citation_year                  2020
+_citation_DOI                   10.1088/1361-648X/ab997d
+
+loop_
+_citation_author_name
+"T. Hiroto"
+"T. J Sato"
+"H. Cao"
+"T. Hawai"
+"T. Yokoo"
+"S. Itoh"
+"R. Tamura"
+
+_temperature_position_structure         15
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     11.6(1)
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+ 3 3 special primary 5 .
+mGM1+ 1 1 . secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure from a determination at 15K
+FM along the direction (1,1,1) or equivalent domain-related directions
+IThe moment magnitude of all Tb atoms is stated in the paper text to be equal with value 6.9 muB, but the moment magnitudes for the two MSG independent Tb sites result to be different, when calculated according to the listed irrep basis vectors (BVs) and the corresponding reported refined amplitudes. The model given here has been built assuming that the irrep BVs and their listed refined amplitudes are correct. 
+See #1.412 for a similar compound with a very different model for its magnetic structure.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic
+3-dim irrep als primary
+1-dim irrep as secondary
+;
+
+_parent_space_group.name_H-M_alt  'I m -3'
+_parent_space_group.IT_number                       204
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-c,-a+b,1/2a+1/2b+1/2c;0,0,0'
+
+_space_group_magn.number_BNS  148.17
+_space_group_magn.name_BNS  "R -3"
+_space_group_magn.point_group_name  "-3"
+_space_group_magn.point_group_number  "17.1.62"
+_cell_length_a                 14.72600
+_cell_length_b                 14.72600
+_cell_length_c                 14.72600
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 z,x,y,+1 
+3 y,z,x,+1 
+4 -x,-y,-z,+1 
+5 -z,-x,-y,+1 
+6 -y,-z,-x,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Au1_1 Au 0.10700 0.33800 0.20400 1.
+Au1_2 Au 0.89300 0.66200 0.20400 1.
+Au1_3 Au 0.89300 0.33800 0.79600 1.
+Au1_4 Au 0.10700 0.66200 0.79600 1.
+Au2_1 Au 0.00000 0.40100 0.35500 1.
+Au2_2 Au 0.00000 0.59900 0.35500 1.
+Au3 Au 0.40600 0.00000 0.00000 1.
+Au4_1 Au 0.15100 0.15100 0.15100 1.
+Au4_2 Au 0.84900 0.84900 0.15100 1.
+Au6_1 Au 0.00000 0.23900 0.08300 0.63
+Au6_2 Au 0.00000 0.76100 0.08300 0.63
+Si6_1 Si 0.00000 0.23900 0.08300 0.37
+Si6_2 Si 0.00000 0.76100 0.08300 0.37
+Au7 Au 0.20000 0.00000 0.50000 0.19
+Si7 Si 0.20000 0.00000 0.50000 0.81
+Au8_1 Au 0.00000 0.09300 0.05400 0.11
+Au8_2 Au 0.00000 0.90700 0.05400 0.11
+Si8_1 Si 0.00000 0.09300 0.05400 0.23
+Si8_2 Si 0.00000 0.90700 0.05400 0.23
+Si9_1 Si 0.25000 0.25000 0.25000 1.
+Si9_2 Si 0.75000 0.75000 0.25000 1.
+Tb1_1 Tb 0.00000 0.18700 0.30600 1.
+Tb1_2 Tb 0.00000 0.81300 0.30600 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tb1_1 0.84 6.48 -2.19 mx,my,mz 6.9 ? ?
+Tb1_2 0.84 6.86 3.07 mx,my,mz 7.6 ? ?
+

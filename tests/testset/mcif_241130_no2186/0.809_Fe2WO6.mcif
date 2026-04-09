@@ -1,0 +1,146 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/31/2022 
+# From a file provided by F. Damay
+
+data_5yOhtAoR
+_audit_creation_date            2022-01-31
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    "beta polymorph of Fe2WO6"
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Fe2 W O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        59
+_citation_page_first            9798
+_citation_page_last             9806
+_citation_article_id            .
+_citation_year                  2020
+_citation_DOI                   10.1021/acs.inorgchem.0c01024
+
+loop_
+_citation_author_name
+"S. Caubergh"
+"N. Matsubara"
+"F. Damay"
+"A. Maignan"
+"F. Fauth"
+"P. Manuel"
+"D. Khalyavin"
+"B. Vertruyen"
+"C. Martin"
+
+_temperature_position_structure         .
+_temperature_atom_positions             10
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            1.5
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     264
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1- 1 1 . primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Between 264 K and about 160 K the my components of the magnetic moments on both sites are zero.
+Magnetoelectric properties expected.
+The structure is described in the non-standard setting P12_1/a1 in the paper. Here it has been transformed to the standard setting P2_1/c
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure  (k=000)
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  14.78
+_space_group_magn.name_BNS  "P 2_1/c'  "
+_space_group_magn.point_group_name  "2/m'"
+_space_group_magn.point_group_number  "5.4.15"
+_cell_length_a                 5.5893(2)
+_cell_length_b                 4.5904(2)
+_cell_length_c                 15.0860(6)
+_cell_angle_alpha              90.0000
+_cell_angle_beta               98.4983
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,-z+1/2,+1
+3 -x,-y,-z,-1
+4 x,-y+1/2,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+W W 0.3617 0.0058 0.5877 1
+Fe1 Fe 0.8551 0.001 0.0857 1
+Fe2 Fe 0.2284 -0.004 0.2578 1
+O1 O 0.862 -0.234 0.97 1
+O2 O 0.447 0.227 0.6899 1
+O3 O 0.670 -0.219 0.637 1
+O4 O -0.383 0.217 0.526 1
+O5 O 0.841 0.236 -0.131 1
+O6 O 0.953 0.295 0.6966 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 2.9(1) -0.8(2) 3.2(2) mx,my,mz 4.1(2) ? ?
+Fe2 2.4(2)  0.4(3) 3.2(2) mx,my,mz 3.7(3) ? ?
+

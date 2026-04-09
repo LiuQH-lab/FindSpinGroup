@@ -1,0 +1,137 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:14:54
+# Database entry: 1.131 Fe2As
+# Cif-like file for the case 1.131
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Fe2 As'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys Soc. Jpn"
+_citation_journal_volume        21
+_citation_page_first            2238
+_citation_page_last             2243
+_citation_article_id            .
+_citation_year                  1966
+_citation_DOI                   10.1143/JPSJ.21.2238
+
+loop_
+_citation_author_name
+"H. Katsuraki"
+"N. Achiwa"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   42335
+_atomic_positions_source_other               .
+
+_transition_temperature     353
+_experiment_temperature     290
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ5+ 2 2 special primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD, NSD
+parent space group in non-standard P4/nmm (a,b,c;-1/4,1/4,0) setting
+orientation of the moments on the ab plane is undetermined. Here, it has been assumed in the b direction (or equivalently along a), in order to realize a maximal symmetry, as observed in other similar compounds as Cr2As (see entry #1.130).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep active. MSG corresponds to an irrep epikernel.
+The easy axis oblique along the (1,1,0) or (1,-1,0) realizes also maximal symmetry. It corresponds to the alternative epikernel for the same active irrep.
+Same MSG as Mn2As, but opposite coupling of the two independent Fe sites (see entry #1.132).
+;
+
+_parent_space_group.name_H-M_alt  'P  4/n  m  m'
+_parent_space_group.IT_number                       129
+_parent_space_group.transform_Pp_abc  'a,b,c;-1/4,1/4,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;1/4,3/4,0'
+
+
+_space_group_magn.number_BNS  62.450
+_space_group_magn.name_BNS  "P_a  n  m  a"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 3.63
+_cell_length_b                 3.63
+_cell_length_c                 11.96
+_cell_angle_alpha              90.
+_cell_angle_beta               90.
+_cell_angle_gamma              90.
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z+1/2,+1
+3 -x+1/2,y+1/2,-z,+1
+4 x+1/2,-y+1/2,-z+1/2,+1
+5 -x+1/2,-y+1/2,-z,+1
+6 x+1/2,y+1/2,-z+1/2,+1
+7 x,-y,z,+1
+8 -x,y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.00000 0.00000 0.00000 1
+Fe2 Fe 0.00000 0.50000 0.165 1
+As1 As 0.00000 0.50000 0.3675 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.0 0.95 0.0 0,my,0
+Fe2 0.0 1.52 0.0 0,my,0
+

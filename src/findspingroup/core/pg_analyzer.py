@@ -36,6 +36,18 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def _point_group_site_weight(site) -> float:
+    """Weight used when deriving inertia-based axis guesses for spin-point sets.
+
+    The artificial ``origin`` anchor should participate in the geometry, but
+    it should not be treated as just another equal-mass endpoint. Giving it a
+    slightly larger weight keeps the anchored-vector intent while reducing the
+    accidental equal-mass tetrahedral degeneracy seen in cases like
+    ``0.1120_KTb3F10``.
+    """
+    return 0.2 if str(site.species) == "origin" else 1.0
+
+
 
 
 class SymmOp(list):
@@ -680,10 +692,9 @@ class IMolecule:
         center = np.zeros(3)
         total_weight: float = 0
         for site in self:
-            # wt = site.species.weight
-            wt = 1
-            # for points, it's the same
-            center += site.coords * wt
+            coords = np.asarray(site.coords, dtype=float)
+            wt = _point_group_site_weight(site)
+            center += coords * wt
             total_weight += wt
         return center / total_weight
 
@@ -1011,10 +1022,8 @@ class PointGroupAnalyzer:
             inertia_tensor = np.zeros((3, 3))
             total_inertia = 0
             for site in self.centered_mol:
-                c = site.coords
-                # wt = site.species.weight
-                wt = 1
-                # for points, it's the same
+                c = np.asarray(site.coords, dtype=float)
+                wt = _point_group_site_weight(site)
                 for i in range(3):
                     inertia_tensor[i, i] += wt * (c[(i + 1) % 3] ** 2 + c[(i + 2) % 3] ** 2)
                 for i, j in ((0, 1), (1, 2), (0, 2)):
@@ -1110,8 +1119,8 @@ class PointGroupAnalyzer:
             self.symmops.append(PointGroupAnalyzer.inversion_op)
         else:
             for v in self.principal_axes:
-                mirror_type = self._find_mirror(v)
-                if mirror_type != "":
+                mirror_type, has_mirror = self._find_mirror(v)
+                if has_mirror or mirror_type != "":
                     self.sch_symbol = "Cs"
                     break
 
@@ -1119,7 +1128,7 @@ class PointGroupAnalyzer:
         """Handles cyclic group molecules."""
         main_axis, rot = max(self.rot_sym, key=lambda v: v[1])
         self.sch_symbol = f"C{rot}"
-        mirror_type = self._find_mirror(main_axis)
+        mirror_type, _has_mirror = self._find_mirror(main_axis)
         if mirror_type == "h":
             self.sch_symbol += "h"
         elif mirror_type == "v":
@@ -1134,7 +1143,7 @@ class PointGroupAnalyzer:
         main_axis, rot = max(self.rot_sym, key=lambda v: v[1])
         # print(rot)
         self.sch_symbol = f"D{rot}"
-        mirror_type = self._find_mirror(main_axis)
+        mirror_type, _has_mirror = self._find_mirror(main_axis)
         if mirror_type == "h":
             self.sch_symbol += "h"
         elif mirror_type != "":
@@ -1151,7 +1160,36 @@ class PointGroupAnalyzer:
                 self.symmops.append(op)
                 self.rot_sym.append((v, 2))
 
-    def _find_mirror(self, axis: NDArray) -> Literal["h", "d", "v", ""]:
+    @staticmethod
+    def _normalized_axis_overlap(v1: NDArray, v2: NDArray) -> float:
+        """Return |cos(theta)| between two candidate normals/axes.
+
+        The spherical-top path builds raw axis candidates from sums/cross products of
+        input coordinates, so their magnitudes vary with the point-set scale. Mirror
+        filtering should therefore compare directions rather than raw dot products.
+        """
+        norm1 = np.linalg.norm(v1)
+        norm2 = np.linalg.norm(v2)
+        if norm1 == 0 or norm2 == 0:
+            return 1.0
+        return abs(float(np.dot(v1, v2)) / float(norm1 * norm2))
+
+    @staticmethod
+    def _normalize_axis(axis: NDArray) -> NDArray:
+        norm = np.linalg.norm(axis)
+        if norm == 0:
+            raise ValueError("zero vector can't be normalized!")
+        return np.asarray(axis, dtype=float) / float(norm)
+
+    def _distance_from_axis(self, point: NDArray, axis: NDArray) -> float:
+        axis_hat = self._normalize_axis(axis)
+        return float(np.linalg.norm(np.cross(np.asarray(point, dtype=float), axis_hat)))
+
+    def _append_symmop_once(self, op: SymmOp) -> None:
+        if op not in self.symmops:
+            self.symmops.append(op)
+
+    def _find_mirror(self, axis: NDArray) -> tuple[Literal["h", "d", "v", ""], bool]:
         """Looks for mirror symmetry of specified type about axis.
 
         Possible types are "h" or "vd". Horizontal (h) mirrors are perpendicular to the
@@ -1159,31 +1197,47 @@ class PointGroupAnalyzer:
         lying on the mirror plane while d mirrors do not.
         """
         mirror_type: Literal["h", "d", "v", ""] = ""
+        has_mirror = False
 
         # First test whether the axis itself is the normal to a mirror plane.
-        if self.is_valid_op(SymmOp.reflection(axis)):
-            self.symmops.append(SymmOp.reflection(axis))
+        horizontal_reflection = SymmOp.reflection(axis)
+        if self.is_valid_op(horizontal_reflection):
+            self._append_symmop_once(horizontal_reflection)
             mirror_type = "h"
+            has_mirror = True
         else:
             # Iterate through all pairs of atoms to find mirror
             for s1, s2 in itertools.combinations(self.centered_mol, 2):
                 if s1.species == s2.species:
                     normal = s1.coords - s2.coords
-                    if np.dot(normal, axis) < self.tol:
-                        op = SymmOp.reflection(normal)
-                        if self.is_valid_op(op):
-                            self.symmops.append(op)
-                            if len(self.rot_sym) > 1:
-                                mirror_type = "d"
-                                for v, _ in self.rot_sym:
-                                    if np.linalg.norm(v - axis) >= self.tol and np.dot(v, normal) < self.tol:
-                                        mirror_type = "v"
-                                        break
-                            else:
-                                mirror_type = "v"
-                            break
+                    if np.linalg.norm(normal) <= self.tol:
+                        continue
 
-        return mirror_type
+                    op = SymmOp.reflection(normal)
+                    if not self.is_valid_op(op):
+                        continue
+
+                    self._append_symmop_once(op)
+                    has_mirror = True
+
+                    # Type classification still depends on the mirror plane being
+                    # comparable to the requested axis. We therefore keep the old
+                    # v/d/h contract, but only after normalizing the geometric test.
+                    if self._normalized_axis_overlap(normal, axis) < self.tol:
+                        if len(self.rot_sym) > 1:
+                            mirror_type = "d"
+                            for v, _ in self.rot_sym:
+                                if (
+                                    np.linalg.norm(v - axis) >= self.tol
+                                    and self._normalized_axis_overlap(v, normal) < self.tol
+                                ):
+                                    mirror_type = "v"
+                                    break
+                        else:
+                            mirror_type = "v"
+                        break
+
+        return mirror_type, has_mirror
 
     def _get_smallest_set_not_on_axis(self, axis: NDArray) -> list:
         """Get the smallest list of atoms with the same species and distance from
@@ -1194,10 +1248,7 @@ class PointGroupAnalyzer:
         """
 
         def not_on_axis(site):
-            v = np.cross(site.coords, axis)
-            return np.linalg.norm(v) > 1e-6
-            # return np.linalg.norm(v) > self.tol
-            # yutong 其实可以算投影 #
+            return self._distance_from_axis(site.coords, axis) > self.tol
 
         valid_sets = []
         _origin_site, dist_el_sites = cluster_sites(self.centered_mol, self.tol)
@@ -1216,9 +1267,8 @@ class PointGroupAnalyzer:
         """
         min_set = self._get_smallest_set_not_on_axis(axis)
         max_sym = len(min_set)
-        for idx in range(max_sym, 0, -1):
-            if max_sym % idx != 0:
-                continue
+        candidate_orders = [idx for idx in range(max_sym, 0, -1) if max_sym % idx == 0]
+        for idx in candidate_orders:
             op = SymmOp.from_axis_angle_and_translation(axis, 360 / idx)
             if self.is_valid_op(op):
                 self.symmops.append(op)
@@ -1256,8 +1306,8 @@ class PointGroupAnalyzer:
             self._proc_sym_top()
 
         elif rot == 3:
-            mirror_type = self._find_mirror(main_axis)
-            if mirror_type == "":
+            mirror_type, has_mirror = self._find_mirror(main_axis)
+            if not has_mirror and mirror_type == "":
                 self.sch_symbol = "T"
             elif self.is_valid_op(PointGroupAnalyzer.inversion_op):
                 self.symmops.append(PointGroupAnalyzer.inversion_op)
@@ -1324,7 +1374,10 @@ class PointGroupAnalyzer:
         Returns:
             list[SymmOp]: symmetry operations in Cartesian coord.
         """
-        return generate_full_symmops(self.symmops, self.tol)
+        # Use the same closure tolerance as point-group identification so the
+        # returned operation set matches the detected finite group instead of
+        # over-expanding near-symmetric generators.
+        return generate_full_symmops(self.symmops, self.mat_tol)
 
 
     def is_valid_op(self, symm_op: SymmOp) -> bool:
@@ -1343,7 +1396,7 @@ class PointGroupAnalyzer:
             ind = find_in_coord_list(coords, coord, self.tol)
 
             if not (any([self.mol[i].species == site.species for i in ind])):
-                # 很可能出现一个点有多个原子的情况，只要有一个对就可以
+                # Multiple atoms can map onto the same point; one valid match is enough.
             # if not (len(ind) == 1 and self.centered_mol[ind[0]].species == site.species):
             # yutong #
                 return False
@@ -1413,6 +1466,7 @@ def find_in_coord_list(coord_list, coord, atol: float = 1e-8):
 def generate_full_symmops(
     symmops: Sequence[SymmOp],
     tol: float,
+    max_generated_ops: int = 240,
 ) -> Sequence[SymmOp]:
     """Recursive algorithm to permute through all possible combinations of the initially
     supplied symmetry operations to arrive at a complete set of operations mapping a
@@ -1436,19 +1490,23 @@ def generate_full_symmops(
         return [SymmOp(identity)]
 
     full = list(generators)
+    index = 0
 
-    for g in full:
+    while index < len(full):
+        g = full[index]
+        index += 1
         for s in generators:
             op = np.dot(g, s)
             d = np.abs(full - op) < tol
             if not np.any(np.all(np.all(d, axis=2), axis=1)):
                 full.append(op)
-            if len(full) > 1000:
-                warnings.warn(
-                    f"{len(full)} matrices have been generated. The tol may be too small. Please terminate"
-                    " and rerun with a different tolerance.",
-                    stacklevel=2,
-                )
+                if len(full) > max_generated_ops:
+                    raise ValueError(
+                        "Point-group closure exceeded the maximum generated operation count "
+                        f"({max_generated_ops}). The current tolerance likely accepts a non-group "
+                        "generator set; lower the relevant PG tolerance instead of allowing "
+                        "unbounded closure growth."
+                    )
 
     d = np.abs(full - identity) < tol
     if not np.any(np.all(np.all(d, axis=2), axis=1)):

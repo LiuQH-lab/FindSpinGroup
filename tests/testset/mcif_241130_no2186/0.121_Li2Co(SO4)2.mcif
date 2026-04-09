@@ -1,0 +1,136 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:57:41
+# Database entry: 0.121 Li2Co(SO4)2
+# Cif-like file for the case 0.121
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Li2 Co (S O4 )2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Inorganic Chemistry"
+_citation_journal_volume        52
+_citation_page_first            10456
+_citation_page_last             10466
+_citation_article_id            .
+_citation_year                  2013
+_citation_DOI                   10.1021/ic401280e
+
+loop_
+_citation_author_name
+"M. Reynaud"
+"G. Rousse"
+"J.-N. Chotard"
+"J. Rodriguez-Carvajal"
+"J.-M. Tarascon"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     7
+_experiment_temperature     1.85
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry(2 possible)
+1-dim irrep active: equivalent to MSG assignment
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  14.79
+_space_group_magn.name_BNS  "P  2_1'/c'  "
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 4.96710
+_cell_length_b                 8.09080
+_cell_length_c                 8.76390
+_cell_angle_alpha              90.00
+_cell_angle_beta               121.855
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,y+1/2,-z+1/2,-1
+4 x,-y+1/2,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1 Co 0.00000 0.00000 0.00000 1
+Li2 Li 0.01400 0.63520 0.10150 1
+S3 S 0.33885 0.30210 0.30460 1
+O4 O 0.18100 0.41760 0.15070 1
+O5 O 0.20050 0.13420 0.24630 1
+O6 O 0.28610 0.35100 0.44650 1
+O7 O 0.68540 0.30180 0.37640 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 0.12 3.33(3) 0.0 mx,my,mz
+

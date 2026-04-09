@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/23/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-09-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Cr1 N1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        105
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            L180101
+_citation_year                  2022
+_citation_DOI                   10.1103/PhysRevB.105.L180101
+
+loop_
+_citation_author_name
+"Z. Gui"
+"C. Gu"
+"H. Cheng"
+"J. Zhu"
+"X. Yu"
+"Er.Guo"
+"L. Wu"
+"J. Mei"
+"J. Sheng"
+"J. Zhang"
+"J. Wang"
+"Y. Zhao"
+"L. Bellaiche"
+"L. Huang"
+"S. Wang"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     270
+_experiment_temperature     10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM3 12 1 special primary 1 0
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Two equivalent domain related descriptions including twin-related structural distortions are presented in the paper. Here only one of them is used.
+The structure has a strong structural orthorhombic distortion according to the space group Pmmn, which is consistent with the MSG of the phase, and is concomitant with the magnetic transitions. It can therefore be in principle considered a magnetostructural effect induced by the magnetic ordering. 
+The structure is described in the standard setting of the MSG. Under this setting, the effective space group Pmmn for the nuclear structure is in a non-standard setting, with transformation to standard: (b,c,a;0,0,0).
+The spin arrangement and corresponding MSG coincides with that reported previously (see #1.28). But the present model includes a structural distortion, which was mentioned in the previous reference but was not fully characterized. In fact, therein it was assigned a different space group not compatible with the resulting MSG of the spin arrangement and it would therefore break further the symmetry (see #1.28).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal symmetry
+2-dim extended (k,-k) small irrep
+;
+
+_parent_space_group.name_H-M_alt  'F m -3 m'
+_parent_space_group.IT_number                       225
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a+b,-1/2a+1/2b,c;1/2,3/4,1/4'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  62.450
+_space_group_magn.name_BNS  "P_a n m a"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 5.7693(1)
+_cell_length_b                 2.9711(1)
+_cell_length_c                 4.1413(1)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z+1/2,+1 
+3 -x,y+1/2,-z,+1 
+4 -x+1/2,-y,z+1/2,+1 
+5 -x,-y,-z,+1 
+6 -x+1/2,y+1/2,z+1/2,+1 
+7 x,-y+1/2,z,+1 
+8 x+1/2,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cr1 Cr 0.1398(5) 0.2500 0.2500 1
+N1 N 0.1148(2) 0.2500 0.7500 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Cr1 0.0 2.35(5) 0.0 0,my,0 2.35(5) ? ?
+

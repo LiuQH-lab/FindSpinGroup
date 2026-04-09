@@ -1,0 +1,126 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Mater. Chem. C"
+_citation_journal_volume        4
+_citation_page_first            5320
+_citation_page_last             5325
+_citation_article_id            ?
+_citation_year                  2016
+_citation_DOI                   10.1039/c6tc01034b
+
+loop_
+_citation_author_name
+"B.P. de Laune"
+"F.J. Berry"
+"J.F. Marco"
+"S.L. Horswell"
+"C. Greaves"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  24
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5-  2  2  special  primary  2  .
+mGM2+  1  1    .      primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Refinement done under a P1 model without restrictions, without using either symmetry or representation analysis.
+The weak mz component, which breaks the collinearity and the magnetic symmetry of the prevailing mx arrangement is only reported for the 4K  model (not detected at 20K and at 16K).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps active as primary. The mGM5- irrep (special irrep direction) corresponds to the prevailing Ax spin arrangement. The mGM2+ irrep is associated with the weak mz component (Cz arrangememt).
+The weak mz component breaks the MSG associated with the mGM5- arrangement.
+Polar symmetry. If insulator, magnetic induced ferroelectricity (type II multiferroic) along b would be expected.
+;
+
+_parent_space_group.name_H-M_alt  'P 4_2/m b c'
+_parent_space_group.IT_number                       135
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-a,b;1/4,0,0'
+
+
+
+_space_group_magn.number_BNS  26.66
+_space_group_magn.name_BNS  "P m c 2_1"
+_cell_length_a             8.47250
+_cell_length_b             8.47250
+_cell_length_c             6.10040
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z,+1
+3 x,y,-z,+1
+4 -x+1/2,y+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.00000 0.50000 0.25000 1.
+Pb1_1 Pb 0.15470 0.15580 0.00000 0.5
+Pb1_2 Pb  0.84530 0.84420 0.00000 0.5
+Pb1_3 Pb  0.84420 0.15470 0.50000 0.5
+Pb1_4 Pb  0.15580 0.84530 0.50000 0.5
+Bi1_1 Bi 0.15470 0.15580 0.00000 0.5
+Bi1_2 Bi  0.84530 0.84420 0.00000 0.5
+Bi1_3 Bi  0.84420 0.15470 0.50000 0.5
+Bi1_4 Bi  0.15580 0.84530 0.50000 0.5
+O1_1 O 0.66870 0.16870 0.25000 1.
+O1_2 O  0.33130 0.83130 0.25000 1.
+O2_1 O 0.09160 0.63130 0.00000 1.
+O2_2 O  0.90840 0.36870 0.00000 1.
+O2_3 O  0.36870 0.09160 0.50000 1.
+O2_4 O  0.63130 0.90840 0.50000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 -3.72(5) 0.00000 0.41(7) mx,my,mz

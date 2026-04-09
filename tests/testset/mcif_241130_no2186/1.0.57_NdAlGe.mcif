@@ -1,0 +1,163 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/18/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-10-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Nd1 Al1 Ge1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        107
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            224414
+_citation_year                  2023
+_citation_DOI                   10.1103/PhysRevB.107.224414
+
+loop_
+_citation_author_name
+"C. Dhital"
+"R. L. Dally"
+"R. Ruvalcaba"
+"R. Gonzalez-Hernandez"
+"J. Guerrero-Sanchez"
+"H. B. Cao"
+"Q. Zhang"
+"W. Tian"
+"Y. Wu"
+"M. D. Frontzek"
+"S. K. Karna"
+"A. Meads"
+"B. Wilson"
+"R. Chapai"
+"D. Graf"
+"8 J. Bacsa"
+"R. Jin"
+"J. F. DiTusa"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    293
+_temperature_cell_parameters            4.8
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "Wang et al., Solid State Com. 321, 114041 (2020)- DOI:10.1016/j.ssc.2020.114041"
+
+_transition_temperature     4.9
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mDT1 4 1 special primary 3 .
+mGM4 1 1 . secondary 1 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Only cell parameters are reported. Positions of non-magnetic atoms here have been taken from another work at room temperature.
+A preliminary incommensurate magnetic phase between 6.3K and 4.9K is observed.
+FM along c
+The MSG allows for the Nd1_1 site a moment component on the plane ab. Fitting some weak peaks it is estimated to be about 0.22(1) muB. But for a refinement of the full data th ab canting was zero within error.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+The article uses the term "multi-k" structure, but in fact the second k(=0), corresponds to an harmonic of the primary one, and cannot be considered a second independent propagation vector. Therefore the arrangement is strictly a 1k magnetic structure. 
+Extended (k,-k) small irrep along a special direction as primary irrep
+A secondary irrep with k=0 is symmetry allowed and present in the model
+The primary irrep has 4 k-vectors in its star. A multi-k arrangement involving all vectors of the irrep star could not be discarded as a possible alternative model.
+;
+
+_parent_space_group.name_H-M_alt  'I 4_1 m d'
+_parent_space_group.IT_number                       109
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,-1/3a+1/3b,c;-1/6,0,0'
+
+
+_space_group_magn.number_BNS  43.227
+_space_group_magn.name_BNS  "F d' d' 2"
+_space_group_magn.point_group_name  "m'm'2"
+_space_group_magn.point_group_number  "7.4.23"
+_cell_length_a                 12.67200
+_cell_length_b                 12.67200
+_cell_length_c                 14.62400
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+2/3,-y,z,+1 
+3 -y,-x+1/6,z+1/4,-1 
+4 y,x+1/2,z+1/4,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/6,y+5/6,z+1/2,+1 
+3 x+1/3,y+2/3,z,+1 
+4 x+1/2,y+1/2,z+1/2,+1 
+5 x+2/3,y+1/3,z,+1 
+6 x+5/6,y+1/6,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Nd1_1 Nd 0.00000 0.00000 0.00000 1
+Nd1_2 Nd 0.16667 0.16667 0.50000 1
+Ge1_1 Ge 0.00000 0.00000 0.43900 1
+Ge1_2 Ge 0.16667 0.16667 0.93900 1
+Al1_1 Al 0.00000 0.00000 0.60900 1
+Al1_2 Al 0.16667 0.16667 0.10900 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Nd1_1 0.0 0.0 -3.03(9) mx,my,mz 3.03(9) ? ?
+Nd1_2 0.0 0.0 3.03(9) 0,0,mz 3.03(9) ? ?
+

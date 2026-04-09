@@ -1,0 +1,115 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 08/11/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-11-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Chin. Phys. B"
+_citation_journal_volume        26
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            027501
+_citation_year                  2017
+_citation_DOI                   10.1088/1674-1056/26/2/027501
+
+loop_
+_citation_author_name
+"X.-Q. Zheng"
+"B.-G. Shen"
+
+
+
+_atomic_positions_source_database_code_ICSD  235976
+_atomic_positions_source_other               .
+
+_transition_temperature  35.5
+_experiment_temperature  20
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3+  1  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+See also Isikawa et al, J. Appl. Phys. 55, 2031 (1984)
+FM along a
+At 13.5K a second magnetic transition takes place with direction b also becoming FM
+Structures at other various temperatures in the same phase are also reported in the same reference.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  62.447
+_space_group_magn.name_BNS  "P n m' a'"
+_cell_length_a             6.9764(1)
+_cell_length_b             4.15478(3)
+_cell_length_c             5.4016(1)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 -x+1/2,y+1/2,z+1/2,+1
+5 -x,y+1/2,-z,-1
+6 -x+1/2,-y,z+1/2,-1
+7 x,-y+1/2,z,-1
+8 x+1/2,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ho1 Ho 0.1814(3) 0.25000 0.1332(6)
+Ni1 Ni 0.0362(2) 0.25000 0.6269(4)
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Ho1 6.98(5) 0.0 -3.39(4) mx,0,mz  7.76(6)
+
+

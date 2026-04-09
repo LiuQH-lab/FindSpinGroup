@@ -1,0 +1,152 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 21/10/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-10-21
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Am. Chem. Soc."
+_citation_journal_volume        141
+_citation_page_first            3838
+_citation_page_last             3842
+_citation_article_id            ?
+_citation_year                  2019
+_citation_DOI                   10.1021/jacs.9b00345
+
+loop_
+_citation_author_name
+"V.V. Klepov"
+"K.A. Pace"
+"S. Calder"
+"J.B. Felder"
+"H.-C. zur Loye"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  3.5
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK4  2  1  special  primary  2  .
+mGM2+ 1  1   . secondary   2   yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (12 possible)
+2-dim irrep along special direction
+Ferrimagnetic
+A secondary irrep is symmetry-allowed and present.
+The reported spin arrangement requires strong weight of a secondary k=0 component corresponding to a secondary irrep associated with the homogeneous magnetic moment.
+Compounds with Mn or Ni, instead of Co, have similar structures.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/3a-1/3b,1/3a+2/3b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  193.260
+_space_group_magn.name_BNS  "P 6_3/m c' m'"
+_cell_length_a             23.96730
+_cell_length_b             23.96730
+_cell_length_c             13.00600
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x-y,x,z+1/2,+1
+3 -y,x-y,z,+1
+4 -x,-y,z+1/2,+1
+5 -x+y,-x,z,+1
+6 y,-x+y,z+1/2,+1
+7 -x,-y,-z,+1
+8 -x+y,-x,-z+1/2,+1
+9 y,-x+y,-z,+1
+10 x,y,-z+1/2,+1
+11 x-y,x,-z,+1
+12 -y,x-y,-z+1/2,+1
+13 -y,-x,-z+1/2,-1
+14 x,x-y,-z+1/2,-1
+15 -x+y,y,-z+1/2,-1
+16 x-y,-y,-z,-1
+17 y,x,-z,-1
+18 -x,-x+y,-z,-1
+19 y,x,z+1/2,-1
+20 -x,-x+y,z+1/2,-1
+21 x-y,-y,z+1/2,-1
+22 -x+y,y,z,-1
+23 -y,-x,z,-1
+24 x,x-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z,+1
+3 x+2/3,y+1/3,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+U1_1 U 0.27666 0.55332 0.25000
+U1_2 U  0.27666 0.88665 0.25000
+Cs1 Cs 0.11111 0.22222 0.05896
+F1_1 F 0.05850 0.11700 0.25000
+F1_2 F  0.05850 0.45033 0.25000
+F2_1 F 0.00000 0.00000 0.25000
+F2_2 F  0.00000 0.33333 0.25000
+F3_1 F 0.29317 0.58634 0.41140
+F3_2 F  0.29317 0.91967 0.41140
+F4_1 F 0.18413 0.36826 0.15630
+F4_2 F  0.18413 0.70160 0.15630
+Co1_1 Co 0.00000 0.00000 0.00000
+Co1_2 Co  0.00000 0.33333 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+U1_1 0.00000 0.00000 -0.91(6) 0,0,mz
+U1_2 0.00000 0.00000 0.91 0,0,mz
+Co1_1 0.00000 0.00000 1.70(10) 0,0,mz
+Co1_2 0.00000 0.00000 -1.70 0,0,mz
+

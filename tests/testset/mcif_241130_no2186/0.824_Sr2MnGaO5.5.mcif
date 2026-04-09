@@ -1,0 +1,155 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/14/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-02-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Sr2 Mn Ga O5.5"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        66
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            184412
+_citation_year                  2002
+_citation_DOI                   10.1103/PhysRevB.66.184412
+
+loop_
+_citation_author_name
+"V. Yu. Pomjakushin"
+"A. M. Balagurov"
+"T. V. Elzhov"
+"D. V. Sheptyakov"
+"P. Fischer"
+"D. I. Khomskii"
+"V. Yu. Yushankhai"
+"A. M. Abakumov"
+"M. G. Rozova"
+"E. V. Antipov"
+"M. V. Lobanov"
+"S. J. L. Billinge"
+
+_temperature_position_structure         300
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  98068
+_atomic_positions_source_other               .
+
+_transition_temperature     110
+_experiment_temperature     1.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM3+ 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 300K.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m m m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a+b,-a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  127.397
+_space_group_magn.name_BNS  "P_C 4/m b m"
+_space_group_magn.point_group_name  "4/mmm1'"
+_space_group_magn.point_group_number  "15.2.54"
+_cell_length_a                 5.37500
+_cell_length_b                 5.37500
+_cell_length_c                 7.96020
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x,z,+1 
+3 y,-x,z,+1 
+4 x+1/2,-y+1/2,-z,+1 
+5 -x+1/2,y+1/2,-z,+1 
+6 -x,-y,z,+1 
+7 y+1/2,x+1/2,-z,+1 
+8 -y+1/2,-x+1/2,-z,+1 
+9 -x,-y,-z,+1 
+10 y,-x,-z,+1 
+11 -y,x,-z,+1 
+12 -x+1/2,y+1/2,z,+1 
+13 x+1/2,-y+1/2,z,+1 
+14 x,y,-z,+1 
+15 -y+1/2,-x+1/2,z,+1 
+16 y+1/2,x+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.00000 0.00000 1.
+Sr1 Sr 0.00000 0.50000 0.23470 1.
+Ga1 Ga 0.97300 0.97300 0.50000 0.25
+O1 O 0.75000 0.75000 0.00000 1.
+O2 O 0.00000 0.00000 0.24570 1.
+O3 O 0.20500 0.70500 0.50000 0.3925
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1 0.0 0.0 2.1(1) 0,0,mz 2.1(1) ? ?
+

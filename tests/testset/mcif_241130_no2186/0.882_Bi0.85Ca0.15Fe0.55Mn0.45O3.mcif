@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/10/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-10-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Bi0.85 Ca0.15 Fe0.55 Mn0.45 O3"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Alloys and Compounds"
+_citation_journal_volume        901
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            163682
+_citation_year                  2022
+_citation_DOI                   10.1016/j.jallcom.2022.163682
+
+loop_
+_citation_author_name
+"V. A. Khomchenko"
+"M. Das"
+"J. A. Paixao"
+"M. V. Silibin"
+"D. V. Karpinsky"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     ?
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Transition temperature is not specified
+The magnetic moment associated to the shared Fe/Mn site is assigned here, due to the format used, separately to each atom.
+FM along c
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  62.446
+_space_group_magn.name_BNS  "P n' m' a"
+_space_group_magn.point_group_name  "m'm'm"
+_space_group_magn.point_group_number  "8.4.27"
+_cell_length_a                 5.52125(11)
+_cell_length_b                 7.79853(18)
+_cell_length_c                 5.49161(11)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,z+1/2,+1 
+3 -x,-y,-z,+1 
+4 x+1/2,y,-z+1/2,+1 
+5 x+1/2,-y+1/2,-z+1/2,-1 
+6 -x,y+1/2,-z,-1 
+7 -x+1/2,y+1/2,z+1/2,-1 
+8 x,-y+1/2,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Bi1 Bi 0.0238(5) 0.25000 0.9931(8) 0.85
+Ca1 Ca 0.0238(5) 0.25000 0.9931(8) 0.15
+Fe1 Fe 0.00000 0.00000 0.50000 0.55
+Mn1 Mn 0.00000 0.00000 0.50000 0.45
+O1 O 0.47260 0.25000 0.0745(9) 1.
+O2 O 0.2125(5) 0.5455(4) 0.2171(5) 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 0.0 -2.21(2) 0.0 mx,my,mz 2.21(2) ? ?
+Mn1 0.0 -2.21(2) 0.0 mx,my,mz 2.21(2) ? ?
+

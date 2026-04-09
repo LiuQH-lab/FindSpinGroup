@@ -1,0 +1,132 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 04/11/2020
+
+
+data_5yOhtAoR
+_audit_creation_date            2020-11-04
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Mater. Horiz."
+_citation_journal_volume        2
+_citation_page_first            528
+_citation_page_last             535
+_citation_article_id            ?
+_citation_year                  2015
+_citation_DOI                   10.1039/c5mh00113g
+
+
+loop_
+_citation_author_name
+"P.J. Saines"
+"J.A.M. Paddison"
+"P.M.M. Thygesen"
+"M.G. Tucker"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  1.7
+_experiment_temperature  1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD2LE2  2  1  general  primary  2  .
+mGM2    1   1    .      seocndary 1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 3K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+An alternative phase, within the same MSG, is reported to fit equally well the data, with two sites having opposite moments and the third one with null moment. This is related with the fact that the data are unsensitive to the global phase of the spin wave with k=(0,0,1). Probably any model where the moments along c at the three sites follow a three-fold sinusoidal modulation with arbitrary initial phase could equally fit the data.
+A k=0 FM mode corresponding to the secondary irrep mGM2 is symmetry allowed, but not present in the model.
+;
+
+_parent_space_group.name_H-M_alt  'R 3 m'
+_parent_space_group.IT_number                       160
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  156.51
+_space_group_magn.name_BNS  "P 3 m' 1"
+_cell_length_a             10.41860
+_cell_length_b             10.41860
+_cell_length_c             3.96820
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x-y,z,+1
+3 -x+y,-x,z,+1
+4 -x+y,y,z,-1
+5 -y,-x,z,-1
+6 x,x-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Tb1_1 Tb 0.00000 0.00000 0.33333
+Tb1_2 Tb  0.66667 0.33333 0.66666
+Tb1_3 Tb  0.33333 0.66667 0.00000
+C1_1 C 0.51305 0.48695 0.21850
+C1_2 C  0.17972 0.82028 0.55183
+C1_3 C  0.84638 0.15362 0.88517
+O1_1 O 0.46548 0.53452 0.98710
+O1_2 O  0.13215 0.86785 0.32043
+O1_3 O  0.79881 0.20119 0.65377
+O2_1 O 0.58347 0.41653 0.16650
+O2_2 O  0.25014 0.74986 0.49983
+O2_3 O  0.91680 0.08320 0.83317
+D1_1 D 0.49466 0.50534 0.48550
+D1_2 D  0.16133 0.83867 0.81883
+D1_3 D  0.82799 0.17201 0.15217
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Tb1_1 0.00000 0.00000 3.40 0,0,mz  3.40
+Tb1_2 0.00000 0.00000 3.40 0,0,mz  3.40
+Tb1_3 0.00000 0.00000 -6.80 0,0,mz 6.80
+
+

@@ -1,0 +1,124 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 13/01/2019
+
+data_5yOhtAoR
+_audit_creation_date            2019-01-13
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        71
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            064405
+_citation_year                  2005
+_citation_DOI                   10.1103/PhysRevB.71.064405
+
+loop_
+_citation_author_name
+"Z.W. Ouyang"
+"F.W. Wang"
+"Q. Huang"
+"W.F. Liu"
+"Y.G. Xiao"
+"J.W. Lynn"
+"J.K. Liang"
+"G.H. Rao"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  246554
+_atomic_positions_source_other               .
+
+_transition_temperature  42
+_experiment_temperature  9
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+  3  3  special  primary  6  .
+GM3+ 2  2 general primary .  .
+mGM5+ 3 3  special secondary 2 no
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+FM phase
+Above 42K and below 100K a ferromagnetic phase with the magnetic moments along c is reported (see #0.227). According to the original reference, the transition at 42K that changes the direction of the spins is accompanied by a small strain, which reduces the effective space group of the positional structure to Fddd.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+3-dim irrep active along a special direction
+If the lattice strain is disregarded, the actual MSG of the structure would be higher, namely Imm'a'
+The further decrease of the symmetry to the monoclinic MSG C2'/c' is due to the lattice strain with respect to the cubic parent phase. This small strain included in the model cannot therefore be interpreted as an induced magnetostriction effect of the magnetic ordering, which would had to conform with the oblique orthorhombic lattice associated with the MSG Imm'a'.
+The Fddd strain is associated with the GM3+ irrep and is therefore here included as primary active irrep for the reported model.
+;
+
+_parent_space_group.name_H-M_alt  'F d -3 m'
+_parent_space_group.IT_number                       227
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1  [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-a,1/2b+1/2c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  15.89
+_space_group_magn.name_BNS  "C 2'/c'"
+_cell_length_a             7.28210
+_cell_length_b             7.28210
+_cell_length_c             7.28210
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 x,-y+1/4,-z+1/4,-1
+4 -x,y+1/4,z+1/4,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Nd1 Nd 0.12500 0.12500 0.12500
+Co1_1 Co 0.50000 0.50000 0.50000
+Co1_2 Co  0.25000 0.25000 0.50000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd1 0.00000 1.98(4) 1.98000 0,my,mz
+Co1_1 0.00000 0.52(2) 0.52000 mx,my,mz
+Co1_2 0.00000 0.52000 0.52000 mx,my,mz

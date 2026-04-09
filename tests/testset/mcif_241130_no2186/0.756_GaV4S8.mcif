@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/23/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-10-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ga V4 S8"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        33
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            255802
+_citation_year                  2021
+_citation_DOI                   10.1088/1361-648X/abf9bb
+
+loop_
+_citation_author_name
+"S. J. R. Holt"
+"C. Ritter"
+"M. R. Lees"
+"G. Balakrishnan"
+
+_temperature_position_structure         4.2
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  158199
+_atomic_positions_source_other               .
+
+_transition_temperature     6
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure is not reported. Here it is used one from a study at 4.2K, retrieved from the ICSD.
+Above 6K and up to 13K an incommensurate structure is reported.
+FM along c
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'R 3 m'
+_parent_space_group.IT_number                       160
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  160.67
+_space_group_magn.name_BNS  "R 3 m' "
+_space_group_magn.point_group_name  "3m'"
+_space_group_magn.point_group_number  "19.3.70"
+_cell_length_a                 6.80000
+_cell_length_b                 6.80000
+_cell_length_c                 16.80230
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x-y,z,+1 
+3 -x+y,-x,z,+1 
+4 -x+y,y,z,-1 
+5 -y,-x,z,-1 
+6 x,x-y,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/3,y+2/3,z+2/3,+1 
+3 x+2/3,y+1/3,z+1/3,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ga1 Ga 0.00000 0.00000 0.00000 1
+V1 V 0.00000 0.00000 0.39100 1
+V2 V 0.86034 0.13966 0.53467 1
+S1 S 0.00000 0.00000 0.62980 1
+S2 S 0.17080 0.82920 0.45450 1
+S3 S 0.00000 0.00000 0.13530 1
+S4 S 0.84804 0.15196 0.28557 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+V1 0.0 0.0 0.23(2) 0,0,mz 0.23(2) ? ?
+V2 -0.079(8) 0.079(8) 0.17(1) mx,-mx,mz 0.22(1) ? ?
+

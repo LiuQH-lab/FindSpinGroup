@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 30/03/2020
+
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-30
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Physics: Condensed Matter"
+_citation_journal_volume        29
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            245801
+_citation_year                  2017
+_citation_DOI                   10.1088/1361-648X/aa7020
+
+loop_
+_citation_author_name
+"E. Moshkina"
+"C. Ritter"
+"E. Eremin"
+"S. Sofronova"
+"A. Kartashev"
+"A. Dubrovskiy"
+"L. Bezmaternykh"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  4622
+_atomic_positions_source_other               .
+
+_transition_temperature  92
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  12  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at room temperature
+Ferrimagnetic on the plane ac
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.79
+_space_group_magn.name_BNS  "P 2_1'/c'"
+_cell_length_a             3.13850
+_cell_length_b             9.40020
+_cell_length_c             12.02040
+_cell_angle_alpha          90.00
+_cell_angle_beta           92.27
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,y+1/2,-z+1/2,-1
+4 x,-y+1/2,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.00000 0.00000 0.09
+Cu1 Cu 0.00000 0.00000 0.00000 0.91
+Mn2 Mn 0.50000 0.00000 0.50000 0.068
+Cu2 Cu 0.50000 0.00000 0.50000 0.932
+Mn3 Mn 0.06380 0.98770 0.27900 0.102
+Cu3 Cu 0.06380 0.98770 0.27900 0.898
+Mn4 Mn 0.57600 0.73240 0.37850 0.877
+Cu4 Cu 0.57600 0.73240 0.37850 0.123
+B1 B 0.40570 0.26400 0.36700 1.
+O1 O 0.00380 0.09530 0.14540 1.
+O2 O 0.14920 0.87250 0.41180 1.
+O3 O 0.46610 0.11870 0.36540 1.
+O4 O 0.60910 0.65970 0.53690 1.
+O5 O 0.64190 0.83320 0.23370 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1 0.09(8) 0.00000 -0.44(9) mx,my,mz
+Cu2 0.60(8) 0.00000 0.97(6) mx,my,mz
+Cu3 -0.23(3) 0.00000 0.91(5) mx,my,mz
+Mn4 -1.93(2) 0.00000 -1.91(6) mx,my,mz
+

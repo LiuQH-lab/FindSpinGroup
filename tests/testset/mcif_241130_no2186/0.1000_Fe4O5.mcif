@@ -1,0 +1,164 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/19/2023 13:18:53
+
+data_5yOhtAoR
+_audit_creation_date            2023-09-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Fe4 O5"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Nature Chemistry"
+_citation_journal_volume        8
+_citation_page_first            501
+_citation_page_last             508
+_citation_article_id            .
+_citation_year                  2016
+_citation_DOI                   10.1038/nchem.2478
+
+loop_
+_citation_author_name
+"S. V. Ovsyannikov"
+"M. Bykov"
+"E. Bykova"
+"D. P. Kozlenko"
+"A. A. Tsirlin"
+"A. E. Karkin"
+"V. V. Shchennikov"
+"S. E. Kichanov"
+"H. GoU"
+"A. M. Abakumov"
+"R. Egoavi"
+"J. Verbeeck"
+"C. McCammon"
+"V. Dyadkin"
+"D. Chernyshov"
+"S. van Smaalen"
+"L. S. Dubrovinsky"
+
+_temperature_position_structure         295
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     150
+_experiment_temperature     10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3- 1 1 . primary 3 .
+mGM4+ 1 1 . primary 5 .
+mGM3+ 1 1 . primary 3 .
+mGM4- 1 1 . secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 295K
+Polar symmetry along c.
+FM on the plane ab
+Ferrimagnetic along a
+The authors do not seem aware that they are proposing a magnetic structure, which breaks centrosymmetry and has a polar MSG.
+The magnitude of moment components has been estimated from a figure in the article.
+The transition at 150K introduces an incommensurate structural modulation, which is not included in the present model
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Three irreps involved. This means that three different order parameters are present. mGM3- is associated with the spin arrangement of Fe1 and Fe3 along z, while mGM4+ corresponds to the Fe2 ordering along, while mGM3+ is for the ferrimagnetic component along a.
+The transition at 150K introduces the non-zero ferrimagnetic component along a, corresponding to the irrep mGM3+.
+The authors do not mention the method employed to arrive to this model, and the fact that the proposed spin arrangement requires three irreps is not mentioned. Not clear if more simple models with two irreps were checked.
+
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,c,1/2a-1/2b;0,0,0'
+
+
+_space_group_magn.number_BNS  4.9
+_space_group_magn.name_BNS  "P 2_1'"
+_space_group_magn.point_group_name  "2'"
+_space_group_magn.point_group_number  "3.3.8"
+_cell_length_a                 2.89060
+_cell_length_b                 9.80240
+_cell_length_c                 12.58040
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.00000 0.50518 0.25000 1
+Fe2 Fe 0.00000 0.00000 0.00000 1
+Fe3_1 Fe 0.00000 0.26037 0.11742 1
+Fe3_2 Fe 0.00000 0.26037 0.38258 1
+O1_1 O 0.00000 0.35900 0.54417 1
+O1_2 O 0.00000 0.35900 0.95583 1
+O2 O 0.00000 0.16010 0.25000 1
+O3_1 O 0.00000 0.09300 0.64222 1
+O3_2 O 0.00000 0.09300 0.85778 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 -1.7 0.0 -3.4 mx,my,mz 3.8 ? ?
+Fe2 1.7 0.0 3.4 mx,my,mz 3.8 ? ?
+Fe3_1 2.2 0.0 3.4 mx,my,mz 4.0 ? ?
+Fe3_2 2.2 0.0 3.4 mx,my,mz 4.0 ? ?
+

@@ -1,0 +1,138 @@
+#Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 06/08/2018 15:57:36
+# Database entry: 1.94 Ba3LaRu2O9
+# Cif-like file for the case 1.94
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-06-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ba3 La Ru2 O9'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        87
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            134402
+_citation_year                  2013
+_citation_DOI                   10.1103/PhysRevB.87.134402
+
+loop_
+_citation_author_name
+"M.S. Senn"
+"S.A.J. Kimber"
+"A.M.A. Lopez"
+"A.H. Hill"
+"J.P. Attfield"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "."
+
+_transition_temperature     22
+_experiment_temperature     1.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM2+ 3 1 . primary 2 .
+mM3+ 3 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+positional structure from a model at 11K.
+An orthogonal setting is used, in accordance with the one in the figure of the reference.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+two primary irreps involved to produce a collinear arrangement on the plane xz along an arbitrary direction.
+Magnetic ordering reduces the symmetry to monoclinic.
+;
+
+_parent_space_group.name_H-M_alt  'P  6_3/m  m  c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,a+2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,a+c;0,0,0'
+
+
+_space_group_magn.number_BNS  14.84
+_space_group_magn.name_BNS  "P_C  2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 5.94920
+_cell_length_b                 10.30430
+_cell_length_c                 14.99810
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0.00000 0.00000 0.25000 1
+Ba2 Ba 0.00000 0.33333 0.89090 1
+La1 La 0.00000 0.00000 0.00000 1
+Ru1 Ru 0.00000 0.33333 0.16556 1
+O1_1 O 0.00000 0.48730 0.25000 1
+O1_2 O 0.26905 0.75635 0.25000 1
+O2_1 O 0.00000 0.17889 0.40471 1
+O2_2 O 0.73166 0.91056 0.40471 1
+O2_3 O 0.26833 0.91056 0.40471 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ru1 -1.3(1) 0.0 -0.6(2) mx,my,mz
+

@@ -1,0 +1,134 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 08/27/2021 04:02:26
+
+data_5yOhtAoR
+_audit_creation_date            2021-08-27
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic		 "barium thio-oxocobaltate"
+_chemical_name_common                    "barium thio-oxocobaltate"
+_chemical_formula_moiety                 'Ba Co S O'
+_chemical_formula_structural             'Ba Co S O'
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  'Ba Co S O'
+_chemical_formula_sum                    'Ba Co S O'
+_chemical_formula_weight                 244.328
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Phys Rev B"
+_citation_journal_volume        100
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            205130
+_citation_year                  2019
+_citation_DOI                   10.1103/PhysRevB.100.205130
+
+loop_
+_citation_author_name
+"Song, Y."
+"Liu, X."
+"Wu, D."
+"Yao, Q."
+"Wen, C."
+"Avdeev, M."
+"Peng, R."
+"Xu, H."
+"Miao, J."
+"Lou, X."
+"Fang, Y."
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     220
+_experiment_temperature     100
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM1 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+Laue neutron single crystal diffraction.
+Reinvestigation of the previously published magnetic structure, doi: 10.1021/acs.inorgchem.5b02615 (see #1.594)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/8,1/4,0'
+
+_space_group_magn.number_BNS  57.386
+_space_group_magn.name_BNS  "P_a b c m"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 7.972
+_cell_length_b                 12.73 
+_cell_length_c                 6.096
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,-z,+1 
+3 -x+1/4,y+1/2,-z+1/2,+1 
+4 -x+1/4,-y+1/2,z+1/2,+1 
+5 -x+1/4,-y+1/2,-z,+1 
+6 -x+1/4,y+1/2,z,+1 
+7 x,-y,z+1/2,+1 
+8 x,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0 0.38663(6)  0.25 1
+Co1 Co 0 0.09522(11) 0.25 1
+S1  S  0 0.69136(12) 0.25 1
+O1  O  0 0           0    1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1 0.0 0.0 3.017(15) 0,0,mz  3.017(15)

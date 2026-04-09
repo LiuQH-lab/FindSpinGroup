@@ -1,0 +1,155 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/14/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-11-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Nd2 Cu O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Physica C"
+_citation_journal_volume        160
+_citation_page_first            124
+_citation_page_last             128
+_citation_article_id            .
+_citation_year                  1989
+_citation_DOI                   10.1016/0921-4534(89)90180-9
+
+loop_
+_citation_author_name
+"S. Skanthakumar"
+"H. Zhang"
+"T. W. Clinton"
+"W-H. Li"
+"J. W. Lynn"
+"Z. Fisk"
+"S.-W. Cheong"
+
+_temperature_position_structure         0.5
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  69886
+_atomic_positions_source_other               .
+
+_transition_temperature     245
+_experiment_temperature     78
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX4+ 2 1 special-2 primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+Polarized and unpolarized NSD 
+Positional structure, including cell parameters, is not specified. Here the structure determined at 0.5K by another atudy and retrieved from the ICSD is used.
+There are two alternative physically distinct tetragonal MSGs, which are possible for this 2k structure, depending on the active irrep. They correspond to the two possible senses of rotation of spins (+pi/2 or -pi/2) in consecutive layers along the c axis. In the present case the spin arrangement is the same as the one proposed for Pr2CuO4, i.e. same MSG, same irrep (see #2.48), but differs from that reported for Sm2CuO4, i.e. different MSG, different irrep (see #2.7).
+The paper reports at 75K a reorientation of the spins so that the rotation of spins in consecutive layers changes from +pi/2 or -pi/2, implying a transition into the other possible MSG mentioned above, reported for Sm2CuO4. The paper reports at 30K a new transitions with the system coming back into the spin arrangement described above 75K. 
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+2-dim full irrep along a special direction.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+K1 [1/2 1/2 0]
+k2 [1/2 -1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,-1/2a+1/2b,c;1/4,1/4,0'
+
+_space_group_magn.number_BNS  134.481
+_space_group_magn.name_BNS  "P_C 4_2/n n m"
+_space_group_magn.point_group_name  "4/mmm1'"
+_space_group_magn.point_group_number  "15.2.54"
+_cell_length_a                 7.87000
+_cell_length_b                 7.87000
+_cell_length_c                 12.14000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y+3/4,x+1/4,z+1/2,+1 
+3 y+3/4,-x+3/4,z+1/2,+1 
+4 y+3/4,x+1/4,-z+1/2,+1 
+5 -y+3/4,-x+3/4,-z+1/2,+1 
+6 -x+1/2,-y,z,+1 
+7 -x+1/2,y,-z,+1 
+8 x,-y,-z,+1 
+9 -x+1/2,-y+1/2,-z,+1 
+10 y+1/4,-x+3/4,-z+1/2,+1 
+11 -y+1/4,x+1/4,-z+1/2,+1 
+12 -y+1/4,-x+3/4,z+1/2,+1 
+13 y+1/4,x+1/4,z+1/2,+1 
+14 x,y+1/2,-z,+1 
+15 x,-y+1/2,z,+1 
+16 -x+1/2,y+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y+1/2,z,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Nd1 Nd 0.00000 0.00000 0.35160 1
+Cu1 Cu 0.00000 0.00000 0.00000 1
+O1_1 O 0.00000 0.25000 0.00000 1
+O1_2 O 0.25000 0.00000 0.00000 1
+O2_1 O 0.00000 0.25000 0.25000 1
+O2_2 O 0.25000 0.00000 0.25000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Nd1 0.0 0.0 0.0 mx,0,0 0.0 ? ?
+Cu1 0.4 0.0 0.0 mx,0,0 0.4 ? ?
+

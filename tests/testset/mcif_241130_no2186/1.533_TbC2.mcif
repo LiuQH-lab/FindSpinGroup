@@ -1,0 +1,117 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/28/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-28
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Chem. Phys."
+_citation_journal_volume        46
+_citation_page_first            1891
+_citation_page_last             ?
+_citation_article_id            ?
+_citation_year                  1967
+_citation_DOI                   10.1063/1.1840950
+
+loop_
+_citation_author_name
+"M. Atoji"
+
+_atomic_positions_source_database_code_ICSD  17025
+_atomic_positions_source_other               .
+
+_transition_temperature     66(2)
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM3(k1) 4  1  special  primary  1  .
+mSM4(k1) 4  1  special  primary  1  .
+mSM3(3k1) 4  1  special secondary 1 no
+mSM4(3k1) 4  1  special secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+At low temperatures (below 35-30K) a different undetermined magnetic arrangement apparently coexists with this one.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps as primary: two order parameters in the sense of Landau theory are involved 
+Helliptical spiral structure
+The irrep star has two pairs of (k,-k) vectors. Alternative possible 2k structures involving the two pairs of the irreps star were not considered.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number             139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [3/4 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '4a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;0,0,0'
+
+
+_space_group_magn.number_BNS  17.12
+_space_group_magn.name_BNS  "P_c 2 2 2_1"
+_space_group_magn.point_group_name  "2221'"
+_space_group_magn.point_group_number  "6.2.18"
+_cell_length_a                 14.712
+_cell_length_b                 3.678(1)
+_cell_length_c                 6.206(1)
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z,+1 
+3 -x+1/2,y,-z,+1 
+4 x+1/2,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tb1_1 Tb 0.25000 0.00000 0.00000 1
+Tb1_2 Tb 0.00000 0.00000 0.00000 1
+Tb1_3 Tb 0.87500 0.50000 0.50000 1
+C1_1 C 0.25000 0.00000 0.6040(7) 1
+C1_2 C 0.00000 0.00000 0.60400 1
+C1_3 C 0.87500 0.50000 0.10400 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Tb1_1 0.0 1.6(3) 0.0 0,My,0   1.6(3)
+Tb1_2 0.0 0.0 7.1(3) 0,0,Mz   7.1(3)
+Tb1_3 0.0 1.13 -5.02 0,My,Mz  5.15
+

@@ -1,0 +1,161 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:10:15
+# Database entry: 1.66 Fe(ND3)2PO4
+# Cif-like file for the case 1.66
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Fe (N D3 )2P O4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        20
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            104227
+_citation_year                  2008
+_citation_DOI                   10.1088/0953-8984/20/10/104227
+
+loop_
+_citation_author_name
+"B.F. Alfonso"
+"C. Trobajo"
+"M.A. Salvado"
+"P. Pertierra"
+"S. Garcia-Granda"
+"J. Rodriguez-Fernandez"
+"M.T. Fernandez-Diaz"
+"J.A. Blanco"
+"J.R. Garcia"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   160964
+_atomic_positions_source_other               .
+
+_transition_temperature     ?
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mB1 2 2 special primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Parent setting used is non-standard P121/n1. Propagation vector refers to this setting.
+Fe site splits into two non-equivalent sites.
+;
+
+_active_magnetic_irreps_details
+;
+k-maximal magnetic symmetry (2 possible, one of them polar).
+Only one 2-dim irrep exists: Representation analysis does not introduce any restriction.
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;3/4,0,0'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S  -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 12.7214
+_cell_length_b                 10.0927
+_cell_length_c                 7.5690
+_cell_angle_alpha              90.00
+_cell_angle_beta               92.56
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1_1 Fe 0.62780 0.34220 0.58860 1
+Fe1_2 Fe 0.12220 0.84220 0.91140 1
+P1_1 P 0.62950 0.66700 0.54600 1
+P1_2 P 0.12050 0.16700 0.95400 1
+O1_1 O 0.78060 0.84820 0.91660 1
+O1_2 O 0.96940 0.34820 0.58340 1
+O2_1 O 0.71650 0.67900 0.42000 1
+O2_2 O 0.03350 0.17900 0.08000 1
+O3_1 O 0.61350 0.78010 0.65880 1
+O3_2 O 0.13650 0.28010 0.84120 1
+O4_1 O 0.63250 0.53310 0.65880 1
+O4_2 O 0.11750 0.03310 0.84120 1
+N1_1 N 0.61465 0.14100 0.48680 1
+N1_2 N 0.13535 0.64100 0.01320 1
+D1_1 D 0.92100 0.37500 0.89970 1
+D1_2 D 0.82900 0.87500 0.60030 1
+D2_1 D 0.54900 0.13110 0.41680 1
+D2_2 D 0.20100 0.63110 0.08320 1
+D3_1 D 0.61800 0.07180 0.59300 1
+D3_2 D 0.13200 0.57180 0.90700 1
+N2_1 N 0.61750 0.39390 0.31770 1
+N2_2 N 0.13250 0.89390 0.18230 1
+D4_1 D 0.68100 0.97610 0.20100 1
+D4_2 D 0.06900 0.47610 0.29900 1
+D5_1 D 0.80850 0.56620 0.72060 1
+D5_2 D 0.94150 0.06620 0.77940 1
+D6_1 D 0.65750 0.82060 0.27100 1
+D6_2 D 0.09250 0.32060 0.22900 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1_1 0.0 2.09(7) -3.05(8) mx,my,mz
+Fe1_2 0.0 2.09 -3.05 mx,my,mz
+

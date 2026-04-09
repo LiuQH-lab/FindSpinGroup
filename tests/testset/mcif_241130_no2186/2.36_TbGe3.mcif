@@ -1,0 +1,122 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 13/04/2020 
+
+data_5yOhtAoR
+_audit_creation_date            2020-04-13
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        19
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            236201
+_citation_year                  2007
+_citation_DOI                   1088/0953-8984/19/23/236201
+
+loop_
+_citation_author_name
+"P Schobinger-Papamantellos"
+"J Rodriguez-Carvajal"
+"K H J Buschow"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  23
+_experiment_temperature  8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM1  4  1  special-2  primary  3  .
+mSM4 2  1    .      secondary 1  yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Incommensurate magnetic ordering above 23K, up to 40K.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+The spin arrangement requires the superpositions of two modulations with symmetry-related propagation vectors (1/2,0,1/3) and (1/2,0,-1/3). The modulation with wavevector (1/2,0,0) can be considered a secondary third harmonic (it does not break further the symmetry)
+The label of the magnetic space group mentioned in the reference is incorrect.
+4-dim full irrep as primary. The star of the irrep has four k-vectors
+A third harmonic with k2=(1/2 0 0) corresponding to a secondary irrep is present with a significant weight.
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/3]
+k2 [1/2 0 -1/3]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,3c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;7/8,1/4,0'
+
+
+
+_space_group_magn.number_BNS  62.452
+_space_group_magn.name_BNS  "P_c n m a"
+_cell_length_a             8.09400
+_cell_length_b             20.80400
+_cell_length_c             11.74440
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/4,y+1/2,-z+1/2,+1 
+3 -x+3/4,-y+1/2,z+1/2,+1 
+4 x+1/2,-y,-z,+1 
+5 -x+3/4,-y+1/2,-z,+1 
+6 x+1/2,-y,z+1/2,+1 
+7 x,y,-z+1/2,+1 
+8 -x+1/4,y+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Tb1_1 Tb 0.00000 0.41670 0.08333
+Tb1_2 Tb  0.00000 0.58330 0.25000
+Ge1_1 Ge 0.00000 0.03820 0.08333
+Ge1_2 Ge  0.00000 0.96180 0.25000
+Ge2_1 Ge 0.00000 0.69170 0.08333
+Ge2_2 Ge  0.00000 0.30830 0.25000
+Ge3_1 Ge 0.00000 0.80950 0.08333
+Ge3_2 Ge  0.00000 0.19050 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Tb1_1 0.00000 0.00000 8.15(7) mx,my,mz
+Tb1_2 0.00000 0.00000 -8.30(5) 0,0,mz
+

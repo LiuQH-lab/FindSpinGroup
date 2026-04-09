@@ -1,0 +1,119 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 20/10/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        102
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            024408
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevB.102.024408
+
+loop_
+_citation_author_name
+"S. Calder"
+"A.V. Haglund"
+"Y. Liu"
+"D.M. Pajerowski"
+"H.B. Cao"
+"T.J. Williams"
+"V.O. Garlea"
+"D. Mandrus"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  40
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA2  1  1  .  primary 4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Moment components only approximate. They have been estimated from a figure of the original reference.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'C 2'
+_parent_space_group.IT_number                       5
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,1/4'
+
+
+
+_space_group_magn.number_BNS  5.16
+_space_group_magn.name_BNS  "C_c 2"
+_cell_length_a             10.8510
+_cell_length_b             7.2560
+_cell_length_c             12.2116
+_cell_angle_alpha          90.00
+_cell_angle_beta           92.036
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x,y,z+1/2,-1
+4 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cr1 Cr 0.00000 0.03750 0.00000
+Cr2 Cr 0.00000 0.54270 0.00000
+P1 P 0.2946 0.2738 0.08205
+S1 S 0.1430 0.0000 0.34680
+S2 S 0.1279 0.5304 0.35125
+S3 S 0.1042 0.2845 0.09775
+S4 S 0.1271 0.7612 0.07680
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1 0.6 0.0 2.8 mx,0,mz
+Cr2 0.6 0.0 2.8 mx,0,mz
+

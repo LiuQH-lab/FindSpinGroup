@@ -1,0 +1,112 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 17/03/2018 18:59:08
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "JOURNAL OF SOLID STATE CHEMISTRY"
+_citation_journal_volume        9
+_citation_page_first            234
+_citation_page_last             241
+_citation_article_id            ?
+_citation_year                  1974
+_citation_DOI                   10.1016/0022-4596(74)90079-6
+
+loop_
+_citation_author_name
+"A. Christensen"
+"S. Quezel"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  6164
+_atomic_positions_source_other               .
+
+_transition_temperature  10
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1-  1  1  .  primary  2  .
+mY2-  1  1   .  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+2k maximal symmetry
+two irreps active
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/m'
+_parent_space_group.IT_number                       11
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,b,-a;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.78
+_space_group_magn.name_BNS  "P2_1/c'"
+_cell_length_a             12.08000
+_cell_length_b             3.69000
+_cell_length_c             4.33000
+_cell_angle_alpha          90.00
+_cell_angle_beta           109.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z,+1
+3 -x,-y,-z,-1
+4 x+1/2,-y+1/2,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Tb1 Tb 0.09495 0.25000 0.33200
+O1 O 0.02400 0.25000 0.77100
+O2 O 0.28150 0.25000 0.74600
+H1 H 0.30000 0.25000 0.90000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Tb1 4.75 5.47 5.31 mx,my,mz
+
+

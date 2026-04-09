@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:04:13
+# Database entry: 1.0.11 CeCoGe3
+# Cif-like file for the case 1.0.11
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ce Co Ge3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Physical Review B"
+_citation_journal_volume        88
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            134416
+_citation_year                  2013
+_citation_DOI                   10.1103/PhysRevB.88.134416
+
+loop_
+_citation_author_name
+"M. Smidman"
+"D.T. Adroja"
+"A.D. Hillier"
+"L.C. Chapon"
+"J.W. Taylor"
+"V.K. Anand"
+"R.P. Singh"
+"M.R. Lees"
+"E.A. Goremychkin"
+"M.M. Koza"
+"V.V. Krishnamurthy"
+"D.M. Paul"
+"G. Balakrishnan"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   190701
+_atomic_positions_source_other               .
+
+_transition_temperature     21
+_experiment_temperature     14
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD4LE5 2 1 general primary 1 yes
+mGM4 1 1 . secondary 1 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (3 possible)
+origin choice along the modulation is not fixed by the MSSG
+the model includes a k=0 (third harmonic) modulation to produce the
++ + - spin configuration along c. The corresponding magnetic diffraction that should overlap with the nuclear Bragg peaks has not been used in the fit. The k=0 FM component has been rather added to fit magnetization measurements.
+;
+
+_parent_space_group.name_H-M_alt  'I  4m  m'
+_parent_space_group.IT_number                       107
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 2/3]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,3c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  107.231
+_space_group_magn.name_BNS  "I  4m'  m'  "
+_space_group_magn.point_group_name  "4m'm'"
+_space_group_magn.point_group_number  "13.4.47"
+_cell_length_a                 4.32040
+_cell_length_b                 4.32040
+_cell_length_c                 29.50450
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x,z,+1
+3 y,-x,z,+1
+4 -x,-y,z,+1
+5 -x,y,z,-1
+6 x,-y,z,-1
+7 -y,-x,z,-1
+8 y,x,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ce1_1 Ce 0.00000 0.00000 0.00000 1
+Ce1_2 Ce 0.50000 0.50000 0.16667 1
+Ce1_3 Ce 0.00000 0.00000 0.33333 1
+Co1_1 Co 0.00000 0.00000 0.22200 1
+Co1_2 Co 0.50000 0.50000 0.38867 1
+Co1_3 Co 0.00000 0.00000 0.55533 1
+Ge1_1 Ge 0.00000 0.00000 0.14270 1
+Ge1_2 Ge 0.50000 0.50000 0.30937 1
+Ge1_3 Ge 0.00000 0.00000 0.47603 1
+Ge2_1 Ge 0.00000 0.50000 0.25260 1
+Ge2_2 Ge 0.50000 0.00000 0.41927 1
+Ge2_3 Ge 0.00000 0.50000 0.58593 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ce1_1 0.0 0.0 0.36 0,0,mz
+Ce1_2 0.0 0.0 -0.36 0,0,mz
+Ce1_3 0.0 0.0 0.36 0,0,mz
+

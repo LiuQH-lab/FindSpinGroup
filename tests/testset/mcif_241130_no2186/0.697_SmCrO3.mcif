@@ -1,0 +1,126 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/05/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-05-12
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        103
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            144418
+_citation_year                  2021
+_citation_DOI                   10.1103/PhysRevB.103.144418
+
+loop_
+_citation_author_name
+"T. Sau"
+"P. Yadav"
+"S. Sharma"
+"R. Raghunathan"
+"P. Manuel"
+"V. Petricek"
+"U. P. Deshpande"
+"N. P. Lalla"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_temperature_position_structure         90
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  37
+_experiment_temperature  25
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Above 37K (up to 192K) another magnetic phase exists(see #0.696)
+An additional transition is claimed to happen below 4K, justified by the report of a magnetic structure with lower symmetry at 1.5K. This claim is however not supported by the proposed structure (see #0.698)
+Non-standard parent setting Pbnm
+Position structure from a determination at 90K
+FM along a (Pbnm setting).
+See #0.478 for a different model of the same phase, having a different symmetry that does not allow FM.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P b n m'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'b,c,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;0,0,0'
+
+_space_group_magn.number_BNS  62.446
+_space_group_magn.name_BNS  "P n' m' a"
+_cell_length_a             5.36340
+_cell_length_b             5.49110
+_cell_length_c             7.63370
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z,+1 
+3 -x,-y,-z,+1 
+4 -x+1/2,y+1/2,z,+1 
+5 -x+1/2,y+1/2,-z+1/2,-1 
+6 -x,-y,z+1/2,-1 
+7 x+1/2,-y+1/2,z+1/2,-1 
+8 x,y,-z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cr1 Cr 0.50000 0.00000 0.00000
+Sm1 Sm 0.00944 0.03310 0.25000
+O1 O -0.08472 0.47673 0.25000
+O2 O 0.29761 0.29495 0.04475
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Cr1 0.0(5) 0.2(2) 2.86(6) mx,my,mz   2.9(5)
+Sm1 0.1(3) 0.4(1) 0.00000 mx,my,0    0.4(4)
+

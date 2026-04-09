@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:03:40
+# Database entry: 0.165 SrMn(VO4)(OH)
+# Cif-like file for the case 0.165
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Sr Mn (V O4 )(O H )'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        93
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            224407
+_citation_year                  2016
+_citation_DOI                   10.1103/PhysRevB.93.224407
+
+loop_
+_citation_author_name
+"L.D. Sanjeewa"
+"V.O. Garlea"
+"M.A. McGuire"
+"C.D. McMillen"
+"H. Cao"
+"J.W. Kolis"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     30
+_experiment_temperature     4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1 1 1 . primary 3 .
+mGM3 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure, including lattice parameters, from a measurement at 300K, except for the Mn-site coordinates.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+two 1-dim irreps are active as primary irreps
+;
+
+_parent_space_group.name_H-M_alt  'P  2_12_12_1'
+_parent_space_group.IT_number                       19
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,a,c;0,1/4,0'
+
+
+_space_group_magn.number_BNS  4.7
+_space_group_magn.name_BNS  "P  2_1"
+_space_group_magn.point_group_name  "2"
+_space_group_magn.point_group_number  "3.1.6"
+_cell_length_a                 6.1322
+_cell_length_b                 7.7201
+_cell_length_c                 9.414
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1_1 Sr 0.02489 0.86680 0.83053 1
+Sr1_2 Sr 0.47511 0.13320 0.33053 1
+Mn1_1 Mn 0.255 0.256 0.995 1
+Mn1_2 Mn 0.244 0.743 0.495 1
+V1_1 V 0.98836 0.88094 0.18244 1
+V1_2 V 0.51164 0.11906 0.68244 1
+O1_1 O 0.00690 0.90310 0.57240 1
+O1_2 O 0.49310 0.09690 0.07240 1
+H1_1 H 0.03600 0.98900 0.51600 1
+H1_2 H 0.46400 0.01100 0.01600 1
+O2_1 O 0.00840 0.05490 0.06530 1
+O2_2 O 0.49160 0.94510 0.56530 1
+O3_1 O 0.22970 0.85490 0.27540 1
+O3_2 O 0.27030 0.14510 0.77540 1
+O4_1 O 0.76220 0.88920 0.29160 1
+O4_2 O 0.73780 0.11080 0.79160 1
+O5_1 O 0.94060 0.71190 0.07350 1
+O5_2 O 0.55940 0.28810 0.57350 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1_1 0.5 2. -2.6 mx,my,mz
+Mn1_2 0.5 -2. 2.6 mx,my,mz
+

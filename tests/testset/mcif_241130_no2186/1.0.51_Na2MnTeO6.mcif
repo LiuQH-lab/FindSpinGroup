@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/17/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-03-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Na2 Mn Te O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        105
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            064416
+_citation_year                  2022
+_citation_DOI                   10.1103/PhysRevB.105.064416
+
+loop_
+_citation_author_name
+"A. I. Kurbakov"
+"A. E. Susloparova"
+"V. Y. Pomjakushin"
+"Y. Skourski"
+"E. L. Vavilova"
+"T. M. Vasilchikova"
+"G. V. Raganyan"
+"A. N. Vasiliev"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     5.5
+_experiment_temperature     1.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mP1 2 1 special primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure including cell parameters from a determination at room temperature
+Moment magnitude obtained from the refinement could not be found in the paper. The value introduced here (1.8 muB) is a private communication from one of the authors (V. Pomjakushin).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim (k,-k) irrep along a special direction (special value of the phase of the modulation)
+;
+
+_parent_space_group.name_H-M_alt  'P -3 1 c'
+_parent_space_group.IT_number                       163
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 1/3]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,3c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2/3a+1/3b,-1/3a+1/3b,c;0,0,5/6'
+
+_space_group_magn.number_BNS  167.106
+_space_group_magn.name_BNS  "R -3' c'"
+_space_group_magn.point_group_name  "-3'm'"
+_space_group_magn.point_group_number  "20.4.74"
+_cell_length_a                 15.34730
+_cell_length_b                 15.34730
+_cell_length_c                 31.71030
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x-y,z,+1 
+3 -x+y,-x,z,+1 
+4 x,x-y,-z+1/6,+1 
+5 -x+y,y,-z+1/6,+1 
+6 -y,-x,-z+1/6,+1 
+7 -x,-y,-z+2/3,-1 
+8 y,-x+y,-z+2/3,-1 
+9 x-y,x,-z+2/3,-1 
+10 -x,-x+y,z+1/2,-1 
+11 x-y,-y,z+1/2,-1 
+12 y,x,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/3,z+2/3,+1 
+3 x,y+2/3,z+1/3,+1 
+4 x+1/3,y,z+2/3,+1 
+5 x+1/3,y+1/3,z+1/3,+1 
+6 x+1/3,y+2/3,z,+1 
+7 x+2/3,y,z+1/3,+1 
+8 x+2/3,y+1/3,z,+1 
+9 x+2/3,y+2/3,z+2/3,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Na1 Na 0.11111 0.22222 0.01267 1.
+Mn1 Mn 0.22222 0.11111 0.08333 0.924
+Te1 Te 0.11111 0.22222 0.25333 0.76
+Mn2_1 Mn 0.00000 0.00000 0.08333 0.048
+Mn2_2 Mn 0.00000 0.00000 0.25000 0.048
+Te2_1 Te 0.00000 0.00000 0.08333 0.924
+Te2_2 Te 0.00000 0.00000 0.25000 0.924
+O1_1 O 0.01740 0.23833 0.21600 0.988
+O1_2 O 0.98260 0.76167 0.78400 0.988
+O1_3 O 0.01740 0.23833 0.54933 0.988
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1 2.08 1.04 0.0 2my,my,0 1.8 ? ?
+

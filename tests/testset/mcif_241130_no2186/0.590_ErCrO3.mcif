@@ -1,0 +1,124 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 22/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        5
+_citation_page_first            93
+_citation_page_last             97
+_citation_article_id            .
+_citation_year                  1967
+_citation_DOI                   10.1016/0038-1098(67)90001-4
+
+loop_
+_citation_author_name
+"E. F. Bertaut"
+"J. Mareschal"
+
+_atomic_positions_source_database_code_ICSD  28487
+_atomic_positions_source_other               .
+
+_temperature_position_structure         293
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  16.8
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+  1   1   .   primary  4  .
+mGM1+  1   1   .   primary  4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Between 133K and 16.8K a phase with only magnetic ordering along x (parent setting Pbnm) of Cr according to irrep mGM4+ with MSG Pb'n'm (Pn'ma' in standard setting)
+Position structure from a determination at 293K. 
+Non-standard setting Pbnm of the parent space group
+See also Bertaut et al., J. Appl. Phys. 37, 1038 (1966).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps involved as primary: two order parameters in the sense of Landau theory. Two phase transitions are reported corresponding to the spontaneous appearance of each of them. 
+Irrep labels are given here for the standard parent setting Pnma.
+Symmetry-allowed Weak FM along c (parent setting Pbnm), but not present in the model.
+;
+
+_parent_space_group.name_H-M_alt  'P b n m'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'b,c,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  11.50
+_space_group_magn.name_BNS  "P 2_1/m"
+_cell_length_a             5.22300
+_cell_length_b             5.51600
+_cell_length_c             7.51900
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z+1/2,+1 
+3 -x,-y,-z,+1 
+4 x,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Er1_1 Er 0.48300 0.43100 0.75000
+Er1_2 Er  0.98300 0.06900 0.25000
+Cr1_1 Cr 0.50000 0.00000 0.00000
+Cr1_2 Cr  0.00000 0.50000 0.00000
+O1_1 O 0.60900 0.03700 0.75000
+O1_2 O  0.10900 0.46300 0.25000
+O2_1 O 0.69200 0.29800 0.05000
+O2_2 O  0.19200 0.20200 0.95000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Er1_1 0.00000 0.00000 -5.2 0,0,mz      5.2
+Er1_2 0.00000 0.00000 5.2 0,0,mz       5.2
+Cr1_1 1.66 2.38 0.00000 mx,my,mz     2.55
+Cr1_2 -1.66 -2.38 0.00000 mx,my,mz   2.55
+

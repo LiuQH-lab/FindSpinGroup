@@ -1,0 +1,124 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/11/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-11-05
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        30
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            435803
+_citation_year                  2018
+_citation_DOI                   10.1088/1361-648X/aae28d
+
+loop_
+_citation_author_name
+"H.S. Nair"
+"C.M.N. Kumar"
+"D.T. Adroja"
+"C. Ritter"
+"A.S. Wills"
+"W.A. Kockelmann"
+"P.P. Deen"
+"A. Bhattacharyya"
+"A.M. Strydom"
+
+
+
+_atomic_positions_source_database_code_ICSD  230824
+_atomic_positions_source_other               .
+
+_transition_temperature  5.1
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM4+  3  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k  magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim small irrep as primary
+The star of the active irrep has 3 k-vectors. The possible multi-k models according to the same irrep  that could equally fit the data are not considered in the article.
+The active irrep includes a second spin mode along c, which is not present in the magnetic structure
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,-1/2a+1/2b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  60.431
+_space_group_magn.name_BNS  "P_C b c n"
+_cell_length_a             8.41220
+_cell_length_b             8.41220
+_cell_length_c             7.86930
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 y,x+1/2,-z,+1
+3 -y,-x,-z+1/2,+1
+4 -x,-y+1/2,z+1/2,+1
+5 -x,-y,-z,+1
+6 -y,-x+1/2,z,+1
+7 y,x,z+1/2,+1
+8 x,y+1/2,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x,y+1/2,z,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Pr1 Pr 0.00000 0.00000 0.00000
+Cu1 Cu 0.16667 0.33333 0.25000
+Si1 Si 0.16667 0.33333 0.75000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Pr1 0.81 -0.81 0.00000 mx,-mx,mz   1.4
+
+

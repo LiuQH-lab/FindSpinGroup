@@ -1,0 +1,125 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-16
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Solid State Chem."
+_citation_journal_volume        177
+_citation_page_first            2044
+_citation_page_last             2052
+_citation_article_id            ?
+_citation_year                  2004
+_citation_DOI                   10.1016/j.jssc.2004.02.012
+
+loop_
+_citation_author_name
+"C. Autret"
+"C. Martin"
+"M. Hervieu"
+"R. Retoux"
+"B. Raveau"
+"G. Andre"
+"F. Bouree"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  99523
+_atomic_positions_source_other               .
+
+_transition_temperature  110
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4-  1  1  .  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD, EM
+Coexistence with another minority phase having a spin arrangement analogous to the one of K2NiF4 (#1.249).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'I 4_1/a c d'
+_parent_space_group.IT_number                       142
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  142.568
+_space_group_magn.name_BNS  "I 4_1'/a' c d'"
+_cell_length_a             5.18680
+_cell_length_b             5.18680
+_cell_length_c             24.12280
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y+1/2,z,+1
+3 y+3/4,x+1/4,-z+1/4,+1
+4 -y+1/4,-x+1/4,-z+1/4,+1
+5 y+3/4,-x+1/4,-z+3/4,+1
+6 -y+1/4,x+1/4,-z+3/4,+1
+7 -x,y,z+1/2,+1
+8 x,-y+1/2,z+1/2,+1
+9 -y+1/4,x+3/4,z+1/4,-1
+10 y+3/4,-x+3/4,z+1/4,-1
+11 x+1/2,-y+1/2,-z,-1
+12 -x+1/2,y,-z,-1
+13 -x,-y,-z,-1
+14 x,y+1/2,-z,-1
+15 -y+3/4,-x+1/4,z+1/4,-1
+16 y+1/4,x+1/4,z+1/4,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ca1 Ca 0.00000 0.25000 0.55107
+Mn1 Mn 0.00000 0.25000 0.37500
+O1 O 0.00000 0.25000 0.45562
+O2 O 0.21004 0.46004 0.12500
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.00000 0.00000 2.4(1) 0,0,mz

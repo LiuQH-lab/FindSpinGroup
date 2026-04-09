@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 24/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Physique"
+_citation_journal_volume        29
+_citation_page_first            67
+_citation_page_last             73
+_citation_article_id            .
+_citation_year                  1968
+_citation_DOI                   10.1051/jphys:0196800290106700
+
+loop_
+_citation_author_name
+"E.F. Bertaut"
+"J. Mareschal"
+
+_atomic_positions_source_database_code_ICSD  28248
+_atomic_positions_source_other               .
+
+_temperature_position_structure         293
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  2.16
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1  1  .  primary  5  .
+mU1-U4- 2  2   general primary 10 .
+mGM3+ 1  1  .  secondary 5  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 293K
+Non-standard parent setting Pbnm
+In 1971 a correction to this model was proposed (see #2.63)
+Below 146K (up to 2.16K) only Cr atoms are magnetically ordered according to the irrep mGM2+ with k=0 (see #0.592)
+The relative sign of the Cr ordering along c with respect to that of Dy on the ab plane (Pbnm setting) is irrelevant, as both possibilties correspond to equivalent domain-related configurations.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Two irreps as primary. One for the Cr order (k1=0) and one for Dy (k2=(1/2,1/2,0) in the parent setting Pbnm)
+A third irrep as secondary. Not present in the spin arrangement.
+Irrep labels according to the standard setting Pnma for the parent space group (k2=(1/2,0,1/2) in this setting)
+FM on the plane ac (ab in the standard Pnma setting). Weak FM to be expected on this plane.
+The MSG has 20 degrees of freedom, which are reduced to 15 if constrained to the two primary irreps. The model has however only four free parameters.
+;
+
+_parent_space_group.name_H-M_alt  'P b n m'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'b,c,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,c,1/2a-1/2b;1/4,0,0'
+
+
+
+_space_group_magn.number_BNS  11.54
+_space_group_magn.name_BNS  "P 2_1'/m'"
+_cell_length_a             10.52600
+_cell_length_b             11.04000
+_cell_length_c             7.55200
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,-z,+1 
+3 -x+1/2,-y,z+1/2,-1 
+4 x,y,-z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cr1_1 Cr 0.25000 0.00000 0.00000
+Cr1_2 Cr  0.00000 0.25000 0.00000
+Cr1_3 Cr  0.75000 0.00000 0.00000
+Cr1_4 Cr  0.50000 0.25000 0.00000
+Dy1_1 Dy 0.99400 0.03250 0.25000
+Dy1_2 Dy  0.49400 0.03250 0.25000
+Dy1_3 Dy 0.75600 0.28250 0.25000
+Dy1_4 Dy 0.74400 0.21750 0.75000
+O1_1 O 0.29950 0.01600 0.75000
+O1_2 O  0.54950 0.23400 0.25000
+O1_3 O  0.70050 0.98400 0.25000
+O1_4 O  0.95050 0.26600 0.75000
+O2_1 O 0.34800 0.15000 0.05000
+O2_2 O  0.59800 0.10000 0.95000
+O2_3 O  0.65200 0.85000 0.55000
+O2_4 O  0.90200 0.40000 0.45000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Cr1_1 0.00000 0.00000 2.76(20) mx,my,mz    2.76(20)
+Cr1_2 0.00000 0.00000 -2.76 mx,my,mz       2.76
+Cr1_3 0.00000 0.00000 2.76 mx,my,mz        2.76
+Cr1_4 0.00000 0.00000 -2.76 mx,my,mz       2.76
+Dy1_1 9.36 -2.47 0.00000  mx,my,0         9.68
+Dy1_2 -9.36 2.47 0.00000 mx,my,0          9.68
+Dy1_3 -4.58  -8.53 0.00000 mx,my,0        9.68
+Dy1_4 4.58  8.53 0.00000 mx,my,0          9.68
+

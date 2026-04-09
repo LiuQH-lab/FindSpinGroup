@@ -11,6 +11,12 @@ from findspingroup.core.tolerances import Tolerances, DEFAULT_TOL
 from findspingroup.version import __version__
 from findspingroup.utils.matrix_utils import normalize_vector_to_zero
 
+MAGNETIC_PRESENCE_TOL = 1e-5
+
+
+def _moment_distance(moment_a, moment_b):
+    return float(np.linalg.norm(np.asarray(moment_a, dtype=float) - np.asarray(moment_b, dtype=float)))
+
 
 def standardize_lattice(lattice):
     """
@@ -173,22 +179,14 @@ def transform_lattice_moments_to_c(moments_in_lattice_cartesian, lattice_matrix)
     return moments_in_lattice_cartesian
 
 def getNormInf(matrix1, matrix2, mode=True):
-    if mode == True:
-        a = np.array(matrix1) % 1
-        b = np.array(matrix2) % 1
-        c = [1, 2, 3]
-        for i in range(3):
-            if a[i] > b[i]:
-                c[i] = min(a[i] - b[i], 1 + b[i] - a[i])
-            if a[i] < b[i]:
-                c[i] = min(b[i] - a[i], 1 + a[i] - b[i])
-            if a[i] == b[i]:
-                c[i] = 0
-        max_value = max(c)
-    else:
-        diff = np.abs(matrix1 - matrix2)
-        max_value = np.max(diff)
-    return max_value
+    if mode:
+        a = np.mod(np.asarray(matrix1, dtype=float), 1.0)
+        b = np.mod(np.asarray(matrix2, dtype=float), 1.0)
+        diff = np.abs(a - b)
+        wrapped = np.minimum(diff, 1.0 - diff)
+        return float(np.max(wrapped))
+    diff = np.abs(np.asarray(matrix1, dtype=float) - np.asarray(matrix2, dtype=float))
+    return float(np.max(diff))
 
 def primitive_cell_transformation(international_symbol):
     primitive_transformation_matrix = {'P':np.array([[1,0,0],[0,1,0],[0,0,1]]),
@@ -241,9 +239,34 @@ def classify_by_occupancies_and_elements(data, tol=1e-6):
 
 
 def are_positions_equivalent(pos1: list[float]|np.ndarray, pos2: list[float]|np.ndarray,
-                           tolerance: float = 0.001) -> bool:
+                           tolerance: float = 0.005) -> bool:
     """Check if two positions are equivalent within tolerance."""
     return getNormInf(pos1, pos2) < tolerance
+
+
+def _fractional_bucket_params(tol: float):
+    tol = float(max(tol, 1e-12))
+    bins = max(1, int(np.ceil(1.0 / tol)))
+    bucket_width = 1.0 / bins
+    neighbor_radius = max(1, int(np.ceil(tol / bucket_width)))
+    return bins, neighbor_radius
+
+
+def _fractional_bucket_key(position, bins: int):
+    wrapped = np.mod(np.asarray(position, dtype=float), 1.0)
+    indices = np.floor(wrapped * bins).astype(int) % bins
+    return tuple(int(value) for value in indices)
+
+
+def _fractional_neighbor_keys(bucket_key, bins: int, neighbor_radius: int):
+    for dx in range(-neighbor_radius, neighbor_radius + 1):
+        for dy in range(-neighbor_radius, neighbor_radius + 1):
+            for dz in range(-neighbor_radius, neighbor_radius + 1):
+                yield (
+                    (bucket_key[0] + dx) % bins,
+                    (bucket_key[1] + dy) % bins,
+                    (bucket_key[2] + dz) % bins,
+                )
 
 
 
@@ -336,44 +359,72 @@ def change_cell_settings(old_cell, transformation_matrix, origin_shift,eps=0.000
     y_range = (math.floor(border['y'][0]+origin_shift[1]),math.ceil(border['y'][1]+origin_shift[1]))
     z_range = (math.floor(border['z'][0]+origin_shift[2]),math.ceil(border['z'][1]+origin_shift[2]))
 
-    temp_cell_positions = []
+    inverse_transformation = np.linalg.inv(transformation_matrix)
+    transformed_origin_shift = inverse_transformation @ origin_shift
+    old_positions = np.asarray(old_cell[1], dtype=float)
+    old_types = list(old_cell[2])
+    old_moments = [np.asarray(item, dtype=float) for item in mag]
+    temp_new_cell_positions = []
     temp_cell_types = []
     temp_cell_moments = []
     for x in range(x_range[0], x_range[1]+1):
         for y in range(y_range[0], y_range[1]+1):
             for z in range(z_range[0], z_range[1]+1):
-                temp_cell_positions  = temp_cell_positions + [np.array([p[0]+x, p[1]+y, p[2]+z]) for p in old_cell[1]]
-                temp_cell_types = temp_cell_types + old_cell[2]
-
-                temp_cell_moments = temp_cell_moments + mag
+                shift = np.array([x, y, z], dtype=float)
+                translated_positions = old_positions + shift
+                transformed_positions = translated_positions @ inverse_transformation.T - transformed_origin_shift
+                temp_new_cell_positions.extend(np.asarray(item, dtype=float) for item in transformed_positions)
+                temp_cell_types.extend(old_types)
+                temp_cell_moments.extend(old_moments)
     # print(x_range, y_range, z_range,origin_shift)
     #2. collect the positions in the new cell
-    temp_new_cell_positions = [np.linalg.inv(transformation_matrix) @ p - np.linalg.inv(transformation_matrix) @ origin_shift for p in temp_cell_positions]
-
     new_cell_lattice =  transformation_matrix.T @ old_cell[0] # row vector
     new_cell_positions = []
     new_cell_types = []
     new_cell_moments = []
+    bins, neighbor_radius = _fractional_bucket_params(eps)
+    position_buckets: dict[tuple, list[int]] = {}
     # print(len(temp_new_cell_positions))
     for i,j in enumerate(temp_new_cell_positions):
-        if (-eps < j[0] < 1+eps ) and (-eps < j[1] < 1+eps ) and (-eps <= j[2] < 1+eps ) and (not any(getNormInf(j, existing_j)<eps and new_cell_types[ind]==temp_cell_types[i] for ind,existing_j in enumerate(new_cell_positions))):
-            # if in (-eps,1+eps) range and not similar to existing positions
-            new_cell_positions.append(normalize_vector_to_zero(j,atol=1e-8))
-            new_cell_types.append(temp_cell_types[i])
-            new_cell_moments.append(temp_cell_moments[i])
+        if not (-eps < j[0] < 1+eps and -eps < j[1] < 1+eps and -eps <= j[2] < 1+eps):
+            continue
+        bucket_key = _fractional_bucket_key(j, bins)
+        atom_type = temp_cell_types[i]
+        duplicate = False
+        for neighbor_key in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius):
+            for candidate_index in position_buckets.get((atom_type, neighbor_key), ()):
+                if getNormInf(j, new_cell_positions[candidate_index]) < eps:
+                    duplicate = True
+                    break
+            if duplicate:
+                break
+        if duplicate:
+            continue
+        # if in (-eps,1+eps) range and not similar to existing positions
+        new_cell_positions.append(normalize_vector_to_zero(j,atol=1e-8))
+        new_cell_types.append(atom_type)
+        new_cell_moments.append(temp_cell_moments[i])
+        position_buckets.setdefault((atom_type, bucket_key), []).append(len(new_cell_positions) - 1)
     # print(len(new_cell_positions),len(old_cell[1]),abs(np.linalg.det(transformation_matrix)))
     if len(new_cell_positions) != round(len(old_cell[1])*abs(np.linalg.det(transformation_matrix))):
         raise ValueError("The number of new cell positions does not match the number of old cell positions, please change tolerance. Or the transformation matrix is not valid.")
 
     mul_num_list = [0]*len(new_cell_positions)
     for i,p1 in enumerate(temp_new_cell_positions):
-        for j,p2 in enumerate(new_cell_positions):
-            if getNormInf(p1%1,p2)<eps and temp_cell_types[i] == new_cell_types[j]:
-                # print(p1,p2)
-                if sum(abs(temp_cell_moments[i]- new_cell_moments[j]))>eps:
-                    raise ValueError(f"Atom moments mismatch after transformation, p:{temp_new_cell_positions[i]}moments:{temp_cell_moments[i]} and p:{new_cell_positions[j]}moments:{new_cell_moments[j]},please change tolerance. Or it's not a valid transformation matrix.")
-                mul_num_list[j] +=1
-                break
+        atom_type = temp_cell_types[i]
+        bucket_key = _fractional_bucket_key(p1, bins)
+        for neighbor_key in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius):
+            for j in position_buckets.get((atom_type, neighbor_key), ()):
+                p2 = new_cell_positions[j]
+                if getNormInf(p1 % 1, p2) < eps:
+                    # print(p1,p2)
+                    if sum(abs(temp_cell_moments[i]- new_cell_moments[j]))>eps:
+                        raise ValueError(f"Atom moments mismatch after transformation, p:{temp_new_cell_positions[i]}moments:{temp_cell_moments[i]} and p:{new_cell_positions[j]}moments:{new_cell_moments[j]},please change tolerance. Or it's not a valid transformation matrix.")
+                    mul_num_list[j] +=1
+                    break
+            else:
+                continue
+            break
 
     return new_cell_lattice, new_cell_positions, new_cell_types, new_cell_moments
 
@@ -438,7 +489,7 @@ class AtomicSite:
         if not isinstance(other, AtomicSite):
             return False
         pos_equal = getNormInf(self.position, other.position) < tol.space
-        mom_equal = np.allclose(self.magnetic_moment, other.magnetic_moment,atol=tol.moment)
+        mom_equal = _moment_distance(self.magnetic_moment, other.magnetic_moment) <= tol.moment
         occ_equal = abs(self.occupancy - other.occupancy) < tol.occupancy
         elem_equal = self.element_symbol == other.element_symbol
         return pos_equal and mom_equal and occ_equal and elem_equal
@@ -470,7 +521,7 @@ class Lattice:
             return
 
         # -----------------------------
-        # Case 2: raw == 3×3 矩阵
+        # Case 2: `raw` is a 3x3 matrix.
         # -----------------------------
         if arr.shape != (3, 3):
             raise ValueError("Lattice input must be 3×3 matrix or (a,b,c,alpha,beta,gamma).")
@@ -524,7 +575,7 @@ class CrystalCell:
         else:
             self.moments = np.asarray(self.moments, dtype=float).reshape(-1, 3)
             self.net_moment= np.linalg.norm([sum(_) for _ in zip(*self.moments_cartesian)])
-            if any([np.linalg.norm(i)> 1e-5 for i in self.moments]) :
+            if any([np.linalg.norm(i) > MAGNETIC_PRESENCE_TOL for i in self.moments]) :
                 pass
             else:
                 self.moments = None
@@ -583,7 +634,7 @@ class CrystalCell:
         else:
             self.magnetic_atom_indices = [
                 i for i, m in enumerate(self.moments)
-                if np.linalg.norm(m) > self.tol.moment
+                if np.linalg.norm(m) > MAGNETIC_PRESENCE_TOL
             ]
 
 
@@ -635,6 +686,7 @@ class CrystalCell:
             elements=new_elem,
             moments=None,
             spin_setting=None,
+            tol=self.tol,
         ),transformation_matrix
 
 
@@ -673,7 +725,7 @@ class CrystalCell:
                 else:
                     ok = True
                     for g in group:
-                        if np.allclose(moments_cartesian[g], moments_cartesian[index],atol=self.tol.moment):
+                        if _moment_distance(moments_cartesian[g], moments_cartesian[index]) <= self.tol.moment:
 
                             L0_nonmagnetic_atom_types[index] = L0_nonmagnetic_atom_types[g]
                             ok = False
@@ -694,7 +746,7 @@ class CrystalCell:
             L0_nonmagnetic_cell, symprec=self.tol.space, to_primitive=True, no_idealize=True
         )
         except:
-            raise ValueError("Spglib failed to find the primitive cell. Maybe the tolerance is too large or the structure is not valid.")
+            raise ValueError("Spglib failed to find the primitive cell. Maybe the tolerance is too small or the structure is not valid.")
 
         prim_occ = [L0_nonmagnetic_atom_types_to_occupancies[t] for t in prim_types]
         prim_elem = [L0_nonmagnetic_atom_types_to_symbol[t] for t in prim_types]
@@ -709,7 +761,8 @@ class CrystalCell:
             occupancies=prim_occ,
             elements=prim_elem,
             moments=np.array(prim_mom, dtype=float),
-            spin_setting="cartesian"
+            spin_setting="cartesian",
+            tol=self.tol,
         ),transformation_matrix
 
     def transform(self, matrix: np.ndarray, shift: np.ndarray, change_moment_to_lattice = False):
@@ -747,7 +800,8 @@ class CrystalCell:
             occupancies=new_occupancies,
             elements=new_elements,
             moments=final_moments,
-            spin_setting=new_spin_setting
+            spin_setting=new_spin_setting,
+            tol=self.tol,
         )
 
     def transform_spin(self,transform_matrix,setting):
@@ -758,7 +812,8 @@ class CrystalCell:
             occupancies=self.occupancies,
             elements=self.elements,
             moments=[transform_matrix@ i for i in self.moments],
-            spin_setting=setting
+            spin_setting=setting,
+            tol=self.tol,
         )
 
         return new_cell
@@ -802,6 +857,8 @@ class CrystalCell:
         species = ' '.join(atom_name[1:])
         atom_number = ' '.join(map(str, count[1:]))
         cartesian = 'direct'
-        positions = '\n'.join(' '.join([f'{v:.5f}' for v in i]) for i in cell[1])
-        magmom = '# MAGMOM=' + ' '.join(' '.join(map(lambda x: str(round(x, 4)), std_rotation @ i)) for i in cell[3])
+        positions = '\n'.join(' '.join(f'{v:.8f}' for v in i) for i in cell[1])
+        magmom = '# MAGMOM=' + ' '.join(
+            ' '.join(f'{x:.8f}' for x in (std_rotation @ i)) for i in cell[3]
+        )
         return '\n'.join([information, scale, lattice, species, atom_number, cartesian, positions, magmom])

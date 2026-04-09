@@ -1,0 +1,154 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:19:43
+# Database entry: 2.4 Eu(Fe0.82Co0.18)As2
+# Cif-like file for the case 2.4
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Eu (Fe0 .82Co0 .18)As2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        88
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            214516
+_citation_year                  2013
+_citation_DOI                   10.1103/physrevb.88.214516
+
+loop_
+_citation_author_name
+"W.T. Jin"
+"S. Nandi"
+"Y. Xiao"
+"Y. Su"
+"O. Zaharko"
+"Z. Guguchia"
+"Z. Bukowski"
+"S. Price"
+"W.H. Jiao"
+"G.H. Cao"
+"T. Bruckel"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     17
+_experiment_temperature     4.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2+(k1) 2 1 . primary 2 ?
+mGM3+(k2) 1 1 . primary 2 ?
+
+_exptl_crystal_magnetic_properties_details
+;
+Moments in the figures and vesta files are not in a linear scale. Fe spins are oversized respect to Eu ones.
+NSD
+A structural transition from tetragonal to Fmmm symmetry at Tc=90K is also reported, distinct from the magnetic one.
+The two magnetic atoms order according to different k-vectors: Fe1 (k1) and Eu (k2) at different temperatures (70 and 17)
+Positional structure refined under space group Fmmm.
+From the magnetic symmetry, Cmmm is the actual effective space group for positions. This means a splitting of the As and Eu sites.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+wave vectors are given in the setting of the parent tetragonal phase.
+Ferromagnetic
+;
+
+_parent_space_group.name_H-M_alt  'I  4/m  m  m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-a,b;0,0,0'
+
+
+_space_group_magn.number_BNS  65.486
+_space_group_magn.name_BNS  "C  m  m'  m'  "
+_space_group_magn.point_group_name  "m'm'm"
+_space_group_magn.point_group_number  "8.4.27"
+_cell_length_a                 5.543(4)
+_cell_length_b                 5.543(4)
+_cell_length_c                 11.98(2)
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z,+1
+3 -x,-y,-z,+1
+4 x,y,-z,+1
+5 x,-y,-z,-1
+6 -x,y,-z,-1
+7 -x,y,z,-1
+8 x,-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Eu1_1 Eu2+ 0.00000 0.00000 0.00000 1.0000
+Eu1_2 Eu2+ 0.00000 0.50000 0.50000 1.0000
+Fe1_1 Fe2+ 0.25000 0.25000 0.25000 0.82
+Co1_1 Co2+ 0.25000 0.25000 0.25000 0.18
+As1_1 As 0.00000 0.00000 0.362(1) 1.0000
+As1_2 As 0.00000 0.50000 0.862(1) 1.0000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Eu1_1 0.0 0.0 6.2(1) 0,0,mz
+Eu1_2 0.0 0.0 6.2 0,0,mz
+Fe1_1 -0.15(1) 0.0 0.0 mx,0,mz
+

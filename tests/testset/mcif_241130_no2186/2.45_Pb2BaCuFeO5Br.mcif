@@ -1,0 +1,139 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 14/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        65
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            104439
+_citation_year                  2002
+_citation_DOI                   10.1103/PhysRevB.65.104439
+
+loop_
+_citation_author_name
+"A. Virtue"
+"X. Zhou"
+"B. Wilfong"
+"J.W. Lynn"
+"K. Taddei"
+"P. Zavalij"
+"L. Wang"
+"E.E. Rodriguez"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  ?
+_experiment_temperature  5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA5-  2  2  special  primary  1  .
+mA1-  1  1  .       primary  1  .
+mM5-  2  2  special  primary 1  .
+mA5+  2  2  special secondary 1  no
+mM1-  1  1   .      secondary 1  no
+mM5+  2  2  special secondary 1  no
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+At 290K a different magnetic phase is reported, with a single propagation vector (1/2,1/2,1/2) and a single order parameter (see #1.393)
+Transition temperature or temperatures between this phase and the one here, which requires three different order parameters, are unknown.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+The MSG label assigned to the structure in the original reference is not correct
+Three primary irreps involved: 3 different order parameters are spontaneous in the sense of Landau theory.
+Two order parameters (mA5-, mA1-) have propagation vector (1/2,1/2,1/2), and mM5- is for the k-vector (1/2,1/2,0).
+The mA1- mode corresponds to the canting along c of the moments, with opposite values for the sites (Fe1_1,Fe1_2): (mz, -mz), mz= 0.86(7)
+The mA5- mode is given by an arrangement with opposite moments along b for the sites (Fe1_1,Fe1_2): (my, -my), my= 1.65(5)
+The mM5- mode is given by an arrangement with equal moments along b for the sites (Fe1_1,Fe1_2): (my, my), my= 0.67(5)
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m m m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+k2 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,-a,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  3.6
+_space_group_magn.name_BNS  "P_C 2"
+_cell_length_a             5.57740
+_cell_length_b             5.57740
+_cell_length_c             23.01600
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Pb1_1 Pb 0.00000 0.50000 0.08601 1.
+Pb1_2 Pb 0.00000 0.50000 0.58601 1.
+Ba1 Ba 0.00000 0.50000 0.25000 1.
+Cu1_1 Cu 0.00000 0.00000 0.16150 0.5
+Cu1_2 Cu 0.00000 0.00000 0.66150 0.5
+Fe1_1 Fe 0.00000 0.00000 0.16150 0.5
+Fe1_2 Fe 0.00000 0.00000 0.66150 0.5
+O1_1 O 0.00000 0.00000 0.25435 0.5
+O1_2 O 0.00000 0.00000 0.75435 0.5
+O2_1 O 0.75000 0.25000 0.14771 1.
+O2_2 O 0.25000 0.25000 0.14771 1.
+O2_3 O 0.75000 0.25000 0.64771 1.
+O2_4 O 0.25000 0.25000 0.64771 1.
+Br1_1 Br 0.00000 0.00000 0.00000 1.
+Br1_2 Br 0.00000 0.00000 0.50000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1_1 0.00000 2.32 0.86 mx,my,mz
+Fe1_2 0.00000 -0.98 -0.86 mx,my,mz
+

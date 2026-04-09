@@ -1,0 +1,153 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 18/10/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-10-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        100
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            014405
+_citation_year                  2019
+_citation_DOI                   10.1103/PhysRevB.100.014405
+
+loop_
+_citation_author_name
+"M. Skoulatos"
+"F. Rucker"
+"G.J. Nilsen"
+"A. Bertin"
+"E. Pomjakushina"
+"J. Ollivier"
+"A. Schneidewind"
+"R. Georgii"
+"O. Zaharko"
+"L. Keller"
+"C. Ruegg"
+"C. Pfleiderer"
+"B. Schmidt"
+"N. Shannon"
+"A. Kriele"
+"A. Senyshyn"
+"A. Smerald"
+
+
+
+_atomic_positions_source_database_code_ICSD  407047
+_atomic_positions_source_other               .
+
+_transition_temperature  1
+_experiment_temperature  0.1
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1  2  2  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure used here from a icsd entry corresponding a room temperature experiment
+Sample with substituted Cd isotope
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+The magnetic ordering breaks the centrosymmetry of the structure resulting in a polar structure along a.
+If insulator, possible multiferroicity of type II, with magnetically induced electric polarization along a.
+V parent site splits into two symmetry-independent sites. The model considers equal moments in both sites.
+;
+
+_parent_space_group.name_H-M_alt  'P b c a'
+_parent_space_group.IT_number                       61
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;0,1/8,0'
+
+
+
+_space_group_magn.number_BNS  33.150
+_space_group_magn.name_BNS  "P_b n a 2_1"
+_cell_length_a             8.83800
+_cell_length_b             17.83000
+_cell_length_c             19.37390
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/4,-z,+1
+3 x+1/2,y+1/2,-z+1/2,+1
+4 x,-y+3/4,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ba1_1 Ba 0.18098 0.49093 0.41775
+Ba1_2 Ba  0.31902 0.50907 0.91775
+Cd1_1 Cd 0.17880 0.43883 0.09038
+Cd1_2 Cd  0.32120 0.56117 0.59038
+V1_1 V 0.00090 0.07255 0.22485
+V1_2 V  0.49910 0.92745 0.72485
+P1_1 P 0.25220 0.19660 0.24610
+P1_2 P  0.24780 0.80340 0.74610
+P2_1 P 0.44240 0.39515 0.52380
+P2_2 P  0.05760 0.60485 0.02380
+O1_1 O 0.08970 0.33455 0.44170
+O1_2 O  0.41030 0.66545 0.94170
+O2_1 O 0.14820 0.40175 0.29690
+O2_2 O  0.35180 0.59825 0.79690
+O3_1 O 0.30440 0.44335 0.54750
+O3_2 O  0.19560 0.55665 0.04750
+O4_1 O 0.01190 0.07065 0.30690
+O4_2 O  0.48810 0.92935 0.80690
+O5_1 O 0.40240 0.31265 0.54000
+O5_2 O  0.09760 0.68735 0.04000
+O6_1 O 0.35340 0.24215 0.19510
+O6_2 O  0.14660 0.75785 0.69510
+O7_1 O 0.45790 0.40290 0.44380
+O7_2 O  0.04210 0.59710 0.94380
+O8_1 O 0.15770 0.24695 0.29280
+O8_2 O  0.34230 0.75305 0.79280
+O9_1 O 0.15820 0.14715 0.19820
+O9_2 O  0.34180 0.85285 0.69820
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+V1_1 0.34(3) 0.00000 0.00000 mx,my,mz
+V1_2 0.34 0.00000 0.00000 mx,my,mz
+

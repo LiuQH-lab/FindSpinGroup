@@ -1,0 +1,171 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:11:12
+# Database entry: 1.83 BaFeO2.5
+# Cif-like file for the case 1.83
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ba Fe O2 .5'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        53
+_citation_page_first            5911
+_citation_page_last             5921
+_citation_article_id            .
+_citation_year                  2014
+_citation_DOI                   10.1021/ic402988y
+
+loop_
+_citation_author_name
+"O. Clemens"
+"M. Groting"
+"R. Witte"
+"J.M. Perez-Mato"
+"C. Loho"
+"F.J. Berry"
+"R. Kruk"
+"K.S. Knight"
+"A.J. Wright"
+"H. Hahn"
+"P.R. Slater"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     720
+_experiment_temperature     300
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY2- 1 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic structure (4 possible)
+1-dim active irrep.
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,0,0'
+
+
+_space_group_magn.number_BNS  14.80
+_space_group_magn.name_BNS  "P_a  2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 13.9506
+_cell_length_b                 11.7281
+_cell_length_c                 23.4507
+_cell_angle_alpha              90.00
+_cell_angle_beta               98.813
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x+1/2,-y,-z,+1
+4 x,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba+2 0.0273 0.3517 0.1145 1
+Ba2 Ba+2 0.125 0.6141 0.3283 1
+Ba3 Ba+2 0.07155 0.1304 0.3215 1
+Ba4 Ba+2 0.16285 0.6328 0.0379 1
+Ba5 Ba+2 0.02735 0.6176 0.6001 1
+Ba6 Ba+2 0.28015 0.3549 0.2558 1
+Ba7 Ba+2 0.1772 0.1102 0.0364 1
+Fe1 Fe+3 0.26245 0.3531 0.1038 1
+Fe2 Fe+3 0.1924 0.5816 0.186 1
+Fe3 Fe+3 0.031 0.3996 0.2595 1
+Fe4 Fe+3 0.08695 0.1525 0.4707 1
+Fe5 Fe+3 0.21795 0.3817 0.3988 1
+Fe6 Fe+3 0.13535 0.1045 0.1746 1
+Fe7 Fe+3 0.0729 0.6217 0.4644 1
+O1 O-2 0 0 0 1
+O2 O-2 0.1486 0.7097 0.1485 1
+O3 O-2 0.4686 0.277 0.2271 1
+O4 O-2 0.0191 0.0449 0.4273 1
+O5 O-2 0.004 0.2474 0.0021 1
+O6 O-2 0.1477 0.5 0.4297 1
+O7 O-2 0.35665 0.2597 0.0766 1
+O8 O-2 0.02795 0.1195 0.1079 1
+O9 O-2 0.203 -0.0138 0.1436 1
+O10 O-2 0.20315 0.2443 0.147 1
+O11 O-2 0.05865 0.0036 0.2168 1
+O12 O-2 0.225 0.1263 0.2497 1
+O13 O-2 0.0972 0.4907 0.211 1
+O14 O-2 0.2708 0.4917 0.1449 1
+O15 O-2 0.15575 0.2406 0.4261 1
+O16 O-2 0.1798 0.3923 0.0364 1
+O17 O-2 0.12575 0.3583 0.3225 1
+O18 O-2 0.3265 0.3669 0.4636 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 2.4(2) 0.0 3.4(1) mx,my,mz
+Fe2 -1.9(2) 0.0 -2.6(1) mx,my,mz
+Fe3 1.6(2) 0.0 2.4(1) mx,my,mz
+Fe4 1.9(2) 0.0 2.9(1) mx,my,mz
+Fe5 -2.4(2) 0.0 -3.3(1) mx,my,mz
+Fe6 -1.4(2) 0.0 -3.6(1) mx,my,mz
+Fe7 1.3(2) 0.0 4.2(1) mx,my,mz
+

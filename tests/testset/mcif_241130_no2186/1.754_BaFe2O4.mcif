@@ -1,0 +1,153 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 04/22/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-04-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ba1 Fe2 O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Nat. Commun."
+_citation_journal_volume        13
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            7968 
+_citation_year                  2022
+_citation_DOI                   10.1038/s41467-022-35669-5
+
+loop_
+_citation_author_name
+"F. Orlandi"
+"D. Delmonte"
+"G. Calestani"
+"E. Cavalli",
+"E. Gilioli"
+"V. V. Shvartsman"
+"P. Graziosi"
+"S. Rampino"
+"G. Spaggiari"
+"C. Liu"
+"W. Ren"
+"S. Picozzi"
+"M. Solzi"
+"M. Casappa"
+"F. Mezzadri"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     890.5
+_experiment_temperature     300
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY4 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Polar parent structure
+AFM
+Multiferroic of type I
+The magnetic structure is reported in standard setting of its MSG, which can be related with the parent Cmc2_1 structure also reported in the paper by the transformation (b,a,-c;1/4,1/4,0)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'C m c 2_1'
+_parent_space_group.IT_number                       36
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'b,a,-c;1/4,1/4,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  29.109
+_space_group_magn.name_BNS  "P_C c a 2_1"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 19.06414(12)
+_cell_length_b                 8.45514(5)
+_cell_length_c                 5.39014(3)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z+1/2,+1 
+3 -x+1/2,y,z+1/2,+1 
+4 x+1/2,-y,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0.3821(3) 0.25000 0.000(3) 1
+Ba2 Ba 0.8688(3) 0.25000 0.024(3) 1
+Fe1 Fe 0.79356(9) 0.02985(17) 0.528(2) 1
+Fe2 Fe -0.04074(9) 0.03894(15) 0.510(2) 1
+O1 O 0.79853(13) 0.25000 0.520(3) 1
+O2 O 0.8770(2) -0.0392(3) 0.382(2) 1
+O3 O 0.04039(17) -0.0399(3) 0.355(2) 1
+O4 O -0.03521(15) 0.25 0.416(3) 1
+O5 O 0.78818(16) -0.0275(2) 0.862(2) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 0.0 -3.740(4) 0.0 mx,my,mz 3.740(4) ? ?
+Fe2 0.0 3.740(4) 0.0 mx,my,mz 3.740(4) ? ?
+

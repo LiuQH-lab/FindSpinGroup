@@ -1,0 +1,127 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 31/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-31
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "JOURNAL OF SOLID STATE CHEMISTRY"
+_citation_journal_volume        93
+_citation_page_first            37
+_citation_page_last             45
+_citation_article_id            ?
+_citation_year                  1991
+_citation_DOI                   10.1016/0022-4596(91)90271-I
+
+loop_
+_citation_author_name
+"P. Lacorre"
+"J. Pannetier"
+"T. Fleischer"
+"R. Hoppe"
+"G. Ferey"
+
+
+
+_atomic_positions_source_database_code_ICSD  86430
+_atomic_positions_source_other               .
+
+_transition_temperature  54
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2  1  1  .  primary  4  .
+mGm4  1  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps involved as primary irreps. This implies two order parameters in the sense of Landau theory
+;
+
+_parent_space_group.name_H-M_alt  'I -4 c 2'
+_parent_space_group.IT_number                       120
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  82.41
+_space_group_magn.name_BNS  "I -4'"
+_cell_length_a             12.43530
+_cell_length_b             12.43530
+_cell_length_c             12.86120
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z,+1
+3 y,-x,-z,-1
+4 -y,x,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cs1 Cs 0.00000 0.00000 0.25000
+Cs2_1 Cs 0.34330 0.83410 0.67990
+Cs2_2 Cs  0.34330 0.16590 0.17990
+Co1 Co 0.50000 0.00000 0.00000
+Co2_1 Co 0.79320 0.07490 0.98610
+Co2_2 Co  0.79320 0.92510 0.48610
+F1_1 F 0.34320 0.00140 0.98990
+F1_2 F  0.34320 0.99860 0.48990
+F2_1 F 0.14120 0.06550 0.99120
+F2_2 F  0.14120 0.93450 0.49120
+F3_1 F 0.07670 0.20940 0.14440
+F3_2 F  0.07670 0.79060 0.64440
+F4_1 F 0.91970 0.79120 0.86320
+F4_2 F  0.91970 0.20880 0.36320
+F5 F 0.72080 0.22080 0.00000
+F6_1 F 0.00000 0.50000 0.14330
+F6_2 F  0.00000 0.50000 0.64330
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 0.00000 0.00000 3.5(1) 0,0,mz
+Co2_1 0.00000 0.00000 -2.8(6) mx,my,mz
+Co2_2 0.00000 0.00000 3.5(6) mx,my,mz
+
+

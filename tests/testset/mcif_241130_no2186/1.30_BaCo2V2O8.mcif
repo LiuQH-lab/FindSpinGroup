@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:07:00
+# Database entry: 1.30 BaCo2V2O8
+# Cif-like file for the case 1.30
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ba Co2 V2 O8'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        87
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            054408
+_citation_year                  2013
+_citation_DOI                   10.1103/physrevb.87.054408
+
+loop_
+_citation_author_name
+"E. Canevet"
+"B. Grenier"
+"M. Klanjsek"
+"C. Berthier"
+"M. Horvatic"
+"V. Simonet"
+"P. Lejay"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     5
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM4 2 2 special primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (10 possible)
+;
+
+_parent_space_group.name_H-M_alt  'I  4_1/a  c  d'
+_parent_space_group.IT_number                       142
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,b,-a;0,0,0'
+
+
+_space_group_magn.number_BNS  54.352
+_space_group_magn.name_BNS  "P_I  c  c  a"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 12.40400
+_cell_length_b                 12.40400
+_cell_length_c                 8.37500
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y,z+1/2,+1
+3 -x+1/2,y,-z,+1
+4 x,-y,-z+1/2,+1
+5 -x,-y,-z,+1
+6 x+1/2,y,-z+1/2,+1
+7 x+1/2,-y,z,+1
+8 -x,y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba Ba 0.00000 0.25000 0.37500 1
+V1 V 0.08000 0.00000 0.25000 1
+V2 V 0.25000 0.83000 0.50000 1
+Co Co 0.16897 0.41897 0.12500 1
+O11 O 0.15868 0.07501 0.38171 1
+O12 O 0.17499 0.90868 0.63171 1
+O21 O 0.49845 0.08729 0.34872 1
+O22 O 0.16271 0.24845 0.59872 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co 0.0 0.0 2.267(3) mx,my,mz
+

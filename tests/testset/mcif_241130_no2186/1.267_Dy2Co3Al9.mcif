@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 17/01/2019 20:21:49
+# Cmcm_parent_paper.cif
+
+data_5yOhtAoR
+_audit_creation_date            2019-01-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        2
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            084406
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevMaterials.2.084406
+
+loop_
+_citation_author_name
+"D. I. Gorbunov"
+"M. S. Henriques"
+"N. Qureshi"
+"B. Ouladdiaf"
+"C. Salazar Mejia"
+"J. Gronemann"
+"A. V. Andreev"
+"V. Petricek"
+"E. L. Green"
+"J. Wosnitza"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+
+_transition_temperature  3.7
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ1  2  2  special  primary 3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Between 6.1K and 5.2K and between 5.2K and 3.7K two different incommensurate phases are reported (see #1.1.48 and #1.1.49)
+Position structure has been taken from the reported Cmcm parent structure at 65K. 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+2-dim irrep active along a special direction
+The Dy parent site splits into two symmetry independent sites, which have very different magnetic moments.
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a,b;0,0,7/8'
+
+
+
+_space_group_magn.number_BNS  38.192
+_space_group_magn.name_BNS  "A_a m m 2"
+_cell_length_a             12.72390
+_cell_length_b             7.45860
+_cell_length_c             18.59880
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z+3/4,+1 
+3 x,y,-z+3/4,+1 
+4 -x,y,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Dy1_1 Dy 0.33940 0.33290 0.12500
+Dy1_2 Dy  0.66060 0.66710 0.37500
+Co1 Co 0.32880 0.00000 0.00000
+Co2 Co 0.00000 0.00000 0.00000
+Al1_1 Al 0.00000 0.12490 0.12500
+Al1_2 Al  0.00000 0.87510 0.37500
+Al2_1 Al 0.10790 0.44590 0.12500
+Al2_2 Al  0.89210 0.55410 0.37500
+Al3_1 Al 0.00000 0.33220 0.27140
+Al3_2 Al  0.00000 0.66780 0.52140
+Al4_1 Al 0.16860 0.33300 0.03585
+Al4_2 Al  0.83140 0.66700 0.28585
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Dy1_1 1.34(2) 8.35(2) 0.00000 mx,my,0
+Dy1_2 0.00000 0.00000 1.38(1) 0,0,mz
+

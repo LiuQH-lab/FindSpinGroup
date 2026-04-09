@@ -212,6 +212,10 @@ mcif_241231_no2104
 temp_cif_file
 upload_files
 output_files
+.playwright-mcp/
+.skill-staging/
+~$*.pptx
+~$*.xlsx
 
 draft.py
 fsg_rewrite.py

@@ -1,0 +1,161 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/06/2022 20:17:45
+# from files submitted by Victoria Li and David Brooks
+
+data_5yOhtAoR
+_audit_creation_date            2022-10-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Pr Fe2 Al8"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        29
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            345801
+_citation_year                  2017
+_citation_DOI                   10.1088/1361-648X/aa7b98
+
+loop_
+_citation_author_name
+"H. Nair"
+"M. Ogunbunmi"
+"C. Kumar"
+"D. Adroja"
+"P. Manuel"
+"D. Fortes"
+"J. Taylor"
+"A. Strydom"
+
+_temperature_position_structure         300
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD   259673
+_atomic_positions_source_other                .
+
+_transition_temperature     4.5
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mU1 2 2 special primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional Structure from a room temperature determination
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special direction
+;
+
+_parent_space_group.name_H-M_alt  'P b a m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,b;0,0,0'
+
+_space_group_magn.number_BNS  12.64
+_space_group_magn.name_BNS  "C_a 2/m"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 25.02020
+_cell_length_b                 14.43830
+_cell_length_c                 8.08220
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z,+1 
+3 -x,-y,-z,+1 
+4 x,y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Pr1_1 Pr 0.17215 0.31793 0.00000 1
+Pr1_2 Pr 0.07785 0.81793 0.00000 1
+Fe1_1 Fe 0.07548 0.09235 0.00000 1
+Fe1_2 Fe 0.17452 0.59235 0.00000 1
+Fe2_1 Fe 0.01809 0.40434 0.00000 1
+Fe2_2 Fe 0.23191 0.90434 0.00000 1
+Al1_1 Al 0.00000 0.50000 0.25000 1
+Al1_2 Al 0.25000 0.00000 0.25000 1
+Al2_1 Al 0.00000 0.00000 0.00000 1
+Al2_2 Al 0.25000 0.50000 0.00000 1
+Al3_1 Al 0.01484 0.13355 0.25000 1
+Al3_2 Al 0.23516 0.63355 0.25000 1
+Al4_1 Al 0.08080 0.37610 0.25000 1
+Al4_2 Al 0.16920 0.87610 0.25000 1
+Al5_1 Al 0.11839 0.17102 0.25000 1
+Al5_2 Al 0.13161 0.67102 0.25000 1
+Al6_1 Al 0.16630 0.49029 0.25000 1
+Al6_2 Al 0.08370 0.99029 0.25000 1
+Al7_1 Al 0.22994 0.18346 0.25000 1
+Al7_2 Al 0.02006 0.68346 0.25000 1
+Al8_1 Al 0.16737 0.03719 0.00000 1
+Al8_2 Al 0.08263 0.53719 0.00000 1
+Al9_1 Al 0.04577 0.25152 0.00000 1
+Al9_2 Al 0.20423 0.75152 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Pr1_1 0.0 0.0 -2.5 0,0,mz 2.5 ? ?
+Pr1_2 0.0 0.0 -2.5 0,0,mz 2.5 ? ?
+

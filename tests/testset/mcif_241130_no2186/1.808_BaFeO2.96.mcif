@@ -1,0 +1,156 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/10/2024
+
+data_5yOhtAoR
+_audit_creation_date            2024-11-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ba1 Fe1 O2.96"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Alloys and Compounds"
+_citation_journal_volume        1010
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            177081
+_citation_year                  2025
+_citation_DOI                   10.1016/j.jallcom.2024.177081
+
+loop_
+_citation_author_name
+"D. Gutierrez-Martin"
+"M. Hernando"
+"M. Parras"
+"A. Torres-Pardo"
+"M. T. Fernandez-Diaz"
+"S. Savvin"
+"J. M. Gonzalez-Calbet"
+"J. E. Rodrigues"
+"R. S. Silva"
+"J. L. Martinez"
+"A. Varela"
+
+_temperature_position_structure         90
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     156
+_experiment_temperature     10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA3 4 4 special primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 90K
+The Fe2 position at 10K is also reported, but some inconsistency with the value at 90K exists, and they have not been taken here.
+The relative signs of the moments of the three independent Fe sites given in the supplemental material are inconsistent with the figure of the paper. The figure has been assumed correct, and the relative signs here have been taken from this figure.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+The MSG is a k-maximal symmetry for the 2a and 4f Fe sites
+4-dim irrep along a special direction
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,a+b,a-b;0,0,7/8'
+
+
+_space_group_magn.number_BNS  38.192
+_space_group_magn.name_BNS  "A_a m m 2"
+_space_group_magn.point_group_name  "mm2.1'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 5.65840
+_cell_length_b                 5.65840
+_cell_length_c                 27.71890
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,-x,-z+3/4,+1 
+3 x,y,-z+3/4,+1 
+4 -y,-x,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1_1 Ba 0.00000 0.00000 0.12500 1
+Ba1_2 Ba 0.00000 0.00000 0.37500 1
+Ba2_1 Ba 0.33333 0.66667 0.29482 1
+Ba2_2 Ba 0.66667 0.33333 0.54482 1
+Fe1 Fe 0.00000 0.00000 0.00000 1
+Fe2_1 Fe 0.66667 0.33333 0.42379 1
+Fe2_2 Fe 0.33333 0.66667 0.67379 1
+O1_1 O 0.48470 0.96940 0.12500 1
+O1_2 O 0.48470 0.51530 0.12500 1
+O1_3 O 0.51530 0.03060 0.37500 1
+O1_4 O 0.51530 0.48470 0.37500 1
+O2_1 O 0.16990 0.33980 0.20800 1
+O2_2 O 0.16990 0.83010 0.20800 1
+O2_3 O 0.83010 0.66020 0.45800 1
+O2_4 O 0.83010 0.16990 0.45800 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 -3.97(5) -3.97(5) 0.0 mx,mx,0 3.97(5) ? ?
+Fe2_1 2.08(5) 2.08(5) 0.0 mx,mx,0 2.08(5) ? ?
+Fe2_2 -0.50(2) -0.50(2) 0.0 mx,mx,0 0.50(2) ? ?
+

@@ -1,0 +1,120 @@
+##CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 06/03/2018 23:57:54
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        14
+_citation_page_first            187
+_citation_page_last             189
+_citation_article_id            ?
+_citation_year                  1974
+_citation_DOI                   10.1016/0038-1098(74)90213-0
+
+loop_
+_citation_author_name
+"J. Gelard"
+"A. Fert"
+"P. Meriel"
+"Y. Allain"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  52369
+_atomic_positions_source_other               .
+
+_transition_temperature  9.3
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mD2  6  1  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Phase without applied field. Under a magnetic field along z, the material exhibits several ferrimagnetic phases.
+Positional structure from a room temperature model of an icsd file
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+The irrep star has 6 k-vectors. Equivalent domain related structures are obtained considering as propagation vectors the other ks from the star (and their opposite): (-1/4,1/4,1/4) and (0,1/4,1/4)
+;
+
+_parent_space_group.name_H-M_alt  'P  -3  m  1'
+_parent_space_group.IT_number                       164
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 0 1/4]
+
+_parent_space_group.child_transform_Pp_abc  '-4a-2b,-b,4c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2c,b,-a;0,0,7/8'
+
+
+
+_space_group_magn.number_BNS  15.90
+_space_group_magn.name_BNS  "C_c2/c"
+_cell_length_a             14.02960
+_cell_length_b             4.05000
+_cell_length_c             27.04000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y,-z+3/4,+1
+3 -x,-y,-z+3/4,+1
+4 x+1/2,-y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+3/4,y+1/2,z+3/4,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/4,y+1/2,z+1/4,+1
+5 x+1/2,y,z,-1
+6 x+1/4,y+1/2,z+3/4,-1
+7 x,y,z+1/2,-1
+8 x+3/4,y+1/2,z+1/4,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Fe1 Fe 0.00000 0.00000 0.00000
+I1_1 I 0.91667 0.49999 0.06250
+I1_2 I 0.91667 0.49999 0.31250
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.00000 0.00000 3.7 mx,0,mz
+
+

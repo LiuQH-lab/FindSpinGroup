@@ -1,0 +1,137 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/06/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-02-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    Mn Nb2 O6
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Acta Cryst. A"
+_citation_journal_volume        32
+_citation_page_first            587
+_citation_page_last             591
+_citation_article_id            .
+_citation_year                  1976
+_citation_DOI                   10.1107/S0567739476001253
+
+loop_
+_citation_author_name
+"S. Klein"
+"H. Weitzel"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  31944
+_atomic_positions_source_other               .
+
+_transition_temperature     ?
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3- 1 1 . primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure is not given. Here the one from a determination at room temperature from another work is used.
+Transition temperature is not specified
+Moment canting angle with respect to the a-axis: 13(4) degrees
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep 
+;
+
+_parent_space_group.name_H-M_alt  'P b c n'
+_parent_space_group.IT_number                       60
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  60.419
+_space_group_magn.name_BNS  "P b' c n"
+_space_group_magn.point_group_name  "m'mm"
+_space_group_magn.point_group_number  "8.3.26"
+_cell_length_a                 14.42040
+_cell_length_b                 5.75660
+_cell_length_c                 5.07840
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z,+1 
+3 x,-y,z+1/2,+1 
+4 x+1/2,y+1/2,-z+1/2,+1 
+5 -x,y,-z+1/2,-1 
+6 -x+1/2,-y+1/2,z+1/2,-1 
+7 -x,-y,-z,-1 
+8 -x+1/2,y+1/2,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.20110 0.25000 1
+Nb1 Nb 0.16020 0.31580 0.74800 1
+O1 O 0.09750 0.39750 0.42410 1
+O2 O 0.08750 0.12290 0.89160 1
+O3 O 0.24640 0.12030 0.59730 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1 3.88 0.0 0.9 mx,0,mz 3.98 ? ?
+

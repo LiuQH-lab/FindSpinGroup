@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/20/2022
+# From files provided by V. O. Garlea
+
+data_5yOhtAoR
+_audit_creation_date            2022-01-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Na2 Co2 Te O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        104
+_citation_page_first            184415-1
+_citation_page_last             184415-11
+_citation_article_id            .
+_citation_year                  2021
+_citation_DOI                   10.1103/PhysRevB.104.184415
+
+loop_
+_citation_author_name
+"A. M. Samarakoon"
+"Q. Chen"
+"H. Zhou,"
+"V. O. Garlea"
+
+_temperature_position_structure         50
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     25
+_experiment_temperature     4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM2 3 1 . primary 4 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The refinment was performed on the pure magnetic scattering obtained by subtracting 50K from 4K data.
+A systematic broadening for the magnetic reflections with l non-zero is observed. This was
+described using an anisotropic microstrain broadening model.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+The magnetic symmetry allows for an out of plane "mc" component that has been ignored in previous reports. 
+This component is expected in the context of the Kitaev-type anisotropic bond-directional couplings model proposed for this system.
+An unconstrained refinement of the small mc components of the two distinct Co positions was not possible, and they 
+were constrained to be equal.
+The irrep has 3 k-vectors in its star. Multi-k arrangements involving more than one k-vector of the irrep, which can equally fit the data were not considered.  
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3 2 2'
+_parent_space_group.IT_number                       182
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,b,c;1/4,1/4,1/4'
+
+_space_group_magn.number_BNS  19.29
+_space_group_magn.name_BNS  "P_C 2_1 2_1 2_1"
+_space_group_magn.point_group_name  "2221'"
+_space_group_magn.point_group_number  "6.2.18"
+_cell_length_a                 10.5174
+_cell_length_b                 5.2587
+_cell_length_c                 11.1699
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              120.000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-2x+y,-z,-1 
+3 x,2x-y,-z+1/2,-1 
+4 -x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1 Co 0.00000 0.00000 0.25000 1.00000
+Co2 Co 0.16667 0.66667 0.75000 1.00000
+Te1 Te 0.16667 0.66667 0.25000 1.00000
+O1_1 O 0.32160 0.97480 0.34520 1.00000
+O1_2 O 0.51260 0.66840 0.34520 1.00000
+O1_3 O 0.16580 0.35680 0.34520 1.00000
+Na1_1 Na 0.12000 0.65000 0.97400 0.093
+Na1_2 Na 0.67500 0.59000 0.97400 0.093
+Na1_3 Na 0.20500 0.76000 0.97400 0.093
+Na2_1 Na 0.00000 0.00000 0.00000 0.370
+Na3_1 Na 0.35100 0.06600 0.99400 0.258
+Na3_2 Na 0.96700 0.63600 0.99400 0.258
+Na3_3 Na 0.68200 0.29800 0.99400 0.258
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Co1 0.0 2.07(7) 0.5(2) 0,my,mz 2.1(1) ? ?
+Co2 0.0 -1.95(10) 0.5(2) 0,my,mz 2.0(1) ? ?

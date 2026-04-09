@@ -1,0 +1,147 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/01/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Cr1 P1 S4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Adv. Mater."
+_citation_journal_volume        32
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            2001200
+_citation_year                  2020
+_citation_DOI                   10.1002/adma.202001200
+
+loop_
+_citation_author_name
+"Y. Peng"
+"S. Ding"
+"M. Cheng"
+"Q. Hu"
+"J. Yang"
+"F. Wang"
+"M. Xue"
+"Z. Liu"
+"Z. Lin"
+"M. Avdeev"
+"Y. Hou"
+"W. Yang"
+"Y. Zheng"
+"J. Yang"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  937
+_atomic_positions_source_other               .
+
+_transition_temperature     38
+_experiment_temperature     1.7
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA2 1 1 . primary 4 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure is not reported. Here it is used one determined at room temperature by another study and retrieved from the ICSD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'C 2'
+_parent_space_group.IT_number                       5
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,1/4'
+
+_space_group_magn.number_BNS  5.16
+_space_group_magn.name_BNS  "C_c 2"
+_space_group_magn.point_group_name  "21'"
+_space_group_magn.point_group_number  "3.2.7"
+_cell_length_a                 10.87100
+_cell_length_b                 7.25400
+_cell_length_c                 12.28000
+_cell_angle_alpha              90.00
+_cell_angle_beta               91.88
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cr1 Cr 0.00000 0.00000 0.00000 1
+Cr2 Cr 0.00000 0.50950 0.00000 1
+P1 P 0.29710 0.25880 0.08275 1
+S1 S 0.13350 0.99160 0.35035 1
+S2 S 0.13470 0.52480 0.34965 1
+S3 S 0.10620 0.25940 0.09670 1
+S4 S 0.13030 0.75750 0.07260 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Cr1 0.48(9) 0.0 2.84(3) mx,0,mz 2.86(3) ? ?
+Cr2 0.48(9) 0.0 2.84(3) mx,0,mz 2.86(3) ? ?
+

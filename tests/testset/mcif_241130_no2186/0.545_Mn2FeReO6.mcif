@@ -1,0 +1,128 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 23/02/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-02-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_audit_creation_date            2021-02-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Angew. Chem. Int. Ed."
+_citation_journal_volume        54
+_citation_page_first            12074
+_citation_page_last             12077
+_citation_article_id            .
+_citation_year                  2015
+_citation_DOI                   10.1002/anie.201506540
+
+loop_
+_citation_author_name
+"A. M. Arevalo-Lopez"
+"G. M. McNally"
+"J. P. Attfield"
+
+_atomic_positions_source_database_code_ICSD  195628
+_atomic_positions_source_other               .
+
+_transition_temperature  75
+_experiment_temperature  50
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+  1  1  .  primary  9   .
+mGM2+  1  1  .  primary  9   .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Non-standard parent setting P2_1/n
+Ferrimagnetic 
+The transition giving place to this phase is reported to happen at 75K. There is however no symmetry break between this structure and those reported at 100K and 150K (see #0.543 and #0.542). The additional non-zero values of Mn, Fe, Re moment components along a and b, present in this structure at 1.7K and 50K do not decrease further the symmetry, so that the transition would be isosymmetric.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim irreps involved as primary. This means that two order parameters are present. One for the ordering of the Fe and Re moments and the y commponent of the Mn moment, and a second one with a different irrep for the arrangement of the Mn moments along a and c. At 300K, Mn moments are reported to be zero (see #0.541) and a single irrep is involved. 
+At 150K and 100K the reported magnetic structures (see #0.543 and #0.542)already involve the two irreps. This implies that a symmetry breaking transition would be taking place between 300K and 150K.
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c' 
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.4
+_space_group_magn.name_BNS  "P -1"
+_cell_length_a             5.1840(2)
+_cell_length_b             5.3423(1)
+_cell_length_c             7.5636(2)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.029(7)
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1_1 Mn 0.496(1) 0.5632(7) 0.7530(2)
+Mn1_2 Mn  0.0040 0.0632 0.7470
+Fe1_1 Fe 0.50000 0.00000 0.50000
+Fe1_2 Fe  0.00000 0.50000 0.00000
+Re1_1 Re 0.50000 0.00000 0.00000
+Re1_2 Re  0.00000 0.50000 0.50000
+O1_1 O 0.319(1) 0.285(8) 0.9294(1)
+O1_2 O  0.1810 0.7850 0.5706
+O2_1 O 0.323(1) 0.3325(9) 0.5638(9)
+O2_2 O  0.177 0.8325 0.9362
+O3_1 O 0.8738(6) 0.4391(6) 0.7709(7)
+O3_2 O  0.6262 0.9391 0.7291
+
+
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1_1 1.77(4) 2.27(3) 2.19(4) mx,my,mz       3.62(2)
+Mn1_2 -1.77 -2.27 -2.19 mx,my,mz             3.62
+Fe1_1 3.19(6) -0.56(5) 3.24(7) mx,my,mz      4.58(6)
+Fe1_2 3.19 0.56 3.24 mx,my,mz                4.58
+Re1_1 -0.56(4) -0.10(1) -0.57(4) mx,my,mz    0.80(5)
+Re1_2 -0.56 0.10 -0.57 mx,my,mz              0.80
+
+

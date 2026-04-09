@@ -1,6 +1,8 @@
 
 import numpy as np
 import re
+import ast
+import math
 from collections import deque
 
 def rref_with_tolerance(A, tol=1e-3):
@@ -35,22 +37,14 @@ def normalize_vector_to_zero(v,atol=1e-10):
     return np.array(new_v)
 
 def getNormInf(matrix1, matrix2, mode=True):
-    if mode == True:
-        a = np.array(matrix1) % 1
-        b = np.array(matrix2) % 1
-        c = [1, 2, 3]
-        for i in range(3):
-            if a[i] > b[i]:
-                c[i] = min(a[i] - b[i], 1 + b[i] - a[i])
-            if a[i] < b[i]:
-                c[i] = min(b[i] - a[i], 1 + a[i] - b[i])
-            if a[i] == b[i]:
-                c[i] = 0
-        max_value = max(c)
-    else:
-        diff = np.abs(matrix1 - matrix2)
-        max_value = np.max(diff)
-    return max_value
+    if mode:
+        a = np.mod(np.asarray(matrix1, dtype=float), 1.0)
+        b = np.mod(np.asarray(matrix2, dtype=float), 1.0)
+        diff = np.abs(a - b)
+        wrapped = np.minimum(diff, 1.0 - diff)
+        return float(np.max(wrapped))
+    diff = np.abs(np.asarray(matrix1, dtype=float) - np.asarray(matrix2, dtype=float))
+    return float(np.max(diff))
 
 
 def check_3x3_numeric_matrix(mat):
@@ -73,7 +67,52 @@ def check_3x3_numeric_matrix(mat):
 
 
 
-def parse_single_coords(coords_str: str):
+def evaluate_numeric_expression(expr: str) -> float:
+    expr = expr.strip().replace('−', '-')
+    if not expr:
+        raise ValueError("Empty numeric expression")
+    expr = re.sub(r'(\d|\))(?=sqrt\()', r'\1*', expr)
+
+    node = ast.parse(expr, mode='eval')
+
+    def _eval(node):
+        if isinstance(node, ast.Expression):
+            return _eval(node.body)
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return float(node.value)
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.UAdd, ast.USub)):
+            value = _eval(node.operand)
+            return value if isinstance(node.op, ast.UAdd) else -value
+        if isinstance(node, ast.BinOp) and isinstance(
+            node.op, (ast.Add, ast.Sub, ast.Mult, ast.Div)
+        ):
+            left = _eval(node.left)
+            right = _eval(node.right)
+            if isinstance(node.op, ast.Add):
+                return left + right
+            if isinstance(node.op, ast.Sub):
+                return left - right
+            if isinstance(node.op, ast.Mult):
+                return left * right
+            return left / right
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "sqrt"
+            and len(node.args) == 1
+            and not node.keywords
+        ):
+            return math.sqrt(_eval(node.args[0]))
+        raise ValueError(f"Unsupported numeric expression: {expr}")
+
+    return float(_eval(node))
+
+
+def _split_linear_terms(expr: str):
+    return [term for term in re.findall(r'[+\-]?[^+\-]+', expr.replace(' ', '')) if term]
+
+
+def parse_single_coords(coords_str: str, variables=('x', 'y', 'z')):
     """
     parse a single coordinate expression like "x+1/2,-y+1/2,z,1"
     matrix: (3,3)
@@ -98,39 +137,29 @@ def parse_single_coords(coords_str: str):
     matrix = np.zeros((3, 3), dtype=float)
     shift = np.zeros(3, dtype=float)
 
-    vars = ['x', 'y', 'z']
-
     for i, expr in enumerate(coords[:3]):
         expr = expr.replace('−', '-')  # fix minus sign issue unicode
-        # get coefficients for x, y, z
-        for j, var in enumerate(vars):
-            # look for patterns like 'x', '-x', '1/2x', '-1/2x', '0.5x', etc.
-            pattern = rf'([+\-]?\d*(?:/\d+)?)\s*{var}'
-            matches = re.findall(pattern, expr)
-            coeff_sum = 0.0
-            for m in matches:
-                if m in ('', '+', '-'):
-                    coeff_sum += 1.0 if m in ('', '+') else -1.0
-                elif '/' in m:
-                    num, den = m.split('/')
-                    coeff_sum += float(num) / float(den)
-                else:
-                    coeff_sum += float(m)
-            matrix[i, j] = coeff_sum
-
-        # get constant term (shift)
-        expr_no_vars = re.sub(r'[+\-]?\s*\d*(?:/\d+)?\s*[xyz]', '', expr)
-        expr_no_vars = expr_no_vars.strip()
-        if expr_no_vars:
-            try:
-                shift[i] = eval(expr_no_vars)
-            except Exception:
-                shift[i] = 0.0
+        for term in _split_linear_terms(expr):
+            matched_var = False
+            for j, var in enumerate(variables):
+                if term.endswith(var):
+                    coeff_expr = term[: -len(var)]
+                    if coeff_expr in ('', '+'):
+                        coeff = 1.0
+                    elif coeff_expr == '-':
+                        coeff = -1.0
+                    else:
+                        coeff = evaluate_numeric_expression(coeff_expr)
+                    matrix[i, j] += coeff
+                    matched_var = True
+                    break
+            if not matched_var:
+                shift[i] += evaluate_numeric_expression(term)
 
     return matrix, shift, t_flag
 
 
-def general_positions_to_matrix(general_positions: str|list):
+def general_positions_to_matrix(general_positions: str|list, variables=('x', 'y', 'z')):
     """
     analyse general positions
     format: '1 x,y,z,+1'
@@ -140,7 +169,7 @@ def general_positions_to_matrix(general_positions: str|list):
     """
     if isinstance(general_positions, str):
         lines = general_positions.strip().split('\n')
-        lines = [re.split(r'\s+', line)[1] for line in lines]
+        lines = [re.split(r'\s+', line, maxsplit=1)[1] for line in lines]
     else:
         lines = general_positions
     gp_matrices = []
@@ -148,7 +177,7 @@ def general_positions_to_matrix(general_positions: str|list):
 
     for line in lines:
         # input should be like "x+1/2,-y+1/2,z,1"
-        matrix, shift, t_flag = parse_single_coords(line)
+        matrix, shift, t_flag = parse_single_coords(line, variables=variables)
         gp_matrices.append([matrix, shift])
         timereversal.append(t_flag)
 
@@ -241,7 +270,7 @@ def generate_point_group(generators):
         if not in_group(current, group):
             group.append(current)
             for g in group:
-                # 两种乘法顺序都尝试，构造闭包
+                # Try both multiplication orders while building the closure.
                 prod1 = np.dot(current, g)
                 prod2 = np.dot(g, current)
                 queue.append(prod1)

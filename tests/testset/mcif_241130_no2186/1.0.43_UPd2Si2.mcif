@@ -1,0 +1,133 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-03
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys. F: Met. Phys."
+_citation_journal_volume        11
+_citation_page_first            1225
+_citation_page_last             ?
+_citation_article_id            ?
+_citation_year                  1981
+_citation_DOI                   10.1088/0305-4608/11/6/009
+
+loop_
+_citation_author_name
+"H Ptasiewicz-Bak"
+"J Leciejewicz"
+"A Zygmunt"
+
+_atomic_positions_source_database_code_ICSD  108867
+_atomic_positions_source_other               .
+
+_temperature_position_structure         293
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  150(4)
+_experiment_temperature  80
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD4  2  1  special  primary  1  .
+mGM3+   1  1   .      secondary   1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 293K
+FM along c
+The propagation vector is given in the paper as (0,0,0.662(10)). Here it is considered to be commensurate (0,0,2/3), which is within the reported error.
+The paper also reports the structure determined at 4.2K. A rather different model having an additional AFM component with propagation vector (0,0,1) (see entry #2.65), which results in a different MSG.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special direction as primary
+A k=0 secondary irrep component (3rd harmonic) is symmetry allowed, but not present in the model. It is the FM mode along c allowed by the MSG. Weak FM along c is to be expected.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 2/3]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,3c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  139.537
+_space_group_magn.name_BNS  "I 4/m m' m'"
+_cell_length_a             4.09700
+_cell_length_b             4.09700
+_cell_length_c             30.13800
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x,z,+1 
+3 y,-x,z,+1 
+4 -x,-y,z,+1 
+5 -x,-y,-z,+1 
+6 y,-x,-z,+1 
+7 -y,x,-z,+1 
+8 x,y,-z,+1 
+9 x,-y,-z,-1 
+10 -x,y,-z,-1 
+11 y,x,-z,-1 
+12 -y,-x,-z,-1 
+13 -x,y,z,-1 
+14 x,-y,z,-1 
+15 -y,-x,z,-1 
+16 y,x,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Pd1_1 Pd 0.00000 0.50000 0.08333
+Pd1_2 Pd  0.50000 0.00000 0.25000
+U1_1 U 0.00000 0.00000 0.00000
+U1_2 U  0.50000 0.50000 0.16667
+Si1_1 Si 0.00000 0.00000 0.12720
+Si1_2 Si  0.50000 0.50000 0.29387
+Si1_3 Si  0.50000 0.50000 0.03947
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+U1_1 0.00000 0.00000 2.55(10) 0,0,mz  2.55(10)
+U1_2 0.00000 0.00000 -1.275 0,0,mz    1.275
+

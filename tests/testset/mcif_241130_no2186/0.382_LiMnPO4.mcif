@@ -1,0 +1,119 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/10/2020
+
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        59
+_citation_page_first            5883
+_citation_page_last             5895
+_citation_article_id            .
+_citation_year                  2020
+_citation_DOI                   10.1021/acs.inorgchem.9b03545
+
+loop_
+_citation_author_name
+"S. Gnewuch"
+"E.E. Rodriguez"
+
+
+
+_atomic_positions_source_database_code_ICSD   .
+_atomic_positions_source_other               .
+
+_transition_temperature     33.7(2)
+_experiment_temperature     10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1- 1 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+See also Urusova et al (Ferroelectrics 509, 74 (2017); DOI:10.1080/00150193.2017.1293442)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic structure (8 possible)
+1-dim irrep as primary
+Symmetry-allowed linear magnetoelectricity
+;
+
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  62.449
+_space_group_magn.name_BNS  "P n' m' a'"
+_space_group_magn.point_group_name  "m'm'm'"
+_space_group_magn.point_group_number  "8.5.28"
+_cell_length_a                 10.4264(3)
+_cell_length_b                 6.0909(2)
+_cell_length_c                 4.7310(1)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z+1/2,+1
+3 -x,y+1/2,-z,+1
+4 -x+1/2,-y,z+1/2,+1
+5 -x,-y,-z,-1
+6 -x+1/2,y+1/2,z+1/2,-1
+7 x,-y+1/2,z,-1
+8 x+1/2,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Li1 Li 0.00000 0.00000 0.00000 1
+Mn1 Mn 0.2795(6) 0.25 0.976(1) 1
+P1 P 0.0920(5) 0.25 0.413(1) 1
+O1 O 0.0957(4) 0.25 0.734(1) 1
+O2 O 0.4545(3) 0.25 0.212(1) 1
+O3 O 0.1622(3) 0.0495(4) 0.2765(8) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 4.28(3) 0.0 0.0 mx,0,mz
+

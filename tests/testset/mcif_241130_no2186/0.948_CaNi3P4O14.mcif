@@ -1,0 +1,144 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/25/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ca1 Ni3 P4 O14"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        93
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            184409
+_citation_year                  2016
+_citation_DOI                   10.1103/PhysRevB.93.184409
+
+loop_
+_citation_author_name
+"A. K. Bera"
+"S. M. Yusuf"
+"A. Kumar"
+"M. Majumder"
+"K. Ghoshray"
+"L. Keller"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  4626
+_atomic_positions_source_other               .
+
+_transition_temperature     16
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+ 1 1 . primary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at room temperature
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+FM along b
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  14.75
+_space_group_magn.name_BNS  "P 2_1/c"
+_space_group_magn.point_group_name  "2/m"
+_space_group_magn.point_group_number  "5.1.12"
+_cell_length_a                 7.30910
+_cell_length_b                 7.55740
+_cell_length_c                 9.35450
+_cell_angle_alpha              90.00
+_cell_angle_beta               111.99
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y+1/2,-z+1/2,+1 
+3 -x,-y,-z,+1 
+4 x,-y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ca1 Ca 0.50000 0.00000 0.00000 1
+Ni1 Ni 0.18400 0.62050 0.02370 1
+Ni2 Ni 0.00000 0.00000 0.00000 1
+P1 P 0.87940 0.70210 0.19100 1
+P2 P 0.60480 0.43330 0.20930 1
+O1 O 0.39210 0.47780 0.19630 1
+O2 O 0.01060 0.20980 0.13460 1
+O3 O 0.97280 0.57810 0.11710 1
+O4 O 0.67310 0.62470 0.17340 1
+O5 O 0.61960 0.29990 0.08680 1
+O6 O 0.27180 0.88320 0.13230 1
+O7 O 0.82850 0.88010 0.10330 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ni1 -0.13(6) 0.18(10) 1.92(4) mx,my,mz 1.98(4) ? ?
+Ni2 0.16(10) 0.18(10) 2.01(6) mx,my,mz 1.96(6) ? ?
+

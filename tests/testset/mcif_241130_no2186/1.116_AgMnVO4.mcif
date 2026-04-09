@@ -1,0 +1,144 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:13:14
+# Database entry: 1.116 AgMnVO4
+# Cif-like file for the case 1.116
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ag Mn V O4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Solid State Chemistry"
+_citation_journal_volume        221
+_citation_page_first            306
+_citation_page_last             310
+_citation_article_id            .
+_citation_year                  2015
+_citation_DOI                   10.1016/j.jssc.2014.09.017
+
+loop_
+_citation_author_name
+"H.B. Yahia"
+"M. Shikano"
+"E. Gaudin"
+"M. Avdeev"
+"C.D. Ling"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   246202
+_atomic_positions_source_other               .
+
+_transition_temperature     12.1
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mU1+U4+ 2 2 . primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+One single physically irreducible active irrep, sum of two conjugate mathematically irreducible ones.
+Non-collinear model. The model forces the two symmetry-independent Mn sites to have their x and z spin components coupled with opposite signs.
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-1/2a+1/2c;0,0,0'
+
+
+_space_group_magn.number_BNS  11.55
+_space_group_magn.name_BNS  "P_a  2_1/m"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 19.15560
+_cell_length_b                 6.85180
+_cell_length_c                 10.74680
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,-z,+1
+3 -x,-y,-z,+1
+4 x,-y+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z+1/2,+1
+3 x+1/2,y,z,-1
+4 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ag1_1 Ag 0.17500 0.25000 0.00110 1
+Ag1_2 Ag 0.07500 0.75000 0.25110 1
+Mn1_1 Mn 0.00000 0.00000 0.00000 1
+Mn1_2 Mn 0.25000 0.00000 0.25000 1
+V1_1 V 0.34010 0.25000 0.01200 1
+V1_2 V 0.90990 0.75000 0.26200 1
+O1_1 O 0.42750 0.25000 0.02200 1
+O1_2 O 0.82250 0.75000 0.27200 1
+O2_1 O 0.31700 0.25000 0.35950 1
+O2_2 O 0.93300 0.75000 0.60950 1
+O3_1 O 0.30600 0.45400 0.08350 1
+O3_2 O 0.94400 0.54600 0.33350 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1_1 2.73(8) 0.0 -2.93(8) mx,my,mz
+Mn1_2 -2.73 0.0 -2.93 mx,my,mz
+

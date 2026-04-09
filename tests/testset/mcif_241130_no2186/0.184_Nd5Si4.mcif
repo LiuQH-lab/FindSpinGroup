@@ -1,0 +1,119 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 20/03/2018 01:30:09
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        14
+_citation_page_first            7191
+_citation_page_last             7200
+_citation_article_id            ?
+_citation_year                  2002
+_citation_DOI                   10.1088/0953-8984/14/30/309
+
+loop_
+_citation_author_name
+"J.M. Cadogan"
+"D.H. Ryan"
+"Z. Altounian"
+"H.B. Wang"
+"I.P. Swainson"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  190404
+_atomic_positions_source_other               .
+
+_transition_temperature  66
+_experiment_temperature  12
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3  1  1  .  primary  8  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Canted ferromagnet
+;
+
+_active_magnetic_irreps_details
+;
+k-maximal magnetic symmetry
+The relative sign of the mx,my components of Nd1 are inconsistent with the reported irrep. This is corrected here, but this implies that the global direction of this spin, relative to those of Nd2 and Nd3 depends on the arbitrary choice made for this correction (my has been changed to negative)
+;
+
+_parent_space_group.name_H-M_alt  'P  4_1  2_1  2'
+_parent_space_group.IT_number                       92
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  92.114
+_space_group_magn.name_BNS  "P4_12_1'2'"
+_cell_length_a             7.87600
+_cell_length_b             7.87600
+_cell_length_c             14.80100
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+1/2,x+1/2,z+1/4,+1
+3 y+1/2,-x+1/2,z+3/4,+1
+4 -x,-y,z+1/2,+1
+5 x+1/2,-y+1/2,-z+3/4,-1
+6 -x+1/2,y+1/2,-z+1/4,-1
+7 y,x,-z,-1
+8 -y,-x,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Nd1 Nd 0.19010 0.19010 0.00000
+Nd2 Nd 0.01420 0.13260 0.61920
+Nd3 Nd 0.98610 0.36670 0.20250
+Si1 Si 0.05290 0.28100 0.80700
+Si2 Si 0.28260 0.32700 0.69260
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd1 0.36(4) -0.36 2.34(6) mx,-mx,mz
+Nd2 0.33(4) 0.43(4) 2.41(6) mx,my,mz
+Nd3 1.38(4) 0.58(4) 2.35(6) mx,my,mz
+
+

@@ -1,0 +1,161 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/11/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-09-11
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ba3 Co1 Nb2 O9"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Chem. Mater."
+_citation_journal_volume        34
+_citation_page_first            6617
+_citation_page_last             6625
+_citation_article_id            .
+_citation_year                  2022
+_citation_DOI                   10.1021/acs.chemmater.2c0157
+
+loop_
+_citation_author_name
+"J. Jiao"
+"S. Zhang"
+"Q. Huang"
+"M. Zhang"
+"M.F. Shu"
+"G. T. Lin"
+"C. R. de la Cruz"
+"V. O. Garlea"
+"N. Butch"
+"M. Matsuda"
+"H. Zhou"
+"J. Ma"
+
+_temperature_position_structure         1.5
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            0.244
+
+_atomic_positions_source_database_code_ICSD  193962
+_atomic_positions_source_other               .
+
+_transition_temperature     1.10
+_experiment_temperature     0.244
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mH3 4 2 special primary 1 .
+mA1- 1 1 . secondary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure, except cell parameters, is not given. Here that reported by another study at 1.5K, and retrieved from the ICSD is used, except for the unit cell parameters, which are taken from the reference. 
+Two phase transitions at 1.36K and 1.10K are mentioned
+Magnetic ordering breaks inversion symmetry and yields a polar MSG, which allows spontaneous electric polarization (multiferroic of type II if insulator).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+4-dim irrep along a special direction as primary
+Symmetry-allowed secondary irrep  mA1- with k2=3k1=(0,0,1/2), corresponding to the z component of the Ni moments not observed.
+;
+
+_parent_space_group.name_H-M_alt  'P -3 m 1'
+_parent_space_group.IT_number                       164
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2/3a+1/3b,-1/3a+1/3b,c;2/9,1/9,0'
+
+_space_group_magn.number_BNS  159.64
+_space_group_magn.name_BNS  "P_c 3 1 c"
+_space_group_magn.point_group_name  "3m1'"
+_space_group_magn.point_group_number  "19.2.69"
+_cell_length_a                 17.313
+_cell_length_b                 17.313
+_cell_length_c                 14.162
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y+1/3,x-y,z,+1 
+3 -x+y+1/3,-x+1/3,z,+1 
+4 -y+1/3,-x+1/3,z+1/2,+1 
+5 x,x-y,z+1/2,+1 
+6 -x+y+1/3,y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/3,y+2/3,z,+1 
+3 x+2/3,y+1/3,z,+1 
+4 x,y,z+1/2,-1 
+5 x+1/3,y+2/3,z+1/2,-1 
+6 x+2/3,y+1/3,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0.00000 0.00000 0.00000 1
+Ba2_1 Ba 0.11111 0.22222 0.33065 1
+Ba2_2 Ba 0.22222 0.11111 0.66935 1
+Ba2_3 Ba 0.22222 0.44444 0.66935 1
+Co1 Co 0.00000 0.00000 0.25000 1
+Nb1_1 Nb 0.11111 0.22222 0.08755 1
+Nb1_2 Nb 0.22222 0.11111 0.91245 1
+Nb1_3 Nb 0.22222 0.44444 0.91245 1
+O1_1 O 0.16667 0.00000 0.00000 1
+O1_2 O 0.00000 0.16667 0.00000 1
+O2_1 O 0.05590 0.94410 0.16595 1
+O2_2 O 0.88820 0.94410 0.16595 1
+O2_3 O 0.94410 0.05590 0.83405 1
+O2_4 O 0.11180 0.05590 0.83405 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Co1 1.18 0.59 0.0 2my,my,mz 1.02(5) ? ?
+

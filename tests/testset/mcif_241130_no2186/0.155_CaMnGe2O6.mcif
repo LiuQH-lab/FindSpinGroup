@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:03:03
+# Database entry: 0.155 CaMnGe2O6
+# Cif-like file for the case 0.155
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ca Mn Ge2 O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Solid State Chemistry"
+_citation_journal_volume        181
+_citation_page_first            3163
+_citation_page_last             3176
+_citation_article_id            .
+_citation_year                  2008
+_citation_DOI                   10.1016/j.jssc.2008.08.014
+
+loop_
+_citation_author_name
+"G.J. Redhammer"
+"G. Roth"
+"W. Treutmann"
+"W. Paulus"
+"G. Andre"
+"C. Pietzonka"
+"G. Amthauer"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     11.6
+_experiment_temperature     1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2- 1 1 . primary 2 .
+mGM1- 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim primary irreps active
+The small mz component corresponds to a different irrep (GM1-) than the mx,mz components.
+An alternative structure with my=0 of higher symmetry(C2'/c) and a single irrep active has been proposed in Phys. Rev. B (2016) 93, 064423. However, the argument discarding the present model of lower symmetry, because it would be incompatible with the observed magnetolectricity is incorrect (an erroneous symmetry is attributed to the structure). In fact, the lower symmetry P-1' model implies a less constrained linear magnetoelectricity.
+;
+
+_parent_space_group.name_H-M_alt  'C  2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,-1/2a+1/2b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  2.6
+_space_group_magn.name_BNS  "P  -1'"
+_space_group_magn.point_group_name  "-1'"
+_space_group_magn.point_group_number  "2.3.5"
+_cell_length_a                 10.26670
+_cell_length_b                 9.14520
+_cell_length_c                 5.45990
+_cell_angle_alpha              90.00
+_cell_angle_beta               104.07
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.90320 0.25000 1
+Ca1 Ca 0.00000 0.30420 0.25000 1
+Ge1_1 Ge 0.28530 0.09790 0.23130 1
+Ge1_2 Ge 0.71470 0.09790 0.26870 1
+O1_1 O 0.11320 0.09610 0.14780 1
+O1_2 O 0.88680 0.09610 0.35220 1
+O2_1 O 0.36770 0.25710 0.34990 1
+O2_2 O 0.63230 0.25710 0.15010 1
+O3_1 O 0.35360 0.02860 0.98060 1
+O3_2 O 0.64640 0.02860 0.51940 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 4.24(7) 0.78(9) 1.11(7) mx,my,mz
+

@@ -1,0 +1,133 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/11/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-11-07
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        98
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            134416
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.98.134416
+
+loop_
+_citation_author_name
+"J. Liu"
+"J. Wang"
+"J. Sheng"
+"F. Ye"
+"K.M. Taddei"
+"J.A. Fernandez-Baca"
+"W. Luo"
+"G.-A. Sun"
+"Z.-C. Wang"
+"H. Jiang"
+"G.-H. Cao"
+"W. Bao"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  291
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM5+  2  2  general  primary  4  .
+mX2+  2  1    .      primary  2  .
+mX1+  2  1    .      secondary 1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Between 590K and 291K only the Cr2 site is magnetically ordered with the moments along z. Below 291K Cr1 also orders with a different propagation vector and a spin flip of the direction of the Cr2 moments also takes place.
+Described in an oblique unit cell with respect to the parent tetragonal one.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k maximal symmetry
+Two irreps as primary. One for the ordering of Cr2 and another for the order of Cr1.
+The Cr2 spin arrangement according to the M5+ irrep, although allowed by the MSG to be along a general direction of the irrep is restricted to a special direction, maintaining the relative collinear ordering observed in the magnetic phase above 291K.
+The irrep mX2+ has two k-vectors in its star. The possibility of a 2k spin arrangement of the Cr1 moments according to this primary irrep, which could equally fit the data and would result in a MSG of type I allowing weak FM was apparently not considered in the original article.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+k2 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+b,c;0,1,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;1/2,-1/2,0'
+
+
+
+_space_group_magn.number_BNS  14.84
+_space_group_magn.name_BNS  "P_C 2_1/c"
+_cell_length_a             5.65530
+_cell_length_b             5.65530
+_cell_length_c             18.71510
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y,z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,y,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Sr1 Sr 0.50000 0.50000 0.41130
+As1 As 0.50000 0.50000 0.83080
+Cr1 Cr 0.50000 0.50000 0.00000
+Cr2_1 Cr 0.25000 0.75000 0.25000
+Cr2_2 Cr 0.75000 0.75000 0.75000
+O1_1 O 0.25000 0.75000 0.00000
+O1_2 O 0.75000 0.75000 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Cr1 0.00000 0.00000 3.10(6) mx,my,mz  3.10(6)
+Cr2_1 -1.55 -1.55 0.00000 mx,my,0     2.19(4)
+Cr2_2 1.55 1.55 0.00000 mx,my,0       2.19
+
+

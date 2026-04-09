@@ -1,0 +1,158 @@
+#\#CIF_2.0 
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/23/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-09-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ce Ir (In0.97Cd0.03)5"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        101
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            195146
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevB.101.195146
+
+loop_
+_citation_author_name
+"K. Beauvois"
+"N. Qureshi"
+"R. Tsunoda"
+"Y. Hirose"
+"R. Settai"
+"D. Aoki"
+"P. Rodiere"
+"A. McCollam"
+"I. Sheikin"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            10
+
+_atomic_positions_source_database_code_ICSD  150225
+_atomic_positions_source_other               .
+
+_transition_temperature     3
+_experiment_temperature     1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA3+ 1  1  . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure except cell parameters is not provided. Here the position of one of the In/Cd sites has been taken from the a different study at room temperature of the pure compound CeIrIn5.
+The cell parameters are from a determination at 10K. 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m m m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a-1/2b,1/2a+1/2b,c;0,0,0'
+
+_space_group_magn.number_BNS  140.550
+_space_group_magn.name_BNS  "I_c 4/m c m"
+_space_group_magn.point_group_name  "4/mmm1'"
+_space_group_magn.point_group_number  "15.2.54"
+_cell_length_a                 9.29820
+_cell_length_b                 9.29820
+_cell_length_c                 14.98520
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x,z,+1 
+3 y,-x,z,+1 
+4 -y,-x,-z+1/2,+1 
+5 y,x,-z+1/2,+1 
+6 -x,-y,z,+1 
+7 x,-y,-z+1/2,+1 
+8 -x,y,-z+1/2,+1 
+9 -x,-y,-z,+1 
+10 y,-x,-z,+1 
+11 -y,x,-z,+1 
+12 y,x,z+1/2,+1 
+13 -y,-x,z+1/2,+1 
+14 x,y,-z,+1 
+15 -x,y,z+1/2,+1 
+16 x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x+1/2,y,z+1/2,+1 
+4 x+1/2,y+1/2,z,+1 
+5 x,y,z+1/2,-1 
+6 x,y+1/2,z,-1 
+7 x+1/2,y,z,-1 
+8 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ce1 Ce 0.00000 0.00000 0.00000 1.
+Ir1 Ir 0.00000 0.00000 0.25000 1.
+In1 In 0.25000 0.25000 0.00000 0.97
+Cd1 Cd 0.25000 0.25000 0.00000 0.03
+In2 In 0.00000 0.25000 0.15262 0.97
+Cd2 Cd 0.00000 0.25000 0.15262 0.03
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ce1 0.0 0.0 0.47(3) 0,0,mz 0.47(3) ?  ?
+

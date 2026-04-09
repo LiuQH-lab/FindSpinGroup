@@ -1,0 +1,147 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:07:31
+# Database entry: 1.38 Nd2NaOsO6
+# Cif-like file for the case 1.38
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Nd2 Na Os O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        88
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            014413
+_citation_year                  2013
+_citation_DOI                   10.1103/physrevb.88.014413
+
+loop_
+_citation_author_name
+"A.A. Aczel"
+"D.E. Bugaris"
+"J. Yeon"
+"C. de la Cruz"
+"H.-C. zur Loye"
+"S.E. Nagler"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     16.2
+_experiment_temperature     4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mD1+D2+ 2 2 general primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+parent space in non-standard P12_1/n1
+k-vector given in the non-standard parent setting
+k-vector=(0 1/2 1/2) in the standard P121/c1 setting
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-1/2a+1/2b,b;0,0,0'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S  -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 11.0259
+_cell_length_b                 11.7864
+_cell_length_c                 7.9242
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.8715
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x+1/2,y,z,-1
+4 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Nd1_1 Nd 0.24090 0.03490 0.25330 1
+Nd1_2 Nd 0.00910 0.28490 0.24670 1
+Na1_1 Na 0.00000 0.00000 0.00000 1
+Na1_2 Na 0.75000 0.25000 0.50000 1
+Os1_1 Os 0.00000 0.00000 0.50000 1
+Os1_2 Os 0.75000 0.25000 0.00000 1
+O1_1 O 0.10430 0.16340 0.05040 1
+O1_2 O 0.64570 0.41340 0.44960 1
+O2_1 O 0.80775 0.22490 0.23070 1
+O2_2 O 0.94225 0.47490 0.26930 1
+O3_1 O 0.66900 0.39025 0.06580 1
+O3_2 O 0.58100 0.14025 0.43420 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd1_1 0.2(2) 1.16(9) -1.1(1) mx,my,mz
+Nd1_2 -0.2(2) 1.16(9) 1.1(1) mx,my,mz
+Os1_1 0.0 -0.9(1) 0.0 mx,my,mz
+Os1_2 0.0 -0.9(1) 0.0 mx,my,mz
+

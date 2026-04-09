@@ -1,0 +1,172 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/25/2022
+# with additional data provided by O. Garlea
+
+data_5yOhtAoR
+_audit_creation_date            2022-07-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Na1 Co2 Se1 O7 H1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Inorg. Chem. Front."
+_citation_journal_volume        9
+_citation_page_first            4329
+_citation_page_last             4340
+_citation_article_id            .
+_citation_year                  2022
+_citation_DOI                   10.1039/d2qi01072k
+
+loop_
+_citation_author_name
+"L. D. Sanjeewa"
+"V. O. Garlea"
+"K. M. Taddei"
+"L. Yin"
+"J. Xing"
+"R. S. Fishman"
+"D. S. Parker"
+"A. S. Sefat"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     6
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+ 1 1 . primary 4 .
+mGM3- 1 1 . secondary 1 no
+mX2   2 2 special primary 7 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Atomic positions are from Rietveld refinements using neutron powder data at 1.5 K.
+Non-centrosymmetric MSG
+FM along b. Polar along c
+Two primary order parameters are active. They transform according to two different irreps with different k-vectors.
+Between 11K and 6K another magnetic phase with only Co2 ordered with a single active irrep mGM4+ (Pn'ma') is reported.
+The additional symmetry break produced by the second order parameter transforming according to mX2 splits the Co1 and Co2 sites of the previous Pn'ma' phase into two independent sites. 
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Two primary irreps involved
+A secondary irrep is symmetry-allowed, but not present.
+The my components of both Co1 and Co2 are ordered according to the irrep mGM4+ (k1=0), while the mx and mz components of both sites are arranged according to irrep mX2 (k2=(1/2,0,0)).
+The correlation present in the model of the mx,mz values for the two split Co1 sites is not forced by the irrep mX2. 
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;7/8,0,0'
+
+_space_group_magn.number_BNS  33.146
+_space_group_magn.name_BNS  "P n' a 2_1'"
+_space_group_magn.point_group_name  "m'm2'"
+_space_group_magn.point_group_number  "7.3.22"
+_cell_length_a     26.3975(6)
+_cell_length_b     6.00765(11)
+_cell_length_c     8.31027(16)
+_cell_angle_alpha  90.0000
+_cell_angle_beta   90.0000
+_cell_angle_gamma  90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,z,+1 
+3 -x+3/4,-y,z+1/2,-1 
+4 -x+1/4,y+1/2,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+ Na1_1 Na  0.12510  0.25000  0.86810 1
+ Na1_2 Na  0.87490  0.75000  0.13190 1
+ Co1_1 Co  0.05475  0.25000  0.21130 1
+ Co1_2 Co  0.94525  0.75000  0.78870 1
+ Co2_1 Co  0.00000  0.00000  0.50000 1
+ Co2_2 Co  0.25000  0.00000  0.00000 1
+ Se1_1 Se  0.16465  0.25000  0.22510 1
+ Se1_2 Se  0.83535  0.75000  0.77490 1
+ Se2_1 Se  0.48735  0.25000  0.88180 1
+ Se2_2 Se  0.51265  0.75000  0.11820 1
+ O1_1 O  0.05095  0.25000  0.46280   1
+ O1_2 O  0.94905  0.75000  0.53720   1
+ H1_1 H  0.07850  0.25000  0.52900   1
+ H1_2 H  0.92150  0.75000  0.47100   1
+ O2_1 O  0.19560  0.25000  0.04310   1
+ O2_2 O  0.80440  0.75000  0.95690   1
+ O3_1 O  0.04495  0.25000  0.96770   1
+ O3_2 O  0.95505  0.75000  0.03230   1
+ O4_1 O  0.49270  0.03020  0.75300   1
+ O4_2 O  0.75730  0.96980  0.25300   1
+ O4_3 O  0.50730  0.53020  0.24700   1
+ O4_4 O  0.74270  0.46980  0.74700   1
+ O5_1 O  0.12280  0.04130  0.19550   1
+ O5_2 O  0.12720  0.95870  0.69550   1
+ O5_3 O  0.87720  0.54130  0.80450   1
+ O5_4 O  0.37280  0.45870  0.30450   1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Co1_1 -0.60(1) -0.2(1) 1.15(4) mx,my,mz 1.32 ? ?
+Co1_2 -0.60(1) -0.2(1) 1.15(4) mx,my,mz 1.32 ? ?
+Co2_1 2.09(3) 1.46(1) 1.53(1) mx,my,mz 2.97 ? ?
+Co2_2 -2.09(3) 1.46(1) 1.53(1) mx,my,mz 2.97 ? ?
+

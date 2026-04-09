@@ -1,0 +1,162 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/23/2025
+# From a file submitted by F. Orlandi
+
+data_5yOhtAoR
+_audit_creation_date            2025-01-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Fe1 Lu1 O6 W1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        108
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            014435
+_citation_year                  2023
+_citation_DOI                   10.1103/PhysRevB.108.014435
+
+loop_
+_citation_author_name
+"S. Mishra"
+"P. Yanda"
+"F. Orlandi"
+"P. Manuel"
+"H.-J. Koo"
+"M.-H. Whangbo"
+"A. Sundaresan"
+
+
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_position_structure         .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     11.8
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT1 2 2 special primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from refinement at 1.5K using the parent space group
+The structure is described in the standard setting of the MSG, with axes interchanged and origin shifted with respect to the standard parent Pna2_1 setting.
+Strongly Non-collinear magnetic structure.
+The magnetic transition split the Fe orbit in two indipendent sites.
+The magnetic order parameter induces a ferroelectric distortion with polarization along the a axis as secondary order parameter. The latter transform as the GM4 irrep of the parent Pna21 space group.
+The paramagnetic structure is polar but only pyroelectric.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic struture
+k-maximal magnetic symmetry
+2-dim irrep along a special direction
+magnetically induced ferroelectricity along the a axis 
+;
+
+_parent_space_group.name_H-M_alt  'P n a 21'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2c,2b,-a;0,1/4,1/4'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  9.41
+_space_group_magn.name_BNS  "C_a c"
+_space_group_magn.point_group_name  "m.1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 14.61020(19)
+_cell_length_b                 10.19989(14)
+_cell_length_c                 10.95442(15)
+_cell_angle_alpha              90
+_cell_angle_beta               90
+_cell_angle_gamma              90
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z,-1 
+3 x+1/2,y+1/2,z,+1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_adp_type
+_atom_site_U_iso_or_equiv
+_atom_site_occupancy
+Lu_1 Lu  0.7549(14) 0.3961(8)   0.0435(12) Uiso 0.0098(5) 1
+Lu_2 Lu  0.0049(15) 0.3539(7)  -0.0435(11) Uiso 0.0098(5) 1
+Fe1_1 Fe 0.6211(14) 0.1411(4)   0.1373(11) Uiso 0.0073(6) 1
+Fe1_2 Fe 0.8711(14) 0.1089(5)   0.8627(11) Uiso 0.0073(6) 1
+W1_1 W   0.6288(16) 0.4024(10)  0.3525(14) Uiso 0.0011(8) 1
+W1_2 W   0.8788(15) 0.3476(11)  0.6475(15) Uiso 0.0011(8) 1
+O1_1 O   0.6465(15) 0.2401(11) -0.0266(14) Uiso 0.0106(4) 1
+O1_2 O   0.8965(14) 0.0099(9)   0.0266(12) Uiso 0.0106(4) 1
+O2_1 O   0.6005(16) 0.0032(10)  0.5247(14) Uiso 0.0106(4) 1
+O2_2 O   0.8505(16) 0.2468(10)  0.4753(13) Uiso 0.0106(4) 1
+O3_1 O   0.6599(15) 0.3207(9)   0.2133(12) Uiso 0.0106(4) 1
+O3_2 O  -0.0901(15) 0.4293(7)   0.7867(12) Uiso 0.0106(4) 1
+O4_1 O   0.5906(14) 0.06445(9)  0.2935(13) Uiso 0.0106(4) 1
+O4_2 O   0.8406(14) 0.1856(10)  0.7065(13) Uiso 0.0106(4) 1
+O5_1 O   0.7532(17) 0.0906(10)  0.1433(13) Uiso 0.0106(4) 1
+O5_2 O   0.0032(15) 0.1594(8)   0.8567(12) Uiso 0.0106(4) 1
+O6_1 O   0.4974(16) 0.2193(7)   0.1167(12) Uiso 0.0106(4) 1
+O6_2 O   0.7474(15) 0.0306(8)   0.8833(13) Uiso 0.0106(4) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1_1 -1.59(6) 0.0 3.06(3)  mx,my,mz 3.44(6) ? ?
+Fe1_2 -0.82(8) 3.03(2) 1.40(7) mx,my,mz 3.44(10) ? ?
+

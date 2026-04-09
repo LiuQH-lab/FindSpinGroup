@@ -1,0 +1,152 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/18/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-11-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Y Fe6 Sn6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "JOURNAL OF APPLIED PHYSICS"
+_citation_journal_volume        87
+_citation_page_first            6046
+_citation_page_last             6048
+_citation_article_id            .
+_citation_year                  2000
+_citation_DOI                   10.1063/1.372607
+
+loop_
+_citation_author_name
+"J. M. Cadogan"
+"Suharyana"
+"D. H. Ryan"
+"O. Moze"
+"W. Kockelmann"
+
+_temperature_position_structure         593
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  190220
+_atomic_positions_source_other               .
+
+_transition_temperature     558
+_experiment_temperature     293
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1- 1 1 . primary 9 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Relative signs of the four symmetry independent Fe moments are not specified. Here they have been inferred from a comparison with the model for ErFe6Ge6  (see #1.632), which is mentioned in the paper, and the comments in the text on the Mossbauer results.
+Moment magnitude is reported to increase to 2.14(6) at 4K.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'I m m m'
+_parent_space_group.IT_number                       71
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,1/4,1/4'
+
+_space_group_magn.number_BNS  48.264
+_space_group_magn.name_BNS  "P_I n n n"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 8.90210
+_cell_length_b                 27.98910
+_cell_length_c                 5.39320
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,-z,+1 
+3 -x,y,-z,+1 
+4 -x,-y,z,+1 
+5 -x+1/2,-y+1/2,-z+1/2,+1 
+6 -x+1/2,y+1/2,z+1/2,+1 
+7 x+1/2,-y+1/2,z+1/2,+1 
+8 x+1/2,y+1/2,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Y1 Y 0.00000 0.00000 0.00000 1
+Y2 Y 0.00000 0.16740 0.50000 1
+Fe1 Fe 0.74580 0.50000 0.00000 1
+Fe2 Fe 0.25000 0.25000 0.25000 1
+Fe3 Fe 0.75350 0.83450 0.00000 1
+Fe4 Fe 0.24830 0.08370 0.24470 1
+Sn1 Sn 0.31500 0.00000 0.00000 1
+Sn2 Sn 0.00000 0.55540 0.00000 1
+Sn3 Sn 0.00000 0.11280 0.00000 1
+Sn4 Sn 0.00000 0.22450 0.00000 1
+Sn5 Sn 0.00000 0.05640 0.50000 1
+Sn6 Sn 0.00000 0.61000 0.50000 1
+Sn7 Sn 0.00000 0.72210 0.50000 1
+Sn8 Sn 0.83990 0.66810 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 -2.03(7) 0.0 0.0 mx,0,0 2.03(7) ? ?
+Fe2 2.03(7) 0.0 0.0 mx,my,mz 2.03(7) ? ?
+Fe3 -2.03(7) 0.0 0.0 mx,my,0 2.03(7) ? ?
+Fe4 2.03(7) 0.0 0.0 mx,my,mz 2.03(7) ? ?
+

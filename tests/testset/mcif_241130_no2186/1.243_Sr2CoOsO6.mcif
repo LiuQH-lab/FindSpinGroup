@@ -1,0 +1,128 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-13
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Amer. Chem. Soc."
+_citation_journal_volume        135
+_citation_page_first            18824
+_citation_page_last             18830
+_citation_article_id            ?
+_citation_year                  2013
+_citation_DOI                   10.1021/ja407342w
+
+loop_
+_citation_author_name
+"R. Morrow"
+"R. Mishra"
+"O.D. Restrepo"
+"M.R. Ball"
+"W. Windl"
+"S. Wurmehl"
+"U. Stockert"
+"B. Buchner"
+"P.M. Woodward"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  108
+_experiment_temperature  80
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mV1+  2  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+below 70K another magnetic phase exists where the Co spins are also ordered with a different k-vector (see #2.25). Other models with only the Co spins ordered or with both Co and Os ordered gave only slightly worse fits.
+See (Yan et al., Phys. Rev. Let. 112, 147202 (2014)) for a completely different model for this phase (see #0.210), including a different space group for the underlying atomic positions.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (1 possible)
+2 vectors in the irrep star. Only one vector active. 1-dim small irrep star.
+irrep label corresponds to a standard setting for the parent space group (k=(1/2,1/2,0) in the standard setting).
+;
+
+_parent_space_group.name_H-M_alt  'I 2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a+c,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,-1/4a+1/4b-1/2c,-1/2a-1/2b-c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             11.01580
+_cell_length_b             11.01940
+_cell_length_c             8.02350
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.57
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/4,y+3/4,z+1/2,+1
+3 x+1/2,y+1/2,z,+1
+4 x+3/4,y+1/4,z+1/2,+1
+5 x+3/4,y+3/4,z+1/2,-1
+6 x,y+1/2,z,-1
+7 x+1/4,y+1/4,z+1/2,-1
+8 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1 Sr 0.25000 0.00000 0.24990 1.
+Co1 Co 0.00000 0.00000 0.50000 1.
+Os1 Os 0.00000 0.00000 0.00000 1.
+O1 O 0.00000 0.00000 0.24230 1.
+O2_1 O 0.10280 0.14030 0.00000 0.5
+O2_2 O  0.89720 0.14030 0.00000 0.5
+O3_1 O 0.13875 0.39845 0.00000 0.5
+O3_2 O  0.86125 0.39845 0.00000 0.5
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 0.00000 0.00000 0.00000 mx,my,mz
+Os1 1.11 -1.11 0.00000 mx,my,mz

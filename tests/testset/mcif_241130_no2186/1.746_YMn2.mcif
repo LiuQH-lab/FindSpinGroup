@@ -1,0 +1,138 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/15/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-02-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Y1 Mn2"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Physica B"
+_citation_journal_volume        120
+_citation_page_first            212
+_citation_page_last             215
+_citation_article_id            .
+_citation_year                  1983
+_citation_DOI                   10.1016/0378-4363(83)90376-5
+
+loop_
+_citation_author_name
+"Y. Nakamura"
+"M. Shiga"
+"S. Kawano"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  643915
+_atomic_positions_source_other               .
+
+_transition_temperature     100
+_experiment_temperature     4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1 6 2 special primary 1 .
+mX2 6 2 special primary 2 .
+mX3 6 2 general primary 4 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Non-standard parent setting Fd-3m (origin choice 1)
+Cell parameters from a determination at room temperature by another work
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Three different irreps are necessarily involved as primary irreps in order to produce the collinear arrangement proposed in this model
+All three irreps have the same propagation vector, and the irrep star has three k-vectors. Possible multi-k orderings, which could equally fit the data, were not considered.
+Ballou et al. (Journal of Magnetism and Magnetic Materials 70 (1987) 129) have claimed subsequently that the phase is incommensurate
+;
+
+_parent_space_group.name_H-M_alt  'F d -3 m'
+_parent_space_group.IT_number                       227
+_parent_space_group.transform_Pp_abc  'a,b,c;1/8,1/8,1/8'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+b+1/2c,-1/2a+1/2c,1/2a+1/2c;0,-1/8,0'
+
+
+_space_group_magn.number_BNS  4.12
+_space_group_magn.name_BNS  "P_C 2_1"
+_space_group_magn.point_group_name  "21'"
+_space_group_magn.point_group_number  "3.2.7"
+_cell_length_a                 7.69200
+_cell_length_b                 7.69200
+_cell_length_c                 7.69200
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -z+3/4,-y+3/4,-x+1/4,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y+1/2,z+1/2,-1 
+4 x+1/2,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1_1 Mn 0.62500 0.62500 0.62500
+Mn1_2 Mn  0.37500 0.87500 0.12500
+Mn1_3 Mn  0.87500 0.12500 0.37500
+Y1 Y 0.25000 0.25000 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1_1 1.56 1.56 1.56 mx,mx,mz 2.7 ? ?
+Mn1_2 -1.56 -1.56 -1.56 mx,mx,mz 2.7 ? ?
+Mn1_3 1.56 1.56 1.56 mx,my,mz 2.7 ? ?
+

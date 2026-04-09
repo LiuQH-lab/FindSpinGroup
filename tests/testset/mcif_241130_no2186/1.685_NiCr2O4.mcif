@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/16/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-10-16
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ni1 Cr2 O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B?"
+_citation_journal_volume        91
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            024407
+_citation_year                  2015
+_citation_DOI                   10.1103/PhysRevB.91.024407
+
+loop_
+_citation_author_name
+"M. Reehuis"
+"M. Tovar"
+"D. M. Tobbens"
+"P. Pattison"
+"A. Hoser"
+"B. Lake"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  241305
+_atomic_positions_source_other               .
+
+_transition_temperature     24
+_experiment_temperature      2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM4 2 2 special primary 3 .
+mM3 2 2 special secondary 2 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+A very small structural distortion lowers the efective space group from I4_1/amd to Fddd. As this structural distortion is simultaneous with the first magnetic ordering and consistent with the resulting MSG, it can be considered an induced effect, and we keep here the tetragonal space group as the parent symmetry. The magnetic structure is however described in the paper within the Fddd setting, and this is mantained here
+In this phase, below 24K, two propagation vectors, k=0 and k=(0,0,1) in setting Fddd in parent tetragonal setting) are observed. It is not clear if they correspond to two coexisting phases or to a single phase. Here, for simplicity, we describe the two corresponding magnetic arrangements separately. The one corresponding to k=(0,0,1) is given here, which is the one detected below 24K.
+For the ferrimagnetic spin arrangement proposed for k=(0,0,0), which is stable up to 74K, see #0.893. 
+If indeed the two magnetic propagation vectors are present in a single phase, these two arrangements should be considered superposed on the same system.
+The direction of the AFM arrangement of this model is along the tetragonal axis of the parent symmetry. This is in contrast with the case of CuCr2O4, which is reported in the same paper, where the AFM component lies on the tetragonal basal plane.
+The paper reports two different AFM orderings, which could not be distinguished, and gave equal good fits. In fact these two arrangements correspond to twin related equivalent orderings, and for this reason gave equal fits. Here, the one that is shown in a figure of the paper has been chosen.
+The propagation vector (0,0,1) 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special direction
+A secondary irrep is symmetry-allowed, and not present.
+;
+
+_parent_space_group.name_H-M_alt  'I 4_1/a m d'
+_parent_space_group.IT_number                       141
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+
+_parent_space_group.child_transform_Pp_abc  'c,a+b,-a+b;0,-3/2,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;7/8,1/8,1/8'
+
+_space_group_magn.number_BNS  20.37
+_space_group_magn.name_BNS  "C_A 2 2 2_1"
+_space_group_magn.point_group_name  "2221'"
+_space_group_magn.point_group_number  "6.2.18"
+_cell_length_a                 8.1661(2)
+_cell_length_b                 8.1794(2)
+_cell_length_c                 8.5623(2)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y+1/4,-z+1/4,+1 
+3 -x+3/4,y,-z+3/4,+1 
+4 -x+3/4,-y+1/4,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y+1/2,z+1/2,-1 
+4 x+1/2,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ni1_1 Ni 0.12500 0.12500 0.12500 1
+Ni1_2 Ni 0.87500 0.87500 0.87500 1
+Cr1 Cr 0.50000 0.50000 0.50000 1
+O1_1 O 0.2572(3) 0.2580(3) 0.2681(1) 1
+O1_2 O 0.7428(3) 0.7420(3) 0.7319(1) 1
+
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ni1_1 0.0 0.0 0.0 mx,0,0 ? ? ?
+Ni1_2 0.0 0.0 0.0 0,my,0 ? ? ?
+Cr1 0.0 0.0 1.20(2) mx,my,mz ? ? ?
+

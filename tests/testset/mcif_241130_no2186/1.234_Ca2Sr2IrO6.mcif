@@ -1,0 +1,129 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-09-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        97
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            235116
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.97.235116
+
+loop_
+_citation_author_name
+"J. Sheng"
+"F. Ye"
+"C. Hoffmann"
+"V.R. Cooper"
+"S. Okamoto"
+"J. Terzic"
+"H. Zheng"
+"H. Zhao"
+"G. Cao"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  13.1
+_experiment_temperature  5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mF1+  3  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (1 possible)
+;
+
+_parent_space_group.name_H-M_alt  'R -3'
+_parent_space_group.IT_number                       148
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,1/3a+1/3b-1/3c,-2/3a+1/3b+2/3c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             9.57110
+_cell_length_b             19.14220
+_cell_length_c             11.39330
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+1/3,z+2/3,+1
+3 x+2/3,y+2/3,z+1/3,+1
+4 x+2/3,y+1/6,z+1/3,-1
+5 x,y+1/2,z,-1
+6 x+1/3,y+5/6,z+2/3,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ir1 Ir 0.00000 0.00000 0.00000 1.
+Ir2 Ir 0.00000 0.00000 0.50000 1.
+Sr1_1 Sr 0.30320 0.16675 0.08320 0.66
+Sr1_2 Sr  0.66650 0.98485 0.08320 0.66
+Sr1_3 Sr  0.03030 0.84840 0.08320 0.66
+Ca1_1 Ca 0.30320 0.16675 0.08320 0.34
+Ca1_2 Ca  0.66650 0.98485 0.08320 0.34
+Ca1_3 Ca  0.03030 0.84840 0.08320 0.34
+Ca2 Ca 0.00000 0.00000 0.25050 1.
+O1_1 O 0.84320 0.40805 0.10500 1.
+O1_2 O  0.18390 0.01355 0.10500 1.
+O1_3 O  0.97290 0.57840 0.10500 1.
+O2_1 O 0.36070 0.42515 0.06120 1.
+O2_2 O  0.14970 0.75520 0.06120 1.
+O2_3 O  0.48960 0.81965 0.06120 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ir1 -0.33(2) -0.64(2) 0.41(5) mx,my,mz
+Ir2 0.32(2) 0.63(2) -0.34(5) mx,my,mz

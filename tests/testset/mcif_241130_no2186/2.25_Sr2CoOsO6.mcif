@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-09
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Amer. Chem. Soc."
+_citation_journal_volume        135
+_citation_page_first            18824
+_citation_page_last             18830
+_citation_article_id            ?
+_citation_year                  2013
+_citation_DOI                   10.1021/ja407342w
+
+loop_
+_citation_author_name
+"R. Morrow"
+"R. Mishra"
+"O.D. Restrepo"
+"M.R. Ball"
+"W. Windl"
+"S. Wurmehl"
+"U. Stockert"
+"B. Buchner"
+"P.M. Woodward"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  70
+_experiment_temperature  12
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mV1+  2  1  .  primary  6  .
+mM1-  1  1  .  primary  2  .
+mM2-  1  1  .  secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Disordered model. Some oxygen sites with partial occupancies.
+Non-standard setting (I2/m) of the parent space group.
+The symmetry of the paramagnetic phase (above 108K) is in fact I4/m. The reduction of the structural symmetry to I2/m takes place concomitantly with the first magnetic ordering at 108K. This lower symmetry has been taken as parent space group for the representation description.
+The spin ordering of the Os atoms (propagation vector k1) is reported to take place below 108K  and the one of Co atoms (propagation vector k2) below 70K. The possibility of a reverse sequence of the Os and Co orderings is not fully discarded.
+DFT calculations find two independent sets of Co atoms with different moment orientations. This is consistent with the MSG of the structure: the Co site splits into two sites due to the lower symmetry resulting from the presence of the Os spin arrangement.
+For a completely different model for this magnetic phase see (Yan et al., Phys. Rev. Let. 112, 147202 (2014)). Not only the spin orientations are different, but also the space group of the underlying nuclear structure is different.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Irrep mV1+ (with vector k1= (1/2,1/2,0) in the C2/c standard setting) corresponds to the Os spin arrangement, and irrep mM1- (with vector k2=(1,0,1/2) in the C2/c standard setting) corresponds to the Co spins.
+The Os ordering breaks the effective symmetry for atomic positions up to P-1, while the mM1-
+ordering of the Co atoms only breaks the symmetry up to a monoclinic MSG of type C_c2/c compatible with the observed I2/m (C2/m) positional symmetry observed at the first transition. This favors the possibility that the Co spins, and not the Os, are those becoming ordered in the first transition at 108K.
+;
+
+_parent_space_group.name_H-M_alt  'I 2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a+c,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+k2 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/4a-1/4b-1/4c,1/4a+3/4b-1/4c,1/2a+1/2b+1/2c;0,0,1/4'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             11.01220
+_cell_length_b             11.01580
+_cell_length_c             16.05160
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.62
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/4,y+3/4,z+3/4,+1
+3 x+1/2,y+1/2,z+1/2,+1
+4 x+3/4,y+1/4,z+1/4,+1
+5 x+1/4,y+1/4,z+1/4,-1
+6 x+1/2,y,z,-1
+7 x+3/4,y+3/4,z+3/4,-1
+8 x,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1_1 Sr 0.25000 0.00000 0.12510 1.
+Sr1_2 Sr  0.75000 0.00000 0.87490 1.
+Os1 Os 0.00000 0.00000 0.00000 1.
+Co1_1 Co 0.00000 0.00000 0.25000 1.
+Co1_2 Co  0.25000 0.25000 0.00000 1.
+O1_1 O 0.00000 0.00000 0.12120 1.
+O1_2 O  0.00000 0.00000 0.87880 1.
+O2_1 O 0.10245 0.14050 0.00000 0.5
+O2_2 O  0.89755 0.14050 0.00000 0.5
+O2_3 O  0.89755 0.85950 0.00000 0.5
+O2_4 O  0.10245 0.85950 0.00000 0.5
+O3_1 O 0.13885 0.39880 0.00000 0.5
+O3_2 O  0.86115 0.39880 0.00000 0.5
+O3_3 O  0.86115 0.60120 0.00000 0.5
+O3_4 O  0.13885 0.60120 0.00000 0.5
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Os1 1.28 -1.28 0.0 mx,my,mz
+Co1_1 2.05 0.0 -2.05 mx,my,mz
+Co1_2 2.05 0.0 -2.05 mx,my,mz

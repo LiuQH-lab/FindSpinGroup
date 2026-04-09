@@ -1,0 +1,121 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "JOURNAL OF SOLID STATE CHEMISTRY"
+_citation_journal_volume        132
+_citation_page_first            98
+_citation_page_last             106
+_citation_article_id            ?
+_citation_year                  1997
+_citation_DOI                   10.1006@jssc.1997.7414
+
+loop_
+_citation_author_name
+"Z. Jirak!
+"J. Hejtmanek"
+"K. Knizek"
+
+_atomic_positions_source_database_code_ICSD  84923
+_atomic_positions_source_other               .
+
+_temperature_position_structure         290
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            4
+
+_transition_temperature  85
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+  1  1  .  primary  4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure except cell parameters from a determination at 290K
+Non-standard parent setting Pbnm 
+FM along c (setting Pbnm)
+The relative sign of the Mn moment components along y and z specifies two non-equivalent arrangements. Both components on the layer at z=0 have been assumed positive.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P b n m'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'b,c,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;0,0,0'
+
+_space_group_magn.number_BNS  62.448
+_space_group_magn.name_BNS  "P n' m a'"
+_cell_length_a             5.448
+_cell_length_b             5.676
+_cell_length_c             7.579
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z+1/2,+1 
+3 -x,-y,-z,+1 
+4 x,y,-z+1/2,+1 
+5 -x+1/2,y+1/2,-z+1/2,-1 
+6 x+1/2,-y+1/2,-z,-1 
+7 x+1/2,-y+1/2,z+1/2,-1 
+8 -x+1/2,y+1/2,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.50000 0.00000 0.00000 1.
+Pr1 Pr 0.48400 0.43700 0.75000 0.95
+K1 K 0.48400 0.43700 0.75000 0.05
+O1 O 0.57800 0.01200 0.75000 1.
+O2 O 0.71600 0.30400 0.03600 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 0.00000 2.64(8) 1.05(20) mx,my,mz 2.84
+Pr1 0.00000 0.00000 0.00000 0,0,mz    0.0
+

@@ -1,0 +1,153 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/09/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-09-03
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        58
+_citation_page_first            6291
+_citation_page_last             6297
+_citation_article_id            ?
+_citation_year                  1998
+_citation_DOI                   10.1103/PhysRevB.58.6291
+
+loop_
+_citation_author_name
+"M.J. Ruiz-Aragon"
+"E. Moran"
+"U. Amador"
+"J.L. Martinez"
+"N.H. Andersen"
+"H. Ehrenberg"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  240
+_experiment_temperature  8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mV5  4  2  special  primary  4  .
+mV2  2  1  special  primary  4  .
+mV5(3k1) 4  2 special secondary 4 yes
+mV2(3k1) 2  1 special secondary 4 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Above 240K and below 475K another magnetic phase with propagation vector (1/2 1/2 1/2) exist (see #1.283 and others).
+Moment modulus: 2.35(15)
+We assume the magnetic moment is associated to only the Fe atoms
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+TWo irreps are involved as primary.
+This spin arrangement requires the presence of 3k harmonics in the spin arrangement with propagation vector (1/2 1/2 1/8) in addition to the primary irrep modes. Diffraction peaks corresponding to this harmonic are not reported as observed.
+This structure is non-polar. This is in contradiction with later reports of ferroelectricity (multiferroicity) in this phase.
+Other publications report this phase as incommensurate
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m m m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 3/8]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,8c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-1/2a+1/2c;0,0,1/4'
+
+_space_group_magn.number_BNS  12.64
+_space_group_magn.name_BNS  "C_a 2/m"
+_cell_length_a             7.73860
+_cell_length_b             7.73860
+_cell_length_c             61.1112
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z+1/2,+1
+3 -x,-y,-z+1/2,+1
+4 x,-y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+5 x,y+1/2,z,-1
+6 x,y,z+1/2,-1
+7 x+1/2,y+1/2,z+1/2,-1
+8 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Y1_1 Y 0.00000 0.00000 0.06250 1.
+Y1_2 Y  0.00000 0.00000 0.18750 1.
+Ba1_1 Ba 0.00000 0.00000 0.00000 1.
+Ba1_2 Ba  0.00000 0.00000 0.12500 1.
+Ba1_3 Ba  0.00000 0.00000 0.25000 1.
+Cu1_1 Cu 0.25000 0.25000 0.03355 0.5
+Cu1_2 Cu  0.25000 0.25000 0.15855 0.5
+Cu1_3 Cu  0.25000 0.25000 0.09145 0.5
+Cu1_4 Cu  0.25000 0.25000 0.28355 0.5
+Fe1_1 Fe 0.25000 0.25000 0.03355 0.5
+Fe1_2 Fe  0.25000 0.25000 0.15855 0.5
+Fe1_3 Fe  0.25000 0.25000 0.09145 0.5
+Fe1_4 Fe  0.25000 0.25000 0.28355 0.5
+O1_1 O 0.00000 0.25000 0.03950 1.
+O1_2 O  0.25000 0.00000 0.03950 1.
+O1_3 O  0.00000 0.25000 0.16450 1.
+O1_4 O  0.25000 0.00000 0.16450 1.
+O1_5 O  0.00000 0.25000 0.08550 1.
+O1_6 O  0.25000 0.00000 0.08550 1.
+O1_7 O  0.00000 0.25000 0.28950 1.
+O1_8 O  0.25000 0.00000 0.28950 1.
+O2_1 O 0.25000 0.25000 0.00000 1.
+O2_2 O  0.25000 0.25000 0.12500 1.
+O2_3 O  0.25000 0.25000 0.25000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1_1 0.00000 0.00000 0.00000 mx,0,mz
+Cu1_2 0.00000 0.00000 0.00000 mx,0,mz
+Cu1_3 0.00000 0.00000 0.00000 mx,0,mz
+Cu1_4 0.00000 0.00000 0.00000 mx,0,mz
+Fe1_1 1.92 0.00000 1.35 mx,0,mz
+Fe1_2 -1.92 0.00000 -1.35 mx,0,mz
+Fe1_3 -1.92 0.00000 -1.35 mx,0,mz
+Fe1_4 1.92 0.00000 1.35 mx,0,mz
+

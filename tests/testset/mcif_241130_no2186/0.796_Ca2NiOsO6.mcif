@@ -1,0 +1,140 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/02/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-01-02
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ca2 Ni Os O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Chem. Mater."
+_citation_journal_volume        28
+_citation_page_first            3666
+_citation_page_last             3675
+_citation_article_id            .
+_citation_year                  2021
+_citation_DOI                   10.1021/acs.chemmater.6b00254
+
+loop_
+_citation_author_name
+"R. Morrow"
+"K. Samanta"
+"T. S. Dasgupta"
+"J. Xiong"
+"J. W. Freeland"
+"D. Haskel"
+"P. M. Woodward"
+
+_temperature_position_structure         4
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  152447
+_atomic_positions_source_other               .
+
+_transition_temperature     175
+_experiment_temperature     10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1 1 . primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+X-ray magnetic circular dichroism. Data measured at 10K and at 5K are mentioned.
+Non-standard setting P2_1/n of the parent space group
+A similar structure is reported for Ca2CoOsO6, but the postional structure is not reported, and no positional structure for this compoound was found in the ICSD.
+FM on the ac plane
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-a+c;0,0,0'
+
+_space_group_magn.number_BNS  14.79
+_space_group_magn.name_BNS  "P 2_1'/c' "
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 5.36080
+_cell_length_b                 5.54300
+_cell_length_c                 7.61760
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.29
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+3 -x+1/2,y+1/2,-z+1/2,-1 
+4 x+1/2,-y+1/2,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ca1 Ca 0.98770 0.05670 0.24910 1
+Ni1 Ni 0.50000 0.00000 0.00000 1
+Os1 Os 0.50000 0.00000 0.50000 1
+O1 O 0.09320 0.47300 0.24160 1
+O2 O 0.71050 0.30600 0.04530 1
+O3 O 0.19080 0.21450 0.95200 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ni1 2.6 0.0 0.0 mx,my,mz 2.6 ? ?
+Os1 -1.41 0.0 0.0 mx,my,mz -1.41 ? ?
+

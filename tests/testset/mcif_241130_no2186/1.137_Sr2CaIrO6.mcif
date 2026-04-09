@@ -1,0 +1,151 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:15:11
+# Database entry: 1.137 Sr2CaIrO6
+# Cif-like file for the case 1.137
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Sr2 Ca Ir O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Eur. J. Inorg. Chem."
+_citation_journal_volume        ?
+_citation_page_first            178
+_citation_page_last             185
+_citation_article_id            .
+_citation_year                  2014
+_citation_DOI                   10.1002/ejic.201301080
+
+loop_
+_citation_author_name
+"P. Kayser"
+"M.J. Martinez-Lope"
+"J.A. Alonso"
+"M. Retuerto"
+"M. Croft"
+"A. Ignatov"
+"M.T. Fernandez-Diaz"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   190083
+_atomic_positions_source_other               .
+
+_transition_temperature     58
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mD1-D2- 2 2 general primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Parent structure in non-standard P121/n1 setting
+The two split magnetic sites have been forced to be related in the refined model, but this is not dictated by the magnetic symmetry or the active physically irreducible irrep.
+Unknown relative signs of the components of the magnetic moments have been chosen to fit with the figures in the reference.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (1 possible)
+2-dim physically irreducible irrep active: only one MSG possible for any direction within the ire space.
+MSG or (physically irreducible irrep) does not restrict the possible moments of the two independent magnetic sites.
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-1/2a+1/2b,2a-b+2c;1/4,0,0'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S  -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 11.53360
+_cell_length_b                 11.63200
+_cell_length_c                 8.17660
+_cell_angle_alpha              90.00
+_cell_angle_beta               89.72
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x,y+1/2,z,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1_1 Sr 0.49660 0.01835 0.24920 1.
+Sr1_2 Sr 0.75340 0.26835 0.25080 1.
+Ca1_1 Ca 0.25000 0.00000 0.00000 0.95
+Ca1_2 Ca 0.00000 0.25000 0.50000 0.95
+Ir1_1 Ir 0.25000 0.00000 0.00000 0.05
+Ir1_2 Ir 0.00000 0.25000 0.50000 0.05
+Ir2_1 Ir 0.25000 0.00000 0.50000 0.95
+Ir2_2 Ir 0.00000 0.25000 0.00000 0.95
+Ca2_1 Ca 0.25000 0.00000 0.50000 0.05
+Ca2_2 Ca 0.00000 0.25000 0.00000 0.05
+O1_1 O 0.03560 0.23950 0.22990 1.
+O1_2 O 0.21440 0.48950 0.27010 1.
+O2_1 O 0.36550 0.15365 0.03800 1.
+O2_2 O 0.88450 0.40365 0.46200 1.
+O3_1 O 0.09540 0.11455 0.95890 1.
+O3_2 O 0.15460 0.36455 0.54110 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ir2_1 0.4 0.0 -1.27 mx,my,mz
+Ir2_2 -0.4 0.0 1.27 mx,my,mz
+

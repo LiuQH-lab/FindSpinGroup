@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:51:44
+# Database entry: 0.64 MnV2O4
+# Cif-like file for the case 0.64
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Mn V2 O4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW LETTERS"
+_citation_journal_volume        100
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            066404
+_citation_year                  2008
+_citation_DOI                   10.1103/physrevlett.100.066404
+
+loop_
+_citation_author_name
+"V.O. Garlea"
+"R. Jin"
+"D. Mandrus"
+"B. Roessli"
+"Q. Huang"
+"M. Miller"
+"A.J. Schultz"
+"S.E. Nagler"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               PhysRevLett.95.197202(2005)
+
+_transition_temperature     53
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+ 1 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The Fd-3m spinel structure reduces to the I41/a symmetry simultaneously or at a temperature very close to the first magnetic phase transitions.
+An intermediate magnetic phase between 56K and 53K has been reported, with moments aligned along z.
+The symmetry I41/a has been taken as parent, but probably the structural and magnetic distortions happen simultaneously in a single phase transition.
+Ferrimagnetic.
+As atomic positional structure, the one reported in Phys Rev Lett. 95,197202(2005) at 40K with symmetry I41/amd has been taken, but transformed to a I41/a description.
+modulus V moment: 1.3; canting angle with respect to z: 65 degrees (moment components given non-significant digits to be reproduce these values).
+Scale of V moments are enhanced by a factor 3 in Figures and vesta files to make them clearly visible.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (5 possible)
+If the cubic group Fd-3m is taken as parent, the spin configuration involves two irreps, mGM3+(mx of V1) and mGM4+ (mz of Mn1 and my,mz of V1).
+The very specific [-1,1,0] directions of V spins in the basal plane requires a very specific combination of these two irreps.
+;
+
+_parent_space_group.name_H-M_alt  'I  4_1/amd'
+_parent_space_group.IT_number                       141
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  88.81
+_space_group_magn.name_BNS  "I  4_1/a"
+_space_group_magn.point_group_name  "4/m"
+_space_group_magn.point_group_number  "11.1.35"
+_cell_length_a                 6.02500
+_cell_length_b                 6.02500
+_cell_length_c                 8.45920
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+3/4,x+1/4,z+1/4,+1
+3 y+1/4,-x+1/4,z+1/4,+1
+4 -x,-y+1/2,z,+1
+5 -x,-y,-z,+1
+6 y+1/4,-x+3/4,-z+3/4,+1
+7 -y+3/4,x+3/4,-z+3/4,+1
+8 x,y+1/2,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.25000 0.12500 1
+V1 V 0.00000 0.00000 0.50000 1
+O1 O 0.00000 0.52430 0.26550 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.0 0.0 4.2 0,0,mz
+V1 -0.83 0.83 -0.55 mx,my,mz
+

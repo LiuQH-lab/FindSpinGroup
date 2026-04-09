@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:12:38
+# Database entry: 1.103 U2Rh2Sn
+# Cif-like file for the case 1.103
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'U2 Rh2 Sn'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        8
+_citation_page_first            11167
+_citation_page_last             11179
+_citation_article_id            .
+_citation_year                  1996
+_citation_DOI                   10.1088/0953-8984/8/50/039
+
+loop_
+_citation_author_name
+"L.C.J. Pereira"
+"J.A. Paixão"
+"P. Estrela"
+"M. Godinho"
+"F. Boudarot"
+"M. Bonnet"
+"J. Rebizant"
+"J.C. Spirlet"
+"M. Almeida"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   246630
+_atomic_positions_source_other               .
+
+_transition_temperature     28
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ4- 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+atomic positions from other reference (30K)
+similar model from NPD in (Nakotte et al., Phys. Rev. B. 53 (1996) 3263)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (10 possible)
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'P  4/m  b  m'
+_parent_space_group.IT_number                       127
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,1/4'
+
+
+_space_group_magn.number_BNS  135.492
+_space_group_magn.name_BNS  "P_c  4_2/m  b  c"
+_space_group_magn.point_group_name  "4/mmm1'"
+_space_group_magn.point_group_number  "15.2.54"
+_cell_length_a                 7.53430
+_cell_length_b                 7.53430
+_cell_length_c                 7.24900
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x,z+1/2,+1
+3 y,-x,z+1/2,+1
+4 x+1/2,-y+1/2,-z+1/2,+1
+5 -x+1/2,y+1/2,-z+1/2,+1
+6 -x,-y,z,+1
+7 y+1/2,x+1/2,-z,+1
+8 -y+1/2,-x+1/2,-z,+1
+9 -x,-y,-z+1/2,+1
+10 y,-x,-z,+1
+11 -y,x,-z,+1
+12 -x+1/2,y+1/2,z,+1
+13 x+1/2,-y+1/2,z,+1
+14 x,y,-z+1/2,+1
+15 -y+1/2,-x+1/2,z+1/2,+1
+16 y+1/2,x+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+U1 U 0.17245 0.67245 0.25000 1
+Rh1 Rh 0.36745 0.86745 0.00000 1
+Sn2 Sn 0.00000 0.00000 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+U1 0.0 0.0 0.53(2) 0,0,mz
+

@@ -1,0 +1,140 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/12/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-12
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Sr2 Mn1 Mo1 O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        14
+_citation_page_first            8817
+_citation_page_last             8830
+_citation_article_id            .
+_citation_year                  2002
+_citation_DOI                   10.1088/0953-8984/14/38/306
+
+loop_
+_citation_author_name
+"A. Munoz"
+"J. A. Alonso"
+"M. T. Casais"
+"M. J. Martinez-Lope"
+"M. T. Fernandez-Diaz"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  97744
+_atomic_positions_source_other               .
+
+_transition_temperature     12
+_experiment_temperature     1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1- 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at room temperature
+Non-standard setting of the parent space group P12_1/n1
+Other possible models corresponding to the second possible irrep, or collinear models involving both irreps could fit similarly well the data. This solution is considered in the paper as the first possible choice by analogy with Ca2MnWO6.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-1/2a+1/2c;1/4,0,0'
+
+_space_group_magn.number_BNS  14.80
+_space_group_magn.name_BNS  "P_a 2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 11.33420
+_cell_length_b                 5.65370
+_cell_length_c                 15.99380
+_cell_angle_alpha              90.00
+_cell_angle_beta               89.93
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/4,y+1/2,-z+1/4,+1 
+3 -x+1/2,-y,-z,+1 
+4 x+3/4,-y+1/2,z+1/4,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x+1/2,y,z,-1 
+4 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1 Sr 0.49810 0.01760 0.12490 1
+Mn1 Mn 0.25000 0.00000 0.00000 1
+Mo1 Mo 0.25000 0.00000 0.25000 1
+O1 O 0.02730 0.49370 0.11815 1
+O2 O 0.36820 0.28910 0.01405 1
+O3 O 0.10340 0.23280 0.48645 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1 1.7(3) 3.5(3) 1.5(5) mx,my,mz 4.17(6) ? ?
+

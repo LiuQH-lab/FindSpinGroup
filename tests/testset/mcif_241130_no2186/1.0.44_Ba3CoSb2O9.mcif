@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/04/2021
+
+
+data_5yOhtAoR
+_audit_creation_date            05/04/2021
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        16
+_citation_page_first            8923
+_citation_page_last             8935
+_citation_article_id            ?
+_citation_year                  2004
+_citation_DOI                   10.1088/0953-8984/16/49/009
+
+loop_
+_citation_author_name
+"Y. Doi"
+"Y. Hinatsu"
+"K. Ohoyama"
+
+_atomic_positions_source_database_code_ICSD  151442
+_atomic_positions_source_other               .
+
+_temperature_position_structure         10
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  3.8
+_experiment_temperature  2.3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK3  2  1  special  primary  1  .
+mK5  4  2  special  primary  1  .
+mGM4+ 1 1  .  secondary 1  no
+mGM6+ 2 2  special secondary 1 no
+mK6  4 2   special secondary 1  no
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 10K
+120 degrees rotation of consecutive moments on the ab plane. The plane of the 120 degrees rotation includes the c axis but its relative orientation with respect to the propagation vector is undetermined. The chosen orientation here (along a of the parent space group) maximizes the symmetry of the system. The other non-equivalent direction that maximizes the symmetry is (1,2,0) in the parent setting (or equivalent directions), with a different MSG: C22'2_1' (N. 20.34). 
+Although these two alternative models are undistinguishable by NPD data, they must exhibitquite different macroscopic properties: the C22'2_1' model reproduced here is non-polar, while the Cm'c2_1' model is polar along c, which implies that some magnetically induced spontaneous polarization along this direction can exist.
+Polar along c. 
+Weak FM to be expected along the (1,2,0) direction in the parent setting, and symmetry equivalent directions in the twin-domain arrangements.
+See entry #1.0.45 for a completely different model proposed for this phase with the moments on the ab plane and hexagonal symmetry.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps as primary, i.e. two order parameters in the sense of Landau theory are present. One for the spin arrangement along c and another one for the one on the basal plane. 
+Many secondary irreps allowed, but not present.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+_parent_space_group.child_transform_Pp_abc  '2a+b,-a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-b,a+b,c;0,0,0'
+
+_space_group_magn.number_BNS  36.174
+_space_group_magn.name_BNS  "C m' c 2_1'"
+_cell_length_a             10.1174
+_cell_length_b             10.1174
+_cell_length_c             14.4283
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,-x,z+1/2,+1 
+3 -x,-y,z+1/2,-1 
+4 y,x,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1_1 Ba 0.0000 0.0000 0.2500 1
+Ba1_2 Ba 0.3333 0.6667 0.2500 1
+Ba2_1 Ba 0.3333 0.3333 0.9112 1
+Ba2_2 Ba 0.3333 0.0000 0.4112 1
+Ba2_3 Ba 0.3333 0.0000 0.0888 1
+Ba2_4 Ba 0.3333 0.3333 0.5888 1
+Co1_1 Co 0.0000 0.0000 0.0000 1
+Co1_2 Co 0.3333 0.6667 0.0000 1
+Sb1_1 Sb 0.3333 0.3333 0.1518 1
+Sb1_2 Sb 0.3333 0.0000 0.6518 1
+Sb1_3 Sb 0.3333 0.0000 0.8482 1
+Sb1_4 Sb 0.3333 0.3333 0.3482 1
+O1_1 O 0.4828 0.4828 0.2500 1
+O1_2 O 0.5172 0.0000 0.2500 1
+O1_3 O 0.8161 0.1495 0.2500 1
+O1_4 O 0.8505 0.6667 0.2500 1
+O1_5 O 0.3333 0.1839 0.2500 1
+O2_1 O 0.1697 0.1697 0.4157 1
+O2_2 O 0.8303 0.0000 0.4157 1
+O2_3 O 0.1697 0.0000 0.5843 1
+O2_4 O 0.8303 0.8303 0.5843 1
+O2_5 O 0.5030 0.8364 0.4157 1
+O2_6 O 0.1636 0.6667 0.4157 1
+O2_7 O 0.3333 0.4970 0.4157 1
+O2_8 O 0.5030 0.6667 0.5843 1
+O2_9 O 0.1636 0.4970 0.5843 1
+O2_10 O 0.3333 0.8364 0.5843 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1_1 0.0000 0.0000 1.35(4) mx,mx,mz  1.35(4)
+Co1_2 0.675 -0.675 -0.675 mx,my,mz    1.35
+

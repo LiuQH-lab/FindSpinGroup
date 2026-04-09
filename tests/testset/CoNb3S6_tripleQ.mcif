@@ -1,0 +1,117 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 26/10/2023 12:48:04
+# CoNb3S6_multiple_q_NP.cif
+
+data_5yOhtAoR
+_audit_creation_date            2023-10-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        ?
+_citation_journal_volume        ?
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            ?
+_citation_year                  ?
+_citation_DOI                   ?
+
+loop_
+_citation_author_name
+?
+
+_atomic_positions_source_database_code_ICSD  ?
+_atomic_positions_source_other               ?
+
+_transition_temperature  ?
+_experiment_temperature  ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+?  ?  ?  ?  ?  ?  ?
+
+_exptl_crystal_magnetic_properties_details
+;
+;
+
+_active_magnetic_irreps_details
+;
+;
+
+_parent_space_group.name_H-M_alt  'P  6_3  2  2'
+_parent_space_group.IT_number                       182
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+? [? ? ?]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/2,0,0'
+
+
+
+_space_group_magn.number_BNS  150.27
+_space_group_magn.name_BNS  "P  32'1"
+_cell_length_a             11.49800
+_cell_length_b             11.49800
+_cell_length_c             11.88600
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y+1/2,x-y+1/2,z,+1 
+3 -x+y,-x+1/2,z,+1 
+4 x-y,-y,-z,-1 
+5 y+1/2,x+1/2,-z,-1 
+6 -x,-x+y+1/2,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1_1 Co 0.16667 0.33333 0.25000
+Co1_2 Co  0.33333 0.16667 0.75000
+Nb1_1 Nb 0.00000 0.00000 0.00000
+Nb1_2 Nb  0.00000 0.00000 0.50000
+Nb1_3 Nb  0.50000 0.00000 0.00000
+Nb1_4 Nb  0.50000 0.00000 0.50000
+Nb2_1 Nb 0.16667 0.33333 0.99440
+Nb2_2 Nb  0.33333 0.16667 0.49440
+Nb2_3 Nb  0.33333 0.16667 0.00560
+Nb2_4 Nb  0.16667 0.33333 0.50560
+S1_1 S 0.16610 0.00045 0.36940
+S1_2 S  0.99955 0.16565 0.36940
+S1_3 S  0.83435 0.83390 0.36940
+S1_4 S  0.83390 0.99955 0.86940
+S1_5 S  0.00045 0.83435 0.86940
+S1_6 S  0.16565 0.16610 0.86940
+S1_7 S  0.66610 0.00045 0.36940
+S1_8 S  0.33390 0.99955 0.86940
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1_1 0.00000 0.00000 2.00000 0,0,mz
+Co1_2 -1.08860 1.08860 -0.66670 mx,my,mz
