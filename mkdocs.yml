@@ -1,0 +1,15 @@
+site_name: findspingroup
+site_description: Spin space group symmetry analysis toolkit for magnetic materials
+site_url: https://findspingroup.readthedocs.io/
+repo_url: https://github.com/LiuQH-lab/FindSpinGroup
+repo_name: LiuQH-lab/FindSpinGroup
+docs_dir: site_docs
+theme:
+  name: readthedocs
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - Examples: examples.md
+  - SCIF: scif.md
+  - CLI: cli.md
