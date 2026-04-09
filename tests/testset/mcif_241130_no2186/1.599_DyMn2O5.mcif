@@ -1,0 +1,174 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/23/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-09-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 7
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Dy Mn2 O5"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Scientific Reports"
+_citation_journal_volume        7
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            14506
+_citation_year                  2017
+_citation_DOI                   10.1038/s41598-017-15150-w
+
+loop_
+_citation_author_name
+"S. Chattopadhyay"
+"S. Petit"
+"E. Ressouche"
+"S. Raymond"
+"V. Baledent"
+"G. Yahia"
+"W. Peng"
+"J. Robert"
+"M.-B. Lepetit"
+"M. Greenblatt"
+"P. Foury-Leylekian"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    300
+_temperature_cell_parameters            300
+
+_atomic_positions_source_database_code_ICSD  18308
+_atomic_positions_source_other               .
+
+_transition_temperature     8
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2 2  2  general primary 22 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Cell parameters could not be found in the publication
+Oxygen positions are not reported. 
+Cell parameters and oxygen positions are therefore taken here from a model at room temperature, retrieved from the ICSD
+See #1.324 for a very different model of higher symmetry but with the same irrep for the same phase.
+Between 42K and 8K an incommensurate magnetic structure is reported.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep as primary along a general direction
+Apparently the refinement was done without controlling neither the underlying MSG or the possible irreps involved.
+The model includes many ad-hoc constraints, which are not symmetry based, neither by the underlying MSG or the irrep involved.
+Despite the constraints included the MSG of the proposed structure is only monoclinic, with many magnetic atoms being symmetry independent.
+Models with higher symmetries are possible for the same active irrep (see #1.324). 
+;
+
+_parent_space_group.name_H-M_alt  "P b a m"
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  "2a,b,c;0,0,0"
+_space_group_magn.transform_BNS_Pp_abc  "b,c,a;0,0,0"
+
+_space_group_magn.number_BNS  7.28
+_space_group_magn.name_BNS  "P_c c"
+_space_group_magn.point_group_name  "m1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 14.58800
+_cell_length_b                 8.55510
+_cell_length_c                 5.68750
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Dy1_1 Dy 0.06935 0.1719 0.00000 1
+Dy1_2 Dy 0.18065 0.6719 0.00000 1
+Dy1_3 Dy 0.31935 0.3281 0.00000 1
+Dy1_4 Dy 0.43065 0.8281 0.00000 1
+Mn1_1 Mn 0.00000 0.50000 0.25436 1
+Mn1_2 Mn 0.25000 0.00000 0.74520 1
+Mn2_1 Mn 0.2056 0.3507 0.50000 1
+Mn2_2 Mn 0.2944 0.6493 0.50000 1
+Mn2_3 Mn 0.0444 0.8507 0.50000 1
+Mn2_4 Mn 0.4556 0.1493 0.50000 1
+O1_1 O 0.00000 0.00000 0.27410 1
+O1_2 O 0.75000 0.50000 0.72590 1
+O2_1 O 0.08235 0.44520 0.00000 1
+O2_2 O 0.66765 -0.05480 0.00000 1
+O2_3 O -0.08235 0.55480 0.00000 1
+O2_4 O 0.83235 0.05480 0.00000 1
+O3_1 O 0.07685 0.43540 0.50000 1
+O3_2 O 0.67315 -0.06460 0.50000 1
+O3_3 O -0.07685 0.56460 0.50000 1
+O3_4 O 0.82685 0.06460 0.50000 1
+O4_1 O 0.19755 0.20820 0.24140 1
+O4_2 O 0.55245 0.70820 0.75860 1
+O4_3 O 0.80245 0.79180 0.24140 1
+O4_4 O -0.05245 0.29180 0.75860 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Dy1_1  3.157 -6.77 0.0 Mx,My,0 7.47(3) 295(1) 90
+Dy1_2 -3.157  6.77 0.0 Mx,My,0 7.47(3) 115(1) 90
+Dy1_3  3.157 -6.77 0.0 Mx,My,0 7.47(3) 295(1) 90
+Dy1_4  3.157 -6.77 0.0 Mx,My,0 7.47(3) 295(1) 90
+Mn1_1 -0.55 -1.798 0.0 Mx,My,Mz 1.88(5) 253(5) 90
+Mn1_2 -0.795 1.704 0.0 Mx,My,Mz 1.88(5) 115(1) 90
+Mn2_1 -0.769  2.869 0.0 Mx,My,0 2.97(11) 105(3) 90
+Mn2_2  0.769 -2.869 0.0 Mx,My,0 2.97(11) 285(3) 90
+Mn2_3  2.754 -1.113 0.0 Mx,My,0 2.97(11) -22(4) 90
+Mn2_4  2.754 -1.113 0.0 Mx,My,0 2.97(11) -22(4) 90
+

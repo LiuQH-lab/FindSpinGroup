@@ -1,0 +1,151 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/06/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-02-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ba1 Mn2 V2 O8"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        7
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            014402
+_citation_year                  2023
+_citation_DOI                   10.1103/PhysRevMaterials.7.014402
+
+loop_
+_citation_author_name
+"A. Pal"
+"K. Anand"
+"T. W. Yen"
+"A. Patra"
+"A. Das"
+"S. M. Huang"
+"E. Blundo"
+"A. Polimeni"
+"H. D. Yang"
+"S. Chatterjee"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     37
+_experiment_temperature     1.5
+ 
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5 2 2 special primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Direction of the spins of this collinear model is undetermined. A direction of maximal symmetry has been assumed. The other possible non-equivalent direction of maximal symmetry would be (1,1,0), with MSG Fd'd2'.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special direction
+FM along a (the direction of the proposed AFM collinear arrangement). Ferrimagnetism along this direction is possible if the two split Mn sites adquire different moment magnitudes, which is fully compatible with the MSG (and the active irrep).
+;
+
+_parent_space_group.name_H-M_alt  'I 4_1 c d'
+_parent_space_group.IT_number                       110
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,a,c;0,0,0'
+
+_space_group_magn.number_BNS  45.237
+_space_group_magn.name_BNS  "I b' a 2'"
+_space_group_magn.point_group_name  "m'm2'"
+_space_group_magn.point_group_number  "7.3.22"
+_cell_length_a                 12.59800
+_cell_length_b                 12.59800
+_cell_length_c                 8.65710
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,z+1/2,+1 
+3 -x,-y,z,-1 
+4 x,-y,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1_1 Ba 0.00000 0.00000 0.00000 1
+Ba1_2 Ba 0.00000 0.50000 0.25000 1
+Mn1_1 Mn 0.33520 0.32810 0.25200 1
+Mn1_2 Mn 0.67190 0.83520 0.50200 1
+V1_1 V 0.25302 0.07669 0.11128 1
+V1_2 V 0.92331 0.75302 0.36128 1
+O1_1 O 0.16250 0.50700 0.04710 1
+O1_2 O 0.49300 0.66250 0.29710 1
+O2_1 O 0.35650 0.67080 0.51830 1
+O2_2 O 0.32920 0.85650 0.76830 1
+O3_1 O 0.16530 0.67840 0.75720 1
+O3_2 O 0.32160 0.66530 0.00720 1
+O4_1 O 0.34000 0.49580 0.23380 1
+O4_2 O 0.50420 0.84000 0.48380 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1_1 2.4 0.0 0.0 mx,my,mz 2.4 ? ?
+Mn1_2 -2.4 0.0 0.0 mx,my,mz 2.4 ? ?
+

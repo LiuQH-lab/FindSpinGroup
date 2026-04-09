@@ -1,0 +1,160 @@
+#Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 06/08/2018 15:57:39
+# Database entry: 1.98 DyFe4Ge2
+# Cif-like file for the case 1.98
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-06-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Dy Fe4 Ge2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        300
+_citation_page_first            333
+_citation_page_last             350
+_citation_article_id            .
+_citation_year                  2006
+_citation_DOI                   10.1016/j.jmmm.2005.05.018
+
+loop_
+_citation_author_name
+"P. Schobinger-Papamantellos"
+"J. Rodriguez-Carvajal"
+"G. Andre"
+"K. Buschow"
+
+
+
+_atomic_positions_source_database_code_ICSD   154829
+_atomic_positions_source_other               "."
+
+_transition_temperature     55
+_experiment_temperature     46
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM4 4 2 general primary 20 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Below 45K and 28K two other magnetic phases exist.
+The reported Cmmm atomic positional distortion, reported as a simultaneous structural phase transitions, can be considered a consequence of the symmetry breaking produced by the magnetic ordering. In fact, the effective space group according to the reported model would be Pmm2, and Cmmm is a supergroup of it.
+The tetragonal paramagnetic phase is therefore taken here as the parent reference for the propagation vector and irreps, instead of the Cmmm.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Single irrep of the parent tetragonal space group active. Model corresponds to a general direction within the small extended irrep (extended to -k).
+The irrep is 4-dim with two k vectors. Only one k-vector active with a 2-dim extended small irrep.
+The model breaks centrosymmetry and it is polar along the (1,1,0) direction of the parent tetragonal setting.
+The active irrep would allow however two possible higher centrosymmetric symmetries by forcing special combinations of the basis modes. Apparently this possibility was not tested.
+The model includes specific non-collinear relations between moments that are not symmetry forced.
+;
+
+_parent_space_group.name_H-M_alt  'P  4_2/m  n  m'
+_parent_space_group.IT_number                       136
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 1/4 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,2a+2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-a,b;3/2,0,0'
+
+
+_space_group_magn.number_BNS  27.82
+_space_group_magn.name_BNS  "P_c  c  c  2"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 10.32220
+_cell_length_b                 20.64440
+_cell_length_c                 3.86090
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z,+1
+3 x,y+1/2,-z,+1
+4 -x,y+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Dy1_1 Dy 0.00000 0.00000 0.50000 1
+Dy1_2 Dy 0.00000 0.25000 0.00000 1
+Dy1_3 Dy 0.50000 0.25000 0.50000 1
+Dy1_4 Dy 0.50000 0.50000 0.00000 1
+Fe1_1 Fe 0.866900 0.11100 0.00000 1
+Fe1_2 Fe 0.133100 0.88900 0.00000 1
+Fe1_3 Fe 0.778900 0.18295 0.50000 1
+Fe1_4 Fe 0.221100 0.31705 0.50000 1
+Fe1_5 Fe 0.366900 0.36100 0.00000 1
+Fe1_6 Fe 0.633100 0.13900 0.00000 1
+Fe1_7 Fe 0.278900 0.43295 0.50000 1
+Fe1_8 Fe 0.721100 0.56705 0.50000 1
+Ge1_1 Ge 0.21570 0.00000 0.00000 1
+Ge1_2 Ge 0.00000 0.35855 0.50000 1
+Ge1_3 Ge 0.00000 0.14145 0.50000 1
+Ge1_4 Ge 0.715700 0.25000 0.00000 1
+Ge1_5 Ge 0.50000 0.60855 0.50000 1
+Ge1_6 Ge 0.50000 0.39145 0.50000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Dy1_1 0.0 4.8(2) 0.0 0,my,0
+Dy1_2 0.0 -4.8(2) 0.0 0,my,0
+Dy1_3 0.0 -4.8(2) 0.0 0,my,0
+Dy1_4 0.0 -4.8(2) 0.0 0,my,0
+Fe1_1 1.3(3) -0.5(3) 0.0 mx,my,0
+Fe1_2 0.3(4) -1.3(3) 0.0 mx,my,0
+Fe1_3 1.3(3) -0.5(3) 0.0 mx,my,0
+Fe1_4 -0.3(4) 1.3(3) 0.0 mx,my,0
+Fe1_5 -1.3(3) 0.5(3) 0.0 mx,my,0
+Fe1_6 0.3(4) -1.3(3) 0.0 mx,my,0
+Fe1_7 -1.3(3) 0.5(3) 0.0 mx,my,0
+Fe1_8 -0.3(4) 1.3(3) 0.0 mx,my,0
+

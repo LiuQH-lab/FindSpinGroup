@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 22/11/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-11-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        29
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            045802
+_citation_year                  2017
+_citation_DOI                   10.1088/1361-648X/29/4/045802
+
+loop_
+_citation_author_name
+"C. Ritter"
+"A. Provino"
+"P. Manfrinetti"
+"A.K. Pathak"
+
+
+
+_atomic_positions_source_database_code_ICSD  257404
+_atomic_positions_source_other               ?
+
+_transition_temperature  36
+_experiment_temperature  5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM5-  2  2  general  primary  1  .
+mM1-  1  1    .    primary  1  .
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Between 48K and 36K another magnetic phase is reported with the moments on the basal plane (see #1.376)
+Strong magnetostructural effect with a magnetic induced strain
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps are active as primary, i.e. two order parameters are necessary in the sense of Landau theory.
+The other magnetic structure at higher temperature with the moments on the ab plane is associated a single order parameter according to one of the two irreps: mM5- (see #1.376)
+The magnetic ordering of this model only reduces the parent symmetry into a monoclinc MSG, as the mM5- ordering is along a special direction. The monoclinic axis is along the (-1,1,0) direction of the parent structure. The unit cell strain of the reported triclinic unit cell with respect to the tetragonal one complies within its tolerances with monoclinic symmetry.
+The reduction from monoclinic into a a triclinic symmetry is only produced by small displacements on the xy plane of the Ce1 and Ge1 atoms, from their (0,0,z) parent positions.
+This small atomic displacements, which break further the symmetry, cannot be considered an induced effect of the magnetic ordering. It is either an artefact of the model or an additional symmetry-breaking structural distortion, i.e. a additional independent order parameter.
+An older version (30/04/2020) of this entry has been corrected.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a-b+3c;1/4,1/4,1/4'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             4.3359(3)
+_cell_length_b             4.3347(3)
+_cell_length_c             15.9628(3)
+_cell_angle_alpha          90.22(1)
+_cell_angle_beta           90.26(4)
+_cell_angle_gamma          89.992(2)
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y+1/2,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ce1 Ce 0.989(2) 0.010(2) 0.3233(1) 1.
+Sc1_1 Sc 0.00000 0.50000 0.00000 1
+Sc1_2 Sc  0.50000 0.00000 0.00000 1
+Ge1 Ge 0.007(1) 0.996(1) 0.1207(8) 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Ce1 0.60(1) 0.60 1.15(4) mx,my,mz 1.42(4)
+

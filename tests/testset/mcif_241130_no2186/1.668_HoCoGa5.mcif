@@ -1,0 +1,139 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/15/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-09-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ho1 Co1 Ga5"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of the Korean Physical Society"
+_citation_journal_volume        63
+_citation_page_first            337
+_citation_page_last             340
+_citation_article_id            .
+_citation_year                  2013
+_citation_DOI                   10.3938/jkps.63.337
+
+loop_
+_citation_author_name
+"R. Kobayashi"
+"K. Kaneko"
+"S. Wakimoto"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  42427
+_atomic_positions_source_other               .
+
+_transition_temperature     7.5
+_experiment_temperature     3.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mR2+ 2 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure is not given. Here a model at room temperature retrieved from the ICSD is used.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+The active irrep has two k-vectors. A 2k-model involving both k-vectors of the irrep, which could equally fit the data is not considered.
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m m m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,b;1/4,0,1/4'
+
+_space_group_magn.number_BNS  67.509
+_space_group_magn.name_BNS  "C_a m m a"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 8.41400
+_cell_length_b                 4.20700
+_cell_length_c                 13.59000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,-z+1/2,+1 
+3 -x,-y,z,+1 
+4 -x,y,-z+1/2,+1 
+5 -x+1/2,-y,-z+1/2,+1 
+6 -x+1/2,y,z,+1 
+7 x+1/2,y,-z+1/2,+1 
+8 x+1/2,-y,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ho1 Ho 0.00000 0.00000 0.00000 1
+Co1 Co 0.00000 0.00000 0.25000 1
+Ga1 Ga 0.25000 0.50000 0.00000 1
+Ga2_1 Ga 0.00000 0.50000 0.15600 1
+Ga2_2 Ga 0.25000 0.00000 0.15600 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ho1 0.0 0.0 8.6(2) 0,0,mz 8.6(2) ? ?
+

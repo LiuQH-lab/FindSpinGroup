@@ -1,0 +1,186 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/18/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-10-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Tb3 Ga5 O12"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        100
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            094442
+_citation_year                  2019
+_citation_DOI                   10.1103/PhysRevB.100.094442
+
+loop_
+_citation_author_name
+"R. Wawrzynczak"
+"B. Tomasello"
+"P. Manuel"
+"D. Khalyavin"
+"M. D. Le"
+"T. Guidi"
+"A. Cervellino"
+"T. Ziman"
+"M. Boehm"
+"G. J. Nilsen"
+"T. Fennell"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     0.25
+_experiment_temperature     0.03
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure, including cell parameters, from a determination at room temperature
+As small occupancy of Tb detected on the Ga1 site.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt             "I a -3 d"
+_parent_space_group.IT_number                       230
+_parent_space_group.transform_Pp_abc       "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  "a,b,c;0,0,0"
+_space_group_magn.transform_BNS_Pp_abc      "a,b,c;0,0,0"
+
+_space_group_magn.number_BNS  230.148
+_space_group_magn.name_BNS  "I a -3 d'"
+_space_group_magn.point_group_name  "m-3m'"
+_space_group_magn.point_group_number  "32.4.121"
+_cell_length_a                 12.35225
+_cell_length_b                 12.35225
+_cell_length_c                 12.35225
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -z,-x,-y,+1
+3 -y,-z,-x,+1
+4 y+1/2,-z,x,+1
+5 -z,x,y+1/2,+1
+6 z,x+1/2,-y,+1
+7 y,z+1/2,-x,+1
+8 -y,z,x+1/2,+1
+9 z+1/2,-x,y,+1
+10 x,y+1/2,-z,+1
+11 x,-y,-z+1/2,+1
+12 -x+1/2,y,-z,+1
+13 -z+1/4,-y+1/4,-x+1/4,-1
+14 -y+1/4,-x+1/4,-z+1/4,-1
+15 x+1/4,z+1/4,y+1/4,-1
+16 y+1/4,-x+1/4,z+3/4,-1
+17 y+3/4,x+1/4,-z+1/4,-1
+18 -x+1/4,z+1/4,-y+3/4,-1
+19 -z+1/4,y+3/4,x+1/4,-1
+20 -z+3/4,-y+1/4,x+1/4,-1
+21 -x+3/4,-z+1/4,y+1/4,-1
+22 -x+1/4,z+3/4,y+1/4,-1
+23 z+1/4,-y+1/4,x+3/4,-1
+24 -y+1/4,x+3/4,z+1/4,-1
+25 -x,-y,-z,+1
+26 z,x,y,+1
+27 y,z,x,+1
+28 -y+1/2,z,-x,+1
+29 z,-x,-y+1/2,+1
+30 -z,-x+1/2,y,+1
+31 -y,-z+1/2,x,+1
+32 y,-z,-x+1/2,+1
+33 -z+1/2,x,-y,+1
+34 -x,-y+1/2,z,+1
+35 -x,y,z+1/2,+1
+36 x+1/2,-y,z,+1
+37 z+3/4,y+3/4,x+3/4,-1
+38 y+3/4,x+3/4,z+3/4,-1
+39 -x+3/4,-z+3/4,-y+3/4,-1
+40 -y+3/4,x+3/4,-z+1/4,-1
+41 -y+1/4,-x+3/4,z+3/4,-1
+42 x+3/4,-z+3/4,y+1/4,-1
+43 z+3/4,-y+1/4,-x+3/4,-1
+44 z+1/4,y+3/4,-x+3/4,-1
+45 x+1/4,z+3/4,-y+3/4,-1
+46 x+3/4,-z+1/4,-y+3/4,-1
+47 -z+3/4,y+3/4,-x+1/4,-1
+48 y+3/4,-x+1/4,-z+3/4,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tb1 Tb 0.12500 0.00000 0.25000 1
+Ga1 Ga 0.00000 0.00000 0.00000 0.985
+Tb2 Tb 0.00000 0.00000 0.00000 0.015
+Ga2 Ga 0.37500 0.00000 0.25000 1
+O1 O 0.0286 0.0566 0.6500 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tb1 2.16(9) 0.0 0.0 mx,0,0 2.16(9) ? ?
+

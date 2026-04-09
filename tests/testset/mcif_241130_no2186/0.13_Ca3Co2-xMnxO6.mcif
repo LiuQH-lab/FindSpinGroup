@@ -1,0 +1,145 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:47:49
+# Database entry: 0.13 Ca3Co2-xMnxO6
+# Cif-like file for the case 0.13
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ca3 Co2 -x Mn x O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Phys. Rev. Lett."
+_citation_journal_volume        100
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            047601
+_citation_year                  2008
+_citation_DOI                   10.1103/physrevlett.100.047601
+
+loop_
+_citation_author_name
+"Y.J. Choi"
+"H.T. Yi"
+"S. Lee"
+"Q. Huang"
+"V. Kiryukhin"
+"S.-W. Cheong"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   93775
+_atomic_positions_source_other               .
+
+_transition_temperature     16
+_experiment_temperature     1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+ 1 1 . primary ? ?
+mGM2- 1 1 . primary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+x parameter in composition around 0.96
+Possible mixed occupation in Mn and Co sites neglected
+Only magnitudes of the two spins are symmetry free.
+Co and Mn positions have much higher symmetry, but also assuming this symmetry two different irreps are involved.
+Polar symmetry of magnetic ordering. Multiferroic
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic symmetry
+mGM1+ is the irrep for the Mn ordering and mGM2- for the Co. mGM1+ alone would force Co to have zero moment.
+;
+
+_parent_space_group.name_H-M_alt  'R  -3c'
+_parent_space_group.IT_number                       167
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  161.69
+_space_group_magn.name_BNS  "R  3c"
+_space_group_magn.point_group_name  "3m"
+_space_group_magn.point_group_number  "19.1.68"
+_cell_length_a                 9.1314
+_cell_length_b                 9.1314
+_cell_length_c                 10.5817
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              120.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x-y,z,+1
+3 -x+y,-x,z,+1
+4 -x+y,y,z+1/2,+1
+5 -y,-x,z+1/2,+1
+6 x,x-y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z+2/3,+1
+3 x+2/3,y+1/3,z+1/3,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ca Ca 0.36210 0.00000 0.25000 1
+Mn Mn 0.00000 0.00000 0.00000 1
+Co Co 0.00000 0.00000 0.25000 1
+O1 O 0.17790 0.02470 0.10800 1
+O1_2 O 0.35803 0.84457 0.05867 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn 0.0 0.0 1.93 0,0,mz
+Co 0.0 0.0 0.66 0,0,mz
+

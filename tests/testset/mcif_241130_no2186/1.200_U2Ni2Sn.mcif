@@ -1,0 +1,126 @@
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 24/02/2018 22:50:27
+# icsd_54391_300K.cif
+
+data_5yOhtAoR
+_audit_creation_date            2018-02-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        138
+_citation_page_first            307
+_citation_page_last             313
+_citation_article_id            ?
+_citation_year                  1994
+_citation_DOI                   10.1016/0304-8853(94)90052-3
+
+loop_
+_citation_author_name
+"F. Bouree"
+"B. Chevalier"
+"L. Fournes"
+"F. Mirambet"
+"T. Roisnel"
+"V. Tran"
+"Z. Zolnierek"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  25
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ5-  2  2  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from model determined at 300K
+lattice parameters from a measurement at 36K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep active along special direction
+The magnetic site is splitted.
+The experiment did not distinguish the direction of the spins on the ab plane. Here the direction is assumed to be (1,1,0), such that the symmetry is maximal.
+Collinearity is forced by the MSG, but not the modulus equality of the two independent sites.
+;
+
+_parent_space_group.name_H-M_alt  'P  4/m  b  m'
+_parent_space_group.IT_number                       127
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,-a+b,c;1/2,0,1/4'
+
+
+
+_space_group_magn.number_BNS  63.466
+_space_group_magn.name_BNS  "C_c  m  c  m"
+_cell_length_a             7.214
+_cell_length_b             7.214
+_cell_length_c             7.414
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 y+1/2,x+1/2,-z+1/2,+1
+3 -y+1/2,-x+1/2,-z,+1
+4 -x,-y,z+1/2,+1
+5 -x,-y,-z+1/2,+1
+6 -y+1/2,-x+1/2,z,+1
+7 y+1/2,x+1/2,z+1/2,+1
+8 x,y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+U1_1 U 0.17390 0.67390 0.25000
+U1_2 U  0.32610 0.17390 0.25000
+Ni1_1 Ni 0.37500 0.87500 0.00000
+Ni1_2 Ni  0.12500 0.37500 0.00000
+Sn1 Sn 0.00000 0.00000 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+U1_1 -1.00000 -1.00000 0.00000 mx,mx,0
+U1_2 1.00000 1.00000 0.00000 mx,mx,0
+
+

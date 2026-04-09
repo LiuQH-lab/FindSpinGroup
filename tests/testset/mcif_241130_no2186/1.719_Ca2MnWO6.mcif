@@ -1,0 +1,146 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/13/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-13
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ca2 Mn1 W1 O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+_citation_journal_abbrev        "Materials Research Bulletin"
+_citation_journal_volume        36
+_citation_page_first            2485
+_citation_page_last             2496
+_citation_article_id            .
+_citation_year                  2001
+_citation_DOI                   10.1016/S0025-5408(01)00708-5
+
+loop_
+_citation_author_name
+"A. K. Azad"
+"S. A. Ivanov"
+"S.-G. Eriksson"
+"J. Eriksen"
+"H. Rundlof"
+"R. Mathieu"
+"P. Svedlindh"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  51616
+_atomic_positions_source_other               .
+
+_transition_temperature     16(1)
+_experiment_temperature     10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mD1+D2+ 2 2 general primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Non-standard setting P12_1/n1 of the parent space group 
+See #1.718 for a very different model of this structure
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim physically irreducible irrep along a general direction
+The irrep label correspond to the standard setting of the parent space group, according to the indicated transformation
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,a+1/2b-1/2c,-2a+c;-1/2,0,1/4'
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 5.44570
+_cell_length_b                 11.30580
+_cell_length_c                 15.56560
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.23
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ca1_1 Ca 0.01360 0.47245 0.12385 1
+Ca1_2 Ca 0.48640 0.72245 0.12615 1
+Mn1_1 Mn 0.50000 0.00000 0.25000 1
+Mn1_2 Mn 0.00000 0.25000 0.00000 1
+W1_1 W 0.50000 0.00000 0.00000 1
+W1_2 W 0.00000 0.25000 0.25000 1
+O1_1 O 0.21430 0.09330 0.02325 1
+O1_2 O 0.28570 0.34330 0.22675 1
+O2_1 O 0.18130 0.10890 0.22160 1
+O2_2 O 0.31870 0.35890 0.02840 1
+O3_1 O 0.59850 0.01865 0.11735 1
+O3_2 O 0.90150 0.26865 0.13265 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1_1 -1.08(13) -0.94(7) -3.20(4) mx,my,mz 3.49(2) ? ?
+Mn1_2 1.08(13) 0.94(7) 3.20(4) mx,my,mz 3.49(2) ? ?
+

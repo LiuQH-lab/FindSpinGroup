@@ -1,0 +1,137 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 25/10/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Physical Review B"
+_citation_journal_volume        102
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            094433
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevB.102.094433
+
+loop_
+_citation_author_name
+"E.A. Zvereva"
+"G.V. Raganyan"
+"T.M. Vasilchikova"
+"V.B. Nalbandyan"
+"D.A. Gafurov"
+"E.L. Vavilova"
+"K.V. Zakharov"
+"H.-J. Koo"
+"V.Y. Pomjakushin"
+"A.E. Susloparova"
+"A.I. Kurbakov"
+"A.N. Vasiliev"
+"M.-H. Whangbo"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "Nalbandyan et al., Inorg. Chem. 58, 5524 (2019)"
+
+_transition_temperature  8.5
+_experiment_temperature  1.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK1 2  1  special  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure here  from a model at 298K, except for the unit cell parameters that are taken from the reference.
+Reported Mn moment components are inconsistent with the reported moment modulus. The mx component has been assumed correct and the other values corrected accordingly.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+2-dim irrep along a special direction as primary
+No secondary irrep allowed
+;
+
+_parent_space_group.name_H-M_alt  'P -3 1 c'
+_parent_space_group.IT_number                       163
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2/3a+1/3b,-1/3a+1/3b,c;1/3,1/3,0'
+
+
+
+_space_group_magn.number_BNS  165.91
+_space_group_magn.name_BNS  "P -3 c 1"
+_cell_length_a             15.0342(5)
+_cell_length_b             15.0342(9)
+_cell_length_c             9.4915
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+2/3,x-y+1/3,z,+1
+3 -x+y+1/3,-x+2/3,z,+1
+4 x,x-y+1/3,-z+1/2,+1
+5 -x+y+1/3,y,-z+1/2,+1
+6 -y+2/3,-x+2/3,-z+1/2,+1
+7 -x+2/3,-y+2/3,-z,+1
+8 y,-x+y+1/3,-z,+1
+9 x-y+1/3,x,-z,+1
+10 -x+2/3,-x+y+1/3,z+1/2,+1
+11 x-y+1/3,-y+2/3,z+1/2,+1
+12 y,x,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z,+1
+3 x+2/3,y+1/3,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.22222 0.11111 0.25000
+Li1 Li 0.11111 0.22222 0.05680
+Te1_1 Te 0.00000 0.00000 0.25000
+Te1_2 Te  0.00000 0.66667 0.25000
+O1_1 O 0.01523 0.23323 0.63640
+O1_2 O  0.76677 0.98477 0.86360
+O1_3 O  0.01523 0.89990 0.63640
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 0.68(2) 1.36 0.00000 mx,2mx,0  1.18
+
+

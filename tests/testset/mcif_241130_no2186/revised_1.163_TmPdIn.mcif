@@ -1,0 +1,76 @@
+# CIF file created by FINDSYM, version 7.1.3
+
+data_findsym-output
+_audit_creation_method FINDSYM
+
+_cell_length_a     13.1930310013
+_cell_length_b     13.1930310013
+_cell_length_c     7.4120000000
+_cell_angle_alpha  90.0000000000
+_cell_angle_beta   90.0000000000
+_cell_angle_gamma  120.0000000000
+_cell_volume       1117.2624639240
+
+_space_group_magn.number_BNS "174.136"
+_space_group_magn.name_UNI "P-6.1'_c[P-6]"
+_space_group_magn.name_BNS "P_c-6"
+_space_group_magn.number_OG "174.4.1366"
+_space_group_magn.name_OG "P_2c-6"
+_space_group_magn.point_group_number_Litvin "22.2.80"
+_space_group_magn.point_group_name_UNI "-6.1'"
+
+loop_
+_space_group_magn_transforms.id
+_space_group_magn_transforms.Pp_abc
+_space_group_magn_transforms.source
+1 a,b,c;0,0,0 "BNS"
+2 a,b,1/2c;0,0,0 "OG"
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x-y,z,+1 
+3 -x+y,-x,z,+1 
+4 -x+y,-x,-z,+1 
+5 x,y,-z,+1 
+6 -y,x-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_symmetry_multiplicity
+_atom_site_Wyckoff_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+_atom_site_fract_symmform
+In1 In   6 j  0.75467  0.17600  0.00000  1.00000 Dx,Dy,0 
+In2 In   6 j  0.75467 -0.08800  0.00000  1.00000 Dx,Dy,0 
+In3 In   6 j  0.49067 -0.08800  0.00000  1.00000 Dx,Dy,0 
+Tm1 Tm   6 k  0.60534  0.46934  0.25000  1.00000 Dx,Dy,0 
+Tm2 Tm   6 k  0.19733  0.06133  0.25000  1.00000 Dx,Dy,0 
+Tm3 Tm   6 k  0.19733  0.46934  0.25000  1.00000 Dx,Dy,0 
+Pd1 Pd   2 a  0.00000  0.00000  0.00000  1.00000 0,0,0   
+Pd2 Pd   6 j  0.00000  0.33333  0.00000  1.00000 Dx,Dy,0 
+Pd3 Pd   2 c  0.33333  0.66667  0.00000  1.00000 0,0,0   
+Pd4 Pd   2 e  0.66667  0.33333  0.00000  1.00000 0,0,0   
+Pd5 Pd   6 k  0.00000  0.66667  0.25000  1.00000 Dx,Dy,0 
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Tm2  0.15531  0.31061  0.00000 Mx,My,0 
+Tm3 -0.15531  0.15531  0.00000 Mx,My,0 
+
+# end of cif

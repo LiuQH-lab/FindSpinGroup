@@ -1,0 +1,162 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/06/2022
+# From a magCIF file submitted by Sijie Xu
+
+data_5yOhtAoR
+_audit_creation_date            2022-10-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Na2 Cu SO4 Cl2"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        105
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            144410
+_citation_year                  2022
+_citation_DOI                   10.1103/PhysRevB.105.144410
+
+loop_
+_citation_author_name
+"M. Fujihala" 
+"Y. Sakuma"
+"S. Mitsuda"
+"A. Nakao"
+"K. Munakata"
+"R. A. Mole"
+"S. Yano"
+"D. H. Yu"
+"K. Takehana"
+"Y. Imanaka"
+"M. Akaki"
+"S. Okubo"
+"H. Ohta"
+
+_temperature_position_structure         .
+_temperature_atom_positions             0.3
+_temperature_non-magn_atom_positions    303
+_temperature_cell_parameters            0.3
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "Fujihala et al., Phys. Rev. B 101, 024410 (2020), DOI: 10.1103/PhysRevB.101.024410"
+
+_transition_temperature     0.54
+_experiment_temperature     0.3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1 2 2 special primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positions of non-magnetic atoms from a determination at 303K of another reference
+Polar MSG along c. If insulator, a spontaneous electric polarization along c can be an induced effect (multiferroic of type II)
+The magnetic ordering breaks the centrosymmetry of the paramagnetic phase.
+Moment magnitude is apparently not refined
+The Cu site is split by the MSG; the model assumes equal moment magnitudes in both sites.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special position
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,-a,c;1/8,1/4,0'
+
+_space_group_magn.number_BNS  31.129
+_space_group_magn.name_BNS  "P_b m n 2_1"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 13.97500
+_cell_length_b                 5.56570
+_cell_length_c                 15.97160
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/4,-y,z+1/2,+1 
+3 x,-y+1/2,z,+1 
+4 -x+1/4,y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Na1_1 Na 0.06826 0.25000 0.89357 1
+Na1_2 Na 0.93174 0.75000 0.10643 1
+Na2_1 Na 0.30010 0.25000 0.21587 1
+Na2_2 Na 0.69990 0.75000 0.78413 1
+Cu1_1 Cu 0.31778 0.25000 0.96576 1
+Cu1_2 Cu 0.68222 0.75000 0.03424 1
+S1_1 S 0.32545 0.25000 0.80373 1
+S1_2 S 0.67455 0.75000 0.19627 1
+O1_1 O 0.40540 0.25000 0.86511 1
+O1_2 O 0.59460 0.75000 0.13489 1
+O2_1 O 0.23945 0.25000 0.85958 1
+O2_2 O 0.76055 0.75000 0.14042 1
+O3_1 O 0.42315 0.53590 0.25212 1
+O3_2 O 0.57685 0.03590 0.74788 1
+Cl1_1 Cl 0.42960 0.25000 0.06421 1
+Cl1_2 Cl 0.57041 0.75000 0.93579 1
+Cl2_1 Cl 0.18850 0.25000 0.04778 1
+Cl2_2 Cl 0.81150 0.75000 0.95222 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Cu1_1 0.0 1. 0.0 0,my,0 1 ? ?
+Cu1_2 0.0 -1. 0.0 0,my,0 1 ? ?
+

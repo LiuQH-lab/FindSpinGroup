@@ -1,0 +1,165 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/21/2024
+
+data_5yOhtAoR
+_audit_creation_date            2024-07-21
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Tm5 Pt2 In4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Acta Cryst B"
+_citation_journal_volume        80
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            .
+_citation_year                  2024
+_citation_DOI                   10.1107/S2052520624004451
+
+loop_
+_citation_author_name
+"A. Deptuch"
+"S. Baran"
+"L. Keller"
+"A. R. Hayyub"
+"A. Szytula"
+
+_temperature_position_structure         120
+_temperature_atom_positions             ?
+_temperature_non-magn_atom_positions    ?
+_temperature_cell_parameters            ?
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     3.8
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT1 2 2 general primary 20 .
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD 
+Positional structure from a determination at 120K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep in a general direction
+The active irreps can result in two alternative MSGs depending on the form of combining the irrep basis vectors. These are C_amc2_1 (36.178) and C_a2/m (12.64) (irrep epikernels). The structure was refined without taking into consideration this, and possible models with these higher symmetries were not checked, only introducing ad-hoc the assumption of equal moment magnitudes in some cases. As a consequence, the MSG of the resulting model (not identified in the reference) is the lowest possible for the active irrep (irrep kernel)
+The Table 6 in the reference, where the model is presented in terms of amplitudes of the irrep basis vectors, is defective and inconsistent with the figure of the structure (according to the Table the moments of Tm3_1 and Tm3_2 would be along y). The figure has been assumed correct.
+The other magnetic structures corresponding to other R5Pt2In4 compounds, which are reported in the same reference, are reported in a similar form and are not introduced in this database.  
+;
+
+_parent_space_group.name_H-M_alt  'P b a m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;0,0,1/4'
+
+
+_space_group_magn.number_BNS  8.36
+_space_group_magn.name_BNS  "C_a m"
+_space_group_magn.point_group_name  "m1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 17.85200
+_cell_length_b                 15.82200
+_cell_length_c                 7.14520
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tm1_1 Tm 0.00000 0.00000 0.00000 1
+Tm1_2 Tm 0.50000 0.25000 0.00000 1
+Tm2_1 Tm 0.22040 0.12150 0.00000 1
+Tm2_2 Tm 0.77960 0.87850 0.00000 1
+Tm2_3 Tm 0.27960 0.37150 0.00000 1
+Tm2_4 Tm 0.72040 0.12850 0.00000 1
+Tm3_1 Tm 0.41800 0.06100 0.00000 1
+Tm3_2 Tm 0.58200 0.93900 0.00000 1
+Tm3_3 Tm 0.08200 0.31100 0.00000 1
+Tm3_4 Tm 0.91800 0.18900 0.00000 1
+Pt1_1 Pt 0.30570 0.01450 0.25000 1
+Pt1_2 Pt 0.69430 0.98550 0.25000 1
+Pt1_3 Pt 0.19430 0.26450 0.25000 1
+Pt1_4 Pt 0.80570 0.23550 0.25000 1
+In1_1 In 0.56800 0.09950 0.25000 1
+In1_2 In 0.43200 0.90050 0.25000 1
+In1_3 In 0.93200 0.34950 0.25000 1
+In1_4 In 0.06800 0.15050 0.25000 1
+In2_1 In 0.85000 0.03650 0.25000 1
+In2_2 In 0.15000 0.96350 0.25000 1
+In2_3 In 0.65000 0.28650 0.25000 1
+In2_4 In 0.35000 0.21350 0.25000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tm1_1 5.7 -2.6 0.0 mx,my,0 6.3 ? ?
+Tm1_2 0.0 -6.3 0.0 mx,my,0 6.3 ? ?
+Tm2_1 -5.7 2.6 0.0 mx,my,0 6.3 ? ?
+Tm2_2 -5.7 -2.6 0.0 mx,my,0 6.3 ? ?
+Tm2_3 4.8 -4.2 0.0 mx,my,0 6.4 ? ?
+Tm2_4 4.8 -4.2 0.0 mx,my,0 6.4 ? ?
+Tm3_1 -2.6 -4.8 0.0 mx,my,0 5.5 ? ?
+Tm3_2 -2.6 4.8 0.0 mx,my,0 5.5 ? ?
+Tm3_3 2.7 4.8 0.0 mx,my,0 5.5 ? ?
+Tm3_4 2.7 4.8 0.0 mx,my,0 5.5 ? ?
+

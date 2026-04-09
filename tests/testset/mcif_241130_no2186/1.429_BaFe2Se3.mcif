@@ -1,0 +1,138 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/08/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-08-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        24
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            059502
+_citation_year                  2012
+_citation_DOI                   10.1088/0953-8984/24/5/059502
+
+loop_
+_citation_author_name
+"A. Krzton-Maziopa"
+"E. Pomjakushina"
+"V. Pomjakushin"
+"D. Sheptyakov"
+"D. Chernyshov"
+"V. Svitlyk"
+"K. Conder"
+
+
+
+_atomic_positions_source_database_code_ICSD  185512
+_atomic_positions_source_other               .
+
+_transition_temperature  240
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mR1R2  4  4  special  primary  12  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The Figure in the Corrigendum of the article is not fully consistent with the accompanying Table. The Table has been assume correct.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (3 possible)
+4-dim irrep (physically irreducible) along a special direction as primary
+The original reference reports a second model equally fitting the data, but this second model is in fact a domain-related equivalent structure. The two equivalent models were obtained using the two complex conjugate irreps separately instead of the real physically irreducible one.
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-1/2a+1/2c;0,1/8,0'
+
+
+
+_space_group_magn.number_BNS  8.36
+_space_group_magn.name_BNS  "C_a m"
+_cell_length_a             23.78070
+_cell_length_b             10.81600
+_cell_length_c             18.27500
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y+1/4,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+5 x,y,z+1/2,-1
+6 x,y+1/2,z,-1
+7 x+1/2,y,z,-1
+8 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Fe1_1 Fe 0.24702 0.00074 0.17631
+Fe1_2 Fe  0.00298 0.49926 0.42631
+Fe1_3 Fe  0.25298 0.25074 0.32369
+Fe1_4 Fe  0.49702 0.24926 0.07369
+Ba1_1 Ba 0.09257 0.12500 0.26104
+Ba1_2 Ba  0.15743 0.37500 0.51104
+Ba1_3 Ba  0.90743 0.37500 0.73896
+Ba1_4 Ba  0.34257 0.12500 0.98896
+Se1_1 Se 0.17752 0.12500 0.11642
+Se1_2 Se  0.07248 0.37500 0.36642
+Se1_3 Se  0.82249 0.37500 0.88358
+Se1_4 Se  0.42751 0.12500 0.13358
+Se2_1 Se 0.31518 0.12500 0.24524
+Se2_2 Se  0.93482 0.37500 0.49523
+Se2_3 Se  0.68482 0.37500 0.75477
+Se2_4 Se  0.56518 0.12500 0.00476
+Se3_1 Se 0.20075 0.12500 0.40865
+Se3_2 Se  0.04925 0.37500 0.65865
+Se3_3 Se  0.79926 0.37500 0.59135
+Se3_4 Se  0.45075 0.12500 0.84135
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1_1 1.00000 0.00000 0.00000 mx,my,mz
+Fe1_2 -1.00000 0.00000 0.00000 mx,my,mz
+Fe1_3 -1.00000 0.00000 0.00000 mx,my,mz
+Fe1_4 -1.00000 0.00000 0.00000 mx,my,mz
+

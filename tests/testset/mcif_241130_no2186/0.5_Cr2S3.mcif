@@ -1,0 +1,137 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:47:32
+# Database entry: 0.5 Cr2S3
+# Cif-like file for the case 0.5
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Cr2 S3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Physique"
+_citation_journal_volume        29
+_citation_page_first            813
+_citation_page_last             ?
+_citation_article_id            .
+_citation_year                  1968
+_citation_DOI                   10.1051/jphys:01968002908-9081300
+
+loop_
+_citation_author_name
+"E. Bertaut"
+"J. Cohen"
+"B. Lambert-Andron"
+"P. Mollard"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   626604
+_atomic_positions_source_other               .
+
+_transition_temperature     122
+_experiment_temperature     4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+mGM3+ 2 2 general primary ? ?
+mGM1+ 1 1 . secondary ? yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+parent structure is pseudpsymmetric for R-3m, but the three Cr sites remain different in this high symmetry.
+the model equals moments of independent sites
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+;
+
+_parent_space_group.name_H-M_alt  'R  -3'
+_parent_space_group.IT_number                       148
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-1/3a+1/3b+1/3c,c;0,0,0'
+
+
+_space_group_magn.number_BNS  2.4
+_space_group_magn.name_BNS  "P  -1"
+_space_group_magn.point_group_name  "-1"
+_space_group_magn.point_group_number  "2.1.3"
+_cell_length_a                 5.9400
+_cell_length_b                 5.9400
+_cell_length_c                 16.7000
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              120.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+2/3,y+1/3,z+1/3,+1
+3 x+1/3,y+2/3,z+2/3,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cr1 Cr 0.00000 0.00000 0.00000 1
+Cr2 Cr 0.00000 0.00000 0.50000 1
+Cr3 Cr 0.00000 0.00000 0.33000 1
+S1 S 0.33300 0.00000 0.25100 1
+S2 S 0.00000 0.33300 0.25100 1
+S3 S 0.66700 0.66700 0.25100 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1 -1.05 0.0 0.58 mx,my,mz
+Cr2 -1.05 0.0 0.58 mx,my,mz
+Cr3 1.05 0.0 -0.58 mx,my,mz
+

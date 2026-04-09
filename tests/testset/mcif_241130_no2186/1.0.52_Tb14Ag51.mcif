@@ -1,0 +1,203 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 04/06/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-03-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Tb14 Ag51"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Acta Cryst. B"
+_citation_journal_volume        78
+_citation_page_first            172
+_citation_page_last             178
+_citation_article_id            .
+_citation_year                  2022
+_citation_DOI                   10.1107/S205252062200124X
+
+loop_
+_citation_author_name
+"V. Pomjakushin"
+"J. M. Perez-Mato"
+"P. Fischer"
+"L. Keller"
+"W. Sikora"
+
+
+_temperature_position_structure         ?
+_temperature_atom_positions             30
+_temperature_non-magn_atom_positions    ?
+_temperature_cell_parameters            1.5
+
+_atomic_positions_source_database_code_ICSD   246436
+_atomic_positions_source_other               .
+
+_transition_temperature     27.5(5)
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK4K6 4 2 special primary 18 .
+mGM2+ 1 1 . secondary 4 yes
+mGM1- 1 1 . secondary 5 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Refinement was done using spherical coordinates for the Tb magnetic moments with the magnetic moment modulus of all Tb sites constrained to be equal
+The absolute orientation of the spin arrangement on the ab plane is undetermined and the orientation of one of the symmetry independent moment was fixed to an arbitrary value
+Tb moment modulus: 8.48(2)
+Tb moment components at some sites are given with non-significant digits in order to be consistent with the refined moment modulus, common for all sites.
+Positional structure (except lattice parameters) from a measurement at 30K in the paramagnetic phase.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+4-dim irrep (physically irreducible) along a special direction as primary
+Secondary irrep modes with k=0 (third harmonic) are allowed and are present with an important weight in the spin arrangement.
+;
+
+_parent_space_group.name_H-M_alt  'P 6/m'
+_parent_space_group.IT_number                       175
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+2b,c;1/3,-1/3,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  174.135
+_space_group_magn.name_BNS  "P -6'"
+_space_group_magn.point_group_name  "-6'"
+_space_group_magn.point_group_number  "22.3.81"
+_cell_length_a                 21.77944
+_cell_length_b                 21.77944
+_cell_length_c                 9.25767
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              120.000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+y,-x,z,+1 
+3 -y,x-y,z,+1 
+4 -x+y,-x,-z,-1 
+5 -y,x-y,-z,-1 
+6 x,y,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tb1a_1 Tb 0.20453 -0.06757 0.50000 1
+Tb1a_2 Tb 0.53787 0.59910 0.50000 1
+Tb1a_3 Tb 0.87120 0.26577 0.50000 1
+Tb1b_1 Tb 0.79547 0.40090 0.50000 1
+Tb1b_2 Tb 0.12880 0.06757 0.50000 1
+Tb1b_3 Tb 0.46213 0.73423 0.50000 1
+Tb2a_1 Tb 0.16813 0.61233 0.00000 1
+Tb2a_2 Tb 0.50147 0.27900 0.00000 1
+Tb2a_3 Tb 0.83480 -0.05433 0.00000 1
+Tb2b_1 Tb 0.83187 0.72100 0.00000 1
+Tb2b_2 Tb 0.16520 0.38767 0.00000 1
+Tb2b_3 Tb 0.49853 0.05433 0.00000 1
+Tb3a Tb 0.00000 0.66667 0.31040 1
+Ag1_1 Ag 0.62843 0.11403 0.23610 1
+Ag1_2 Ag 0.55263 0.84773 0.23610 1
+Ag1_3 Ag 0.81893 0.03823 0.23610 1
+Ag1_4 Ag 0.70490 0.88597 0.23610 1
+Ag1_5 Ag 0.78070 0.15227 0.23610 1
+Ag1_6 Ag 0.51440 0.96177 0.23610 1
+Ag2_1 Ag 0.57963 0.20363 0.15220 1
+Ag2_2 Ag 0.46303 0.70933 0.15220 1
+Ag2_3 Ag 0.95733 0.08703 0.15220 1
+Ag2_4 Ag 0.75370 0.79637 0.15220 1
+Ag2_5 Ag 0.87030 0.29067 0.15220 1
+Ag2_6 Ag 0.37600 0.91297 0.15220 1
+Ag3_1 Ag 0.92513 0.18093 0.33090 1
+Ag3_2 Ag 0.48573 0.07753 0.33090 1
+Ag3_3 Ag 0.58913 0.74153 0.33090 1
+Ag3_4 Ag 0.40820 0.81907 0.33090 1
+Ag3_5 Ag 0.84760 0.92247 0.33090 1
+Ag3_6 Ag 0.74420 0.25847 0.33090 1
+Ag4_1 Ag 0.80560 0.09887 0.50000 1
+Ag4_2 Ag 0.56780 0.04007 0.50000 1
+Ag4_3 Ag 0.62660 0.86107 0.50000 1
+Ag4_4 Ag 0.52773 0.90113 0.50000 1
+Ag4_5 Ag 0.76553 0.95993 0.50000 1
+Ag4_6 Ag 0.70673 0.13893 0.50000 1
+Ag5_1 Ag 0.29130 0.37357 0.00000 1
+Ag5_2 Ag 0.29310 0.25107 0.00000 1
+Ag5_3 Ag 0.41560 0.37537 0.00000 1
+Ag5_4 Ag 0.04203 0.62643 0.00000 1
+Ag5_5 Ag 0.04023 0.74893 0.00000 1
+Ag5_6 Ag 0.91773 0.62463 0.00000 1
+Ag6_1 Ag 0.66667 0.33333 0.29940 1
+Ag6_2 Ag 0.33333 0.66667 0.29940 1
+Ag6_3 Ag 0.00000 0.00000 0.29940 1
+Ag6_4 Ag 0.66667 0.66667 0.29940 1
+Ag7_1 Ag 0.66667 0.33333 0.00000 1
+Ag7_2 Ag 0.33333 0.66667 0.00000 1
+Ag7_3 Ag 0.00000 0.00000 0.00000 1
+Ag7_4 Ag 0.66667 0.66667 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tb1a_1 4.895 -4.895 0.0 mx,my,0  8.48(2) 330      90        
+Tb1a_2 -4.47 5.31  0.0  mx,my,0  8.48(2) 147(2)   90
+Tb1a_3 -9.79 -5.05 0.0  mx,my,0  8.48(2) 211(3)   90
+Tb1b_1 -1.63 7.55  0.0 	mx,my,0  8.48(2) 130(3)   90
+Tb1b_2 -2.30 -9.39 0.0	mx,my,0  8.48(2) 286(3)   90
+Tb1b_3  4.67 -5.12 0.0 	mx,my,0  8.48(2) 329(3)   90
+Tb2a_1 -3.38 -9.65 0.0 	mx,my,0	 8.48(2) 280(3)   90
+Tb2a_2  5.00  9.79 0.0 	mx,my,0	 8.48(2)  89(3)   90
+Tb2a_3 -5.56 -9.76 0.0 	mx,my,0  8.48(2) 265(3)   90
+Tb2b_1 -9.54 -6.70 0.0 	mx,my,0  8.48(2) 223(3)   90
+Tb2b_2 -9.58 -6.55 0.0	mx,my,0  8.48(2) 222(2)   90
+Tb2b_3  9.49  6.84 0.0 	mx,my,0  8.48(2)  44(3)   90
+Tb3a    5.64  9.42 2.13	mx,my,mz 8.48(2)  84(2)   75(2)
+

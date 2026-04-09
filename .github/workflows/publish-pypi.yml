@@ -1,0 +1,71 @@
+name: Publish PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build backend
+        run: python -m pip install --upgrade build
+
+      - name: Verify tag matches package version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          version_text = Path("src/findspingroup/version.py").read_text(encoding="utf-8")
+          match = re.search(r'__version__\s*=\s*"([^"]+)"', version_text)
+          if not match:
+              raise SystemExit("Could not find __version__ in src/findspingroup/version.py")
+
+          package_version = match.group(1)
+          tag_name = "${{ github.ref_name }}"
+          expected_tag = f"v{package_version}"
+          if tag_name != expected_tag:
+              raise SystemExit(
+                  f"Tag/version mismatch: got tag {tag_name!r}, expected {expected_tag!r}"
+              )
+          print(f"Tag/version check passed: {tag_name}")
+          PY
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/*
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

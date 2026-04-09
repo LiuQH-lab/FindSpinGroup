@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-09-29
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        2
+_citation_page_first            9409
+_citation_page_last             9422
+_citation_article_id            ?
+_citation_year                  1990
+_citation_DOI                   10.1088/0953-8984/2/47/015
+
+loop_
+_citation_author_name
+"P.J. Brown"
+"V. Nunez"
+"F. Tasset"
+"J.B. Forsyth"
+"P. Radhakrishna"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  643730
+_atomic_positions_source_other               .
+
+_transition_temperature  420
+_experiment_temperature  200
+
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM6+  2  2  special  primary  2  .
+mGM4+  1  1   .   secondary    1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+polarized NSD
+;
+
+_active_magnetic_irreps_details
+;
+1k structure
+2-dim irrep active along special direction.
+Secondary weak FM along the (2,1,0) direction (and domain related equivalent ones) is symmetry allowed. Weak FM has been detected in macroscopic measurements.
+This structure is one of the two possible models proposed in the article. It corresponds to a special direction within the space of the active irrep (mGM6+). The other model (see #0.199), which results undistinguishable, is realized when considering the second possible non-equivalent special direction for the same active irrep.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,2a+b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  63.464
+_space_group_magn.name_BNS  "C m' c m'"
+_cell_length_a             5.66500
+_cell_length_b             5.66500
+_cell_length_c             4.53100
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,x-y,-z+1/2,+1
+3 -x,-y,-z,+1
+4 -x,-x+y,z+1/2,+1
+5 -x,-x+y,-z,-1
+6 -x,-y,z+1/2,-1
+7 x,x-y,z,-1
+8 x,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1_1 Mn 0.83880 0.67760 0.25000
+Mn1_2 Mn  0.32240 0.16120 0.25000
+Sn1 Sn 0.333333 0.666667 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1_1 -1.73 1.73 0.00000 mx,my,0
+Mn1_2 3.46 1.73 0.00000 2my,my,0
+

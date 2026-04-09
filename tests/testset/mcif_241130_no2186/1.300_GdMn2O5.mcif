@@ -1,0 +1,128 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 19/10/2019 
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-10-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        99
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            094429
+_citation_year                  2019
+_citation_DOI                   10.1103/PhysRevB.99.094429
+
+loop_
+_citation_author_name
+"J. Sheng"
+"X. Tong"
+"F. Ye"
+"J. A. Fernandez-Baca"
+"H. Cao"
+"N. Poudel"
+"M. Gooch"
+"B. Lorenz"
+"C.W. Chu"
+"X. Wang"
+"S.-W. Cheong"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  33
+_experiment_temperature  20
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2  2  2  special  primary  11  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Above 33K and up to about 40K an incommensurate phase exists (see #1.1.62 and #1.1.63).
+Lattice parameters are absent in the article; those of a room temperature model (icsd #97046) are used here.
+Only magnetic atoms are reported.
+Similar model as the one proposed in PRL 110, 137203 (2013) (see #1.54) but with very different magnetic moment values, despite being for the same temperature.
+See entry #1.299 for the structure in the same phase at 5K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+2-dim irrep along a special direction
+Multiferroic with electric polarization along b (in parent setting)
+;
+
+_parent_space_group.name_H-M_alt  'P b a m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-a,-c,-b;7/8,0,0'
+
+
+
+_space_group_magn.number_BNS  29.104
+_space_group_magn.name_BNS  "P_a c a 2_1"
+_cell_length_a             14.70620
+_cell_length_b             8.53710
+_cell_length_c             5.68070
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+3/4,y+1/2,-z,+1 
+3 -x+1/4,y+1/2,z,+1 
+4 x+1/2,y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Gd1_1 Gd 0.0694 0.1709 0.00000
+Gd1_2 Gd  0.3194 0.3291 0.00000
+Mn1 Mn 0.00000 0.50000 0.2558
+Mn2_1 Mn 0.20575 0.3523 0.50000
+Mn2_2 Mn  0.29425 0.6477 0.50000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Gd1_1 3.67(20) 0.02(1) 0.00000 mx,my,0
+Gd1_2 -3.02(18) 1.70(30) 0.00000 mx,my,0
+Mn1 -1.72(11) 0.82(17) -0.91(33) mx,my,mz
+Mn2_1 2.88(23) -0.18(30) 0.00000 mx,my,0
+Mn2_2 -2.71(24) 1.22(25) 0.00000 mx,my,0
+
+

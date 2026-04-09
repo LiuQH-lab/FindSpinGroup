@@ -1,0 +1,169 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:19:57
+# Database entry: 2.9 Ca3CuNi2(PO4)4
+# Cif-like file for the case 2.9
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ca3 Cu Ni2 (P O4 )4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        76
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            174433
+_citation_year                  2007
+_citation_DOI                   10.1103/PhysRevB.76.174433
+
+loop_
+_citation_author_name
+"V.Y. Pomjakushin"
+"A. Furrer"
+"D.V. Sheptyakov"
+"E.V. Pomjakushina"
+"K. Conder"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   159902
+_atomic_positions_source_other               .
+
+_transition_temperature     20
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mV1- 2 1 special-2 primary 12 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+See also Pomjakushin, J. Phys. Cond. Matter 26 (2014) 496002
+Cu/Ni slight mixture on Cu and Ni sites for the atomic position refinement, but magnetic moments were fitted assuming full occupancy of Cu and Ni, respectively.
+Moments refined in polar coordinates
+Cu moment modulus: 0.62(2)
+Ni moment modulus: 1.89(1)
+Moment components given with non-significant digits to be consistent with the reported modulus.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+2-dim irrep active: three different possible MSGs for the same irrep (two epikernels, one kernel)
+Transformation to standard setting only requires an origin shift. The change of basis introduced in J. Phys. Cond. Matter 26 (2014) 496002 is not necessary to use a standard setting.
+;
+
+_parent_space_group.name_H-M_alt  'C  2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+k2 [-1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,1/4,0'
+
+
+_space_group_magn.number_BNS  15.91
+_space_group_magn.name_BNS  "C_a  2/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 35.43480
+_cell_length_b                 9.64220
+_cell_length_c                 17.84750
+_cell_angle_alpha              90.00
+_cell_angle_beta               123.64
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z+1/2,+1
+3 -x,-y+1/2,-z,+1
+4 x,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x,y+1/2,z,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cu1_1 Cu 0.00000 0.25000 0.00000 1
+Cu1_2 Cu 0.75000 0.00000 0.00000 1
+Ni2_1 Ni 0.30995 0.26810 0.96710 1
+Ni2_2 Ni 0.05995 0.01810 0.96710 1
+Ca1_1 Ca 0.00000 0.47550 0.25000 1
+Ca1_2 Ca 0.25000 0.72550 0.25000 1
+Ca2_1 Ca 0.38335 0.22205 0.36140 1
+Ca2_2 Ca 0.63335 0.47205 0.36140 1
+P1_1 P 0.04665 0.49575 0.12570 1
+P1_2 P 0.29665 0.74575 0.12570 1
+P2_1 P 0.17030 0.47490 0.11110 1
+P2_2 P 0.42030 0.72490 0.11110 1
+O1_1 O 0.08965 0.04055 0.21210 1
+O1_2 O 0.33965 0.29055 0.21210 1
+O2_1 O 0.25555 0.26070 0.13010 1
+O2_2 O 0.50555 0.51070 0.13010 1
+O3_1 O 0.05085 0.34840 0.09950 1
+O3_2 O 0.30085 0.59840 0.09950 1
+O4_1 O 0.04005 0.09060 0.04770 1
+O4_2 O 0.29005 0.34060 0.04770 1
+O5_1 O 0.19900 0.05185 0.19720 1
+O5_2 O 0.44900 0.30185 0.19720 1
+O6_1 O 0.17815 0.02410 0.03810 1
+O6_2 O 0.42815 0.27410 0.03810 1
+O7_1 O 0.42710 0.06715 0.12200 1
+O7_2 O 0.67710 0.31715 0.12200 1
+O8_1 O 0.12060 0.49830 0.08060 1
+O8_2 O 0.37060 0.74830 0.08060 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1_1 0.3228 -0.1426 -0.3601 mx,my,mz
+Cu1_2 -0.3228 0.1426 0.3601 mx,my,mz
+Ni2_1 0.1539 -0.1984 -1.7917 mx,my,mz
+Ni2_2 -0.1539 0.1984 1.7917 mx,my,mz
+

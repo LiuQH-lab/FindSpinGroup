@@ -1,0 +1,140 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/17/2023 01:44:48
+
+data_5yOhtAoR
+_audit_creation_date            2023-02-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Nd1 Pd1 In1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        285
+_citation_page_first            272
+_citation_page_last             278
+_citation_article_id            .
+_citation_year                  2005
+_citation_DOI                   10.1016/j.jmmm.2004.08.002
+
+loop_
+_citation_author_name
+"L. Gondek"
+"S. Baran"
+"A. Szytula"
+"D. Kaczorowski"
+"J. Hernandez-Velasco"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  153004
+_atomic_positions_source_other               .
+
+_transition_temperature     30
+_experiment_temperature     15
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3 1 1 . primary 1 .
+mGM6 2 2 special primary 2 .
+mGM2 1 1 . secondary 1 no
+mGM5 2 2 special secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Ferromagnet
+Moment direction 50 degrees out of the basal plane
+FM on the plane perpendicular to the direction (2,1,0)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps are involved as primary irreps
+Two degrees of freedom corresponding to secondary irreps are symmetry allowed, but not present
+;
+
+_parent_space_group.name_H-M_alt  'P -6 2 m'
+_parent_space_group.IT_number                       189
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,2a+b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  8.34
+_space_group_magn.name_BNS  "C m'"
+_space_group_magn.point_group_name  "m'"
+_space_group_magn.point_group_number  "4.3.11"
+_cell_length_a                 7.6743(25)
+_cell_length_b                 7.6743(25)
+_cell_length_c                 3.9940(11)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-x+y,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Nd1_1 Nd 0.5840(7) 0.00000 0.00000 1
+Nd1_2 Nd 0.00000 0.58400 0.00000 1
+Pd1 Pd 0.00000 0.00000 0.00000 1
+Pd2 Pd 0.33333 0.66667 0.50000 1
+In1_1 In 0.2482(43) 0.00000 0.50000 1
+In1_2 In 0.00000 0.24820 0.50000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Nd1_1 0.0 1.15 0.96 mx,my,mz 1.5(2) ? ?
+Nd1_2 0.0 1.15 0.96 0,my,mz 1.5(2) ? ?
+

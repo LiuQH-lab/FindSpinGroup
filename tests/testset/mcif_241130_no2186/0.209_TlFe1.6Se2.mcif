@@ -1,0 +1,123 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW LETTERS"
+_citation_journal_volume        109
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            077003
+_citation_year                  2012
+_citation_DOI                   10.1103/PhysRevLett.109.077003
+
+loop_
+_citation_author_name
+"A.F. May"
+"M.A. McGuire"
+"H. Cao"
+"I. Sergueev"
+"C. Cantoni"
+"B.C. Chakoumakos"
+"D.S. Parker"
+"B.C. Sales"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  500
+_experiment_temperature  150
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1- 1  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Sample with fully ordered Fe vacancies.
+Below 100K a spin reorientation takes place and the spins lie on the ab plane (see #0.207 and #0.208).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m'
+_parent_space_group.IT_number                       87
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  87.78
+_space_group_magn.name_BNS  "I 4/m'"
+_cell_length_a             8.640
+_cell_length_b             8.640
+_cell_length_c             13.878
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x,z,+1
+3 y,-x,z,+1
+4 -x,-y,z,+1
+5 -x,-y,-z,-1
+6 y,-x,-z,-1
+7 -y,x,-z,-1
+8 x,y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Tl1 Tl 0.00000 0.00000 0.00000
+Tl2 Tl 0.19373 0.39406 0.00000
+Fe1 Fe 0.09220 0.19627 0.24668
+Se1 Se 0.00000 0.00000 0.36504
+Se2 Se 0.19864 0.39073 0.35489
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.00000 0.00000 3.141(28) mx,my,mz

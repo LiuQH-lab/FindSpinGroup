@@ -1,0 +1,129 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Alloys and Compounds"
+_citation_journal_volume        237
+_citation_page_first            9
+_citation_page_last             19
+_citation_article_id            ?
+_citation_year                  1996
+_citation_DOI                   10.1016/0925-8388(95)02066-7
+
+loop_
+_citation_author_name
+"S.L. Brock"
+"N. Raju"
+"J. Greedan"
+"S.M. Kauzlarich"
+
+
+
+_atomic_positions_source_database_code_ICSD  81803
+_atomic_positions_source_other               .
+
+_transition_temperature  340
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2-  1  1  .  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Mn1 moments remain disordered
+Same Mn2 spin arrangement as in Sr2Mn3Sb2O2 (see #2.27)
+see also (Nath et al., Phys. Rev. 81, 224513 (2010))
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+1-dim irrep active
+The zero value of Mn1 moments is symmetry forced.
+If insulator, linear magnetoelectricity is to be expected.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  139.536
+_space_group_magn.name_BNS  "I 4'/m' m' m"
+_cell_length_a             4.14070
+_cell_length_b             4.14070
+_cell_length_c             18.78700
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,-z,+1
+3 -x,y,-z,+1
+4 -x,-y,z,+1
+5 y,-x,-z,+1
+6 -y,x,-z,+1
+7 -y,-x,z,+1
+8 y,x,z,+1
+9 -y,x,z,-1
+10 y,-x,z,-1
+11 y,x,-z,-1
+12 -y,-x,-z,-1
+13 -x,-y,-z,-1
+14 -x,y,z,-1
+15 x,-y,z,-1
+16 x,y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Sr1 Sr 0.00000 0.00000 0.41360
+Mn1 Mn 0.00000 0.00000 0.00000
+Mn2 Mn 0.00000 0.50000 0.25000
+As1 As 0.00000 0.00000 0.16910
+O1 O 0.00000 0.50000 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.00000 0.00000 0.00000 0,0,0
+Mn2 0.00000 0.00000 3.4(1) 0,0,mz
+

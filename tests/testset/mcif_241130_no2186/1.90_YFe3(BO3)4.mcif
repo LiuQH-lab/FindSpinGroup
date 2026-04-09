@@ -1,0 +1,171 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:11:31
+# Database entry: 1.90 YFe3(BO3)4
+# Cif-like file for the case 1.90
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Y Fe3 (B O3 )4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        20
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            365209
+_citation_year                  2008
+_citation_DOI                   10.1088/0953-8984/20/36/365209
+
+loop_
+_citation_author_name
+"C. Ritter"
+"A. Vorotynov"
+"A. Pankrats"
+"G. Petrakovskii"
+"V. Temerov"
+"I. Gudim"
+"R. Szymczak"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     37
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA3 2 2 special primary 12 yes
+mA1 1 1 . secondary 5 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Collinear model with considerable restrictions not forced by symmetry.
+If insulator or semiconductor, a magnetically induced ferroelectricity along the x axis (or symmetry equivalent) should be expected.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Experiment cannot determine the direction of the moments on the plane xy.
+Moments direction has been chosen so that maximal symmetry compatible with the reported collinear model is preserved.
+A secondary irrep is allowed, but not present.
+The primary irrep has 12 basis modes, but the model is reduced to a single parameter.
+;
+
+_parent_space_group.name_H-M_alt  'P  3_121'
+_parent_space_group.IT_number                       152
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+2b,-a,c;0,0,1/6'
+
+
+_space_group_magn.number_BNS  5.16
+_space_group_magn.name_BNS  "C_c  2"
+_space_group_magn.point_group_name  "21'"
+_space_group_magn.point_group_number  "3.2.7"
+_cell_length_a                 9.51720
+_cell_length_b                 9.51720
+_cell_length_c                 15.09060
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x-y,-y,-z+1/3,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Y1_1 Y 0.33460 0.00000 0.16667 1
+Y1_2 Y 0.00000 0.33460 0.33333 1
+Fe1_1 Fe 0.88520 0.00000 0.16667 1
+Fe1_2 Fe 0.00000 0.88520 0.33333 1
+Fe2_1 Fe 0.78860 0.45180 0.17235 1
+Fe2_2 Fe 0.54820 0.33680 0.33902 1
+Fe2_3 Fe 0.66320 0.21140 0.50568 1
+O1_1 O 0.92050 0.00000 0.41667 1
+O1_2 O 0.00000 0.92050 0.08333 1
+O2_1 O 0.41340 0.71560 0.06205 1
+O2_2 O 0.28440 0.69780 0.22872 1
+O2_3 O 0.30220 0.58660 0.39538 1
+O3_1 O 0.87560 0.69710 0.41150 1
+O3_2 O 0.30290 0.17850 0.57817 1
+O3_3 O 0.82150 0.12440 0.74483 1
+O4_1 O 0.85530 0.64010 0.09350 1
+O4_2 O 0.35990 0.21520 0.26017 1
+O4_3 O 0.78480 0.14470 0.42683 1
+O5_1 O 0.47840 0.15000 0.42150 1
+O5_2 O 0.85000 0.32840 0.58817 1
+O5_3 O 0.67160 0.52160 0.75483 1
+O6_1 O 0.18800 0.00000 0.41667 1
+O6_2 O 0.00000 0.18800 0.08333 1
+O7_1 O 0.47740 0.46690 0.40655 1
+O7_2 O 0.53310 0.01050 0.57322 1
+O7_3 O 0.98950 0.52260 0.73988 1
+B1_1 B 0.33300 0.00000 0.41667 1
+B1_2 B 0.00000 0.33300 0.08333 1
+B2_1 B 0.55280 0.87580 0.07545 1
+B2_2 B 0.12420 0.67700 0.24212 1
+B2_3 B 0.32300 0.44720 0.40878 1
+B3_1 B 0.78000 0.00000 0.41667 1
+B3_2 B 0.00000 0.78000 0.08333 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Y1_1 0.0 0.0 0.0 mx,0,0
+Y1_2 0.0 0.0 0.0 mx,my,mz
+Fe1_1 -3.95(5) 0.0 0.0 mx,0,0
+Fe1_2 3.95 0.0 0.0 mx,my,mz
+Fe2_1 -3.95 0.0 0.0 mx,my,mz
+Fe2_2 3.95 0.0 0.0 mx,my,mz
+Fe2_3 -3.95 0.0 0.0 mx,my,mz
+

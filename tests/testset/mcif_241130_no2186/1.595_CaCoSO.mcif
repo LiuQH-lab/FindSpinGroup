@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 28/08/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-08-28
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        55
+_citation_page_first            1697
+_citation_page_last             1701
+_citation_article_id            .
+_citation_year                  2016
+_citation_DOI                   10.1021/acs.inorgchem.5b02615
+
+loop_
+_citation_author_name
+"E. J. T. Salter"
+"J. N. Blandy"
+"S. J. Clarke"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  ?
+_experiment_temperature  8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mH3  4  2  special  primary  4  .
+mH1H2 4  2  special  "secondary?" 2 yes
+mA2A3 2  2  general  secondary 2 yes
+mA5A6 4  4  special  secondary 2 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Transition temperature is not given.
+The description is done in the standard setting of the assigned MSG, as in the original reference.
+Other not specified magnetic orderings are said to fit equally well the data. 
+Apparently, the proposed arrangement was not analyzed in terms of irreps. 
+The model includes correlations between the moments of all the symmetry independent Co-sites. 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+The spin arrangement on the plane ab corresponds to the primary irrep mH3, but along a special direction of higher trigonal symmetry.  
+The proposed spin canting along c, apart from a component corresponding to the expected secondary irrep mA2A3 with wave vector (0,0,1/2) (point A), which would keep the trigonal symmetry, it also includes a mode with irrep mH1H2 with the same propagation vector (1/3,1/3,1/2) as the primary irrep mH3. It is this latter, which lowers the symmetry to a monoclinic MSG, and therefore it cannot be explained as a secondary effect.
+; 
+
+_parent_space_group.name_H-M_alt  'P 6_3 m c'
+_parent_space_group.IT_number                       186
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 1/2]
+k2 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '-2a-b,-3b,2c;2/3,1/3,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  9.40
+_space_group_magn.name_BNS  "C_c c"
+_cell_length_a             6.464(4)
+_cell_length_b             11.195(7)
+_cell_length_c             22.17(1)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ca1_1 Ca 0.66666 0.00000 0.13340
+Ca1_2 Ca 0.50000 0.83334 0.38340
+Ca1_3 Ca 0.16667 0.16667 0.13340
+Ca1_4 Ca 0.00000 0.00000 0.38340
+Co1_1 Co 0.83333 0.16667 0.00000
+Co1_2 Co 0.33333 0.00000 0.00000
+Co1_3 Co 0.83333 0.16667 0.25000
+Co1_4 Co 0.33333 0.00000 0.25000
+S1_1 S 0.66666 0.00000 0.28910
+S1_2 S 0.50000 0.83334 0.53910
+S1_3 S 0.16667 0.16667 0.28910
+S1_4 S 0.00000 0.00000 0.53910
+O1_1 O 0.33333 0.00000 0.16580
+O1_2 O 0.33333 0.00000 0.41580
+O1_3 O 0.83333 0.16667 0.16580
+O1_4 O 0.83333 0.16667 0.41580
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1_1 1.10(2) -1.90(4) -1.61(6) mx,my,mz  2.72(5)
+Co1_2 -2.20(5) 0.0 1.61(6)      mx,0,mz   2.72(5)
+Co1_3 1.10(2) 1.90(4) -1.61(6)  mx,my,mz  2.72(5)
+Co1_4 -2.20(5) 0.0 1.61(6)      mx,0,mz   2.72(5)
+

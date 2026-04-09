@@ -1,0 +1,152 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:13:00
+# Database entry: 1.110 ScMn6Ge6
+# Cif-like file for the case 1.110
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Sc Mn6 Ge6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        369
+_citation_page_first            243
+_citation_page_last             248
+_citation_article_id            .
+_citation_year                  2014
+_citation_DOI                   10.1016/j.jmmm.2014.06.052
+
+loop_
+_citation_author_name
+"P. Schobinger-Papamantellos"
+"J. Rodriguez-Carvajal"
+"K. Buschow"
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     516
+_experiment_temperature     309
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+at 149 K, Mn moment: 2.08(4)
+Mn layers in the form of Kagome lattices.
+Below 100K an incommensurate phase with an additional propagation vector (0,0,g) is reported.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+1-dim active irrep
+;
+
+_parent_space_group.name_H-M_alt  'P  6/m  m  m'
+_parent_space_group.IT_number                       191
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  192.252
+_space_group_magn.name_BNS  "P_c  6/m  c  c"
+_space_group_magn.point_group_name  "6/mmm1'"
+_space_group_magn.point_group_number  "27.2.101"
+_cell_length_a                 5.1822
+_cell_length_b                 5.1822
+_cell_length_c                 16.2204
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x-y,x,z,+1
+3 -y,x-y,z,+1
+4 -x,-y,z,+1
+5 -x+y,-x,z,+1
+6 y,-x+y,z,+1
+7 x-y,-y,-z+1/2,+1
+8 y,x,-z+1/2,+1
+9 -x,-x+y,-z+1/2,+1
+10 x,x-y,-z+1/2,+1
+11 -x+y,y,-z+1/2,+1
+12 -y,-x,-z+1/2,+1
+13 -x,-y,-z,+1
+14 -x+y,-x,-z,+1
+15 y,-x+y,-z,+1
+16 x,y,-z,+1
+17 x-y,x,-z,+1
+18 -y,x-y,-z,+1
+19 -x+y,y,z+1/2,+1
+20 -y,-x,z+1/2,+1
+21 x,x-y,z+1/2,+1
+22 -x,-x+y,z+1/2,+1
+23 x-y,-y,z+1/2,+1
+24 y,x,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.50000 0.00000 0.1229 1
+Ge1 Ge 0.333333 0.666667 0.25000 1
+Ge2 Ge 0.333333 0.666667 0.00000 1
+Ge3 Ge 0.00000 0.00000 0.169 1
+Sc1 Sc 0.00000 0.00000 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.0 0.0 1.96(4) 0,0,mz
+

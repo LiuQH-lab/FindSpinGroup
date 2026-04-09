@@ -1,0 +1,151 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/30/2019 
+
+data_5yOhtAoR
+_audit_creation_date            2019-05-30
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Dy Fe W O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        95
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            224416
+_citation_year                  2017
+_citation_DOI                   10.1103/PhysRevB.95.224416
+
+loop_
+_citation_author_name
+"S. Ghara"
+"E. Suard"
+"F. Fauth"
+"T.T. Tran"
+"P.S. Halasyamani"
+"A. Iyo"
+"J. Rodriguez-Carvajal"
+"A. Sundaresan"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     18
+_experiment_temperature     3.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT1 2 2 special primary 12 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Symmetry-mode parameterization was employed in the refinement.
+Extremely non-collinear atructure
+A weak symmetry-compatible monoclinic displacive structural distortion (irrep distortion GM4) induced by the magnetic ordering is reported and it is given a quantitative value, but it is not included in the present structure. 
+Detailed values of the moment components, not given in the article, are taken from a private communication from J. Rodriguez-Carvajal. Moment magnitudes and atomic coordinates, slightly differing from those given in the article, also come from this private communication. 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal symmetry (2 possible)
+2-dim primary irrep along a special direction
+Only one irrep exists for this propagation vector
+;
+
+_parent_space_group.name_H-M_alt  "P n a 2_1"
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  "a,2b,2c;0,0,0"
+_space_group_magn.transform_BNS_Pp_abc  "c,b,-a;0,1/8,0"
+
+_space_group_magn.number_BNS  9.41
+_space_group_magn.name_BNS  "C_a c"
+_space_group_magn.point_group_name  "m1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 10.97206(5)
+_cell_length_b                 10.36716(5)
+_cell_length_c                 14.67390(6)
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/4,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x,y+1/2,z,-1 
+4 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Dy_1 Dy 0.04250 0.22879(10) 0.12500 1
+Dy_2 Dy 0.95750 0.77120(10) 0.37500 1
+Fe_1 Fe 0.1361(4) 0.4834(5) 0.4966(5) 1
+Fe_2 Fe 0.8639(4) 0.5166(5) 0.7466(5) 1
+W_1 W 0.3540(5) 0.2270(7) 0.0044(6) 1
+W_2 W 0.6460(5) 0.7730(7) 0.2544(6) 1
+O1_1 O 0.9736(7) 0.3811(7) 0.0197(8) 1
+O1_2 O 0.0264(7) 0.6189(7) 0.2697(8) 1
+O2_1 O 0.5236(11) 0.1299(11) 0.4778(11) 1
+O2_2 O 0.4764(11) 0.8701(11) 0.7278(11) 1
+O3_1 O 0.2157(8) 0.3031(10) 0.0314(7) 1
+O3_2 O 0.7843(8) 0.6969(10) 0.2814(7) 1
+O4_1 O 0.2934(5) 0.0645(6) 0.4671(5) 1
+O4_2 O 0.7066(5) 0.9355(6) 0.7171(5) 1
+O5_1 O 0.1435(3) 0.0301(3) 0.1265(12) 1
+O5_2 O 0.8565(3) 0.9699(3) 0.3765(12) 1
+O6_1 O 0.1205(3) 0.4145(3) 0.3737(10) 1
+O6_2 O 0.8795(3) 0.5855(3) 0.6237(10) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Dy_1 -0.4(3) -5.62(12) -5.30(10) mx,my,mz  7.74(4)
+Dy_2 0.4(3) -5.41(11) 5.52(8)    mx,my,mz  7.74(4)
+Fe_1 3.36(13) 2.3(3) -2.77(16)   mx,my,mz  4.94(10)
+Fe_2 -0.4(5) -4.88(11) -0.52(16) mx,my,mz  4.94(10)
+

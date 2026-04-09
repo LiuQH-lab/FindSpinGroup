@@ -1,0 +1,127 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/09/2019
+
+data_5yOhtAoR
+_audit_creation_date            2019-09-03
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        58
+_citation_page_first            6291
+_citation_page_last             6297
+_citation_article_id            ?
+_citation_year                  1998
+_citation_DOI                   10.1103/PhysRevB.58.6291
+
+loop_
+_citation_author_name
+"M.J. Ruiz-Aragon"
+"E. Moran"
+"U. Amador"
+"J.L. Martinez"
+"N.H. Andersen"
+"H. Ehrenberg"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  475
+_experiment_temperature  298
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA5+  2  2  special  primary  2  .
+mA2+  1  1   .  primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Below 240K a new magnetic phase is reported with a commensurate propagation vector (1/2,1/2,3/8), in contrast with other publications reporting an incommensurate phase.
+Moment modulus: 1.45(5)
+Moment value much smaller than in the models proposed in 1994 (see #1.281) and 1995 (see #1.282)
+We assume the reported magnetic moment to be associated to only the Fe atom.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+TWo irreps are involved as primary. This seems to be in contradiction with the apparent continuous character of the phase transition
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m m m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,b,-1/2a+1/2c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  12.64
+_space_group_magn.name_BNS  "C_a 2/m"
+_cell_length_a             7.74800
+_cell_length_b             7.74800
+_cell_length_c             15.33520
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z,+1
+3 -x,-y,-z,+1
+4 x,-y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+5 x,y,z+1/2,-1
+6 x,y+1/2,z,-1
+7 x+1/2,y,z,-1
+8 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Y1 Y 0.00000 0.00000 0.25000 1.
+Ba1 Ba 0.00000 0.00000 0.00000 1.
+Cu1 Cu 0.25000 0.25000 0.13400 0.5
+Fe1 Fe 0.25000 0.25000 0.13400 0.5
+O1_1 O 0.00000 0.25000 0.15780 1.
+O1_2 O  0.25000 0.00000 0.15780 1.
+O2 O 0.25000 0.25000 0.00000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1 0.00000 0.00000 0.00000 mx,0,mz
+Fe1 1.19 0.00000 0.83 mx,0,mz
+

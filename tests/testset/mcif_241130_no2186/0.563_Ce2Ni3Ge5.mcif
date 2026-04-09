@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 27/02/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-02-27
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        246
+_citation_page_first            366
+_citation_page_last             374
+_citation_article_id            .
+_citation_year                  2002
+_citation_DOI                   10.1016/S0304-8853(02)00107-5
+
+loop_
+_citation_author_name
+"L. Durivault"
+"F. Bouree"
+"B. Chevalier"
+"G. Andrea"
+"J. Etourneau"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  4.8
+_experiment_temperature  1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2-  1  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 300K
+This is one of the two alternative structures with different MSGs (different irreps), which fit equally well the data (see #0.562). Despite their similarity, they are physically inequivalent models.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'I b a m'
+_parent_space_group.IT_number                       72
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,1/4,1/4'
+
+
+
+_space_group_magn.number_BNS  56.376
+_space_group_magn.name_BNS  "P_I c c n"
+_cell_length_a             9.80850
+_cell_length_b             11.83780
+_cell_length_c             5.96020
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z,+1 
+3 -x+1/2,y+1/2,-z,+1 
+4 -x,-y,z,+1 
+5 -x+1/2,-y+1/2,-z+1/2,+1 
+6 -x,y,z+1/2,+1 
+7 x,-y,z+1/2,+1 
+8 x+1/2,y+1/2,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ce1 Ce 0.26270 0.13200 0.00000
+Ni1 Ni 0.00000 0.00000 0.25000
+Ni2 Ni 0.10930 0.36610 0.00000
+Ge1 Ge 0.50000 0.00000 0.25000
+Ge2 Ge 0.00000 0.23460 0.25000
+Ge3 Ge 0.34800 0.39680 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Ce1 0.4(1) 0.00000 0.00000 mx,my,0  0.4(1)
+

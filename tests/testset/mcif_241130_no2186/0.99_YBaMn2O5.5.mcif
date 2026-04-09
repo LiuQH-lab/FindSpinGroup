@@ -1,0 +1,152 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:55:13
+# Database entry: 0.99 YBaMn2O5.5
+# Cif-like file for the case 0.99
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Y Ba Mn2 O5 .5'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Chem. Mater."
+_citation_journal_volume        17
+_citation_page_first            1835
+_citation_page_last             1843
+_citation_article_id            .
+_citation_year                  2005
+_citation_DOI                   10.1021/cm048119k
+
+loop_
+_citation_author_name
+"C. Perca"
+"L. Pinsard-Gaudart"
+"A. Daoud-Aladine"
+"M.T. Fernandez-Diaz"
+"J. Rodriguez-Carvajal"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   152235
+_atomic_positions_source_other               .
+
+_transition_temperature     155
+_experiment_temperature     133
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+ 1 1 . primary ? ?
+mGM2+ 1 1 . primary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Another phase of higher symmetry having the spins along a, with a single irrep active is reported
+to exist below 120K (see entry 0.98)
+Two Mn sites have been forced to have the same moments
+Moment components only rough approximate; taken from the article figures.
+Parent setting is not the standard one of Ibam (Icam in the setting used)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim active irreps
+Symmetry-allowed weak FM along b (in the setting used)
+;
+
+_parent_space_group.name_H-M_alt  'I  c  a  m'
+_parent_space_group.IT_number                       72
+_parent_space_group.transform_Pp_abc  'a,c,-b;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+c,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  12.58
+_space_group_magn.name_BNS  "C  2/m"
+_space_group_magn.point_group_name  "2/m"
+_space_group_magn.point_group_number  "5.1.12"
+_cell_length_a                 8.16120
+_cell_length_b                 7.54640
+_cell_length_c                 15.27940
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y,-z,+1
+3 -x,-y,-z,+1
+4 x,-y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Y1_1 Y 0.27290 0.00000 0.00470 1.
+Y1_2 Y 0.22710 0.00000 0.50470 1.
+Ba1_1 Ba 0.25350 0.00000 0.25310 1.
+Ba1_2 Ba 0.24650 0.00000 0.75310 1.
+Mn1 Mn 0.00000 0.75000 0.88560 1.
+Mn2 Mn 0.00000 0.75000 0.62330 1.
+O1_1 O 0.23060 0.27920 0.09840 1.
+O1_2 O 0.26940 0.72080 0.59840 1.
+O2 O 0.00000 0.75000 0.74820 1.
+O3_1 O 0.03430 0.00000 0.09320 1.
+O3_2 O 0.46570 0.00000 0.59320 1.
+O4_1 O 0.97090 0.00000 0.38440 1.
+O4_2 O 0.52910 0.00000 0.88440 1.
+O5 O 0.50000 0.75000 0.00000 1.
+O6 O 0.00000 0.75000 0.00000 0.1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 2.4 0.0 1.3 mx,my,mz
+Mn2 2.4 0.0 1.3 mx,my,mz
+

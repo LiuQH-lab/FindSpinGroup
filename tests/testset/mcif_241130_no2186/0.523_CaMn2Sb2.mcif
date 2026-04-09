@@ -1,0 +1,113 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/31/2021
+
+data_5yOhtAoR
+_audit_creation_date            2020-11-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        321
+_citation_page_first            3653
+_citation_page_last             3657
+_citation_article_id            .
+_citation_year                  2009
+_citation_DOI                   10.1016/j.jmmm.2009.07.015
+
+loop_
+_citation_author_name
+"C.A. Bridges"
+"V.V. Krishnamurthy"
+"S. Poulton"
+"M.P. Paranthaman"
+"B.C. Sales"
+"C. Myers"
+"S. Bobev"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  164899
+_atomic_positions_source_other               .
+
+_transition_temperature  85
+_experiment_temperature  20
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3-  2  2  special  primary  2  .
+mGM1-  1  1    .   primary?  1  yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Direction of the moment on the basal plane is undetermined; a special direction has been chosen arbitrarily
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep as primary. Although this irrep alone along a general direction results in the observed MSG, the arbitrarily chosen special direction of the moments on the basal plane, along a, keeps a higher monoclinic symmetry (MSG: C2'/m). The reduction to triclinic P-1' is due to the non-zero z-component of the Mn moments, which corresponds the 1-dim irrep mGM1-. This second irrep can then be taken as an additional primary irrep, if the special direction chosen on the xy plane is indeed realized, or as an induced secondary irrep for a more general direction on the xy plane.
+;
+
+_parent_space_group.name_H-M_alt  'P -3 m 1'
+_parent_space_group.IT_number                       164
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.6
+_space_group_magn.name_BNS  "P -1'"
+_cell_length_a             4.52540
+_cell_length_b             4.52540
+_cell_length_c             7.44280
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ca1 Ca 0.00000 0.00000 0.00000
+Mn1 Mn 0.33333 0.66667 0.62210
+Sb1 Sb 0.33333 0.66667 0.24900
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 -3.06 0.00000 1.43 mx,my,mz  3.38(6)
+

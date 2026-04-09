@@ -1,0 +1,144 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/05/2024
+# From a file submitted by V. Pomjakushin
+
+data_5yOhtAoR
+_audit_creation_date            2024-11-05
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "La0.35 Pr0.35 Ca0.3 Mn1 O3"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Phys Rev B"
+_citation_journal_volume        76
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            054410
+_citation_year                  2007
+_citation_DOI                   10.1103/PhysRevB.75.054410
+
+loop_
+_citation_author_name
+"V.Yu. Pomjakushin"
+"D.V. Sheptyakov"
+"K. Conder"
+"E.V. Pomjakushina"
+"A.M. Balagurov"
+
+_temperature_position_structure         15
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     183
+_experiment_temperature     15
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+This is one of two coexisting phases. FM along c. For the coexisting AFM phase see #2.109
+This sample contained the natural oxygen isotope O(16) while the magnetic structures of the two coexisting phases for a sample with the oxygen isotope O(18) are described under entries 0.1056 and 2.110
+The magnetic moments are effective values, calculated under the assumption that the magnetic phase occupies the entire sample volume. However, as shown in the paper, the AFM and FM phases are phase-separated, with magnetic moment sizes of  M_{AFM} = 2.26  \mu_B  and  M_{FM} = 3.57 \mu_B  throughout the phase diagram of (La_{1−y}Pr_y){0.7}Ca{0.3}MnO_3, while the phase volumes are redistributed in sync. 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number        62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  62.446
+_space_group_magn.name_BNS  "P n' m' a"
+_space_group_magn.point_group_name  "m'm'm"
+_space_group_magn.point_group_number  "8.4.27"
+_cell_length_a                 5.44490
+_cell_length_b                 7.68230
+_cell_length_c                 5.44240
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,z+1/2,+1 
+3 -x,-y,-z,+1 
+4 x+1/2,y,-z+1/2,+1 
+5 x+1/2,-y+1/2,-z+1/2,-1 
+6 -x,y+1/2,-z,-1 
+7 -x+1/2,y+1/2,z+1/2,-1 
+8 x,-y+1/2,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.00000 0.50000 1.00000
+La1 La 0.46561 0.25000 0.50257 0.35000
+Pr1 Pr 0.46561 0.25000 0.50257 0.35000
+Ca1 Ca 0.46561 0.25000 0.50257 0.30000
+O1 O 0.01076 0.25000 0.57602 1.00000
+O2 O 0.27209 0.53120 0.71494 1.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1 0.0 0.0 3.53 Mx,My,Mz 3.53 ? ?
+

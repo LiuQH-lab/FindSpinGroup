@@ -1,0 +1,145 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:00:41
+# Database entry: 0.139 BiCrO3
+# Cif-like file for the case 0.139
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Bi Cr O3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Solid State Sciences"
+_citation_journal_volume        12
+_citation_page_first            660
+_citation_page_last             664
+_citation_article_id            .
+_citation_year                  2010
+_citation_DOI                   10.1016/j.solidstatesciences.2008.12.004
+
+loop_
+_citation_author_name
+"C. Darie"
+"C. Goujon"
+"M. Bacia"
+"H. Klein"
+"P. Toulemonde"
+"P. Bordet"
+"E. Suard"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   174406
+_atomic_positions_source_other               .
+
+_transition_temperature     80
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1+ 1 1 . primary ? ?
+mGM2+ 1 1 . primary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Modulus Cr moments: 2.6. spin angle on the bc plane with the b axis: 50 degrees. Corresponding moment components used here are only approximate.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+spin reorientation phase that breaks the symmetry of a previous one with spins along b (see entry #0.138)
+Ferrimagnetism allowed. weak FM reported in other sources.
+;
+
+_parent_space_group.name_H-M_alt  'C  2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,-1/2a+1/2b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  2.4
+_space_group_magn.name_BNS  "P  -1"
+_space_group_magn.point_group_name  "-1"
+_space_group_magn.point_group_number  "2.1.3"
+_cell_length_a                 9.45190
+_cell_length_b                 5.47410
+_cell_length_c                 9.57670
+_cell_angle_alpha              90.00
+_cell_angle_beta               108.55
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Bi1_1 Bi 0.13340 0.21580 0.13130 1
+Bi1_2 Bi 0.86660 0.21580 0.36870 1
+Cr1_1 Cr 0.25000 0.25000 0.50000 1
+Cr1_2 Cr 0.75000 0.25000 0.00000 1
+Cr2 Cr 0.00000 0.76500 0.25000 1
+O1_1 O 0.08730 0.20200 0.58700 1
+O1_2 O 0.91270 0.20200 0.91300 1
+O2_1 O 0.15570 0.52300 0.36490 1
+O2_2 O 0.84430 0.52300 0.13510 1
+O3_1 O 0.35750 0.52200 0.15960 1
+O3_2 O 0.64250 0.52200 0.34040 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1_1 0.0 1.7 2. mx,my,mz
+Cr1_2 0.0 1.7 2. mx,my,mz
+Cr2 0.0 -1.7 -2. mx,my,mz
+

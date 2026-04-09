@@ -1,0 +1,147 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/06/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-12-06
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Mn3 Rh1 Ge1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        7
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            114402
+_citation_year                  2023
+_citation_DOI                   10.1103/PhysRevMaterials.7.114402
+
+loop_
+_citation_author_name
+"A. E. Hall"
+"P. Manuel"
+"D. D. Khalyavin"
+"F. Orlandi"
+"D. A. Mayoh"
+"L.-J. Chang"
+"Y.-S. Chen"
+"D. G. C. Jonas"
+"M. R. Lees"
+"G. Balakrishnan"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     225(2)
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+An intermediate incommensurate phase is reported below 225K, with a broad range of coexistence reaching 175K with this phase.
+The moment modulus is reported to be 3.07(2), but this is not consistent with the reported moment components, which yield 3.17. The monent components have been assumed correct.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1 3'
+_parent_space_group.IT_number                       198
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  198.9
+_space_group_magn.name_BNS  "P 2_1 3 .1"
+_space_group_magn.point_group_name  "23"
+_space_group_magn.point_group_number  "28.1.107"
+_cell_length_a                 6.60100(5)
+_cell_length_b                 6.60100(5)
+_cell_length_c                 6.60100(5)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z,+1 
+3 -x,y+1/2,-z+1/2,+1 
+4 -x+1/2,-y,z+1/2,+1 
+5 z,x,y,+1 
+6 y,z,x,+1 
+7 -y,z+1/2,-x+1/2,+1 
+8 -z+1/2,-x,y+1/2,+1 
+9 -y+1/2,-z,x+1/2,+1 
+10 z+1/2,-x+1/2,-y,+1 
+11 y+1/2,-z+1/2,-x,+1 
+12 -z,x+1/2,-y+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.120(2) 0.206(14) 0.452(2) 1
+Rh1 Rh 0.6862(11) 0.6862(11) 0.6862(11) 1
+Ge1 Ge 0.0640(8) 0.0640(8) 0.0640(8) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1 1.34(2) 2.2(2) -1.84(14) mx,my,mz 3.17 ? ?
+

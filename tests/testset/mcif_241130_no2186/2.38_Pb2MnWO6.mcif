@@ -1,0 +1,169 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/04/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-04
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Mater. Chem. C"
+_citation_journal_volume        2
+_citation_page_first            9215
+_citation_page_last             9223
+_citation_article_id            ?
+_citation_year                  2014
+_citation_DOI                   10.1039/c4tc01450b
+
+loop_
+_citation_author_name
+"F. Orlandi"
+"L. Righi"
+"C. Ritter"
+"C. Pernechele"
+"M. Solzi"
+"R. Cabassi"
+"F. Bolzoni"
+"G. Calestani"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     7
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM2 2 1 special primary 6 .
+mGM1 1 1  .      primary   2 .
+mX4  1 1  .      secondary 3 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Between about 9K to 7K a preceding incommensurate structure is observed
+Model obtained as a modulated structure using the superspace formalism under a magnetic superspace group (MSSG).
+The model includes a single harmonic (restricted to the y and z moment components) plus a symmetry-allowed homogeneous k=0 term of the x component.
+The corresponding description as a commensurate modulated structure under the symmetry of a MSSG can be seen in #1.1.78. The commensurate structure is obtained with a choice of the global initial phase of the modulation t=1/8.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k-maximal magnetic symmetry
+two irreps with different k-vectors as primary
+Symmetry-allowed harmonic with k=(1/2,0,0) (irrep mX4) is not present in the model
+;
+
+_parent_space_group.name_H-M_alt  "P m c 2_1"
+_parent_space_group.IT_number                       26
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 0 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  "4a,b,c;1/8,0,0"
+_space_group_magn.transform_BNS_Pp_abc  "a,b,c;0,0,0"
+
+
+_space_group_magn.number_BNS  31.123
+_space_group_magn.name_BNS  "P  m  n  2_1"
+_cell_length_a                 32.06480(10)
+_cell_length_b                 5.78220(10)
+_cell_length_c                 11.63490(10)
+_cell_angle_alpha              90
+_cell_angle_beta               90
+_cell_angle_gamma              90
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y,z+1/2,+1
+3 x+1/2,-y,z+1/2,+1
+4 -x,y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Pb1_1 Pb 0.0657 0.9746 0.8653 1
+Pb1_2 Pb 0.3157 0.9746 0.8653 1
+Pb1_3 Pb 0.5657 0.9746 0.8653 1
+Pb1_4 Pb 0.8157 0.9746 0.8653 1
+Pb2_1 Pb 0.06155 0.5477 0.5786 1
+Pb2_2 Pb 0.31155 0.5477 0.5786 1
+Pb2_3 Pb 0.56155 0.5477 0.5786 1
+Pb2_4 Pb 0.81155 0.5477 0.5786 1
+W1_1 W -0.125 0.522 0.8644 1
+W1_2 W 0.375 0.522 0.8644 1
+W2_1 W 0 0.001 0.6117 1
+W2_2 W 0.25 0.001 0.6117 1
+W2_3 W 0.5 0.001 0.6117 1
+Mn1_1 Mn 0 0.492 0.8646 1
+Mn1_2 Mn 0.25 0.492 0.8646 1
+Mn1_3 Mn 0.5 0.492 0.8646 1
+Mn2_1 Mn -0.125 0.998 0.1027 1
+Mn2_2 Mn 0.375 0.998 0.1027 1
+O1_1 O -0.125 0.724 0.73 1
+O1_3 O 0.375 0.724 0.73 1
+O2_1 O -0.125 0.311 0.973 1
+O2_3 O 0.375 0.311 0.973 1
+O3_1 O 0 0.767 0.7103 1
+O3_2 O 0.25 0.767 0.7103 1
+O3_3 O 0.5 0.767 0.7103 1
+O4_1 O 0 0.222 0.721 1
+O4_2 O 0.25 0.222 0.721 1
+O4_3 O 0.5 0.222 0.721 1
+O5_1 O -0.125 0.249 0.7442 1
+O5_3 O 0.375 0.249 0.7442 1
+O6_1 O 0 0.209 0.477 1
+O6_2 O 0.25 0.209 0.477 1
+O6_3 O 0.5 0.209 0.477 1
+O7_1 O 0.0596 0.0361 0.5956 1
+O7_2 O 0.3096 0.0361 0.5956 1
+O7_3 O 0.5596 0.0361 0.5956 1
+O7-4 O 0.8096 0.0361 0.5956 1
+O8_1 O 0 0.294 0.9958 1
+O8_2 O 0.25 0.294 0.9958 1
+O8_3 O 0.5 0.294 0.9958 1
+O9_1 O 0.066675 0.52 0.8655 1
+O9_2 O 0.316675 0.52 0.8655 1
+O9_3 O 0.566675 0.52 0.8655 1
+O9_4 O 0.816675 0.52 0.8655 1
+O10_1 O -0.125 0.786 0.9568 1
+O10_2 O 0.375 0.786 0.9568 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1_1 -2.31 0.0 0.0  mx,0,0
+Mn1_2 -2.31 3.26 -1.57 mx,my,mz
+Mn1_3 -2.31 0.0 0.0  mx,0,0
+Mn2_1 2.31 3.58 1.11 mx,my,mz
+Mn2_2 2.31 -3.58 -1.11 mx,my,mz
+
+

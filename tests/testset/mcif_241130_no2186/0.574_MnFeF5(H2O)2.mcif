@@ -1,0 +1,122 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 14/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "JOURNAL OF SOLID STATE CHEMISTRY"
+_citation_journal_volume        66
+_citation_page_first            242
+_citation_page_last             250
+_citation_article_id            .
+_citation_year                  1987
+_citation_DOI                   10.1016/0022-4596(87)90193-9
+
+loop_
+_citation_author_name
+"Y. Laligant"
+"J. Pannetier"
+"G. Ferey"
+
+_atomic_positions_source_database_code_ICSD  202193
+_atomic_positions_source_other               .
+
+_position_structure_temperature 50
+_transition_temperature  39.5
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3  1  1  .  primary  3  .
+mGM4  1  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 50K
+The parent space group is probably wrong. It was corrected by some of the authors in a subsequent paper (see Lagigant et al., Zeitschrift für Kristallographie (1987) 181, 1) and reported to be Imma.
+FM on the plane xy
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim irreps as primary.
+Defective application of representation analysis. Simpler spin arrangements of higher symmetry were not checked.
+;
+
+_parent_space_group.name_H-M_alt  'I m m 2'
+_parent_space_group.IT_number                       44
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,c,a;0,0,0'
+
+
+
+_space_group_magn.number_BNS  5.15
+_space_group_magn.name_BNS  "C 2'"
+_cell_length_a             7.47500
+_cell_length_b             10.76600
+_cell_length_c             6.59400
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.00000 0.25000 0.75000
+Fe1 Fe 0.25000 0.00000 0.00000
+F1_1 F 0.29100 0.87300 0.19800
+F1_2 F  0.29100 0.12700 0.19800
+F2_1 F 0.70900 0.62600 0.30200
+F2_2 F  0.70900 0.37400 0.30200
+F3 F 0.00000 0.00000 0.07300
+F4 F 0.00000 0.50000 0.42700
+O1 O 0.00000 0.82100 0.44500
+O2 O 0.00000 0.67900 0.05400
+H1_1 H 0.10100 0.84000 0.36300
+H1_2 H  0.10100 0.16000 0.36300
+H2_1 H 0.89700 0.66000 0.13800
+H2_2 H  0.89700 0.34000 0.13800
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 -4.59 0.86 -1.60 mx,my,mz 4.93
+Fe1 1.83 0.0 -2.90 mx,my,mz   3.43
+

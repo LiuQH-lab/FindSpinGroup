@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 16/10/2020
+
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-16
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Solid State Chemistry"
+_citation_journal_volume        215
+_citation_page_first            245
+_citation_page_last             252
+_citation_article_id            ?
+_citation_year                  2014
+_citation_DOI                   10.1016/j.jssc.2014.04.002
+
+loop_
+_citation_author_name
+"M. Batuk"
+"D. Batuk"
+"A.M. Abakumov"
+"J. Hadermann"
+
+
+
+_atomic_positions_source_database_code_ICSD  248568
+_atomic_positions_source_other               .
+
+_transition_temperature  450(10)
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM5-  2  2  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The orientation of the spins on the xy plane is undetermined. It was fixed arbitrarily along one diagonal of the ab unit cell face, and this orientation corresponds to one of the epikernels of the active irrep, maximizing the possible symmetry of the structure.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+2-dim irrep along a special direction as primary
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m m m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-1/2a+1/2b,c,1/2a+1/2b;1/4,1/2,0'
+
+
+
+_space_group_magn.number_BNS  51.302
+_space_group_magn.name_BNS  "P_B m m a"
+_cell_length_a             7.80700
+_cell_length_b             7.80700
+_cell_length_c             19.26410
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+1/2,-x,-z,+1
+3 -x+1/2,-y,z,+1
+4 y+1/2,x+1/2,-z,+1
+5 -x+1/2,-y,-z,+1
+6 y+1/2,x+1/2,z,+1
+7 x,y,-z,+1
+8 -y+1/2,-x,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+3 x,y+1/2,z,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Pb1 Pb 0.25000 0.25000 0.09410 1.
+Pb2 Pb 0.25000 0.25000 0.30290 1.
+Pb3 Pb 0.25000 0.25000 0.50000 1.
+Fe1 Fe 0.00000 0.00000 0.19460 0.89
+Ti1 Ti 0.00000 0.00000 0.19460 0.11
+Fe2 Fe 0.00000 0.00000 0.39600 0.61
+Ti2 Ti 0.00000 0.00000 0.39600 0.39
+Cl1 Cl 0.00000 0.00000 0.00000 1.
+O1 O 0.00000 0.25000 0.16600 1.
+O2 O 0.03200 0.25000 0.39190 0.5
+O3 O 0.00000 0.00000 0.28810 1.
+O4 O 0.00000 0.00000 0.50000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1 2.87 -2.87 0.00000 mx,-mx,0  4.06(4)
+Fe2 -2.73 2.73 0.00000 mx,-mx,0  3.86(5)
+
+

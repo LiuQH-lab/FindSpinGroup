@@ -1,0 +1,69 @@
+# CIF file created by FINDSYM, version 7.1.3
+
+data_findsym-output
+_audit_creation_method FINDSYM
+
+_cell_length_a     10.0000000000
+_cell_length_b     17.3205080757
+_cell_length_c     20.0000000000
+_cell_angle_alpha  90.0000000000
+_cell_angle_beta   90.0000000000
+_cell_angle_gamma  90.0000000000
+_cell_volume       3464.1016151378
+
+_space_group_magn.number_BNS "35.168"
+_space_group_magn.name_UNI "Cm'm'2"
+_space_group_magn.name_BNS "Cm'm'2"
+_space_group_magn.number_OG "35.4.239"
+_space_group_magn.name_OG "Cm'm'2"
+_space_group_magn.point_group_number_Litvin "7.4.23"
+_space_group_magn.point_group_name_UNI "m'm'2"
+
+loop_
+_space_group_magn_transforms.id
+_space_group_magn_transforms.Pp_abc
+_space_group_magn_transforms.source
+1 a,b,c;0,0,0 "BNS"
+2 a,b,c;0,0,0 "OG"
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z,+1 
+3 -x,y,z,-1 
+4 x,-y,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_type_symbol
+Fe    
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_symmetry_multiplicity
+_atom_site_Wyckoff_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+_atom_site_fract_symmform
+Fe1 Fe   2 a  0.0000000000  0.0000000000  0.0000000000  1.0000000000 0,0,Dz  
+Fe2 Fe   4 e  0.0000000000  0.3333300000  0.0000000000  1.0000000000 0,Dy,Dz 
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1  0.0000000000  0.0000000000  1.0000000000 0,0,Mz  
+Fe2  0.0000000000  0.8660254038 -0.5000000000 0,My,Mz 
+
+# end of cif

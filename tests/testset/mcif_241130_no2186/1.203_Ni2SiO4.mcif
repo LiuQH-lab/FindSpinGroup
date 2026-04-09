@@ -1,0 +1,130 @@
+##CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 20/02/2018 23:31:29
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-02-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Acta Cryst."
+_citation_journal_volume        19
+_citation_page_first            147
+_citation_page_last             148
+_citation_article_id            ?
+_citation_year                  1965
+_citation_DOI                   10.1107/S0365110X6500289X
+
+loop_
+_citation_author_name
+"R.E. Newnham"
+"R. Santoro"
+"J. Fang"
+"S. Nomura"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  35675
+_atomic_positions_source_other               .
+
+_transition_temperature  34
+_experiment_temperature  5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mU2+U3+  2  2  general  primary  10  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Spin modulus and global direction of the spin arrangement on the plane ab are arbitrary.
+Relative spin orientation is only approximate.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim physically irrep active
+Magnetic sites are splitted by the magnetic ordering
+A more detailed quantitative structure has been reported in 2009 (see #1.204), having the same physically active as here (despite the statement on the contrary in this 2009 report)
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a-1/2c,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.82
+_space_group_magn.name_BNS  "P_c  2_1/c"
+_cell_length_a             20.23460
+_cell_length_b             5.91250
+_cell_length_c             9.45540
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z+1/2,+1
+3 x,y,z+1/2,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ni1_1 Ni 0.00000 0.00000 0.00000
+Ni1_2 Ni  0.25000 0.00000 0.25000
+Ni2_1 Ni 0.13687 0.25000 0.49621
+Ni2_2 Ni  0.11313 0.75000 0.74621
+Si1_1 Si 0.04714 0.25000 0.21355
+Si1_2 Si  0.20286 0.75000 0.46355
+O1_1 O 0.04664 0.25000 0.38470
+O1_2 O  0.20336 0.75000 0.63470
+O2_1 O 0.22257 0.25000 0.10858
+O2_2 O  0.02743 0.75000 0.35858
+O3_1 O 0.08156 0.03010 0.13719
+O3_2 O  0.16845 0.96990 0.38719
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1_1 1.00000 0.00000 1.00000 mx,my,mz
+Ni1_2 -1.00000 0.00000 1.00000 mx,my,mz
+Ni2_1 -1.00000 0.00000 -1.00000 mx,0,mz
+Ni2_2 1.00000 0.00000 -1.00000 mx,0,mz
+
+

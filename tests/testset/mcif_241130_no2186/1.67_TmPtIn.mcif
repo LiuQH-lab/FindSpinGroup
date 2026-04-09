@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:10:18
+# Database entry: 1.67 TmPtIn
+# Cif-like file for the case 1.67
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Tm Pt In'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        322
+_citation_page_first            2177
+_citation_page_last             2183
+_citation_article_id            .
+_citation_year                  2010
+_citation_DOI                   10.1016/j.jmmm.2010.02.005
+
+loop_
+_citation_author_name
+"S. Baran"
+"D. Kaczorowski"
+"A. Arulraj"
+"B. Penc"
+"A. Szytula"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   415510
+_atomic_positions_source_other               .
+
+_transition_temperature     3.5
+_experiment_temperature     1.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mQ4QA4 6 2 general primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+k-maximal magnetic symmetry (4 possible)
+restricted model with only one free moment parameter.
+symmetry allows 6 moment parameters
+4 symmetry-inequivalent Tm-sites
+;
+
+_parent_space_group.name_H-M_alt  'P  -62m'
+_parent_space_group.IT_number                       189
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 1/4 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '4a,4b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/4a-1/4b,c,-1/2a-1/2b;0,0,1/4'
+
+
+_space_group_magn.number_BNS  39.201
+_space_group_magn.name_BNS  "A_b  b  m  2"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 30.13600
+_cell_length_b                 30.13600
+_cell_length_c                 7.53420
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 y+1/2,x+1/2,-z+1/2,+1
+3 y+3/4,x+3/4,z,+1
+4 x+1/4,y+1/4,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/4,y+1/4,z+1/2,+1
+4 x+1/4,y+3/4,z,+1
+5 x+1/2,y,z+1/2,+1
+6 x+1/2,y+1/2,z,+1
+7 x+3/4,y+1/4,z,+1
+8 x+3/4,y+3/4,z+1/2,+1
+9 x,y,z+1/2,-1
+10 x,y+1/2,z,-1
+11 x+1/4,y+1/4,z,-1
+12 x+1/4,y+3/4,z+1/2,-1
+13 x+1/2,y,z,-1
+14 x+1/2,y+1/2,z+1/2,-1
+15 x+3/4,y+1/4,z+1/2,-1
+16 x+3/4,y+3/4,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tm1_1 Tm 0.14884 0.00000 0.25000 1
+Tm1_2 Tm 0.85116 0.85116 0.25000 1
+Tm1_3 Tm 0.14884 0.25000 0.25000 1
+Tm1_4 Tm 0.85116 0.10116 0.25000 1
+Pt1_1 Pt 0.00000 0.00000 0.25000 1
+Pt1_2 Pt 0.00000 0.25000 0.25000 1
+Pt2_1 Pt 0.08332 0.16667 0.00000 1
+Pt2_2 Pt 0.08333 0.41667 0.00000 1
+In1_1 In 0.06570 0.00000 0.00000 1
+In1_2 In 0.93430 0.93430 0.00000 1
+In1_3 In 0.06570 0.25000 0.00000 1
+In1_4 In 0.93430 0.18430 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Tm1_1 5.59(9) 0.0 0.0 mx,my,0
+Tm1_2 -5.59 -5.59 0.0 mx,mx,0
+Tm1_3 -5.59 0.0 0.0 mx,my,0
+Tm1_4 -5.59 -5.59 0.0 mx,mx,0
+

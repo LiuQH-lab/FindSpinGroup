@@ -1,0 +1,150 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:04:02
+# Database entry: 1.0.6 CoV2O6
+# Cif-like file for the case 1.0.6
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Co V2 O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        86
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            134401
+_citation_year                  2012
+_citation_DOI                   10.1103/physrevb.86.134401
+
+loop_
+_citation_author_name
+"M. Markkula"
+"A.M. Arevalo-Lopez"
+"J.P. Attfield"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   263002
+_atomic_positions_source_other               .
+
+_transition_temperature     15
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mB2 2 1 special primary ? ?
+mGM2+ 1 1 . secondary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+setting used related with the one in the reference by (-a,-b,c;0, 0 ,0)
+magnetic phase between 1.9-3.2 T. Measurement at 2.5 T
+above 3.2 T the system becomes ferromagnetic.
+spin orientation on the ac plane is undetermined.
+for simplicity the orientation is taken along z
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+the ++- configuration along c requires the contribution of a 3k secondary FM mode (mGM2+).
+Ferrimagnetic
+;
+
+_parent_space_group.name_H-M_alt  'C  2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [-1/3 1 1/3]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '-a-c,-b,3c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+c,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  12.62
+_space_group_magn.name_BNS  "C  2'/m'  "
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 9.10590
+_cell_length_b                 3.50270
+_cell_length_c                 19.79160
+_cell_angle_alpha              90.00
+_cell_angle_beta               110.09
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,y,-z,-1
+4 x,-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1_1 Co 0.00000 0.00000 0.00000 1
+Co1_2 Co 0.00000 0.00000 0.33333 1
+V1_1 V 0.19100 0.00000 0.84467 1
+V1_2 V 0.19100 0.00000 0.17800 1
+V1_3 V 0.80900 0.00000 0.48867 1
+O1_1 O 0.34640 0.00000 0.81897 1
+O1_2 O 0.34640 0.00000 0.15230 1
+O1_3 O 0.65360 0.00000 0.51437 1
+O2_1 O 0.03330 0.00000 0.77040 1
+O2_2 O 0.03330 0.00000 0.10373 1
+O2_3 O 0.96670 0.00000 0.56293 1
+O3_1 O 0.30880 0.00000 0.95693 1
+O3_2 O 0.30880 0.00000 0.29027 1
+O3_3 O 0.69120 0.00000 0.37640 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1_1 0.0 0.0 4.4(1) mx,0,mz
+Co1_2 0.0 0.0 -4.4(1) mx,0,mz
+

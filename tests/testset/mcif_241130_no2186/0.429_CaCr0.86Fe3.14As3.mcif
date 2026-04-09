@@ -1,0 +1,132 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 14/10/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        88
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            104414
+_citation_year                  2013
+_citation_DOI                   10.1103/PhysRevB.88.104414
+
+loop_
+_citation_author_name
+"P. Manuel"
+"L.C. Chapon"
+"G. Trimarchi"
+"I.S. Todorov"
+"D.Y. Chung"
+"B. Ouladdiaf"
+"M.J. Gutmann"
+"A.J. Freeman"
+"M.G. Kanatzidis"
+
+
+
+_atomic_positions_source_database_code_ICSD  169100
+_atomic_positions_source_other               .
+
+_transition_temperature  90
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3- 1  1  .  primary  4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Unit cell from a measurement at 150K. Fe positions from the measurement at 1.5K.
+Remaining atomic positions retrieved from another study of a similar compound with composition CaCr0.84Fe3.16As3 at 10K.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  62.443
+_space_group_magn.name_BNS  "P n' m a"
+_cell_length_a             12.16
+_cell_length_b             3.766
+_cell_length_c             11.80
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z+1/2,+1
+3 x,-y+1/2,z,+1
+4 x+1/2,y,-z+1/2,+1
+5 -x,y+1/2,-z,-1
+6 -x+1/2,-y,z+1/2,-1
+7 -x,-y,-z,-1
+8 -x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.02150 0.25000 0.31410 0.144(6)
+Cr1 Cr 0.02150 0.25000 0.31410 0.856(6)
+Fe2 Fe 0.06610 0.25000 0.53830 1.
+Fe3 Fe 0.30510 0.25000 0.12210 1.
+Fe4 Fe 0.31550 0.25000 0.72310 1.
+Ca1 Ca 0.33817 0.25000 0.43050 1.
+As1 As 0.36728 0.25000 0.92156 1.
+As2 As 0.11435 0.25000 0.73819 1.
+As3 As 0.10028 0.25000 0.11972 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1 0.00000 -0.48(6) 0.00000 0,my,0  0.48(6)
+Fe2 0.00000 0.46(5) 0.00000 0,my,0   0.46(5)
+Fe3 0.00000 1.71(5) 0.00000 0,my,0   1.71(5)
+Fe4 0.00000 1.58(5) 0.00000 0,my,0   1.58(5)
+
+
+

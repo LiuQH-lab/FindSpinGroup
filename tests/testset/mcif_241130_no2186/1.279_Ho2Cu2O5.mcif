@@ -1,0 +1,132 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 25/08/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-08-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        44
+_citation_page_first            4716
+_citation_page_last             4719
+_citation_article_id            ?
+_citation_year                  1991
+_citation_DOI                   10.1103/PhysRevB.44.4716
+
+loop_
+_citation_author_name
+"J.L. Garcia-Muoz"
+"J. Rodriguez-Carvajal"
+"X. Obradors"
+"M. Vallet-Reg"
+"J. Gonzalez-Calbet"
+"M. Parras"
+
+
+
+_atomic_positions_source_database_code_ICSD  79428
+_atomic_positions_source_other               .
+
+_transition_temperature  13
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1  2  2  special  primary  24  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+2-dim irrep active along a special direction
+;
+
+_parent_space_group.name_H-M_alt  'P n a 2_1'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,-c,-a;0,1/4,0'
+
+
+
+_space_group_magn.number_BNS  4.10
+_space_group_magn.name_BNS  "P_a 2_1"
+_cell_length_a             10.80960
+_cell_length_b             6.99240
+_cell_length_c             12.47350
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ho1_1 Ho 0.20800 0.11350 0.00000
+Ho1_2 Ho  0.70800 0.13650 0.00000
+Ho2_1 Ho 0.04240 0.11300 0.33030
+Ho2_2 Ho  0.54240 0.13700 0.33030
+Cu1_1 Cu 0.99020 0.33100 0.11500
+Cu1_2 Cu  0.49020 0.91900 0.11500
+Cu2_1 Cu 0.26100 0.33200 0.21700
+Cu2_2 Cu  0.76100 0.91800 0.21700
+O1_1 O 0.17300 0.36300 0.35900
+O1_2 O  0.67300 0.88700 0.35900
+O2_1 O 0.32400 0.35600 0.06600
+O2_2 O  0.82400 0.89400 0.06600
+O3_1 O 0.12400 0.16000 0.16900
+O3_2 O  0.62400 0.09000 0.16900
+O4_1 O 0.42700 0.38800 0.26300
+O4_2 O  0.92700 0.86200 0.26300
+O5_1 O 0.42600 0.11500 0.47900
+O5_2 O  0.92600 0.13500 0.47900
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ho1_1 -4.4(1) 1.0(2) 7.8(1) mx,my,mz
+Ho1_2 4.4 1.0 -7.8 mx,my,mz
+Ho2_1 -4.40 -1.0 7.8 mx,my,mz
+Ho2_2 4.4 -1.0 -7.8 mx,my,mz
+Cu1_1 -0.8(2) 0.0 0.0 mx,my,mz
+Cu1_2 0.8 0.0 0.0 mx,my,mz
+Cu2_1 -0.8 0.0 0.0 mx,my,mz
+Cu2_2 0.8 0.0 0.0 mx,my,mz
+

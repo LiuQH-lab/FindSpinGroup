@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:03:52
+# Database entry: 1.0.1 Ag2CrO2
+# Cif-like file for the case 1.0.1
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ag2 Cr O2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        85
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            144407
+_citation_year                  2012
+_citation_DOI                   10.1103/physrevb.85.144407
+
+loop_
+_citation_author_name
+"M. Matsuda"
+"C. de la Cruz"
+"H. Yoshida"
+"M. Isobe"
+"R.S. Fishman"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     24
+_experiment_temperature     4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD2(k1) 6 1 . primary ? ?
+mLD1(k2) 6 1 . secondary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Reported weak ferromagnetism is not compatible with the magnetic structure. FM not allowed by its symmetry.
+Partial disordered sites symmetry-forced.
+
+The reported simultaneous structural transition is in fact part of the magnetic symmetry break, i.e. an induced effect. The magnetic ordering decreases the effective space group for the nuclear positions to C2/m, with same unit cell as the magnetic cell. Expected primary  modulations for the nuclear positions with wave vector (2/5,2/5,0). The reported C2/m nuclear structure is an average structure with a cell five times smaller. The reference disregards the allowed modulation of nuclear positions.
+
+The reference reports magnetic reflections of type (4/5, 1/5, L) which are not consistent with the magnetic structure proposed.
+
+The equality of the moments of the two independent Cr sites of the model requires the presence of a third harmonic in the spin modulation with propagation vector (2/5, 2/5, 0). Satellites of this type not reported in the reference.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+;
+
+_parent_space_group.name_H-M_alt  'P  -3m  1'
+_parent_space_group.IT_number                       164
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/5 1/5 0]
+k2 [2/5 2/5 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,-5a-5b,-c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  12.60
+_space_group_magn.name_BNS  "C  2'/m"
+_space_group_magn.point_group_name  "2'/m"
+_space_group_magn.point_group_number  "5.3.14"
+_cell_length_a                 5.07976(16)
+_cell_length_b                 14.58493(4)
+_cell_length_c                 8.66164(2)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.0723(3)
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,z,+1
+3 -x,y,-z,-1
+4 -x,-y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ag1 Ag 0.8375 0.90000 0.3719 1
+Ag2 Ag 0.3375 0.80000 0.3719 1
+Ag3 Ag 0.3375(11) 0.00000 0.3719(4) 1
+Cr1 Cr 0.00000 0.00000 0.00000 1
+Cr2 Cr 0.00000 0.40000 0.00000 1
+Cr3 Cr 0.00000 0.80000 0.00000 1
+O1 O 0.8309 0.90000 0.1195 1
+O2 O 0.3309 0.80000 0.1195 1
+O3 O 0.3309(12) 0.00000 0.1195(4) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1 0 0 0 0,0,0
+Cr2 0.0 0.0 2.9(1) mx,0,mz
+Cr3 0.0 0.0 2.9(1) mx,0,mz
+

@@ -1,0 +1,139 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/05/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-02-05
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ni Nb2 O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Acta Cryst. A"
+_citation_journal_volume        32
+_citation_page_first            592
+_citation_page_last             597
+_citation_article_id            .
+_citation_year                  1976
+_citation_DOI                   10.1107/S0567739476001265
+
+loop_
+_citation_author_name
+"H. Weitzel"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  15853
+_atomic_positions_source_other               .
+
+_transition_temperature     ?
+_experiment_temperature     4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY2 2 2 special primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at room temperature
+Transition temperature is not specified
+Ni moment magnitude is not determined. Here an arbitrary unit value is used
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special direction
+;
+
+_parent_space_group.name_H-M_alt  'P b c n'
+_parent_space_group.IT_number                       60
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/2,1/4,1/2'
+
+_space_group_magn.number_BNS  14.81
+_space_group_magn.name_BNS  "P_b 2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 14.02170
+_cell_length_b                 11.35040
+_cell_length_c                 5.01500
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y+1/2,-z+1/2,+1 
+3 -x,-y+1/2,-z,+1 
+4 x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ni1_1 Ni 0.00000 0.07760 0.25000 1
+Ni1_2 Ni 0.50000 0.17240 0.75000 1
+Nb1_1 Nb 0.15870 0.15980 0.74860 1
+Nb1_2 Nb 0.34130 0.09020 0.24860 1
+O1_1 O 0.09320 0.19230 0.41900 1
+O1_2 O 0.40680 0.05770 0.91900 1
+O2_1 O 0.08620 0.05820 0.92010 1
+O2_2 O 0.41380 0.19180 0.42010 1
+O3_1 O 0.25940 0.05545 0.58860 1
+O3_2 O 0.24060 0.19455 0.08860 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ni1_1 1 0.0 0.0 mx,0,mz ? ? ?
+Ni1_2 1 0.0 0.0 mx,0,mz ? ? ?
+

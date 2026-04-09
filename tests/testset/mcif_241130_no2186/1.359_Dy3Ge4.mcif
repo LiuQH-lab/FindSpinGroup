@@ -1,0 +1,115 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/04/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-04-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Alloys and Compounds"
+_citation_journal_volume        262-263
+_citation_page_first            492
+_citation_page_last             497
+_citation_article_id            ?
+_citation_year                  1997
+_citation_DOI                   10.1016/S0925-8388(97)00316-2
+
+loop_
+_citation_author_name
+"O. Oleksyn"
+"P. Schobinger-Papamantellos"
+"C. Ritter"
+"C. de Groot"
+"K. Buschow"
+
+
+
+_atomic_positions_source_database_code_ICSD  84343
+_atomic_positions_source_other               .
+
+_transition_temperature  6
+_experiment_temperature  1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY4-  1  1  .  primary  1  .
+mY3-  1  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The two Dy sites order independently. Below T_N=19K only Dy1 is ordered up to 6K, where Dy2 orders with a further symmetry break.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps involved as primary: two distinct order parameters corresponding to the two Dy sites, which order separately.
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-b,c,-a;1/4,1/4,0'
+
+
+
+_space_group_magn.number_BNS  11.55
+_space_group_magn.name_BNS  "P_a 2_1/m"
+_cell_length_a             4.0242(9)
+_cell_length_b             10.602(3)
+_cell_length_c             14.175(4)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y+1/2,z+1/2,+1
+3 -x+1/2,-y+1/2,-z,+1
+4 x,y,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Dy1 Dy 0.00000 0.3336(9) 0.0987(9)
+Dy2 Dy 0.00000 0.055(2) 0.25000
+Ge1 Ge 0.00000 0.353(5) 0.888(2)
+Ge2 Ge 0.00000 0.789(6) 0.25000
+Ge3 Ge 0.00000 0.00000 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Dy1 7.36(8) 0.00000 0.00000 mx,my,mz
+Dy2 0.00000 0.00000 -5.7(3) 0,0,mz
+
+

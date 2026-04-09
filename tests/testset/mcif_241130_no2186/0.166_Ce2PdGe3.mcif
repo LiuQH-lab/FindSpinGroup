@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:03:43
+# Database entry: 0.166 Ce2PdGe3
+# Cif-like file for the case 0.166
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ce2 Pd Ge3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        94
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            014418
+_citation_year                  2016
+_citation_DOI                   10.1103/PhysRevB.94.014418
+
+loop_
+_citation_author_name
+"A. Bhattacharyya"
+"C. Ritter"
+"D.T. Adroja"
+"F.C. Coomer"
+"A.M. Strydom"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   427680
+_atomic_positions_source_other               .
+
+_transition_temperature     10.7
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+phase below 10.7K and above 2.3K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'P  4_2/m  m  c'
+_parent_space_group.IT_number                       131
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  131.440
+_space_group_magn.name_BNS  "P  4_2'/m'  m'  c"
+_space_group_magn.point_group_name  "4'/m'm'm"
+_space_group_magn.point_group_number  "15.5.57"
+_cell_length_a                 4.24440
+_cell_length_b                 4.24440
+_cell_length_c                 14.79280
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,-z,+1
+3 -x,y,-z,+1
+4 -x,-y,z,+1
+5 y,-x,-z+1/2,+1
+6 -y,x,-z+1/2,+1
+7 -y,-x,z+1/2,+1
+8 y,x,z+1/2,+1
+9 -y,x,z+1/2,-1
+10 y,-x,z+1/2,-1
+11 y,x,-z+1/2,-1
+12 -y,-x,-z+1/2,-1
+13 -x,-y,-z,-1
+14 -x,y,z,-1
+15 x,-y,z,-1
+16 x,y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ce1 Ce 0.00000 0.50000 0.00000 1.
+Ce2 Ce 0.50000 0.50000 0.25000 1.
+Ge1 Ge 0.00000 0.00000 0.33323 1.
+Ge2 Ge 0.00000 0.50000 0.41877 0.458
+Pd1 Pd 0.00000 0.50000 0.41877 0.542
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ce1 0.0 0.0 0.0 0,0,0
+Ce2 0.0 0.0 -1.78(1) 0,0,mz
+

@@ -1,0 +1,130 @@
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/02/2018 13:00:36
+# icsd_251833_1.5K.cif
+
+data_5yOhtAoR
+_audit_creation_date            2018-02-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorganic Chenistry"
+_citation_journal_volume        54
+_citation_page_first            8012
+_citation_page_last             8021
+_citation_article_id            ?
+_citation_year                  2015
+_citation_DOI                   10.1021/acs.inorgchem.5b01195
+
+loop_
+_citation_author_name
+"W. Yi"
+"A.J. Princep"
+"Y. Guo"
+"R.D. Johnson"
+"D. Khalyavin"
+"P. Manuel"
+"A. Senyshyn"
+"I.A. Presniakov"
+"A.V. Sobolev"
+"Y. Matsushita"
+"M. Tanaka"
+"A.A. Belik"
+"A.T. Boothroyd"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  251833
+_atomic_positions_source_other               .
+
+_transition_temperature  35
+_experiment_temperature  ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1+  1  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Below 17K the Ni spins become also ordered with a second propagation vector (0 1/2 1/2) yielding a 2k magnetic structure (see entry #2.18).
+;
+
+_active_magnetic_irreps_details
+;
+k-maximal magnetic symmetry (4 possible)
+1-dim single irrep active
+parent space in non-standard setting: P21/n
+k vector in P21/c setting: (1/2,0,0)
+irrep label used here is for the standard setting of the parent space group
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,1/2a+1/2c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.80
+_space_group_magn.name_BNS  "P_a  2_1/c"
+_cell_length_a             9.98170
+_cell_length_b             5.35270
+_cell_length_c             14.68240
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.87
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/4,y+1/2,-z+1/4,+1
+3 -x,-y,-z,+1
+4 x+1/4,-y+1/2,z+1/4,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z+1/2,+1
+3 x+1/2,y,z,-1
+4 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.25000 0.00000 0.25000
+Ni1 Ni 0.25000 0.00000 0.00000
+Sc1 Sc 0.48650 0.07700 0.12700
+O1 O 0.18300 0.93800 0.12900
+O2 O 0.09600 0.18400 0.28150
+O3 O 0.33700 0.30000 0.21300
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 1.17000 0.00000 1.19000 mx,my,mz
+Ni1 0.00000 0.00000 0.00000 0,0,0
+
+

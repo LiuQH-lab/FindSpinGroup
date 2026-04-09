@@ -1,0 +1,151 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:18:14
+# Database entry: 1.167 NiS2
+# Cif-like file for the case 1.167
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ni S2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        93
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            024409
+_citation_year                  2016
+_citation_DOI                   10.1103/PhysRevB.93.024409
+
+loop_
+_citation_author_name
+"S. Yano"
+"D. Louca"
+"J. Yang"
+"U. Chatterjee"
+"D.E. Bugaris"
+"D.Y. Chung"
+"L. Peng"
+"M. Grayson"
+"M.G. Kanatzidis"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   76684
+_atomic_positions_source_other               .
+
+_transition_temperature     39
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mR1+R3+ 4 4 general primary 8 .
+mR2+R2+ 4 4 general secondary 4 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+This phase appears at lower temperature, superposed or coexisting with a first k=0 magnetic phase (see entry #0.150) appearing at 39K.
+The graphical representation of the structure in the article does not match with the values listed in a Table of the article. The Table has been taken as correct.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+4-dim physically irreducible irrep. Two MSGs are possible for this irrep. The model has the lowest one corresponding to a general direction of the order parameter within the irrep space.
+The active irrep comprehends 8 basis spin functions. The refinement has been arbitrarily constrained to some particular basis function obtained with SARAH. More general models including the 8 degrees of freedom twithin this irrep have apparently not been explored.
+A secondary irrep is allowed by the resulting MSG and increases the degrees of freedom from 8 to 12. It is not present in the model.
+;
+
+_parent_space_group.name_H-M_alt  'P  a  -3'
+_parent_space_group.IT_number                       205
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a-1/2c,-1/2a+1/2b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S  -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 11.37400
+_cell_length_b                 11.37400
+_cell_length_c                 11.37400
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y+1/2,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+5 x+1/2,y+1/2,z+1/2,-1
+6 x+1/2,y,z,-1
+7 x,y+1/2,z,-1
+8 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ni1_1 Ni 0.00000 0.00000 0.00000 1
+Ni1_2 Ni 0.25000 0.00000 0.25000 1
+Ni1_3 Ni 0.00000 0.25000 0.25000 1
+Ni1_4 Ni 0.25000 0.25000 0.00000 1
+S1_1 S 0.19650 0.19650 0.19650 1
+S1_2 S 0.05350 0.80350 0.44650 1
+S1_3 S 0.80350 0.44650 0.05350 1
+S1_4 S 0.44650 0.05350 0.80350 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1_1 -0.895 0.895 0.0 mx,my,mz
+Ni1_2 0.517 -0.138 0.378 mx,my,mz
+Ni1_3 -0.138 -0.517 -0.378 mx,my,mz
+Ni1_4 -0.517 0.517 -1.033 mx,my,mz
+

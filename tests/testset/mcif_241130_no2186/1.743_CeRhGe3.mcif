@@ -1,0 +1,161 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/14/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-02-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ce1 Rh1 Ge3"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        85
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            134405
+_citation_year                  2012
+_citation_DOI                   10.1103/PhysRevB.85.134405
+
+loop_
+_citation_author_name
+"A. D. Hillier"
+"D. T. Adroja"
+"P. Manuel"
+"V. K. Anand"
+"J. W. Taylor"
+"K. A. McEwen"
+"B. D. Rainford"
+"M. M. Koza"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     7
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD4LE4(k1) 2 1 general primary 2 .
+mLD4LE4(3k1) 2 1 general secondary 2 No
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at room temperature
+The model is a sinusoidal spin wave, and the data cannot determine its initial phase. As the parent space group is polar along the propagation vector, the MSG does not depend on this phase. Any model under this MSG where the four symmetry independent Ce1_i sites have mz values 0.45*Cos[(3pi/4)(i-1)+Phi], with any phase Phi, would equally fit the data. Here the structure is depicted for Phi=0.
+A secondary third harmonic with 3k1=(0,0,1/4) is symmetry allowed, but not present. This third harmonic would be required for a model with equal moment magnitudes.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim physically irrep as primary
+2-dim physically irrep allowed as secondary
+;
+
+_parent_space_group.name_H-M_alt  'I 4 m m'
+_parent_space_group.IT_number                       107
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 3/4]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,4c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  103.200
+_space_group_magn.name_BNS  "P_c 4 c c"
+_space_group_magn.point_group_name  "4mm1'"
+_space_group_magn.point_group_number  "13.2.45"
+_cell_length_a                 4.39600
+_cell_length_b                 4.39600
+_cell_length_c                 40.08970
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x,z,+1 
+3 y,-x,z,+1 
+4 -x,-y,z,+1 
+5 -x,y,z+1/2,+1 
+6 x,-y,z+1/2,+1 
+7 -y,-x,z+1/2,+1 
+8 y,x,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ce1_1 Ce 0.00000 0.00000 0.14502 1
+Ce1_2 Ce 0.50000 0.50000 0.27002 1
+Ce1_3 Ce 0.00000 0.00000 0.39502 1
+Ce1_4 Ce 0.50000 0.50000 0.52002 1
+Rh1_1 Rh 0.00000 0.00000 0.05962 1
+Rh1_2 Rh 0.50000 0.50000 0.18462 1
+Rh1_3 Rh 0.00000 0.00000 0.30962 1
+Rh1_4 Rh 0.50000 0.50000 0.43462 1
+Ge1_1 Ge 0.00000 0.00000 0.00000 1
+Ge1_2 Ge 0.50000 0.50000 0.12500 1
+Ge1_3 Ge 0.00000 0.00000 0.25000 1
+Ge1_4 Ge 0.50000 0.50000 0.37500 1
+Ge2_1 Ge 0.00000 0.50000 0.08530 1
+Ge2_2 Ge 0.50000 0.00000 0.21030 1
+Ge2_3 Ge 0.00000 0.50000 0.33530 1
+Ge2_4 Ge 0.50000 0.00000 0.46030 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ce1_1 0.0 0.0 0.45(9) 0,0,mz 0.45(9) ? ?
+Ce1_2 0.0 0.0 -0.3182 0,0,mz 0.3182 ? ?
+Ce1_3 0.0 0.0 0.0 0,0,mz 0.0 ? ?
+Ce1_4 0.0 0.0 0.3182 0,0,mz 0.3182 ? ?
+

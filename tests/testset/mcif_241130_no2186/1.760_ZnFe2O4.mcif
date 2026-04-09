@@ -1,0 +1,143 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 08/30/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-08-30
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Zn1 Fe2 O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "phys. stat. sol."
+_citation_journal_volume        40
+_citation_page_first            171
+_citation_page_last             182
+_citation_article_id            .
+_citation_year                  1970
+_citation_DOI                   10.1002/pssb.19700400118
+
+loop_
+_citation_author_name
+"B. Boucher"
+"R. Buhl"
+"M. Perrin"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    20
+_temperature_cell_parameters            293
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "Szytula et al, Acta Phys. Pol. 106, 583 (2004)"
+
+_transition_temperature     10.6
+_experiment_temperature     4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mW1 12 2 special primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD and Mossbauer
+The description has been changed here to a standard setting for the parent space group
+Figure in the paper had to be interpreted to construct an unambiguous model of the reported structure. Some misinterpretation of the figure may have happened. 
+Three different models are reported to fit equally well the experimental data. This is the one of higher symmetry
+See #1.759 for another model of this phase under the same MSG
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+4-dim extended small (k,-k) irrep
+Possible multi-k structures for the same irrep were not considered
+;
+
+_parent_space_group.name_H-M_alt  'F d -3 m'
+_parent_space_group.IT_number                       227
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;-1/8,-1/8,-1/16'
+
+_space_group_magn.number_BNS  122.338
+_space_group_magn.name_BNS  "I_c -4 2 d"
+_space_group_magn.point_group_name  "-42m1'"
+_space_group_magn.point_group_number  "14.2.49"
+_cell_length_a                 8.44300
+_cell_length_b                 8.44300
+_cell_length_c                 16.88600
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y+1/4,-z+1/8,+1 
+3 -x+3/4,y+1/2,-z+1/8,+1 
+4 -x+3/4,-y+3/4,z,+1 
+5 y,-x+3/4,-z+7/8,+1 
+6 -y+3/4,x,-z+7/8,+1 
+7 -y+3/4,-x+1/4,z+1/4,+1 
+8 y,x+1/2,z+1/4,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Zn1_1 Zn 0.37500 0.37500 0.18750 1
+Zn1_2 Zn 0.12500 0.62500 0.06250 1
+Fe1 Fe 0.00000 0.00000 0.00000 1
+O1_1 O 0.75940 0.75940 0.37970 1
+O1_2 O 0.50940 0.00940 0.87030 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 -4.0. 0.0 0.0 mx,my,mz 4.0 ? ?
+

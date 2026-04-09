@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/22/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-09-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Li Fe (Mo O4)2"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        59
+_citation_page_first            8127
+_citation_page_last             8133
+_citation_article_id            .
+_citation_year                  2020
+_citation_DOI                   10.1021/acs.inorgchem.0c00432
+
+loop_
+_citation_author_name
+"M. Liu"
+"Y. Zhang"
+"T. Zou"
+"V. O. Garlea"
+"T. Charlton"
+"Yu Wang"
+"F. Liu"
+"Y. Xie"
+"X. Li"
+"L. Yang"
+"B. Li"
+"X. Wang"
+"S. Dong"
+"J.-M. Liu"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     23.8
+_experiment_temperature     1.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1- 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD collected at HB2A difractometer at HFIR, ORNL
+Atomic positions were refined together with the magnetic moments.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep 
+;
+
+_parent_space_group.name_H-M_alt  'P -1'
+_parent_space_group.IT_number                       2
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,b;0,1/4,0'
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 6.7510
+_cell_length_b                 14.4060
+_cell_length_c                 7.1700
+_cell_angle_alpha              90.673
+_cell_angle_beta               110.227
+_cell_angle_gamma              105.579
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y+1/2,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mo1 Mo 0.33314 0.28806 0.29130 1
+Mo2 Mo 0.82113 0.48107 0.22280 1
+Fe1 Fe 0.39993 0.05013 0.31839 1
+Li1 Li 0.77110 0.22325 0.25930 1
+O1 O 0.41780 0.42039 0.38460 1
+O2 O 0.25360 0.28510 0.03970 1
+O3 O 0.09470 0.24235 0.33610 1
+O4 O 0.48140 0.19220 0.35080 1
+O5 O 0.68580 0.06485 0.26970 1
+O6 O 0.76800 0.47645 0.96640 1
+O7 O 0.71300 0.36250 0.26490 1
+O8 O 0.11130 0.02330 0.35520 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 0.582 4.2 1.296 mx,my,mz 4.21 ? ?
+

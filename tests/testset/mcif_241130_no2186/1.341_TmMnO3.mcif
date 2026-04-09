@@ -1,0 +1,126 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 29/03/2020 
+
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-29
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "New Journal of Physics"
+_citation_journal_volume        11
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            043019
+_citation_year                  2009
+_citation_DOI                   10.1088/1367-2630/11/4/043019
+
+loop_
+_citation_author_name
+"V Y Pomjakushin1"
+"M Kenzelmann"
+"A Donni"
+"A B Harris"
+"T Nakajima"
+"S. Mitsuda"
+"M Tachibana"
+"L Keller"
+"J Mesot"
+"H Kitazawa"
+"E Takayama-Muromachi"
+
+_atomic_positions_source_database_code_ICSD  162209
+_atomic_positions_source_other               .
+
+_transition_temperature  32
+_experiment_temperature  ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX1  2  2  special  primary  5  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at room temperature taken from icsd
+It is reported that below 4K the Tm moment also order along c, breaking further the symmetry. The Tm spin arrangement in this additional phase is not further specified. It cannot correspond to the same mX1 irrep, ctive in the present structure, which only allows non-zero Tm spin along b.
+Mn moment value is only appoximate: it is the one reported at 2K, where the Tm momens are also ordered in an specified way and must break the symmetry into a lower MSG.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+2-dim irrep along a special direction as primary
+Magnetic ordering breaks the symmetry into a polar group along c in the parent Pnma setting
+Magnetically induced ferroelectricity along c is symmetry-llowed and observed (multiferroic of type II).
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,-a,c;1/8,1/4,0'
+
+
+
+_space_group_magn.number_BNS  31.129
+_space_group_magn.name_BNS  "P_b m n 2_1"
+_cell_length_a             11.63140
+_cell_length_b             7.32180
+_cell_length_c             5.23100
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/4,-y,z+1/2,+1 
+3 x,-y+1/2,z,+1 
+4 -x+1/4,y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Tm1_1 Tm 0.04250 0.25000 0.98200
+Tm1_2 Tm  0.95750 0.75000 0.01800
+Mn1 Mn 0.00000 0.00000 0.50000
+O1_1 O 0.23400 0.25000 0.11100
+O1_2 O  0.76600 0.75000 0.88900
+O2_1 O 0.16300 0.05600 0.70400
+O2_2 O  0.83700 0.55600 0.29600
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Tm1_1 0.00000 0.00000 0.00000 0,my,0
+Tm1_2 0.00000 0.00000 0.00000 0,my,0
+Mn1 3.75 0.00000 0.00000 mx,my,mz
+

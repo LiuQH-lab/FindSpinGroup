@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/04/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-04
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Cs1 Cr0.98 Al0.02 F4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        102
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            174440
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevB.102.174440
+
+loop_
+_citation_author_name
+"S. Hayashida"
+"M. Hagihala"
+"M. Avdeev"
+"Y. Miura"
+"H. Manaka"
+"T. Masuda"
+
+_temperature_position_structure         10
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     5
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL2 3 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at 10K
+This is one of the two alternative models proposed in the paper. See #1.713 for the second one.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal symmetry
+1-dim small irrep
+The active irrep has 3 k-vectors. Multi-k arrangements that could also fit the available data were not considered.
+;
+
+_parent_space_group.name_H-M_alt  'P -6 2 m'
+_parent_space_group.IT_number                       189
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a+b,b;0,0,0'
+
+_space_group_magn.number_BNS  46.247
+_space_group_magn.name_BNS  "I_a m a 2"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 19.13770
+_cell_length_b                 9.56890
+_cell_length_c                 7.70120
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-2x+y,-z,+1 
+3 x,y,-z+1/2,+1 
+4 -x,-2x+y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cr1_1 Cr 0.11163 0.00000 0.00000 0.98
+Cr1_2 Cr 0.00000 0.22327 0.00000 0.98
+Al1_1 Al 0.11163 0.00000 0.00000 0.02
+Al1_2 Al 0.00000 0.22327 0.00000 0.02
+Cs1_1 Cs 0.28602 0.00000 0.25000 1.
+Cs1_2 Cs 0.00000 0.57203 0.25000 1.
+F1_1 F 0.41604 0.00000 0.00000 1.
+F1_2 F 0.00000 0.83208 0.00000 1.
+F2_1 F 0.11045 0.00000 0.25000 1.
+F2_2 F 0.00000 0.22089 0.25000 1.
+F3_1 F 0.21901 0.16032 0.00000 1.
+F3_2 F 0.91984 0.27769 0.00000 1.
+F3_3 F 0.86116 0.56199 0.00000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Cr1_1 1.199 0.556 0.0 mx,my,0 1.04(7) 27.6 90
+Cr1_2 0.0 1.04 0.0 0,my,0 1.04(7) 120 90
+

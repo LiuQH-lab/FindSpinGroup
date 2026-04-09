@@ -1,0 +1,143 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:16:04
+# Database entry: 1.149 La0.8Bi0.2Mn2O5
+# Cif-like file for the case 1.149
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'La0 .8Bi0 .2Mn2 O5'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys.: Condes. Matter"
+_citation_journal_volume        25
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            216002
+_citation_year                  2013
+_citation_DOI                   10.1088/0953-8984/25/21/216002
+
+loop_
+_citation_author_name
+"M. Retuerto"
+"A. Munoz"
+"M.J. Martinez-Lope"
+"M. Garcia-Hernandez"
+"G. Andre"
+"K. Krezhov"
+"J.A. Alonso"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   188949
+_atomic_positions_source_other               .
+
+_transition_temperature     25
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (8 possible)
+1-dim irrep active: equivalent to MSG assignment
+;
+
+_parent_space_group.name_H-M_alt  'P  b  a  m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  55.361
+_space_group_magn.name_BNS  "P_c  b  a  m"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 7.64940
+_cell_length_b                 8.67420
+_cell_length_c                 11.44860
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z,+1
+3 -x+1/2,y+1/2,-z,+1
+4 -x,-y,z,+1
+5 -x,-y,-z,+1
+6 -x+1/2,y+1/2,z,+1
+7 x+1/2,-y+1/2,z,+1
+8 x,y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1 La 0.14600 0.17220 0.00000 0.8
+Bi1 Bi 0.14600 0.17220 0.00000 0.2
+Mn1 Mn 0.00000 0.50000 0.12850 1.
+Mn2 Mn 0.40600 0.35170 0.25000 1.
+O1 O 0.00000 0.00000 0.13900 1.
+O2 O 0.15270 0.44920 0.00000 1.
+O3 O 0.15020 0.43480 0.25000 1.
+O4 O 0.40430 0.20540 0.12750 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.0 0.0 1.58(8) 0,0,mz
+Mn2 -1.55(7) 0.98(11) 0.0 mx,my,0
+

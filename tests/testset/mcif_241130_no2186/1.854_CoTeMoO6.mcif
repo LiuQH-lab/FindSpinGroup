@@ -1,0 +1,140 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 08/15/2025
+
+data_5yOhtAoR
+_audit_creation_date            2025-08-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Co1 Te1 Mo1 O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        622
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            172963
+_citation_year                  2025
+_citation_DOI                   10.1016/j.jmmm.2025.172963
+
+loop_
+_citation_author_name
+"Brady Wilson"
+"Ananta Raj Acharya"
+"Eun Sang Choi"
+"Ram Rai"
+"Qiang Zhang"
+"Stuart Calder"
+"Rafael Gonzalez-Hernandez"
+"Jonathan Guerrero Sanchez"
+"Chetan Dhital"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     24
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ4 1 1 . primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1 2_1 2'
+_parent_space_group.IT_number                       18
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,0,1/4'
+
+
+_space_group_magn.number_BNS  19.28
+_space_group_magn.name_BNS  "P_c 2_1 2_1 2_1"
+_space_group_magn.point_group_name  "2221'"
+_space_group_magn.point_group_number  "6.2.18"
+_cell_length_a                 5.24060
+_cell_length_b                 5.05430
+_cell_length_c                 17.63120
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z+1/2,+1 
+3 -x+1/2,y+1/2,-z,+1 
+4 -x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1 Co 0.00000 0.00000 0.26195 1
+Te1 Te 0.00000 0.50000 0.12700 1
+Mo1 Mo 0.00000 0.50000 0.40450 1
+O1 O 0.29600 0.84700 0.03650 1
+O2 O 0.18500 0.76100 0.35100 1
+O3 O 0.17900 0.72000 0.19600 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Co1 0.59(4) 3.54(3) 0.0 mx,my,0 3.59(3) ? ?
+

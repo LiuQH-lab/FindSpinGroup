@@ -1,0 +1,155 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/26/2024
+# From a file submitted by V. Pomjakushin
+
+data_5yOhtAoR
+_audit_creation_date            2024-09-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Tb3 Nb1 O7"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        599
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            172106
+_citation_year                  2024
+_citation_DOI                   https://doi.org/10.1016/j.jmmm.2024.172106
+
+loop_
+_citation_author_name
+"M. Hase"
+"A. Dönni"
+"V.Yu. Pomjakushin"
+"M. Rotter"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     3.2
+_experiment_temperature     2.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mS2 2 1 special-2 primary 9 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+In the paper, the fits were performed in P1 with single k-vector (1/2,1/2,0), but using the original C-centered unit cell. The authors applied the constraints that effectively accounted for a 2k structure, meaning the active propagation vectors were  k1 = (1/2, 1/2, 0)  and  k2 = (1/2, -1/2, 0) in the parent C222_1 structure.
+The structure is presented here in the standard setting of the MSG, which implies an origin shift with respect to the description in the paper.
+The magnetic moments were only ordered on a single Tb2 site, indicating the appearance of a partially disordered state.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k-maximal magnetic symmetry
+2-dim full irrep involving the two k-vectors of the irrep star
+;
+
+_parent_space_group.name_H-M_alt  'C 2 2 2_1'
+_parent_space_group.IT_number                       20
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+k2 [1/2 -1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;1/2,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c,;0,0,0'
+
+
+_space_group_magn.number_BNS  20.36
+_space_group_magn.name_BNS  "C_a 2 2 2_1"
+_space_group_magn.point_group_name  "222.1'"
+_space_group_magn.point_group_number  "6.2.18"
+_cell_length_a                 14.93120
+_cell_length_b                 21.09910
+_cell_length_c                 7.49920
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,-z,+1 
+3 -x,y,-z+1/2,+1 
+4 -x,-y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+3 x+1/2,y+1/2,z,+1 
+4 x,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tb1_1 Tb 0.49412 0.00000 0.00000 1
+Tb1_2 Tb 0.74411 0.25000 0.00000 1
+Tb2_1 Tb 0.11607 0.36728 0.25497 1
+Tb2_2 Tb 0.86607 0.11728 0.25497 1
+Nb1_1 Nb -0.00465 0.25000 0.00000 1
+Nb1_2 Nb 0.74535 0.00000 0.00000 1
+O1_1 O 0.14651 0.43933 0.02152 1
+O1_2 O 0.89651 0.18933 0.02152 1
+O2_1 O 0.15724 0.43723 0.46373 1
+O2_2 O -0.09276 0.18723 0.46373 1
+O3_1 O 0.00000 0.06418 0.25000 1
+O3_2 O 0.25000 0.31418 0.25000 1
+O4_1 O 0.00000 0.43238 0.25000 1
+O4_2 O 0.25000 0.68238 0.25000 1
+O5_1 O 0.00000 0.28382 0.25000 1
+O5_2 O 0.25000 0.53382 0.25000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tb1_1 0.0 0.0 0.0 Mx,0,0 0.0 ? ?
+Tb1_2 0.0 0.0 0.0 0,My,Mz 0.0 ? ?
+Tb2_1 3.64(8) 5.31(6) -1.76(4) Mx,My,Mz 6.68(3) ? ?
+Tb2_2 -3.64(8) -5.31(6) 1.76(4) Mx,My,Mz 6.68(3) ? ?
+

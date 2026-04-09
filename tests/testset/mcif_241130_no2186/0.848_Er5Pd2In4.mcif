@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/21/2022
+# from a file submitted by Aleksandra Deptuch
+
+data_5yOhtAoR
+_audit_creation_date            2022-07-21
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Er5 Pd2 In4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Alloys Compd."
+_citation_journal_volume        877
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            160171
+_citation_year                  2021
+_citation_DOI                   10.1016/j.jallcom.2021.160171
+
+loop_
+_citation_author_name
+"S. Baran"
+"A. Deptuch"
+"M. Reehuis"
+"Yu. Tyvanchuk"
+"F. Yokaichiya"
+"A. Szytula"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     16
+_experiment_temperature     1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3+ 1 1 . primary 6 .
+mGM4+ 1 1 . primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD. Ferrimagnetic 
+FM on the plane ab
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps involved as primary
+One irrep [mGM3+] for the sites Er1 and Er3, which order at 16K, and the other irrep [mGM4+] for the site Er2, which orders at a lower unspecified temperature.
+;
+
+_parent_space_group.name_H-M_alt  "P b a m"
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;0,0,0'
+
+_space_group_magn.number_BNS  10.46
+_space_group_magn.name_BNS  "P 2'/m'"
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 17.9388
+_cell_length_b                 7.9185
+_cell_length_c                 3.57256
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+3 -x,-y,z,-1 
+4 x,y,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Er1_1 Er 0.00000 0.00000 0.00000 1
+Er1_2 Er 0.50000 0.50000 0.00000 1
+Er2_1 Er 0.22312 0.24211 0.00000 1
+Er2_2 Er 0.72312 0.25789 0.00000 1
+Er3_1 Er 0.42454 0.11952 0.00000 1
+Er3_2 Er -0.07546 0.38048 0.00000 1
+Pd1_1 Pd 0.30090 0.05044 0.50000 1
+Pd1_2 Pd 0.80090 0.44956 0.50000 1
+In1_1 In 0.56898 0.18535 0.50000 1
+In1_2 In 0.06898 0.31465 0.50000 1
+In2_1 In 0.85319 0.06747 0.50000 1
+In2_2 In 0.35319 0.43253 0.50000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Er1_1 -3.9(4) 6.9(3) 0.0 mx,my,0 7.9(5) ? ?
+Er1_2 -3.9(4) -6.9(3) 0.0 mx,my,0 7.9(5) ? ?
+Er2_1 0.0 2.7(3) 0.0 mx,my,0 2.7(3) ? ?
+Er2_2 0.0 2.7(3) 0.0 mx,my,0 2.7(3) ? ?
+Er3_1 0.0 -6.0(2) 0.0 mx,my,0 6.0(2) ? ?
+Er3_2 0.0 6.0(2) 0.0 mx,my,0 6.0(2) ? ?
+

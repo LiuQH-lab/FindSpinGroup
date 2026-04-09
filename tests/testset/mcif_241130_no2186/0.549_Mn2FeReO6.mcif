@@ -1,0 +1,141 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 24/02/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-02-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Angew. Chem. Int. Ed."
+_citation_journal_volume        54
+_citation_page_first            12069
+_citation_page_last             12073
+_citation_article_id            .
+_citation_year                  2015
+_citation_DOI                   10.1002/anie.201506456
+
+loop_
+_citation_author_name
+"M.-R. Li"
+"M. Retuerto"
+"Z. Deng"
+"P. W. Stephens"
+"M. Croft"
+"Q. Huang"
+"H. Wu"
+"X. Deng"
+"G. Kotliar"
+"J. Sanchez-Benitez"
+"J. Hadermann"
+"D. Walker"
+"M. Greenblatt"
+
+_atomic_positions_source_database_code_ICSD  429766
+_atomic_positions_source_other               .
+
+_transition_temperature  ?
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  9  .
+mGM1+  1  1  .  primary  9  .
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Non-standard parent setting P2_1/n
+Ferrimagnetic
+mx and mz components of Fe and Re sites have been constrained to have equal values
+See #0.545 for a different model under the same MSG at 1.7K
+The Mn my orientation represented in a figure of the article is inconsistent with the value reproted in a table of its supplementary material. The table has been assumed correct.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim irreps involved as primary. This means that two order parameters are present. One for the ordering of the Fe and Re moments and the Mn my component, and another one with different irrep for the Mn mx and mz components.
+At 300K and 250K, Mn moments are reported to be zero (see #0.546 and #0.547) and a single irrep is involved. The Mn magnetic ordering according to a different irrep in the present structure and the one for 70K (see #0.548) breaks the symmetry and reduces the MSG to P-1. This implies that some phase transition must take place between 250K and 70K. 
+As the Mn mx aand mz components are associated to the second order parameter, their relative sign with respect to the other moment values in the full arrangement is arbtrary, as they will correspond to domain-related arrangements with one of the two order parameters with opposite sign. The sign of the Mn my component, associated with the same irrep as the spin arrangement of Fe and Re atomos, is on the contrary fully correlated with the Fe and Re moment arrangement. See #0.545 for a model at 1.7K where the Mn mx and mz componentes have approximately opposite values to those here.
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.4
+_space_group_magn.name_BNS  "P -1"
+_cell_length_a             5.19050
+_cell_length_b             5.35360
+_cell_length_c             7.57160
+_cell_angle_alpha          90.00
+_cell_angle_beta           89.861
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1_1 Mn 0.98330 0.05840 0.22820 1.
+Mn1_2 Mn  0.51670 0.55840 0.27180 1.
+Fe1_1 Fe 0.50000 0.00000 0.50000 0.9446
+Fe1_2 Fe  0.00000 0.50000 0.00000 0.9446
+Re1_1 Re 0.50000 0.00000 0.50000 0.0554
+Re1_2 Re  0.00000 0.50000 0.00000 0.0554
+Re2_1 Re 0.50000 0.00000 0.00000 0.9446
+Re2_2 Re  0.00000 0.50000 0.50000 0.9446
+Fe2_1 Fe 0.50000 0.00000 0.00000 0.0554
+Fe2_2 Fe  0.00000 0.50000 0.50000 0.0554
+O1_1 O 0.19300 0.19100 0.93100 1.
+O1_2 O  0.30700 0.69100 0.56900 1.
+O2_1 O 0.17500 0.18600 0.55980 1.
+O2_2 O  0.32500 0.68600 0.94020 1.
+O3_1 O 0.38080 0.94050 0.24800 1.
+O3_2 O  0.11920 0.44050 0.25200 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1_1 2.05(11) -2.91(7) 1.3(2) mx,my,mz      3.79
+Mn1_2 -2.05 2.91 -1.3 mx,my,mz               3.79
+Fe1_1 3.19(7) 0.00000 3.19 mx,my,mz          4.51
+Fe1_2 3.19 0.00000 3.19 mx,my,mz             4.51
+Re2_1 -0.143(3) 0.00000 -0.143 mx,my,mz      0.202
+Re2_2 -0.143 0.00000 -0.143 mx,my,mz         0.202
+

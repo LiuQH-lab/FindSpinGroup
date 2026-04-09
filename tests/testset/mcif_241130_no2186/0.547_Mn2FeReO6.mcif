@@ -1,0 +1,129 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 24/02/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-02-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Angew. Chem. Int. Ed."
+_citation_journal_volume        54
+_citation_page_first            12069
+_citation_page_last             12073
+_citation_article_id            .
+_citation_year                  2015
+_citation_DOI                   10.1002/anie.201506456
+
+loop_
+_citation_author_name
+"M.-R. Li"
+"M. Retuerto"
+"Z. Deng"
+"P. W. Stephens"
+"M. Croft"
+"Q. Huang"
+"H. Wu"
+"X. Deng"
+"G. Kotliar"
+"J. Sanchez-Benitez"
+"J. Hadermann"
+"D. Walker"
+"M. Greenblatt"
+
+_atomic_positions_source_database_code_ICSD  429764
+_atomic_positions_source_other               .
+
+_transition_temperature  520
+_experiment_temperature  250
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  9  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Non-standard parent setting P2_1/n
+Ferrimagnetic on the plane ac
+mx and mz components of Fe and Re sites have been constrained to have equal values
+See #0.541 for a quite different model under the same MSG at 300K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+The structure was incorrectly assigned the MSG P2_1/n. Here the correct one is used (P2_1'/n': P2_1'/c' in a non-standard setting).
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-a+c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.79
+_space_group_magn.name_BNS  "P 2_1'/c'"
+_cell_length_a             5.19780
+_cell_length_b             5.36050
+_cell_length_c             7.58150
+_cell_angle_alpha          90.00
+_cell_angle_beta           89.918
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+3 -x+1/2,y+1/2,-z+1/2,-1 
+4 x+1/2,-y+1/2,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.98000 0.06000 0.23020 1.
+Fe1 Fe 0.50000 0.00000 0.50000 0.9446
+Re1 Re 0.50000 0.00000 0.50000 0.0554
+Re2 Re 0.50000 0.00000 0.00000 0.9446
+Fe2 Fe 0.50000 0.00000 0.00000 0.0554
+O1 O 0.19000 0.19300 0.93360 1.
+O2 O 0.18000 0.18300 0.55870 1.
+O3 O 0.38210 0.94470 0.24900 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 0.00000 0.00000 0.00000 mx,my,mz      0.0
+Fe1 2.81(7) 0.00000 2.81 mx,my,mz         3.97
+Re2 -0.122(3) 0.00000 -0.122 mx,my,mz     0.173
+

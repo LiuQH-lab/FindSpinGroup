@@ -1,0 +1,128 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 18/03/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        57
+_citation_page_first            12817
+_citation_page_last             12835
+_citation_article_id            ?
+_citation_year                  2018
+_citation_DOI                   10.1021/acs.inorgchem.8b02023
+
+loop_
+_citation_author_name
+"S. Ghara"
+"F. Fauth"
+"E. Suard"
+"J. Rodriquez-Carvajal"
+"A. Sundaresan"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  25
+_experiment_temperature  3.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1  1  1  .  primary  6  .
+mGM2  1  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from data at room temperature
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim irreps are active as primary irreps: two order parameters in the sense of Landau theory are present in the spin arrangement.
+;
+
+_parent_space_group.name_H-M_alt  'P n a 2_1'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  4.7
+_space_group_magn.name_BNS  "P 2_1"
+_cell_length_a             10.87860
+_cell_length_b             5.18330
+_cell_length_c             7.32150
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Dy1_1 Dy 0.04300 0.45420 0.25000
+Dy1_2 Dy  0.54300 0.04580 0.25000
+Cr1_1 Cr 0.13400 0.95130 0.99620
+Cr1_2 Cr  0.63400 0.54870 0.99620
+W1_1 W 0.35310 0.44430 0.00440
+W1_2 W  0.85310 0.05570 0.00440
+O1_1 O 0.97730 0.76880 0.04650
+O1_2 O  0.47730 0.73120 0.04650
+O2_1 O 0.52730 0.25880 0.96470
+O2_2 O  0.02730 0.24120 0.96470
+O3_1 O 0.20530 0.61610 0.06070
+O3_2 O  0.70530 0.88390 0.06070
+O4_1 O 0.28220 0.12630 0.93490
+O4_2 O  0.78220 0.37370 0.93490
+O5_1 O 0.14290 0.05850 0.24730
+O5_2 O  0.64290 0.44150 0.24730
+O6_1 O 0.12020 0.83400 0.74920
+O6_2 O  0.62020 0.66600 0.74920
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Dy1_1 1.69(19) -5.90(7) -4.77(3) mx,my,mz
+Dy1_2 1.69 -5.90 4.77 mx,my,mz
+Cr1_1 0.90(29) 2.78(9) 0.03(5) mx,my,mz
+Cr1_2 0.90 2.78 -0.03 mx,my,mz
+
+

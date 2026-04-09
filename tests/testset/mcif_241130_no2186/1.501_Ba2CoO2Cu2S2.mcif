@@ -1,0 +1,126 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 18/02/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-02-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Am. Chem. Soc."
+_citation_journal_volume        133
+_citation_page_first            2691
+_citation_page_last             2705
+_citation_article_id            .
+_citation_year                  2011
+_citation_DOI                   10.1021/ja109553u
+
+loop_
+_citation_author_name
+"C. F. Smura"
+"D. R. Parker"
+"M. Zbiri"
+"M. R. Johnson"
+"Z. A. Gal"
+"S. J. Clarke"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  230
+_experiment_temperature  5K
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX3+  1  1  .  primary  1  .
+mX4+  1  1  .  primary?  1  .
+mX2+  1  1  .  secondary?  1  yes
+GM2+  1  1  .  secondary  ?   yes
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+See Koo et al. (Inorg. Chem. (2020) 59, 18319 - 18324), which puts into question this magnetic structure.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim small irreps involved as primary. Not clear which.
+A third 1-dim small irrep as secondary is present. Not clear which
+Simpler arrangements with higher symmetry and a single primary irrep were not checked. Actually the proposed magnetic model includes within its standard deviations a spin arrangement of higher (monoclinic) symmetry, with the moment direction on the basal plane along (1,1,0). 
+The irrep star has 2 k-vectors and a 2k non-collinear arrangement of higher symmetry could equally fit the NPD data. The article considers however only a 1k model.
+The reported position structure includes a structural distortion that reduces its effective space group to Immm. This distortion corresponds to the irrep GM2+, and it is one of various structural irrep distortions that can be induced by the proposed magnetic ordering through magneto-structural coupling.
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/4a-1/4b+1/2c,-1/4a+1/4b+1/2c,-1/2a-1/2b+c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             8.09320
+_cell_length_b             8.12040
+_cell_length_c             18.75500
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/4,y+3/4,z+1/2,+1 
+3 x+1/2,y+1/2,z,+1 
+4 x+3/4,y+1/4,z+1/2,+1 
+5 x+3/4,y+3/4,z+1/2,-1 
+6 x,y+1/2,z,-1 
+7 x+1/4,y+1/4,z+1/2,-1 
+8 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1 Co 0.00000 0.00000 0.00000 1.
+Cu1 Cu 0.25000 0.00000 0.25050 0.99
+S1 S 0.00000 0.00000 0.17810 1.
+Ba1 Ba 0.00000 0.00000 0.09650 1.
+O1 O 0.00000 0.25000 0.50000 1.
+O2 O 0.25000 0.00000 0.50000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1 3.05(9) 3.01(9) 1.2(2) mx,my,mz 4.45(9)
+

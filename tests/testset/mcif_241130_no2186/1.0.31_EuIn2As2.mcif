@@ -1,0 +1,134 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 08/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "NATURE COMMUNICATIONS"
+_citation_journal_volume        12
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            999
+_citation_year                  2021
+_citation_DOI                   10.1038/s41467-021-21154-y
+
+loop_
+_citation_author_name
+"S. X. M. Riberolles"
+"T. V. Trevisan"
+"B. Kuthanazhi"
+"T. W. Heitmann"
+"F. Ye"
+"D. C. Johnston"
+"S. L. Budko"
+"D. H. Ryan"
+"P. C. Canfield"
+"A. Kreyssig"
+"A. Vishwanath"
+"R. J. McQueeney"
+"L. -L. Wang"
+"P. P. Orth"
+"B. G. Ueland"
+
+_atomic_positions_source_database_code_ICSD  260109
+_atomic_positions_source_other               .
+
+_transition_temperature  16.2(1)
+_experiment_temperature  6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mDT6  4  2  special  primary  2  .
+mDT3  2  1  special secondary 1  no
+mGM5+ 2  2  special secondary 1  yes
+mGM2+ 1  1   .       secondary 1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Between 17.6(2) and 16.2(2) a different phase with hexagonal symmetry is reported.
+Position structure is not given. Here the one determined at 90K in another study is used.
+This phase is actually incommensurate, with k=(0,0,0.303), but the model has been obtained approximating the propagation vector to the commensurate value (0,0,1/3)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+4-dim irrep along a special direction as primary
+Three irreps allowed as secondary, corresponding to three degrees of freedom of the moments within the MSG.
+The secondary irreps corresponding to canting of the moments along c are inactive, but the irrep mGM5+ ordering represents spme moment arrangement on the basal xy plane and it is present in the proposed model, in addition to the primary mDT6 component.
+The model includes in the spin arrangement a k=0 component, as a secondary induced third harmonic of the primary modulation. However, if the actual incommensurate value of the propagation vector is considered, this third harmonic would also be incommensurate with a k different from zero and a k=0 component can only be present in the real incommensurate structure as a second independent primary order parameter.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/3]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,3c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-b,a+b,c;0,0,1/12'
+
+
+
+_space_group_magn.number_BNS  20.33
+_space_group_magn.name_BNS  "C 2' 2' 2_1"
+_cell_length_a             4.20670
+_cell_length_b             4.20670
+_cell_length_c             53.66730
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z+1/2,+1 
+3 -y,-x,-z+1/6,-1 
+4 y,x,-z+2/3,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Eu1_1 Eu 0.00000 0.00000 0.00000
+Eu1_2 Eu  0.00000 0.00000 0.33333
+In1_1 In 0.33333 0.66667 0.27576
+In1_2 In  0.66667 0.33333 0.44243
+In1_3 In  0.33333 0.66667 0.60910
+As1_1 As 0.33333 0.66667 0.13084
+As1_2 As  0.66667 0.33333 0.29751
+As1_3 As  0.33333 0.66667 0.46418
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Eu1_1 2.35000 6.69000 0.00000 mx,my,mz     5.9(2)
+Eu1_2 -3.39000 3.39000 0.00000 mx,-mx,mz   5.9
+
+
+

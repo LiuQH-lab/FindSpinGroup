@@ -1,0 +1,150 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:10:59
+# Database entry: 1.79 Li2CoSiO4
+# Cif-like file for the case 1.79
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Li2 Co Si O4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Solid State Chem."
+_citation_journal_volume        216
+_citation_page_first            42
+_citation_page_last             48
+_citation_article_id            .
+_citation_year                  2014
+_citation_DOI                   10.1016/j.jssc.2014.04.028
+
+loop_
+_citation_author_name
+"M. Avdeev"
+"Z. Mohamed"
+"C.D. Ling"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   245536
+_atomic_positions_source_other               .
+
+_transition_temperature     14
+_experiment_temperature     3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT1 2 2 special primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Structure reported in citation was refined with the x,y coordinates of one atom erroneously kept fixed.
+Structure here from icsd 24536 transformed to a standard setting.
+a and b have opposite directions than in citation.
+Parent phase has polar symmetry.
+Parent is pseudosymmetric (Pnma, max. displacements 0.6 A)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+Only one irrep in the magnetic representation: restriction to one irrep introduces no restriction.
+Parent is pseudosymmetric (Pnma, max. displacements 0.6 A)
+;
+
+_parent_space_group.name_H-M_alt  'P  n  a  2_1'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,b,-a;0,1/8,0'
+
+
+_space_group_magn.number_BNS  9.41
+_space_group_magn.name_BNS  "C_a  c"
+_space_group_magn.point_group_name  "m1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 10.68500
+_cell_length_b                 12.50600
+_cell_length_c                 9.85800
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/4,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x,y,z+1/2,-1
+4 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1_1 Co2+ 0.16480 0.24650 0.37280 1
+Co1_2 Co2+ 0.83520 0.75350 0.62280 1
+Si1_1 Si 0.41360 0.12460 0.36945 1
+Si1_2 Si 0.58640 0.87540 0.61945 1
+Li1_1 Li 0.16020 0.49530 0.35515 1
+Li1_2 Li 0.83980 0.50470 0.60515 1
+Li2_1 Li 0.42440 0.36970 0.37235 1
+Li2_2 Li 0.57560 0.63030 0.62235 1
+O1_1 O 0.41050 0.12445 0.20520 1
+O1_2 O 0.58950 0.87555 0.45520 1
+O2_1 O 0.55780 0.12665 0.42375 1
+O2_2 O 0.44220 0.87335 0.67375 1
+O3_1 O 0.34100 0.01545 0.42395 1
+O3_2 O 0.65900 0.98455 0.67395 1
+O4_1 O 0.34200 0.23220 0.42595 1
+O4_2 O 0.65800 0.76780 0.67595 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1_1 -2.92(4) 0.0 0.0 mx,my,mz
+Co1_2 -2.92(4) 0.0 0.0 mx,my,mz
+

@@ -1,0 +1,151 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:13:09
+# Database entry: 1.114 Ca4IrO6
+# Cif-like file for the case 1.114
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ca4 Ir O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        89
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            081104(R)
+_citation_year                  2014
+_citation_DOI                   10.1103/PhysRevB.89.081104
+
+loop_
+_citation_author_name
+"S. Calder"
+"G.-X. Cao"
+"S. Okamoto"
+"J.W. Kim"
+"V.R. Cooper"
+"Z. Gai"
+"B.C. Sales"
+"M.D. Lumsden"
+"D. Mandrus"
+"A.D. Christianson"
+
+
+
+
+_atomic_positions_source_database_code_ICSD   280873
+_atomic_positions_source_other               .
+
+_transition_temperature     12
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mF1+ 3 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD and DFT calculations
+spins oriented along the Ir-O bonds.
+Modulus Ir spin: 0.42(10)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+;
+
+_parent_space_group.name_H-M_alt  'R  -3c'
+_parent_space_group.IT_number                       167
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/6a-1/6b+2/3c,1/2a+1/2b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  13.74
+_space_group_magn.name_BNS  "P_C  2/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 18.60600
+_cell_length_b                 18.60600
+_cell_length_c                 11.08640
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 y,x,-z+1/2,+1
+3 -x,-y,-z,+1
+4 -y,-x,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/6,y+5/6,z+2/3,+1
+3 x+1/3,y+2/3,z+1/3,+1
+4 x+1/2,y+1/2,z,+1
+5 x+2/3,y+1/3,z+2/3,+1
+6 x+5/6,y+1/6,z+1/3,+1
+7 x+1/3,y+1/6,z+1/3,-1
+8 x+1/2,y,z,-1
+9 x+2/3,y+5/6,z+2/3,-1
+10 x+5/6,y+2/3,z+1/3,-1
+11 x,y+1/2,z,-1
+12 x+1/6,y+1/3,z+2/3,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ca1_1 Ca 0.31896 0.00000 0.25000 1
+Ca1_2 Ca 0.68104 0.68104 0.25000 1
+Ca2 Ca 0.00000 0.00000 0.25000 1
+Ir1 Ir 0.00000 0.00000 0.00000 1
+O1_1 O 0.42060 0.01425 0.10810 1
+O1_2 O 0.98575 0.40635 0.10810 1
+O1_3 O 0.59365 0.57940 0.10810 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ir1 -0.24 0.04 0.33 mx,my,mz
+

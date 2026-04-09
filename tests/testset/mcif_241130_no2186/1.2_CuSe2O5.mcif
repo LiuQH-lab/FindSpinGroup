@@ -1,0 +1,141 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:04:17
+# Database entry: 1.2 CuSe2O5
+# Cif-like file for the case 1.2
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Cu Se2 O5'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        87
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            104413
+_citation_year                  2013
+_citation_DOI                   10.1103/physrevb.87.104413
+
+loop_
+_citation_author_name
+"M. Herak"
+"A. Zorko"
+"M. Pregelj"
+"O. Zaharko"
+"G. Posnjak"
+"Z. Jagličic"
+"A. Potočnik"
+"H. Luetkens"
+"J. van Tol"
+"A. Ozarowski"
+"H. Berger"
+"D. Arčon"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   603
+_atomic_positions_source_other               .
+
+_transition_temperature     17
+_experiment_temperature     6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY2+ 1 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+;
+
+_active_magnetic_irreps_details
+;
+k-maximal magnetic symmetry (from 2 possible)
+1k-magnetic structure
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'C  2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-a,b,-a-c;0,0,0'
+
+
+_space_group_magn.number_BNS  14.84
+_space_group_magn.name_BNS  "P_c  21/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 12.2540
+_cell_length_b                 4.8580
+_cell_length_c                 7.9600
+_cell_angle_alpha              90.0000
+_cell_angle_beta               110.7000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,-y+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cu1 Cu 0.00000 0.00000 0.00000 1
+Se1 Se 0.13990 -0.43530 0.32990 1
+O1 O 0.12580 0.22510 -0.01310 1
+O2 O 0.12560 -0.22370 0.15840 1
+O3 O 0.00000 -0.61680 0.25000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1 0.13(7) 0.50(1) 0.00(8) mx,my,mz
+

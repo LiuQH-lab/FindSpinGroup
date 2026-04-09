@@ -1,0 +1,163 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:00:09
+# Database entry: 0.135 Ni3B7O13Br
+# Cif-like file for the case 0.135
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ni3 B7 O1 3Br'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Ferroelectrics"
+_citation_journal_volume        146
+_citation_page_first            81
+_citation_page_last             97
+_citation_article_id            .
+_citation_year                  1993
+_citation_DOI                   10.1080/00150199308008529
+
+loop_
+_citation_author_name
+"S.Y. Mao"
+"F. Kubel"
+"H. Schmid"
+"P. Schobinger"
+"P. Fischer"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   79127
+_atomic_positions_source_other               .
+
+_transition_temperature     30
+_experiment_temperature     8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Ferroelectric. Type I multiferroic.
+It belongs to the family of boracites, the first compounds identified as multiferroics.
+The atomic positions are from a measurement at 36K.
+An alternative second model with null moment for Ni1 is also proposed.
+Similar models for a measurement at 24K are also reported in the same reference.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep active.
+weak FM along b. According to the reported structure it can be considered a ferrimagnetic effect.
+Above 398K, high-temperature parent structure with F-43c space group.
+Switching between ferroelectric domains with opposite polarization implies a 90� rotation of the weak FM component.
+;
+
+_parent_space_group.name_H-M_alt  'P  c  a  2_1'
+_parent_space_group.IT_number                       29
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  29.101
+_space_group_magn.name_BNS  "P  c'  a  2_1'"
+_space_group_magn.point_group_name  "m'm2'"
+_space_group_magn.point_group_number  "7.3.22"
+_cell_length_a                 8.51600
+_cell_length_b                 8.49500
+_cell_length_c                 12.03400
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y,z,+1
+3 -x,-y,z+1/2,-1
+4 -x+1/2,y,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ni1 Ni 0.74400 0.24900 0.73000 1
+Ni2 Ni 0.98800 0.47500 0.50100 1
+Ni3 Ni 0.98500 0.02400 0.50200 1
+Br1 Br 0.77300 0.25000 0.51176 1
+B1 B 0.49400 0.48300 0.74500 1
+B2 B 0.25300 0.25200 0.49700 1
+B3 B 0.99400 0.99500 0.74500 1
+B4 B 0.04600 0.26400 0.85100 1
+B5 B 0.75300 0.59300 0.67200 1
+B6 B 0.39600 0.25100 0.83100 1
+B7 B 0.75800 0.90900 0.67200 1
+O1 O 0.75300 0.75100 0.73900 1
+O2 O 0.95600 0.32500 0.78500 1
+O3 O 0.88300 0.67300 0.44100 1
+O4 O 0.53100 0.17300 0.78000 1
+O5 O 0.68200 0.64000 0.58000 1
+O6 O 0.83400 0.02700 0.73700 1
+O7 O 0.13900 0.17800 0.43800 1
+O8 O 0.65900 0.47400 0.73300 1
+O9 O 0.82100 0.87700 0.57500 1
+O10 O 0.43400 0.41300 0.84900 1
+O11 O 0.04700 0.07900 0.85400 1
+O12 O 0.91400 0.55700 0.65700 1
+O13 O 0.57200 0.94200 0.65600 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1 3.51(5) 0.0 0.6(2) mx,my,mz
+Ni2 0.0 1.31(7) 0.2(1) mx,my,mz
+Ni3 0.0 -1.31(7) -0.5(1) mx,my,mz
+

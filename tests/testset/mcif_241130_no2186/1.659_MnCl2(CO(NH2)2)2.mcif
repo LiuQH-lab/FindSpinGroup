@@ -1,0 +1,145 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/17/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-02-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Mn Cl2 C2 O2 N4 H8"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        54
+_citation_page_first            11897
+_citation_page_last             11905
+_citation_article_id            .
+_citation_year                  2015
+_citation_DOI                   10.1021/acs.inorgchem.5b02162
+
+loop_
+_citation_author_name
+"J. L. Manson"
+"Q.-Z. Huang"
+"C. M. Brown"
+"J. W. Lynn" 
+"M. B. Stone"
+"J. Singleton"
+"F. Xiao"
+
+_temperature_position_structure         295
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     2.99(4)
+_experiment_temperature     1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX3 1 1 . primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 295K
+The propagation vector and the MSG assigned to the magnetic structure in the original paper are wrong. The magnetic arrangement does not correspond to a cero propagation vector, but to k=(1,1,1), which is not equivalent k=0, for this body centered space group. 
+The correct values of the propagation vector and the MSG for the proposed model are given here.
+The origin of the magnetic structure has been shifted here by (0,1/2,0), with respect to the one of the reported parent paramagnetic structure, in order to show a graphical description of the spin arrangement similar to the one employed in the original paper.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'I b a 2'
+_parent_space_group.IT_number                       45
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,1/2,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,1/4,0'
+
+_space_group_magn.number_BNS  29.110
+_space_group_magn.name_BNS  "P_I c a 2_1"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 9.16300
+_cell_length_b                 12.57720
+_cell_length_c                 7.33980
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y+1/2,z+1/2,+1 
+3 -x,y,z+1/2,+1 
+4 x+1/2,-y+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn Mn 0.00000 0.00000 0.31430 1
+Cl Cl 0.80034 0.00855 0.06295 1
+O O 0.98278 0.16790 0.32360 1
+C C 0.07137 0.24412 0.32280 1
+N1 N 0.03620 0.33569 0.40210 1
+H1 H 0.95100 0.34070 0.45750 1
+H2 H 0.09040 0.39280 0.41340 1
+N2 N 0.20018 0.23661 0.24140 1
+H3 H 0.23040 0.17720 0.19140 1
+H4 H 0.26670 0.28540 0.26370 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn 0.0 4.06(6) 0.0 mx,my,0 4.06(6) ? ?
+

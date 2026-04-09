@@ -1,0 +1,131 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 18/09/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-09-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Appl. Phys. A"
+_citation_journal_volume        74
+_citation_page_first            S704
+_citation_page_last             S706
+_citation_article_id            ?
+_citation_year                  2002
+_citation_DOI                   10.1007/s003390101146
+
+loop_
+_citation_author_name
+"G. Rousse"
+"J. Rodriguez-Carvajal"
+"C. Wurm"
+"C. Masquelier"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  98361
+_atomic_positions_source_other               .
+
+_transition_temperature  23
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1  1  . primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from an icsd entry at room temperature, except for the unit cell parameters that are taken from the report on the magnetic structure.
+One of the two different forms reported for this compound (see #0.259 for the other)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim primary irrep
+Ferrimagnetic
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,-c,a+b;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,a+b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.79
+_space_group_magn.name_BNS  "P 2_1'/c'"
+_cell_length_a             8.5599
+_cell_length_b             11.9965
+_cell_length_c             8.6096
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.559
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x+1/2,-y+1/2,z+1/2,-1
+4 x+1/2,y+1/2,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Fe1 Fe 0.24620 0.10790 0.46190
+Fe2 Fe 0.75410 0.39500 0.47080
+P1 P 0.10300 0.14840 0.10690
+P2 P 0.60393 0.34950 0.11600
+P3 P 0.03590 0.49320 0.25120
+O1 O 0.42920 0.33090 0.08850
+O2 O 0.92370 0.14970 0.11510
+O3 O 0.35270 0.26200 0.48060
+O4 O 0.80220 0.21930 0.49720
+O5 O 0.16690 0.03890 0.05800
+O6 O 0.64550 0.47130 0.09200
+O7 O 0.45070 0.06890 0.36780
+O8 O 0.92730 0.40370 0.31320
+O9 O 0.17090 0.43170 0.17100
+O10 O 0.59790 0.07010 0.12730
+O11 O 0.16350 0.18680 0.26360
+O12 O 0.63740 0.31680 0.28680
+Li1 Li 0.28800 0.32000 0.27500
+Li2 Li 0.57100 0.20200 0.41900
+Li3 Li 0.90100 0.24300 0.29100
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 4.7(3) 0.00000 0.00000 mx,my,mz
+Fe2 -4.0(3) 0.00000 0.00000 mx,my,mz
+

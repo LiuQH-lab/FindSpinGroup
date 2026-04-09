@@ -1,0 +1,160 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# from an initial mcif file provided by L. Canadillas-Delgado
+# Date: 01/26/2024
+
+data_5yOhtAoR
+_audit_creation_date            2024-01-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Cs1 Mn1 N3 C3 S3"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Chem. Sci."
+_citation_journal_volume        14
+_citation_page_first            3531
+_citation_page_last             3540
+_citation_article_id            .
+_citation_year                  2023
+_citation_DOI                   10.1039/d2sc06861c
+
+loop_
+_citation_author_name
+"M. Geers"
+"J. Y. Lee"
+"S. Ling"
+"O. Fabelo"
+"L. Canadillas-Delgado"
+"M. J. Cliffe"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     16.8
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mD1-D2- 2 2 general primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Non-standard setting P2_1/n for the parent space group
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,1/2b-1/2c,c;0,0,1/4'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 12.7468
+_cell_length_b                 26.4892
+_cell_length_c                 11.3082
+_cell_angle_alpha              90.3000
+_cell_angle_beta               95.8400
+_cell_angle_gamma              90.1000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x,y+1/2,z,-1 
+4 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1_1 Mn 0.50000 0.00000 0.25000 1
+Mn1_2 Mn 0.00000 0.25000 0.00000 1
+Mn2_1 Mn 0.00000 0.00000 0.25000 1
+Mn2_2 Mn 0.50000 0.25000 0.00000 1
+N1_1 N 0.96941 0.29597 0.34155 1
+N1_2 N 0.53059 0.54597 0.90845 1
+N2_1 N 0.41929 0.22148 0.14167 1
+N2_2 N 0.08071 0.47148 0.10833 1
+N3_1 N 0.16791 0.25315 0.47606 1
+N3_2 N 0.33209 0.50315 0.77394 1
+C1_1 C 0.99016 0.31260 0.25127 1
+C1_2 C 0.50984 0.56260 0.99873 1
+C2_1 C 0.41766 0.20270 0.23514 1
+C2_2 C 0.08234 0.45271 0.01486 1
+C3_1 C 0.24132 0.27627 0.45418 1
+C3_2 C 0.25868 0.52628 0.79582 1
+Cs1_1 Cs 0.21669 0.13760 0.07475 1
+Cs1_2 Cs 0.28331 0.38760 0.17525 1
+S1_1 S 0.02003 0.33643 0.12505 1
+S1_2 S 0.47997 0.58644 0.12495 1
+S2_1 S 0.41667 0.17405 0.36295 1
+S2_2 S 0.08333 0.42405 0.88705 1
+S3_1 S 0.34307 0.31062 0.42500 1
+S3_2 S 0.15693 0.56062 0.82500 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1_1 -1.9(5) 1.6(10) 3.7(5)  mx,my,mz 4.63(9) ? ?
+Mn1_2 -1.1(10) 3.3(4) -3.2(7) mx,my,mz 4.63(9) ? ?
+Mn2_1 1.6(5) -1.7(10) -3.8(5) mx,my,mz 4.63(9) ? ?
+Mn2_2 -1.5(10) -4.4(4) 0.1(8) mx,my,mz 4.63(9) ? ?
+

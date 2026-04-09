@@ -1,0 +1,150 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/28/2024
+
+data_5yOhtAoR
+_audit_creation_date            2024-07-28
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "La0.4 Na0.6 Fe2 As2"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        91
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            024501
+_citation_year                  2015
+_citation_DOI                   10.1103/PhysRevB.91.024501
+
+loop_
+_citation_author_name
+"J.-Q. Yan"
+"S. Nandi"
+"B. Saparov"
+"P. Cermak"
+"Y. Xiao"
+"Y. Su"
+"W. T. Jin"
+"A. Schneidewind"
+"Th. Bruckel"
+"R. W. McCallum"
+"T. A. Lograsso"
+"B. C. Sales"
+"D. G. Mandrus"
+
+_temperature_position_structure         100
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  241303
+_atomic_positions_source_other               .
+
+_transition_temperature     128.0(5)
+_experiment_temperature     5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX2+ 2 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure from a determination at 100K
+A so-called "concomitant" structural transition with space group lowering from I4/mmm to Fmmm is reported to coincide with the magnetic transition, but the space group Fmmm is the effective space group for the positional structure to be expected for the MSG C_Amca, whose UNI symbol is Cmca.1'_A[Fmmm]. Therefore the structural distortion can be an induced effect of the magnetic ordering.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep with a 1-dim small irrep
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       69
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a,b;0,0,0'
+
+
+_space_group_magn.number_BNS  64.480
+_space_group_magn.name_BNS  "C_A m c a"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 5.46970
+_cell_length_b                 5.47400
+_cell_length_c                 12.06800
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z,+1 
+3 x,-y+1/2,-z+1/2,+1 
+4 -x,y+1/2,-z+1/2,+1 
+5 -x,-y,-z,+1 
+6 x,y,-z,+1 
+7 -x,y+1/2,z+1/2,+1 
+8 x,-y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y+1/2,z+1/2,-1 
+4 x+1/2,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1 La 0.00000 0.00000 0.00000 0.406
+Na1 Na 0.00000 0.00000 0.00000 0.594
+Fe1 Fe 0.25000 0.25000 0.25000 1.
+As1 As 0.00000 0.00000 0.63558 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 -0.7(1) 0.0 0.0 mx,0,0 0.7(1) ? ?
+

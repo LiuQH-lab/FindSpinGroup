@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:04:05
+# Database entry: 1.0.7 LuFe2O4
+# Cif-like file for the case 1.0.7
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Lu Fe2 O4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Phys. Rev. Lett."
+_citation_journal_volume        100
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            107601
+_citation_year                  2008
+_citation_DOI                   10.1103/physrevlett.100.107601
+
+loop_
+_citation_author_name
+"A.D. Christianson"
+"M.D. Lumsden"
+"M. Angst"
+"Z. Yamani"
+"W. Tian"
+"R. Jin"
+"E.A. Payzant"
+"S.E. Nagler"
+"B.C. Sales"
+"D. Mandrus"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   68481
+_atomic_positions_source_other               .
+
+_transition_temperature     240
+_experiment_temperature     220
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM2 2 6 special primary ? yes
+mGM2 1 1 . secondary ? yes
+mGM3 2 2 special secondary ? no
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+the model ignores the structural charge ordering that takes place below 320 and  reduces structural paramagnetic symmetry to monoclinic.
+Nuclear positions are assumed to be those of the rhombohedral phase of higher temperature.
+Alternative models that include the monoclinic structural distortion have been proposed (see PRL 108, 037206(2012)).
+Claimed to be multiferroic, but ferroelectricity is inconsistent with structural and magnetic models.
+Magnetic order reduces symmetry to monoclinic centrosymmetric with the monoclinic axis along (1,1,0) or a twin-equivalent one.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+The up-up-down configuration of the model requires the presence of a secondary k=0 irrep mode mGM2. Another secondary k=0 mGM3 is also possible, but it is not present.
+The presence of a k=0 components implies that magnetic scattering should also superpose with the nuclear reflections, but apparently these were not considered in the reference.
+;
+
+_parent_space_group.name_H-M_alt  'R  -3m'
+_parent_space_group.IT_number                       166
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/9a-1/9b+2/3c,a+b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  12.62
+_space_group_magn.name_BNS  "C  2'/m'  "
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 10.32180
+_cell_length_b                 10.32180
+_cell_length_c                 25.28000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 y,x,-z,-1
+4 -y,-x,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/9,y+8/9,z+2/3,+1
+3 x+2/9,y+7/9,z+1/3,+1
+4 x+1/3,y+2/3,z,+1
+5 x+4/9,y+5/9,z+2/3,+1
+6 x+5/9,y+4/9,z+1/3,+1
+7 x+2/3,y+1/3,z,+1
+8 x+7/9,y+2/9,z+2/3,+1
+9 x+8/9,y+1/9,z+1/3,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Lu1_1 Lu 0.00000 0.00000 0.00000 1
+Lu1_2 Lu 0.22222 0.11111 0.33333 1
+Fe1_1 Fe 0.00000 0.00000 0.21518 1
+Fe1_2 Fe 0.22222 0.11111 0.54851 1
+O1_1 O 0.00000 0.00000 0.12810 1
+O1_2 O 0.22222 0.11111 0.46143 1
+O2_1 O 0.00000 0.00000 0.29260 1
+O2_2 O 0.22222 0.11111 0.62593 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1_1 0.0 0.0 4.5 mx,-mx,mz
+Fe1_2 0.0 0.0 -4.5 mx,my,mz
+

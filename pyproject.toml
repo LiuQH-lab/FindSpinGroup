@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "findspingroup"
+description = "Spin space group (SSG) symmetry analysis toolkit for magnetic materials. Automatically identifies and classifies SSGs, generating symmetry operations, spin Wyckoff positions, and spin Brillouin zones. Designed for integration with first-principles and high-throughput computational workflows."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Yutong Yu", email = "karl.yt.yu@gmail.com" }]
+maintainers = [{ name = "Yutong Yu", email = "karl.yt.yu@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26.0",
+    "scipy>=1.17.0",
+    "seekpath>=2.1.0",
+    "spglib>=2.6.0",
+    "spintensor",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+keywords = ["spin space group", "magnetic symmetry", "crystallography", "spglib", "spinCIF"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.4.2"]
+
+[project.urls]
+Homepage = "https://github.com/LiuQH-lab/FindSpinGroup"
+Repository = "https://github.com/LiuQH-lab/FindSpinGroup"
+Issues = "https://github.com/LiuQH-lab/FindSpinGroup/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "findspingroup.version.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["findspingroup*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+findspingroup = ["core/identify_index/databases/*.db", "examples/*.mcif"]
+
+[project.scripts]
+fsg = "findspingroup.cli:main"
+fsg-batch = "findspingroup.batch_mcif:main"
+findspin = "findspingroup.cli:main"
+findspin-batch = "findspingroup.batch_mcif:main"
+findspingroup = "findspingroup.cli:main"
+findspingroup-batch = "findspingroup.batch_mcif:main"

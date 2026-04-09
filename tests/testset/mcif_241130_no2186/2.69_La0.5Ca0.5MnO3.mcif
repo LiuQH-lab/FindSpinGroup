@@ -1,0 +1,132 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 28/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-28
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        55
+_citation_page_first            3015
+_citation_page_last             3023
+_citation_article_id            .
+_citation_year                  1997
+_citation_DOI                   10.1103/PhysRevB.55.3015
+
+loop_
+_citation_author_name
+"P. G. Radaelli"
+"D. E. Cox"
+"M. Marezio"
+"S-W. Cheong"
+
+_atomic_positions_source_database_code_ICSD  56660
+_atomic_positions_source_other               .
+
+_transition_temperature  155
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ1  2  2  special  primary  3  .
+mU1+U4+ 2  2  general primary 6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The structure has a structural modulation, which is not included in the model.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k-maximal magnetic symmetry
+two irreps as primary: two order parameters are involved.
+The irrep mZ1 (k1) corresponds to the ordering of the Mn1_1 and Mn1_2 moments, while mU1+U4+ (k2) is associated with the ordering of the Mn1_3 moments.
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+k2 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;0,0,0'
+
+_space_group_magn.number_BNS  11.55
+_space_group_magn.name_BNS  "P_a 2_1/m"
+_cell_length_a             10.89320
+_cell_length_b             7.52470
+_cell_length_c             10.95260
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y+1/2,-z,+1 
+3 -x,-y,-z,+1 
+4 x,-y+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1_1 La 0.00970 0.25000 0.24820 0.5
+La1_2 La  0.24030 0.75000 0.49820 0.5
+La1_3 La  0.25970 0.25000 0.00180 0.5
+La1_4 La  0.50970 0.25000 0.24820 0.5
+Ca1_1 Ca 0.00970 0.25000 0.24820 0.5
+Ca1_2 Ca  0.24030 0.75000 0.49820 0.5
+Ca1_3 Ca  0.25970 0.25000 0.00180 0.5
+Ca1_4 Ca  0.50970 0.25000 0.24820 0.5
+Mn1_1 Mn 0.00000 0.00000 0.00000 1.
+Mn1_2 Mn  0.50000 0.00000 0.00000 1.
+Mn1_3 Mn  0.25000 0.00000 0.25000 1.
+O1_1 O 0.24525 0.25000 0.28225 1.
+O1_2 O  0.00475 0.75000 0.53225 1.
+O1_3 O  0.49525 0.25000 0.96775 1.
+O1_4 O  0.74525 0.25000 0.28225 1.
+O2_1 O 0.13600 0.03370 0.11355 1.
+O2_2 O  0.11400 0.96630 0.36355 1.
+O2_3 O  0.38600 0.46630 0.13645 1.
+O2_4 O  0.63600 0.03370 0.11355 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1_1 1.01(9) 0.00000 2.80(4) mx,my,mz  2.98(2)
+Mn1_2 1.01(9) 0.00000 2.80(4) mx,my,mz  2.98(2)
+Mn1_3 0.00000 0.00000 2.57(2) mx,my,mz  2.57(2)
+
+
+
+

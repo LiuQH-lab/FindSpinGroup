@@ -1,0 +1,116 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 14/09/2018 22:37:37
+
+data_5yOhtAoR
+_audit_creation_date            2018-09-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW LETTERS"
+_citation_journal_volume        121
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            117601
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevLett.121.117601
+
+loop_
+_citation_author_name
+"A. Garcia-Castro"
+"W. Ibarra-Hernandez"
+"E. Bousquet"
+"A.H. Romero"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  9930
+_atomic_positions_source_other               .
+
+_transition_temperature  275
+_experiment_temperature  .
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2 1  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+DFT calculation
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+Weak FM along z
+Ferroelectric. Multiferroic.
+Virtual parent paraelectric phase with Cmcm space group
+When considered from the parent Cmcm symmetry, the weak FM mz component is a secondary  component, which is switchable with the polarization.
+The allowed mz component is correlated with the structural polar distortion reducing the symmetry to Cmc2_1.
+;
+
+_parent_space_group.name_H-M_alt  'C  m  c  2_1'
+_parent_space_group.IT_number                       36
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  36.176
+_space_group_magn.name_BNS  "C  m' c' 2_1"
+_cell_length_a             4.47600
+_cell_length_b             13.97200
+_cell_length_c             5.55100
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z+1/2,+1
+3 -x,y,z,-1
+4 x,-y,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ba1 Ba 0.00000 0.13700 0.00000
+Cu1 Cu 0.00000 0.40740 0.02390
+F1 F 0.00000 0.48120 0.33650
+F2 F 0.00000 0.30200 0.24270
+F3 F 0.00000 0.32910 0.75500
+F4 F 0.00000 0.93210 0.03500
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1 0.00000 0.829 0.059 0,my,mz

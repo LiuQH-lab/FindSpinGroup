@@ -1,0 +1,236 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/23/2024
+# from a file submitted by S. Esser
+
+data_Gd3Ru4Al12
+_audit_creation_date            2024-07-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Gd3 Ru4 Al12"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "npj Quantum Mater."
+_citation_journal_volume        9
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            45
+_citation_year                  2024
+_citation_DOI                   10.1038/s41535-024-00654-2
+
+loop_
+_citation_author_name
+"M. Hirschberger"
+"B.G. Szigeti"
+"M. Hemmida"
+"M.M. Hirschmann"
+"S. Esser"
+"H. Ohsumi"
+"Y. Tanaka"
+"L. Spitz"
+"S. Gao"
+"K.K. Kolincio"
+"H. Sagayama"
+"H. Nakao"
+"Y. Yamasaki"
+"L. Forro"
+"H.-A. Krug von Nidda"
+"I. Kezsmarki"
+"T.-h. Arima"
+"Y. Tokura"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other  "DOI: 10.1107/S0108768192011510"
+
+_temperature_position_structure         298
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature     11
+_experiment_temperature     7.6
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1 1 . primary 1 .
+mSM3(1/4,0,0) 6 2 special-2 primary 6 .
+mSM2(1/4,0,0) 6 2 special-2 secondary? 4 yes
+mGM2- 1 1 . secondary 1 yes
+mLD3(1/4,1/4,0) 6 2 special-2 secondary 6 yes
+mLD4(1/4,1/4,0) 6 2 special-2 secondary 3 yes
+mM2+ 3 1 special-2 secondary 2 yes
+mM2- 3 1 special-2 secondary 3 yes
+
+
+_exptl_crystal_magnetic_properties_details
+;
+REXS
+Positional structure of a room temperature experiment retrieved from DOI: 10.1107/S0108768192011510 
+lattice parameter refined by powder x-ray at room temperature in DOI: 10.1038/s41467-019-13675-4
+;
+
+_active_magnetic_irreps_details
+;
+4k magnetic structure
+propagation vector k_i is commensurate locked with weak discommensuration of delta q = 0.0018 r.l.u.
+commensurate locked structure stable in field range of B = 1.2 .. 1.6 Tesla at temperature T = 7.6K
+According to the decomposition obtained with ISODISTORT when processing this entry, this model, derived from only REXS data, includes contributions with comparable weights according to many different propagation vectors (not only those taken here as primary), but their combinations as (1/4,1/4,0),(-1/4,1/2,0),(-1/2,1/4,0), and (1/2,0,0),(0,1/2,0),(1/2,1/2,0), and for these vectors several irreps are involved. A total of 8 irreps are present, many of them with comparable amplitudes.
+;
+
+_parent_space_group.name_H-M_alt  "P 6_3/m m c"
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 0 0]
+k2 [0 -1/4 0]
+k3 [-1/4 1/4 0]
+k4 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '4a,4b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  "182.183"
+_space_group_magn.name_BNS  "P6_32'2'"
+_space_group_magn.point_group_name  "62'2'"
+_space_group_magn.point_group_number  "24.4.90"
+_cell_length_a                         35.19488
+_cell_length_b                         35.19488
+_cell_length_c                         9.56509
+_cell_angle_alpha                      90.000000
+_cell_angle_beta                       90.000000
+_cell_angle_gamma                      120.000000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x-y,x,z+1/2,+1 
+3 -y,x-y,z,+1 
+4 -x,-y,z+1/2,+1 
+5 -x+y,-x,z,+1 
+6 y,-x+y,z+1/2,+1 
+7 x-y,-y,-z,-1 
+8 x,x-y,-z+1/2,-1 
+9 y,x,-z,-1 
+10 -x+y,y,-z+1/2,-1 
+11 -x,-x+y,-z,-1 
+12 -y,-x,-z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+   _atom_site_label
+   _atom_site_type_symbol
+   _atom_site_fract_x
+   _atom_site_fract_y
+   _atom_site_fract_z
+   _atom_site_occupancy
+   Gd1        Gd     0.048210     0.096420     0.250000    1.0
+   Gd2        Gd     0.201790     0.153580     0.750000    1.0
+   Gd3        Gd     0.048210     0.346430     0.250000    1.0
+   Gd4        Gd     0.798210     0.596420     0.250000    1.0
+   Gd5        Gd     0.153570     0.451790     0.250000    1.0
+   Gd6        Gd     0.096420     0.298210     0.750000    1.0
+   Gd7        Gd     0.048210     0.451790     0.250000    1.0
+   Gd8        Gd     0.201790     0.653580     0.750000    1.0
+   Gd9        Gd     0.548210     0.096420     0.250000    1.0
+   Gd10       Gd     0.298210     0.596420     0.250000    1.0
+   Ru1        Ru     0.125000     0.000000     0.000000    1.0
+   Ru2        Ru     0.875000     0.000000     0.000000    1.0
+   Ru3        Ru     0.000000     0.000000     0.000000    1.0
+   Ru4        Ru     0.125000     0.250000     0.000000    1.0
+   Ru5        Ru     0.375000     0.000000     0.000000    1.0
+   Ru6        Ru     0.125000     0.375000     0.000000    1.0
+   Ru7        Ru     0.625000     0.000000     0.000000    1.0
+   Ru8        Ru     0.125000     0.375000     0.500000    1.0
+   Ru9        Ru     0.250000     0.000000     0.000000    1.0
+   Ru10       Ru     0.750000     0.000000     0.000000    1.0
+   Ru11       Ru     0.125000     0.500000     0.000000    1.0
+   Ru12       Ru     0.125000     0.625000     0.000000    1.0
+   Ru13       Ru     0.500000     0.000000     0.000000    1.0
+   Ru14       Ru     0.250000     0.625000     0.000000    1.0
+   Ru15       Ru     0.250000     0.500000     0.000000    1.0
+Al1_1  Al 0.04055  0.08110  0.57620 1.0
+Al1_2 Al 0.29055  0.08110  0.57620 1.0
+Al1_3 Al 0.54055  0.08110  0.57620 1.0
+Al1_4 Al 0.79055  0.08110  0.57620 1.0
+Al1_5 Al 0.04055  0.33110  0.57620 1.0
+Al1_6 Al 0.04055  0.58110  0.57620 1.0
+Al1_7 Al 0.04055  0.83110  0.57620 1.0
+Al1_8 Al 0.16890  0.95945  0.57620 1.0
+Al1_9 Al 0.33110  0.04055  0.07620 1.0
+Al1_10 Al 0.29055  0.58110  0.57620 1.0
+Al1_11 Al 0.29055  0.83110  0.57620 1.0
+Al1_12 Al 0.41890  0.95945  0.57620 1.0
+Al1_13 Al 0.54055  0.33110  0.57620 1.0
+Al1_14 Al 0.54055  0.83110  0.57620 1.0
+Al1_15 Al 0.79055  0.33110  0.57620 1.0
+Al1_16 Al 0.79055  0.58110  0.57620 1.0
+Al2_1  Al 0.14092  0.03185  0.25000 1.0
+Al2_2 Al  0.39093  0.03185  0.25000 1.0
+Al2_3 Al  0.14092  0.28185  0.25000 1.0
+Al2_4 Al  0.14092  0.53185  0.25000 1.0
+Al2_5 Al  0.14092  0.78185  0.25000 1.0
+Al2_6 Al  0.21815  0.10908  0.25000 1.0
+Al2_7 Al  0.28185  0.89092  0.75000 1.0
+Al2_8 Al  0.39093  0.78185  0.25000 1.0
+Al2_9 Al  0.46815  0.10908  0.25000 1.0
+Al2_10 Al 0.64092  0.28185  0.25000 1.0
+Al3_1 Al  0.08333  0.16667  0.01160 1.0
+Al3_2 Al  0.33333  0.16667  0.01160 1.0
+Al3_3 Al  0.58333  0.16667  0.01160 1.0
+Al3_4 Al  0.08333  0.41667  0.01160 1.0
+Al3_5 Al  0.08333  0.66666  0.01160 1.0
+Al3_6 Al  0.33333  0.66666  0.01160 1.0
+Al4_1  Al 0.00000  0.00000  0.25000 1.0
+Al4_2 Al  0.25000  0.00000  0.25000 1.0
+Al4_3 Al  0.50000  0.00000  0.25000 1.0
+Al4_4 Al  0.25000  0.50000  0.25000 1.0
+Al4_5 Al  0.50000  0.25000  0.25000 1.0
+
+
+loop_
+ _atom_site_moment_label
+ _atom_site_moment_crystalaxis_x
+ _atom_site_moment_crystalaxis_y
+ _atom_site_moment_crystalaxis_z
+ _atom_site_moment.symmform
+ _atom_site_moment.magnitude
+ _atom_site_moment.spherical_azimuthal
+ _atom_site_moment.spherical_polar
+   Gd1  -2.11988  0.00000 -6.67129 Mx,0,Mz  7.0 ? ?
+   Gd2  -1.51949  3.63496 -5.28724 Mx,My,Mz 7.0 ? ?
+   Gd3  -7.98010 -2.94750 -0.38941 Mx,My,Mz 7.0 ? ?
+   Gd4   6.92468  0.00000  1.02410 Mx,0,Mz  7.0 ? ?
+   Gd5  -6.38226 -0.67480  3.48111 Mx,My,Mz 7.0 ? ?
+   Gd6  -6.91607 -1.39489 -2.97815 Mx,My,Mz 7.0 ? ?
+   Gd7  -5.39665 -1.68623  5.11203 Mx,My,Mz 7.0 ? ?
+   Gd8   2.68554  3.36482  6.28508 Mx,My,Mz 7.0 ? ?
+   Gd9  -1.69436  0.00000  6.79184 Mx,0,Mz  7.0 ? ?
+   Gd10 -1.83337  0.00000  6.75565 Mx,0,Mz  7.0 ? ?
+

@@ -1,0 +1,144 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:17:00
+# Database entry: 1.157 FeF3(H2O)2H2O
+# Cif-like file for the case 1.157
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Fe F3 (H2 O )2H2 O'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Dalton Trans."
+_citation_journal_volume        44
+_citation_page_first            14130
+_citation_page_last             14138
+_citation_article_id            .
+_citation_year                  2015
+_citation_DOI                   10.1039/c5dt02242h
+
+loop_
+_citation_author_name
+"G. Nenert"
+"O. Fabelo"
+"K. Forsberg"
+"C.V. Colin"
+"J. Rodriguez-Carvajal"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     20
+_experiment_temperature     1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+MZ3-Z4- 2 2 general primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The direction of the spins on the ab plane could not be determined. It has been taken arbitrarily along the a direction.
+Atomic positions from a room temperature measurement. Unit cell parameters from the 1.8K measurement.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+The irrep assignment in the reference is corrected here and ISOTROPY irrep labels are used.
+Although the physically irreducible irrep is 2-dim, it is the sum of two conjugate irreps and no special direction producing a higher MSG exists.
+;
+
+_parent_space_group.name_H-M_alt  'P  4/n'
+_parent_space_group.IT_number                       85
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,-c,a+b;0,0,1/4'
+
+
+_space_group_magn.number_BNS  14.81
+_space_group_magn.name_BNS  "P_b  2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 7.80949
+_cell_length_b                 7.80949
+_cell_length_c                 7.753338
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y+1/2,z+1/2,+1
+3 -x,-y,-z+1/2,+1
+4 x+1/2,y+1/2,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.25000 0.25000 0.42595 1.
+F1 F 0.25000 0.25000 0.17635 1.
+O11 O 0.25000 0.75000 0.25000 1.
+O1_1 O 0.85273 0.97690 0.07065 0.5
+O1_2 O 0.52310 0.85273 0.07065 0.5
+F2_1 F 0.85273 0.97690 0.07065 0.5
+F2_2 F 0.52310 0.85273 0.07065 0.5
+H11_1 H 0.17770 0.92040 0.36450 0.5
+H11_2 H 0.57960 0.17770 0.36450 0.5
+H1_1 H 0.34810 0.78400 0.18000 0.5
+H1_2 H 0.71600 0.34810 0.18000 0.5
+H2_1 H 0.03150 0.00000 0.00000 0.5
+H2_2 H 0.50000 0.03150 0.00000 0.5
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 3.23(4) 0.0 0.0 mx,my,0
+

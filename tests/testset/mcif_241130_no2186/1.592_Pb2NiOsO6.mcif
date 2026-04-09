@@ -1,0 +1,129 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 19/08/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-08-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Chem. Mater."
+_citation_journal_volume        33
+_citation_page_first            4188
+_citation_page_last             4195
+_citation_article_id            .
+_citation_year                  2021
+_citation_DOI                   10.1021/acs.chemmater.1c01032
+
+loop_
+_citation_author_name
+"H. L. Feng"
+"C.-J. Kang"
+"P. Manuel"
+"F. Orlandi"
+"Y. Su"
+"J. Chen"
+"Y. Tsujimoto"
+"J. Hadermann"
+"G. Kotliar"
+"K. Yamaura"
+"E. E. McCabe"
+"M. Greenblatt"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  58
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1+  1  1  . primary  2  .
+mY2-  1  1  . primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Non-standard parent setting P2_1/n
+Non-centrosymmetric MSG
+The relative sign of the Ni and Os moments is chosen according to the figure of the article. This relative sign can be chosen arbitrarily, as the two possibilities correspond to domain equivalent arrangements.
+An alternative non-equivalent model with a different active irrep for the Ni atoms (mY2+) could equally fit the data. From the two models the one favored by DFT calculations is proposed in the article.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps as primary: One for the Ni ordering and another one for the Os ordering.
+There is no single irrep, which allows non-zero moments for both atoms. The magnetic ordering of both atoms requires at least two irreps. But the ordering of both atoms seems to take place in a single phase transition.
+Polar on the plane ac
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,-1/2a+1/2c;0,1/4,0'
+
+_space_group_magn.number_BNS  7.27
+_space_group_magn.name_BNS  "P_a c"
+_cell_length_a             11.21910
+_cell_length_b             5.57030
+_cell_length_c             15.74280
+_cell_angle_alpha          90.00
+_cell_angle_beta           89.96
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+3/4,-y+1/2,z+1/4,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x+1/2,y,z,-1 
+4 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Pb1_1 Pb 0.00150 0.51610 0.12415 0.97
+Pb1_2 Pb  0.24850 0.01610 0.12585 0.97
+Ni1 Ni 0.00000 0.00000 0.00000 1.
+Os1 Os 0.00000 0.00000 0.25000 1.
+O1_1 O 0.46765 0.98960 0.13070 0.988
+O1_2 O  0.78235 0.48960 0.11930 0.988
+O2_1 O 0.11575 0.28500 0.01640 0.948
+O2_2 O  0.13425 0.78500 0.23360 0.948
+O3_1 O 0.14315 0.76940 0.01690 1.013
+O3_2 O  0.10685 0.26940 0.23310 1.013
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Ni1 0.00000 0.00000 1.90(1)   mx,my,mz   1.90(1)
+Os1 0.00000 0.00000 -0.378(2) mx,my,mz   0.378(2)
+

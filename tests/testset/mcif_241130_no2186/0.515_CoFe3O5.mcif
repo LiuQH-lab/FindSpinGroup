@@ -1,0 +1,126 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 28/12/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-12-28
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        57
+_citation_page_first            14347
+_citation_page_last             14352
+_citation_article_id            .
+_citation_year                  2018
+_citation_DOI                   10.1021/acs.inorgchem.8b02458
+
+loop_
+_citation_author_name
+"K.H. Hong"
+"E. Solana-Madruga"
+"M. Coduri"
+"J.P. Attfield"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  100
+_experiment_temperature  10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+  1  1  .  primary  5  .
+mGM3+  1  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Synthesized under pressure
+Position structure from a determination at 5K
+FM on the plane ab
+Ferrimagnetic
+Magnetic moments are reported as associated to the sites, two of them having mixed Fe/Co occupancies. Here, only for simplicity of the format, the moments are only assigned to the Fe atoms.
+Magnetic moment values at various temperatures are reported in the same reference
+Between 300K and 100K, a magnetic phase with a collinear arrangement and a single order parameter (MSG: Cm'cm' - irrep mGM4+)  is reported.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim irreps involved as primary irreps
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,-c,-1/2a+1/2b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  11.54
+_space_group_magn.name_BNS  "P 2_1'/m'"
+_cell_length_a             2.88002
+_cell_length_b             9.78467
+_cell_length_c             12.52485
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,-y,z+1/2,-1
+4 x,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1 Fe 0.50000 0.2385 0.1166 1.
+Fe2 Fe 0.00000 0.00000 0.00000 0.78
+Fe3 Fe 0.00000 0.4930 0.25000 0.64
+Co2 Co 0.00000 0.00000 0.00000 0.22
+Co3 Co 0.00000 0.4930 0.25000 0.36
+O1 O 0.50000 0.3437 0.25000 1.
+O2 O 0.00000 0.3626 0.0450 1.
+O3 O 0.00000 0.0967 0.1436 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1 1.82(3) 0.00000 3.94(4) mx,my,mz  4.34(3)
+Fe2 0.00000 0.00000 -3.31(6) mx,my,mz 3.31(6)
+Fe3 -2.56(5) 0.00000 0.00000 mx,my,0  2.65(5)
+
+

@@ -1,0 +1,150 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/23/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-10-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Tb2 Ni2 In"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Acta Cryst. B"
+_citation_journal_volume        79
+_citation_page_first            346
+_citation_page_last             353
+_citation_article_id            .
+_citation_year                  2023
+_citation_DOI                   10.1107/S2052520623006315
+
+loop_
+_citation_author_name
+"S. Baran"
+"A. Deptuch"
+"A. Hoser"
+"B. Penc"
+"J. Przewoznik"
+"A. Szytula"
+
+_temperature_position_structure         60
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     40
+_experiment_temperature     1.55
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mR2+ 2 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from data at 60K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim small 1-dim irrep
+The active irrep has 2 k-vectors in its star. Possible 2k-structures involving the two vectors of the irrep, which could equally fit the data, were not considered.
+;
+
+_parent_space_group.name_H-M_alt  'C m m m'
+_parent_space_group.IT_number                       65
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2b,c,1/4a-1/4b;1/4,0,1/4'
+
+
+_space_group_magn.number_BNS  12.64
+_space_group_magn.name_BNS  "C_a 2/m"
+_space_group_magn.point_group_name  "2/m.1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 7.84840
+_cell_length_b                 28.37400
+_cell_length_c                 7.40520
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,z,+1 
+3 -x+1/2,-y,-z+1/2,+1 
+4 x,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x+1/4,y+1/4,z+1/2,+1 
+4 x+1/4,y+3/4,z,+1 
+5 x+1/2,y,z+1/2,+1 
+6 x+1/2,y+1/2,z,+1 
+7 x+3/4,y+1/4,z,+1 
+8 x+3/4,y+3/4,z+1/2,+1 
+9 x,y,z+1/2,-1 
+10 x,y+1/2,z,-1 
+11 x+1/4,y+1/4,z,-1 
+12 x+1/4,y+3/4,z+1/2,-1 
+13 x+1/2,y,z,-1 
+14 x+1/2,y+1/2,z+1/2,-1 
+15 x+3/4,y+1/4,z+1/2,-1 
+16 x+3/4,y+3/4,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tb1 Tb 0.00000 0.18195 0.25000 1
+Ni1 Ni 0.00000 0.09880 0.00000 1
+In1 In 0.00000 0.00000 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tb1 0.0 0.0 8.8(4) 0,0,mz 8.8(4) ? ?
+

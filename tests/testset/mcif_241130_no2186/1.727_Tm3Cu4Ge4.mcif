@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/29/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-11-29
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Tm3 Cu4 Ge4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        25
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            066012
+_citation_year                  2013
+_citation_DOI                   10.1088/0953-8984/25/6/066012
+
+loop_
+_citation_author_name
+"S. Baran"
+"D. Kaczorowski"
+"A. Szytula"
+"A. Gil"
+"A. Hoser"
+
+_temperature_position_structure         4.9
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  187624
+_atomic_positions_source_other               .
+
+_transition_temperature     2.8
+_experiment_temperature     2.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mDT4 2 1 special primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a determination at 4.9K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim (k,-k) irrep along a special direction (special modulation phase)
+;
+
+_parent_space_group.name_H-M_alt  'I m m m'
+_parent_space_group.IT_number                       71
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;1/4,1/8,1/4'
+
+_space_group_magn.number_BNS  62.450
+_space_group_magn.name_BNS  "P_a n m a"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 13.71760
+_cell_length_b                 13.19280
+_cell_length_c                 4.13210
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y+1/2,-z,+1 
+3 -x+1/2,-y+1/4,z+1/2,+1 
+4 x+1/2,-y+3/4,-z+1/2,+1 
+5 -x+1/2,-y+1/4,-z+1/2,+1 
+6 x+1/2,-y+3/4,z+1/2,+1 
+7 x,y,-z,+1 
+8 -x,y+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tm1 Tm 0.50000 0.00000 0.50000 1
+Tm2 Tm 0.12990 0.00000 0.00000 1
+Cu1_1 Cu 0.32970 0.09585 0.00000 1
+Cu1_2 Cu 0.67030 0.90415 0.00000 1
+Ge1 Ge 0.21740 0.25000 0.00000 1
+Ge2_1 Ge 0.00000 0.09475 0.50000 1
+Ge2_2 Ge 0.00000 0.90525 0.50000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tm1 0.0 0.0 5.7(2) 0,0,mz 5.7(2) ? ?
+Tm2 0.0 0.0 0.0 0,0,mz 0.0 ? ?
+

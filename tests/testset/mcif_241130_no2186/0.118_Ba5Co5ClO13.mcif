@@ -1,0 +1,162 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:57:32
+# Database entry: 0.118 Ba5Co5ClO13
+# Cif-like file for the case 0.118
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ba5 Co5 Cl O1 3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Solid State Sciences"
+_citation_journal_volume        10
+_citation_page_first            471
+_citation_page_last             475
+_citation_article_id            .
+_citation_year                  2008
+_citation_DOI                   10.1016/j.solidstatesciences.2007.12.032
+
+loop_
+_citation_author_name
+"O. Mentre"
+"M. Kauffmann"
+"G. Ehora"
+"S. Daviero-Minaud"
+"F. Abraham"
+"P. Roussel"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   99371
+_atomic_positions_source_other               .
+
+_transition_temperature     110
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep active: equivalence with MSG assignment
+;
+
+_parent_space_group.name_H-M_alt  'P  6_3/m  m  c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  194.268
+_space_group_magn.name_BNS  "P  6_3'/m'  m'  c"
+_space_group_magn.point_group_name  "6'/m'mm'"
+_space_group_magn.point_group_number  "27.5.104"
+_cell_length_a                 5.66900
+_cell_length_b                 5.66900
+_cell_length_c                 24.30400
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x-y,z,+1
+3 -x+y,-x,z,+1
+4 x,x-y,-z+1/2,+1
+5 -x+y,y,-z+1/2,+1
+6 -y,-x,-z+1/2,+1
+7 -x,-y,-z,+1
+8 y,-x+y,-z,+1
+9 x-y,x,-z,+1
+10 -x,-x+y,z+1/2,+1
+11 x-y,-y,z+1/2,+1
+12 y,x,z+1/2,+1
+13 x-y,x,z+1/2,-1
+14 -x,-y,z+1/2,-1
+15 y,-x+y,z+1/2,-1
+16 x-y,-y,-z,-1
+17 y,x,-z,-1
+18 -x,-x+y,-z,-1
+19 -x+y,-x,-z+1/2,-1
+20 x,y,-z+1/2,-1
+21 -y,x-y,-z+1/2,-1
+22 -x+y,y,z,-1
+23 -y,-x,z,-1
+24 x,x-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ba1 Ba 0.00000 0.00000 0.25000 1
+Ba2 Ba 0.33330 0.66670 0.37135 1
+Ba3 Ba 0.33330 0.66670 0.95991 1
+Co1 Co 0.00000 0.00000 0.60285 1
+Co2 Co 0.33330 0.66670 0.82316 1
+Co3 Co 0.00000 0.00000 0.00000 1
+Cl1 Cl 0.33330 0.66670 0.25000 1
+O1 O 0.83880 0.67760 0.35063 1
+O2 O 0.14690 0.29380 0.44984 1
+O3 O 0.33330 0.66670 0.75000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 0.0 0.0 -0.61(7) 0,0,mz
+Co2 0.0 0.0 2.21(7) 0,0,mz
+Co3 0.0 0.0 0.35(8) 0,0,mz
+

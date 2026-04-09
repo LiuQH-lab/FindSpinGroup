@@ -1,0 +1,132 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/08/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-08-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        52
+_citation_page_first            395
+_citation_page_last             401
+_citation_article_id            ?
+_citation_year                  2013
+_citation_DOI                   10.1021/ic302191d
+
+loop_
+_citation_author_name
+"P. Barpanda"
+"M. Avdeev"
+"C.D. Ling"
+"J. Lu"
+"A. Yamada"
+
+
+
+_atomic_positions_source_database_code_ICSD  251081
+_atomic_positions_source_other               .
+
+_transition_temperature  6.5
+_experiment_temperature  3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4  1  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Moments of the two independent Co sites have not only constrained to have equal modulus, but also their components along x and z are apparently forced to be correlated.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P n a 2_1'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  33.146
+_space_group_magn.name_BNS  "P n' a 2_1'"
+_cell_length_a             15.37580
+_cell_length_b             10.23930
+_cell_length_c             7.68700
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,z,+1
+3 -x,-y,z+1/2,-1
+4 -x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1 Co 0.13200 0.50700 0.47600
+Co2 Co 0.12620 0.01400 0.43500
+P1 P 0.19020 0.07090 0.09200
+P2 P 0.06110 0.05260 0.80380
+P3 P 0.05420 0.46460 0.85120
+P4 P 0.19560 0.47980 0.09630
+Na1 Na 0.30100 0.27140 0.29700
+Na2 Na 0.93840 0.23350 0.59800
+Na3 Na 0.23050 0.28210 0.76300
+Na4 Na 0.01080 0.24080 0.12400
+O1 O 0.13930 0.10370 0.91910
+O2 O 0.13500 0.12280 0.24240
+O3 O 0.28260 0.11210 0.10000
+O4 O 0.18370 0.92320 0.10950
+O5 O 0.07310 0.90720 0.81400
+O6 O 0.07570 0.12240 0.62860
+O7 O 0.98710 0.10960 0.91270
+O8 O 0.10680 0.42670 0.01670
+O9 O 0.96670 0.39370 0.86410
+O10 O 0.04330 0.60900 0.84300
+O11 O 0.09290 0.40780 0.68780
+O12 O 0.18920 0.42330 0.27820
+O13 O 0.27170 0.41630 0.00340
+O14 O 0.19410 0.62790 0.09200
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 1.09(7) 0.00000 -2.71(3) mx,my,mz
+Co2 1.09 0.00000 2.71 mx,my,mz
+

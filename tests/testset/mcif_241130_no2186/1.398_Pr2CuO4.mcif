@@ -1,0 +1,120 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 15/05/2020 16:11:27
+# icsd_65925_15K.cif
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Physical Review B"
+_citation_journal_volume        40
+_citation_page_first            6998
+_citation_page_last             7004
+_citation_article_id            ?
+_citation_year                  1989
+_citation_DOI                   10.1103/PhysRevB.40.6998
+
+loop_
+_citation_author_name
+"D.E. Cox"
+"A.I. Goldman"
+"M.A. Subramanian"
+"J. Gopalakrishnan"
+"A.W. Sleight"
+
+
+
+_atomic_positions_source_database_code_ICSD  65925
+_atomic_positions_source_other               .
+
+_transition_temperature  270
+_experiment_temperature  15
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX4+  2  1  .  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Cu moment modulus: 0.48
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal symmetry (3 possible)
+2-dim irrep as primary, restricted to one of the k-vectors of its star.
+This is one of two possible models that equally fit the data. The second one is a 2k non-collinear model corresponding to the same irrep as primary, but involving the two k-vectors of the irrep star (see #2.48).
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a+b,-a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;1,3/4,1/4'
+
+
+
+_space_group_magn.number_BNS  66.500
+_space_group_magn.name_BNS  "C_A c c m"
+_cell_length_a             5.59320
+_cell_length_b             5.59320
+_cell_length_c             12.17720
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y+1/2,z,+1
+3 -x+1/2,y,-z+1/2,+1
+4 x,-y+1/2,-z+1/2,+1
+5 -x,-y+1/2,-z+1/2,+1
+6 x+1/2,y,-z+1/2,+1
+7 x+1/2,-y+1/2,z,+1
+8 -x,y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y+1/2,z,-1
+4 x+1/2,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Pr1 Pr 0.00000 0.00000 0.35170
+Cu1 Cu 0.00000 0.00000 0.00000
+O1 O 0.25000 0.25000 0.00000
+O2 O 0.25000 0.25000 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1 0.48 0.00000 0.00000 mx,0,0
+

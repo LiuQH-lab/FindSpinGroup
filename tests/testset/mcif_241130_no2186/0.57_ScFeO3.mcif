@@ -1,0 +1,157 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:51:29
+# Database entry: 0.57 ScFeO3
+# Cif-like file for the case 0.57
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Sc Fe O3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Am. Chem. Soc."
+_citation_journal_volume        134
+_citation_page_first            3737
+_citation_page_last             3747
+_citation_article_id            .
+_citation_year                  2012
+_citation_DOI                   10.1021/ja208395z
+
+loop_
+_citation_author_name
+"M.-R. Li"
+"U. Adem"
+"S.R.C. McMitchell"
+"Z. Xu"
+"C.I. Thomas"
+"J.E. Warren"
+"D.V. Giap"
+"H. Niu"
+"X. Wan"
+"R.G. Palgrave"
+"F. Schiffmann"
+"F. Cora"
+"B. Slater"
+"T.L. Burnett"
+"M.G. Cain"
+"A.M. Abakumov"
+"G. van Tendeloo"
+"M.F. Thomas"
+"M.J. Rosseinsky"
+"J.B. Claridge"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   262384
+_atomic_positions_source_other               .
+
+_transition_temperature     360
+_experiment_temperature     300
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3 2 2 special primary 4 ?
+mGM2 1 1 . secondary 2 ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Moment sign correlations between non-symmetry related sites taken from figure in the citation
+Moment orientation forced to be along x to be collinear
+Ferromagnetism/ferrimagnetism is symmetry-allowed along x and z.
+To be expected ferrimagnetism along x and weak canted ferromagnetism along z
+moments in two different sites have been restricted to have equal modulus
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+secondary irrep mGM2 corresponds to possible FM canting along z
+;
+
+_parent_space_group.name_H-M_alt  'R  3c'
+_parent_space_group.IT_number                       161
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-1/3a-2/3b-2/3c,a,c;0,0,0'
+
+
+_space_group_magn.number_BNS  9.39
+_space_group_magn.name_BNS  "C  c'  "
+_space_group_magn.point_group_name  "m'"
+_space_group_magn.point_group_number  "4.3.11"
+_cell_length_a                 5.20250
+_cell_length_b                 5.20250
+_cell_length_c                 14.01450
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+y+1/3,y+2/3,z+1/6,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z+2/3,+1
+3 x+2/3,y+1/3,z+1/3,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+O1_1 O 0.34230 0.97393 0.81757 1.0
+O1_2 O 0.02607 0.36837 0.81757 1.0
+O1_3 O 0.63163 0.65770 0.81757 1.0
+Fe1 Fe3+ 0.00000 0.00000 0.25790 0.46
+Fe2 Fe3+ 0.00000 0.00000 0.04768 0.54
+Sc1 Sc 0.00000 0.00000 0.04768 0.46
+Sc2 Sc 0.00000 0.00000 0.25790 0.54
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 2.72(4) 0.0 0.0 mx,my,mz
+Fe2 -2.72(4) 0.0 0.0 mx,my,mz
+

@@ -1,0 +1,126 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/01/2021
+
+
+data_5yOhtAoR
+_audit_creation_date            2021-01-05
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        102
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            214404
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevB.102.214404
+
+loop_
+_citation_author_name
+"S. Choi"
+"D.G. Oh"
+"M.J. Gutmann"
+"S. Pan"
+"G. Kim"
+"K. Son"
+"J. Kim"
+"N. Lee"
+"S.-W. Cheong"
+"Y.J. Choi"
+"V. Kiryukhin"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other     "N. Lee et al., Scientific Reports (2020 10:12362) [DOI:10.1038/s41598-020-69117-5]"
+
+_transition_temperature  20
+_experiment_temperature  15
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3-  2  2  special  primary  4  .
+mGM2-  1  1    .      secondary 2 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Position structure from a determination at 298K
+For some unknwon reason the magnitude of the components of the moments of the two independent Co sites have been constrained to have equal magnitudes, although this does not imply equal magnitude for the their total moments, which in fact differ considerably.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep along a special direction as primary
+Linear magnetoelectric
+;
+
+_parent_space_group.name_H-M_alt  'P -3 c 1'
+_parent_space_group.IT_number                       165
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2a+b,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  15.87
+_space_group_magn.name_BNS  "C 2'/c"
+_cell_length_a             5.17180
+_cell_length_b             5.17180
+_cell_length_c             14.127
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,x-y,z+1/2,+1
+3 -x,-x+y,-z+1/2,-1
+4 -x,-y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1 Co 0.33333 0.66667 0.19186
+Co2 Co 0.33333 0.66667 0.98604
+Ta1 Ta 0.00000 0.00000 0.14280
+O1_1 O 0.28700 0.00000 0.25000
+O1_2 O  0.00000 0.28700 0.25000
+O2_1 O 0.02300 0.68140 0.08440
+O2_2 O  0.31860 0.34160 0.08440
+O2_3 O  0.65840 0.97700 0.08440
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1 -0.73000 2.30000 0.00000 mx,my,mz  2.74
+Co2 0.73000 2.30000 0.00000 mx,my,mz   2.04
+

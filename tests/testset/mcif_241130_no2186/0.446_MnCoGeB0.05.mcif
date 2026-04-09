@@ -1,0 +1,131 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 20/10/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        4
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            104407
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevMaterials.4.104407
+
+loop_
+_citation_author_name
+"X. Miao"
+"Y. Gong"
+"L. Caron"
+"Y. You"
+"G. Xu"
+"D. Sheptyakov"
+"P. Manuel"
+"F. Qian"
+"Y. Zhang"
+"F. Xu"
+"N. van Dijk"
+"E. Bruck"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  75
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1    .   primary    2  .
+mGM5+  2  2  special primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Two magnetic transitions are detected. One at 260K where the moments are aligned along c (parent hexagonal setting) with only irrep mGM2+ active, and a second one at 75K, where the Mn moment adquires an additional component on the hexagonal basal plane.
+As the MSG was incorrectly identified as Pnm'a', the structure is described using a standard unit cell for the subgroup of P63/mmc of type Pnma.
+FM along a in the setting used.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps of the hexagonal parent space group are involved as primary, corresponding to the two observed consecutive magnetic transitions.
+The second primary irreps is 2-dimensional and is restricted to a special direction.
+As the propagation vector of the magnetic arrangement is (0,0,0) and the positional structure is not reported to deviate from the ideal hexagonal positions, the correct MSG of the structure is Cm'c'm (Amc'm' in the setting used).
+The unit cell is said in the reference to be constrained by the relation c=sqr(3)*b, but this is inconsistent with the c and b values that are reported. This deviation from hexagonality does not break the C-centered MSG of the structure.
+The MSG forces the Co mz to be zero (the second active irrep mGM5+ is only relevant for the Mn sites)
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '-c,-a,a+2b;1/2,1/2,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;0,1/4,1/4'
+
+
+
+_space_group_magn.number_BNS  63.462
+_space_group_magn.name_BNS  "C m' c' m"
+_cell_length_a             5.2579(1)
+_cell_length_b             4.0697(1)
+_cell_length_c             7.0529(2)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z+1/2,+1
+3 -x,-y+1/2,-z+1/2,+1
+4 -x+1/2,y,z,+1
+5 -x,y,-z+1/2,-1
+6 -x+1/2,-y+1/2,z,-1
+7 x,-y+1/2,z,-1
+8 x+1/2,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.00000 0.25000 0.75000
+Co1 Co 0.25000 0.25000 0.08333
+Ge1 Ge 0.75000 0.25000 0.08333
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 2.07(2) 0.00000 0.73(3) mx,0,mz 2.20(3)
+Co1 0.76(4) 0.00000 0.00000 mx,0,0  0.76(4)
+
+

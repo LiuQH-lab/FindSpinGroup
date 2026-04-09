@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:47:52
+# Database entry: 0.14 Gd5Ge4
+# Cif-like file for the case 0.14
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Gd5 Ge4'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        71
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            214408
+_citation_year                  2005
+_citation_DOI                   10.1103/physrevb.71.214408
+
+loop_
+_citation_author_name
+"L. Tan"
+"A. Kreyssig"
+"J.W. Kim"
+"A.I. Goldman"
+"R.J. McQueeney"
+"D. Wermeille"
+"B. Sieve"
+"T.A. Lograsso"
+"D.L. Schlagel"
+"S.L. Budko"
+"V.K. Pecharsky"
+"K.A. Gschneidner"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   97390
+_atomic_positions_source_other               .
+
+_transition_temperature     127
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4- 1 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+XRMS
+arbitrary moment scale
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  62.444
+_space_group_magn.name_BNS  "P  n  m'  a"
+_space_group_magn.point_group_name  "m'mm"
+_space_group_magn.point_group_number  "8.3.26"
+_cell_length_a                 7.6890
+_cell_length_b                 14.8196
+_cell_length_c                 7.7800
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,-z,+1
+3 -x+1/2,y+1/2,z+1/2,+1
+4 x+1/2,y,-z+1/2,+1
+5 x+1/2,-y+1/2,-z+1/2,-1
+6 -x+1/2,-y,z+1/2,-1
+7 -x,-y,-z,-1
+8 x,-y+1/2,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Gd1 Gd 0.29270 0.25000 0.00220 1
+Gd2 Gd -0.02370 0.09970 0.18110 1
+Gd3 Gd 0.37870 0.88210 0.16290 1
+Ge1 Ge 0.17120 0.25000 0.36880 1
+Ge2 Ge 0.91570 0.25000 0.88400 1
+Ge3 Ge 0.21800 0.95530 0.47300 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Gd1 0.0 0.0 1. mx,0,mz
+Gd2 0.0 0.0 1. mx,my,mz
+Gd3 0.0 0.0 1. mx,my,mz
+

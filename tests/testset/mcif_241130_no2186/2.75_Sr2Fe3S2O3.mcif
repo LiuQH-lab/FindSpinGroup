@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/29/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-10-29
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Sr2 Fe3 S2 O3"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        532
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            167936
+_citation_year                  2021
+_citation_DOI                   10.1016/j.jmmm.2021.167936
+
+loop_
+_citation_author_name
+"H. Guo"
+"M.T. Fernandez-Diaz"
+"K.T. Lai"
+"M. Valldor"
+"A.C. Komarek"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    293
+_temperature_cell_parameters            293
+
+_atomic_positions_source_database_code_ICSD  254367
+_atomic_positions_source_other               .
+
+_transition_temperature     52.5
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ3+ 1 1 . primary 3 .
+mS3+S4+ 2 2 general primary 8 .
+mZ4+ 1 1 . secondary 3 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The structure is reported in the paper with insufficient or ambiguous information. The figures in the paper have been used here to infer the actual model being reported. Some misinterpretation of the figures and/or the information given in the text may have happened. 
+Above 52.5K two other magnetic phases are reported. A 1k phase up to 76K with only Fe2 magnetically ordered (see #1.625), and an incommensurate one between 76K and 119K (not included in this database because of insufficient or ambiguous information).
+A secondary irrep with k=(0,0,1/2) is allowed by the MSG, but not present in the model
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Two irreps as primary, one for the Fe2 ordering and another one for Fe1. They represent two order parameters with different temperature transitions (76K for Fe2 (irrep mZ3+) and 52.5K for Fe1 (irrep mS3+S4+)). This latter with also some weak component producing the canting of the Fe2 moments with respect to the c axis.
+;
+
+_parent_space_group.name_H-M_alt  'P b a m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+k2 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a-1/2b,c,-a;0,0,0'
+
+_space_group_magn.number_BNS  14.83
+_space_group_magn.name_BNS  "P_A 2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 15.40600
+_cell_length_b                 19.80360
+_cell_length_c                 7.91120
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,z+1/2,+1 
+3 -x,-y,-z,+1 
+4 x+1/2,y,-z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,-1 
+3 x+1/2,y+1/2,z,+1 
+4 x,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Sr1_1 Sr 0.79689 0.07816 0.00000 1
+Sr1_2 Sr 0.29689 0.07816 0.00000 1
+Sr1_3 Sr 0.04689 0.17184 0.00000 1
+Sr1_4 Sr 0.54689 0.17184 0.00000 1
+Fe1_1 Fe 0.00000 0.00000 0.00000 1
+Fe1_2 Fe 0.00000 0.00000 0.50000 1
+Fe1_3 Fe 0.75000 0.25000 0.50000 1
+Fe1_4 Fe 0.75000 0.25000 0.00000 1
+Fe2_1 Fe 0.12890 0.04528 0.25000 1
+Fe2_2 Fe 0.37890 0.20472 0.75000 1
+S1_1 S -0.04947 0.08042 0.25000 1
+S1_2 S 0.20053 0.16959 0.75000 1
+O1_1 O 0.00000 0.25000 0.75000 1
+O1_2 O 0.25000 0.00000 0.75000 1
+O2_1 O 0.86605 0.20445 0.00000 1
+O2_2 O 0.36605 0.20445 0.00000 1
+O2_3 O 0.11605 0.04555 0.00000 1
+O2_4 O 0.61605 0.04555 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1_1 -3.39(4) -1.6(2) 0.0 mx,my,0 3.75(9) ? ?
+Fe1_2 -3.39(4) -1.6(2) 0.0 mx,my,0 3.75(9) ? ?
+Fe1_3 -3.39(4) 1.6(2) 0.0 mx,my,0 3.75(9) ? ?
+Fe1_4 -3.39(4) 1.6(2) 0.0 mx,my,0 3.75(9) ? ?
+Fe2_1 1.50(3)  0.19(8) 3.27(2) mx,my,mz 3.60(2) ? ?
+Fe2_2 -1.50(3) -0.19(8) -3.27(2) mx,my,mz 3.60(2) ? ?
+

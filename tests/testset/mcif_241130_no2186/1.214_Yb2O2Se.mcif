@@ -1,0 +1,110 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 13/03/2018 00:31:24
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-13
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        10
+_citation_page_first            735
+_citation_page_last             738
+_citation_article_id            ?
+_citation_year                  1972
+_citation_DOI                   10.1016/0038-1098(72)90182-2
+
+loop_
+_citation_author_name
+"G. Quezel"
+"J. Rossat-Mignod"
+"H.Y. Lang"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  25811
+_atomic_positions_source_other               .
+
+_transition_temperature  ?
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA3-  2  2  special  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+unit cell parameters taken from a room-temperature structure (icsd 25811). Atomic positions from reference.
+Spin direction on the xy plane is undetermined. Here the spin direction is taken along one of the two non-equivalent directions that maximize the symmetry (the other one is (1,2,0)
+Reported moment modulus: 1.6(1). Moment is here decomposed approximately into x,y components, and this introduces a round-up error in the corresponding modulus.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2-dim irrep active, with 3 possible MSGs depending on the OP direction within the 2-dim irrep space. Here the spin direction has been assumed such that one of the high-symmetry MSGs
+;
+
+_parent_space_group.name_H-M_alt  'P  -3m  1'
+_parent_space_group.IT_number                       164
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2a+b,b,c;0,0,1/4'
+
+_space_group_magn.number_BNS  15.90
+_space_group_magn.name_BNS  "C_c2/c"
+_cell_length_a             3.76100
+_cell_length_b             3.76100
+_cell_length_c             13.39400
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-x+y,-z,+1
+3 -x,-y,-z+1/2,+1
+4 x,x-y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Yb1 Yb 0.33333 0.66667 0.14500
+Se1 Se 0.00000 0.00000 0.00000
+O1 O 0.33333 0.66667 0.31000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Yb1 1.8 0.9 0.00000 2my,my,mz
+
+

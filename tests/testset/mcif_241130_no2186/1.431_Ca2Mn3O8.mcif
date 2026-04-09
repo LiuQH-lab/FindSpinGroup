@@ -1,0 +1,124 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/10/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-05
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Mater. Chem. C"
+_citation_journal_volume        6
+_citation_page_first            4541
+_citation_page_last             4548
+_citation_article_id            ?
+_citation_year                  2018
+_citation_DOI                   10.1039/c7tc05187e
+
+loop_
+_citation_author_name
+"L.J.V. Stimpson"
+"E.E. Rodriguez"
+"C.M. Brown"
+"G.B.G. Stenning"
+"M. Jura"
+"D.C. Arnold"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  58
+_experiment_temperature  4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mV1+ 2  1  .  primary  1  .
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+1-dim small irrep as primary
+The active irrep has two symmetry related k-vectors. An alternative 2k structure for the same active irrep can possibly fit equally well the powder data.
+The reference states that the spins of the two Mn sites are ordered according to two different irreps. However, the structure that is reported with MSG P_s-1, and reproduced here, involves the same irrep for the two Mn sites. Only one irrep is active, The presence of spin arrangements according to the two irreps would in fact break the space inversion symmetry of the system.
+;
+
+_parent_space_group.name_H-M_alt  'C 2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,-1/4a+1/4b,-1/2a-1/2b;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_cell_length_a             22.0154
+_cell_length_b             11.6804
+_cell_length_c             4.937
+_cell_angle_alpha          90.00
+_cell_angle_beta           109.738
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/4,y+3/4,z,+1
+3 x+1/2,y+1/2,z,+1
+4 x+3/4,y+1/4,z,+1
+5 x+3/4,y+3/4,z,-1
+6 x,y+1/2,z,-1
+7 x+1/4,y+1/4,z,-1
+8 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ca1 Ca 0.36230 0.00000 0.66350
+Mn1 Mn 0.00000 0.00000 0.50000
+Mn2 Mn 0.00000 0.13100 0.00000
+O1_1 O 0.05060 0.11110 0.39350
+O1_2 O  0.94940 0.11110 0.60650
+O2 O 0.04770 0.00000 0.89980
+O3 O 0.30165 0.00000 0.96090
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 2.5(2) 0.00000 0.00000 mx,my,mz  2.5(2)
+Mn2 -2.1(2) 0.00000 -0.57(5) mx,my,mz 2.0(2)
+

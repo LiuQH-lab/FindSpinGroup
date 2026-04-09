@@ -1,0 +1,152 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/08/2018 13:53:06
+
+data_5yOhtAoR
+_audit_creation_date            2018-03-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        95
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            174439
+_citation_year                  2017
+_citation_DOI                   10.1103/PhysRevB.95.174439
+
+loop_
+_citation_author_name
+"J.A. Rodriguez-Velamazan"
+"O. Fabelo"
+"J. Campo"
+"Á. Millan"
+"J. Rodriguez-Carvajal"
+"L.C. Chapon"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  ?
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2- 1 1 . primary 3 .
+mGM2+ 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Phase observed at 2K with a magnetic field of 6T along a. Between 2.5 and 5 T a different phase with propagation vector k= (0,0,1/4) is reported
+At zero field, below 7K, the magnetic ordering is inconmensurate with k-vector along z
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+2 irreps active. One of them just corresponds to the induced magnetic moment along the a direction by effect of the applied field.
+Irreps labels used here correspond to the standard setting of parent structure
+;
+
+_parent_space_group.name_H-M_alt  "P  2_1/c  "
+_parent_space_group.IT_number          14
+_parent_space_group.transform_Pp_abc  'b,c,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  "a,b,c;0,0,0"
+_space_group_magn.transform_BNS_Pp_abc  "b,c,a;1/4,0,0"
+
+
+_space_group_magn.number_BNS  4.9
+_space_group_magn.name_BNS  "P2_1'"
+_space_group_magn.point_group_name  "2'"
+_space_group_magn.point_group_number  "3.3.8"
+_cell_length_a                 13.50190
+_cell_length_b                 9.95780
+_cell_length_c                 6.90490
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.10900
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Fe1_1 Fe 0.88094 0.24977 0.18738 1
+Fe1_2 Fe 0.11906 0.75023 0.81262 1
+Cl1_1 Cl 0.89028 0.01019 0.16728 1
+Cl1_3 Cl 0.10972 -0.01019 0.83272 1
+Cl2_1 Cl 0.89684 0.48995 0.18146 1
+Cl2_3 Cl 0.10316 0.51005 0.81854 1
+Cl3_1 Cl 0.77266 0.25432 -0.07705 1
+Cl3_3 Cl 0.22734 0.74568 0.07705 1
+Cl4_1 Cl 0.74848 0.25079 0.40032 1
+Cl4_3 Cl 0.25152 0.74921 0.59968 1
+Cl5_1 Cl -0.00653 0.24489 0.45673 1
+Cl5_3 Cl 0.00653 0.75511 0.54327 1
+N1_1 N 0.86016 0.00440 0.66976 1
+N1_3 N 0.13984 -0.00440 0.33024 1
+N2_1 N 0.86348 0.50177 0.66426 1
+N2_3 N 0.13652 0.49823 0.33574 1
+O1W_1 O 0.00218 0.25006 -0.00325 1
+O1W_3 O -0.00218 0.74994 0.00325 1
+D1W_1 D 0.03486 0.32915 -0.05219 1
+D1W_3 D -0.03486 0.67085 0.05219 1
+D2W_1 D 0.03539 0.17153 -0.05058 1
+D2W_3 D -0.03539 0.82847 0.05058 1
+D1_1 D 0.89653 0.08452 0.60791 1
+D1_3 D 0.10347 -0.08452 0.39209 1
+D2_1 D 0.88859 -0.08312 0.61732 1
+D2_3 D 0.11141 0.08312 0.38268 1
+D3_1 D 0.86849 0.00740 0.81550 1
+D3_3 D 0.13151 -0.00740 0.18450 1
+D4_1 D 0.78666 0.01011 0.63936 1
+D4_3 D 0.21334 -0.01011 0.36064 1
+D5_1 D -0.06364 0.50262 0.70247 1
+D5_3 D 0.06364 0.49738 0.29753 1
+D6_1 D 0.83007 0.41660 0.71281 1
+D6_3 D 0.16993 0.58340 0.28719 1
+D7_1 D 0.85915 0.50719 0.51761 1
+D7_3 D 0.14085 0.49281 0.48239 1
+D8_1 D 0.82941 0.58454 0.72255 1
+D8_3 D 0.17059 0.41546 0.27745 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1_1 0.9 0.0 -4.6(3) mx,my,mz
+Fe1_2 0.9 0.0 4.6 mx,my,mz
+
+

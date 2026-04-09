@@ -1,0 +1,152 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/20/2017 13:33:17
+# Database entry: 1.193 CrTe3
+# Cif-like file for the case 1.193
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Cr Te3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        95
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            144421
+_citation_year                  2017
+_citation_DOI                   10.1103/PhysRevB.95.144421
+
+loop_
+_citation_author_name
+"M.A. McGuire"
+"V.O. Garlea"
+"KC Santosh"
+"V.R. Cooper"
+"J. Yan"
+"H. Cao"
+"B.C. Sales"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     55
+_experiment_temperature     10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mE1-E2- 2 2 general primary 12 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+k-maximal magnetic symmetry (2 possible)
+1 single active irrep
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a-1/2c,-1/2a+1/2b,c;0,0,1/4'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S  -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 15.76000
+_cell_length_b                 22.16800
+_cell_length_c                 23.03600
+_cell_angle_alpha              90.00
+_cell_angle_beta               118.46
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+5 x,y,z+1/2,-1
+6 x,y+1/2,z,-1
+7 x+1/2,y,z,-1
+8 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cr1_1 Cr 0.00400 0.25150 0.08500 1
+Cr1_2 Cr 0.99600 0.50150 0.16500 1
+Cr2_1 Cr 0.01100 0.11650 0.00400 1
+Cr2_2 Cr 0.98900 0.36650 0.24600 1
+Te1_1 Te 0.10050 0.31000 0.19900 1
+Te1_2 Te 0.89950 0.56000 0.05100 1
+Te2_1 Te 0.11450 0.29950 0.03650 1
+Te2_2 Te 0.88550 0.54950 0.21350 1
+Te3_1 Te 0.13900 0.08650 0.21650 1
+Te3_2 Te 0.86100 0.33650 0.03350 1
+Te4_1 Te 0.13750 0.16300 0.12300 1
+Te4_2 Te 0.86250 0.41300 0.12700 1
+Te5_1 Te 0.14550 0.02950 0.04750 1
+Te5_2 Te 0.85450 0.27950 0.20250 1
+Te6_1 Te 0.39750 0.19300 0.13250 1
+Te6_2 Te 0.60250 0.44300 0.11750 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1_1 2.1 0.7 1.1 mx,my,mz
+Cr1_2 2.1 0.7 1.1 mx,my,mz
+Cr2_1 -2.1 -0.7 -1.1 mx,my,mz
+Cr2_2 -2.1 -0.7 -1.1 mx,my,mz
+

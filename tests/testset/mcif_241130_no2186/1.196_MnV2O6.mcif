@@ -1,0 +1,137 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/30/2017 15:28:15
+# Database entry: 1.196 MnV2O6
+# Cif-like file for the case 1.196
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-30
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Mn V2 O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        95
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            024419
+_citation_year                  2017
+_citation_DOI                   10.1103/PhysRevB.95.024419
+
+loop_
+_citation_author_name
+"M.L. Hneda"
+"J.B.M. da Cunha"
+"M.A. Gusmão"
+"S.R.O. Neto"
+"J. Rodriguez-Carvajal"
+"O. Isnard"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     4.7
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ1 2 2 special primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+k-maximal magnetic symmetry (4 possible)
+single 2-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'P  b  c  n'
+_parent_space_group.IT_number                       60
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,-a,-b;0,0,0'
+
+
+_space_group_magn.number_BNS  14.80
+_space_group_magn.name_BNS  "P_a  2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 13.75800
+_cell_length_b                 5.58890
+_cell_length_c                 9.76100
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z,+1
+3 -x,-y,-z,+1
+4 -x+1/2,y+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.18300 0.12500 1
+V1_1 V 0.16980 0.32020 0.37650 1
+V1_2 V 0.33020 0.17980 0.62650 1
+O1_1 O 0.09470 0.40000 0.23100 1
+O1_2 O 0.40530 0.10000 0.48100 1
+O2_1 O 0.08750 0.11200 0.44750 1
+O2_2 O 0.41250 0.38800 0.69750 1
+O3_1 O 0.25600 0.14000 0.30350 1
+O3_2 O 0.24400 0.36000 0.55350 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.42(11) 3.15(3) 1.99(5) mx,my,mz
+

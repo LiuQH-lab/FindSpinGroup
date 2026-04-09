@@ -1,0 +1,157 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 27/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-27
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        74
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            092404
+_citation_year                  2006
+_citation_DOI                   10.1103/PhysRevB.74.092404
+
+loop_
+_citation_author_name
+"S. Diaz"
+"S. de Brion"
+"G. Chouteau"
+"B. Canals"
+"V. Simonet"
+"P. Strobel"
+
+_atomic_positions_source_database_code_ICSD  21115
+_atomic_positions_source_other               .
+
+_temperature_position_structure         293
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            1.5
+
+_transition_temperature  23.5
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL3+  8  2  special  primary  3  .
+mL1- 4  1  .  primary  1  .
+mL3- 8  2  special  primary  1   no
+mL1+  4  1   .       secondary 1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Position structure used here from a determination at 293K in another work, except cell parameters.
+Common orientation of the  Co1_2 and Co1_3 moments on the plane (1,1,1, are undetermined. Here a direction of maximal symmetry is chosen.
+An alternative model with the Co1_1 moments being coplanar with the other Co atoms fit nearly equally well the data.
+Moment components are given here with non-significant digits to yield the reported moment magnitudes.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two small irreps as primary. One for the ordering of Co1_2 and Co1_3, and another one for the ordering of Co1_1.
+The relative sign of the moments on the Co1_1 and the Co1_2,Co1_3 layers is domain dependent and therefore irrelevant. Both values are equivalent.
+The primary irreps star has 4 k-vectors. Possible alternative multi-k structures, which could equally fit the data, are not mentioned.
+Two degrees of freedom corresponding to two secondary irreps are symmetry allowed, but not present.
+;
+
+_parent_space_group.name_H-M_alt  'F d -3 m'
+_parent_space_group.IT_number                       227
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/4a-1/2b+1/4c,1/4a-1/4c,1/2a+1/2c;0,0,0'
+
+_space_group_magn.number_BNS  5.16
+_space_group_magn.name_BNS  "C_c 2"
+_cell_length_a             16.502
+_cell_length_b             16.502
+_cell_length_c             16.502
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -z,-y,-x,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/4,z+3/4,+1 
+3 x,y+1/2,z+1/2,+1 
+4 x,y+3/4,z+1/4,+1 
+5 x+1/4,y,z+3/4,+1 
+6 x+1/4,y+1/4,z+1/2,+1 
+7 x+1/4,y+1/2,z+1/4,+1 
+8 x+1/4,y+3/4,z,+1 
+9 x+1/2,y,z+1/2,+1 
+10 x+1/2,y+1/4,z+1/4,+1 
+11 x+1/2,y+1/2,z,+1 
+12 x+1/2,y+3/4,z+3/4,+1 
+13 x+3/4,y,z+1/4,+1 
+14 x+3/4,y+1/4,z,+1 
+15 x+3/4,y+1/2,z+3/4,+1 
+16 x+3/4,y+3/4,z+1/2,+1 
+17 x+1/4,y,z+1/4,-1 
+18 x+1/4,y+1/4,z,-1 
+19 x+1/4,y+1/2,z+3/4,-1 
+20 x+1/4,y+3/4,z+1/2,-1 
+21 x+1/2,y,z,-1 
+22 x+1/2,y+1/4,z+3/4,-1 
+23 x+1/2,y+1/2,z+1/2,-1 
+24 x+1/2,y+3/4,z+1/4,-1 
+25 x+3/4,y,z+3/4,-1 
+26 x+3/4,y+1/4,z+1/2,-1 
+27 x+3/4,y+1/2,z+1/4,-1 
+28 x+3/4,y+3/4,z,-1 
+29 x,y,z+1/2,-1 
+30 x,y+1/4,z+1/4,-1 
+31 x,y+1/2,z,-1 
+32 x,y+3/4,z+3/4,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ge1 Ge 0.06250 0.06250 0.06250
+Co1_1 Co 0.25000 0.25000 0.25000
+Co1_2 Co  0.12500 0.37500 0.00000
+Co1_3 Co  0.37500 0.00000 0.12500
+O1_1 O 0.12500 0.12500 0.12500
+O1_2 O  0.25000 0.00000 0.37500
+O1_3 O  0.00000 0.37500 0.25000
+O1_4 O  0.37500 0.25000 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1_1 1.745 1.745 1.745 mx,my,mx        3.02(1)
+Co1_2 2.135 0.00000 -2.135 mx,my,mz     3.02(1)
+Co1_3 2.135 0.00000 -2.135 mx,0,-mx     3.02(1)
+

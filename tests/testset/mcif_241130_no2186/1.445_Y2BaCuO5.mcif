@@ -1,0 +1,121 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 27/10/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-27
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        87
+_citation_page_first            1035
+_citation_page_last             1037
+_citation_article_id            ?
+_citation_year                  1993
+_citation_DOI                   10.1016/0038-1098(93)90556-3
+
+loop_
+_citation_author_name
+"I. Golosovsky"
+"P. Boni"
+"P. Fischer"
+
+
+
+_atomic_positions_source_database_code_ICSD  62903
+_atomic_positions_source_other               .
+
+_transition_temperature  ?
+_experiment_temperature  1.7
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT1  2  2  special  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Transition temperature is not mentioned
+Position structure from another study at room temperature retrieved from ICSD
+The two alternative models proposed in the article, which could equally fit the data, are in fact domain-related equivalent structures. Here, one of these two equivalent descriptions, is used.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+2-dim irrep along a special direction as primary
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,a,1/2b-1/2c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.80
+_space_group_magn.name_BNS  "P_a 2_1/c"
+_cell_length_a             12.17600
+_cell_length_b             11.31000
+_cell_length_c             14.26000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+3/4,-z+1/4,+1
+3 -x,-y,-z,+1
+4 -x+1/2,y+3/4,z+1/4,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x,y+1/2,z,-1
+4 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ba1 Ba 0.09520 0.12500 0.03492
+Y1 Y 0.42618 0.12500 0.44795
+Y2 Y 0.21173 0.12500 0.30815
+Cu1 Cu 0.84050 0.12500 0.10630
+O1_1 O 0.56810 0.25350 0.41725
+O1_2 O  0.93190 0.74650 0.66725
+O2_1 O 0.77120 0.25150 0.32160
+O2_2 O  0.72880 0.74850 0.57160
+O3 O 0.90000 0.12500 0.46100
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Cu1 0.00000 0.00000 0.55(3) mx,my,mz  0.55(3)
+
+

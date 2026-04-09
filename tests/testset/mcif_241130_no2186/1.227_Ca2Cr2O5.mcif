@@ -1,0 +1,117 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/09/2018 01:31:57
+
+data_5yOhtAoR
+_audit_creation_date            2018-09-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Dalton Trans."
+_citation_journal_volume        44
+_citation_page_first            10661
+_citation_page_last             10664
+_citation_article_id            ?
+_citation_year                  2015
+_citation_DOI                   10.1039/c4dt03780d
+
+loop_
+_citation_author_name
+"A.M. Arevalo-Lopez"
+"J.P. Attfield"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  238797
+_atomic_positions_source_other               .
+
+_transition_temperature  220
+_experiment_temperature  10
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX3  1  1  .  primary  3  .
+mX4  1  1  .  primary  4  .
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+non-standard setting of the parent structure
+;
+
+_active_magnetic_irreps_details
+;
+two 1-dim irreps active as primary
+Polar structure
+;
+
+_parent_space_group.name_H-M_alt  'I  2  m  b'
+_parent_space_group.IT_number                       46
+_parent_space_group.transform_Pp_abc  'c,a,b;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b+c,-a,-b;0,1/4,1/4'
+
+
+
+_space_group_magn.number_BNS  4.12
+_space_group_magn.name_BNS  "P_C  2_1"
+_cell_length_a             5.42000
+_cell_length_b             14.77000
+_cell_length_c             5.50900
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,-y+1/2,-z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ca1_1 Ca 0.49700 0.10740 0.01200
+Ca1_2 Ca 0.49700 0.60740 0.98800
+Cr1_1 Cr 0.00100 0.00000 0.00000
+Cr1_2 Cr 0.00100 0.50000 0.00000
+Cr2 Cr 0.99300 0.25000 0.93600
+O1_1 O 0.75400 0.49190 0.74600
+O1_2 O 0.75400 0.99190 0.25400
+O2_1 O 0.02200 0.13980 0.03600
+O2_2 O 0.02200 0.63980 0.96400
+O3 O 0.16200 0.25000 0.63400
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1_1 0.00000 1.08(5) -1.33(7) 0,my,mz
+Cr1_2 0.00000 1.08 -1.33 0,my,mz
+Cr2 0.00000 1.08 1.33 mx,my,mz
+

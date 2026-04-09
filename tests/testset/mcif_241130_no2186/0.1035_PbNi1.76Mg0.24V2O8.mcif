@@ -1,0 +1,145 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/17/2024
+# From a file submitted by V. Pomjakushin
+
+data_5yOhtAoR
+_audit_creation_date            2024-10-17
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Pb1 Ni1.76 Mg0.24 V2 O8"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        66
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            014428
+_citation_year                  2002
+_citation_DOI                   10.1103/PhysRevB.66.014428
+
+loop_
+_citation_author_name
+"A. Lappas"
+"V. Alexandrakis"
+"J. Giapintzakis"
+"V. Pomjakushin"
+"K. Prassides"
+"A. Schenck"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     3.2
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+The magnetic site is shared between Ni and Mg atoms, with a composition of Ni0.88 and Mg0.12. The magnetic moment is specified per Ni atom, rather than per site, which means that it reflects only the contribution from the nickel atoms present at the site.
+Only Mz component was refined.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure 
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'I 4_1 c d'
+_parent_space_group.IT_number                       110
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  110.248
+_space_group_magn.name_BNS  "I 4_1' c d'"
+_space_group_magn.point_group_name  "4'm'm"
+_space_group_magn.point_group_number  "13.3.46"
+_cell_length_a                 12.2448(7)
+_cell_length_b                 12.2448(7)
+_cell_length_c                 8.3592(7)
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,z,+1 
+3 -x,y,z+1/2,+1 
+4 x,-y,z+1/2,+1 
+5 y+1/2,x,z+1/4,-1 
+6 -y+1/2,-x,z+1/4,-1 
+7 -y,x+1/2,z+1/4,-1 
+8 y,-x+1/2,z+1/4,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ni1 Ni 0.32377 0.33202 0.17461 0.88000
+Mg1 Mg 0.32377 0.33202 0.17461 0.12000
+Pb1 Pb 0.00000 0.00000 0.00000 1.00000
+V1 V 0.25960 0.08020 0.10150 1.00000
+O1 O 0.15269 0.49279 -0.0985 1.00000
+O2 O 0.33108 0.65842 0.43680 1.00000
+O3 O 0.15670 0.68715 0.66993 1.00000
+O4 O 0.33042 0.49960 0.19823 1.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ni1 0.0 0.0 0.9(1) Mx,My,Mz 0.9(1) ? ?
+

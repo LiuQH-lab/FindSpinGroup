@@ -1,0 +1,119 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 24/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        63
+_citation_page_first            65
+_citation_page_last             67
+_citation_article_id            .
+_citation_year                  1987
+_citation_DOI                   10.1016/0038-1098(87)90067-6
+
+loop_
+_citation_author_name
+"T. Chattopadhyay"
+"J. Rossat-Mignod"
+"H. Fjellvag"
+
+_atomic_positions_source_database_code_ICSD  12959
+_atomic_positions_source_other               .
+
+_transition_temperature  49
+_experiment_temperature  1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mDT4  6  1  special  primary  3  .
+mDT1  6  1  special  primary  3  .
+mGM4  3  3  special  secondary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure used here is from another work at 293K.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two irreps involved as primary: two order parameters in the sense of Landau are involved
+A secondary irrep corresponding to k=0 (third harmonic) is also present in the spin arrangement to produce a square-ike modulation.
+This model requires a very specific relationship between the amplitudes of two order parameters associated with two different irreps. It is claimed to correct a previous one (see #1.0.47), which only involves a single order parameter (single primary irrep).
+Polar along c
+FM along b
+;
+
+_parent_space_group.name_H-M_alt  'P a -3'
+_parent_space_group.IT_number                       205
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 0 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,-a,c;1/12,0,0'
+
+_space_group_magn.number_BNS  29.102
+_space_group_magn.name_BNS  "P c a' 2_1'"
+_cell_length_a             19.28250
+_cell_length_b             6.42750
+_cell_length_c             6.42750
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y+1/2,z+1/2,+1 
+3 -x+1/6,-y,z+1/2,-1 
+4 -x+1/6,y+1/2,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1_1 Mn 0.00000 0.00000 0.00000
+Mn1_2 Mn  0.33333 0.00000 0.00000
+Mn1_3 Mn  0.50000 0.00000 0.50000
+Se1_1 Se 0.13119 0.39357 0.39357
+Se1_2 Se  0.86881 0.89358 0.10642
+Se1_3 Se  0.46453 0.39358 0.39358
+Se1_4 Se  0.36881 0.60642 0.89358
+Se1_5 Se  0.20214 0.89358 0.10642
+Se1_6 Se  0.63119 0.10642 0.60642
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1_1  2.8 0.0 0.0 mx,my,mz   2.8
+Mn1_2 -2.8 0.0 0.0 mx,my,mz   2.8
+Mn1_3 -2.8 0.0 0.0 mx,my,mz   2.8
+

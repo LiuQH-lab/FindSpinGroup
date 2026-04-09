@@ -1,0 +1,135 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 23/03/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        12
+_citation_page_first            7089
+_citation_page_last             7098
+_citation_article_id            ?
+_citation_year                  2000
+_citation_DOI                   10.1088/0953-8984/12/31/310
+
+loop_
+_citation_author_name
+"P. Fischer"
+"T. Herrmannsdorfer"
+"T. Bonelli"
+"F. Fauth"
+"L. Keller"
+"E. Bauer"
+"M. Giovannini"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  8
+_experiment_temperature  2.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM2  4  1  general  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from data at 15K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+1-dim small irrep but 2-dim irrep as primary (k and -k included)
+The spin arrangement corresponds to a general direction within the irrep, with the lowest possible symmetry for this irrep.
+The spin arrangement breaks the inversion center symmetry of the paramagnetic phase (the MSg is polar along (1,1,0)).
+The arrangement of the larger Nd moments corresponds to a special direction of the active irrep yielding a higher symmetry P_abam, and the spin arrangement of the Nd atoms with much weaker moments also follow the P_abam symmetry, but according to a domain-related configuration. Both arrangements of higher equivalent symmetries but different groups, when superposed reduce the global MSG to the lowest possible one for the active irrep. A model with both sets of atoms consistently following the same ymmetry (by switching the weaker moment arrangement to the domain-related one by inversion) does not seem to have been tested in the refinement.
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m b m'
+_parent_space_group.IT_number                       127
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/4 1/4 0]
+
+_parent_space_group.child_transform_Pp_abc  '4a,4b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-1/4a+1/4b,1/2a+1/2b;1/16,-1/16,0'
+
+_space_group_magn.number_BNS  26.73
+_space_group_magn.name_BNS  "P_c m c 2_1"
+_cell_length_a             30.87600
+_cell_length_b             30.87600
+_cell_length_c             3.86100
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 y+3/8,x+1/8,-z,+1
+3 x,y,-z,+1
+4 y+3/8,x+1/8,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/4,y+3/4,z,+1
+3 x+1/2,y+1/2,z,+1
+4 x+3/4,y+1/4,z,+1
+5 x+1/4,y+1/4,z,-1
+6 x+1/2,y,z,-1
+7 x+3/4,y+3/4,z,-1
+8 x,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Nd1_1 Nd 0.04398 0.16898 0.50000
+Nd1_2 Nd  0.95603 0.08102 0.50000
+Nd1_3 Nd  0.08102 0.04398 0.50000
+Nd1_4 Nd  0.04398 0.41897 0.50000
+Nd1_5 Nd  0.95603 0.33103 0.50000
+Nd1_6 Nd  0.08102 0.29397 0.50000
+Pd1_1 Pd 0.09295 0.21795 0.00000
+Pd1_2 Pd  0.90705 0.03205 0.00000
+Pd1_3 Pd  0.03205 0.09295 0.00000
+Pd1_4 Pd  0.09295 0.46795 0.00000
+Pd1_5 Pd  0.90705 0.28205 0.00000
+Pd1_6 Pd  0.03205 0.34295 0.00000
+In1_1 In 0.00000 0.00000 0.00000
+In1_2 In  0.12500 0.12500 0.00000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd1_1 0.00000 0.00000 3.3(2) 0,0,mz
+Nd1_2 0.00000 0.00000 3.3 0,0,mz
+Nd1_3 0.00000 0.00000 -0.8(1) 0,0,mz
+Nd1_4 0.00000 0.00000 3.3 0,0,mz
+Nd1_5 0.00000 0.00000 3.3 0,0,mz
+Nd1_6 0.00000 0.00000 0.8 0,0,mz
+

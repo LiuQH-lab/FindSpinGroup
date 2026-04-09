@@ -1,0 +1,140 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-02
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys. F: Met. Phys."
+_citation_journal_volume        15
+_citation_page_first            181
+_citation_page_last             192
+_citation_article_id            .
+_citation_year                  1985
+_citation_DOI                   10.1088/0305-4608/15/1/020
+
+loop_
+_citation_author_name
+"F Vigneron"
+"M Bonnet"
+"J Chappert"
+
+_atomic_positions_source_database_code_ICSD  58707
+_atomic_positions_source_other               .
+
+_transition_temperature  10.0(5)
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mDT5  12  2  special  primary  4  .
+mX5-   6  2  special  secondary 1  yes
+mX5+   6  2  special  secondary 1  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure not given. Here it is taken one determined at 300K by another study
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+4-dim extended (k,-k) small irrep as primary, with a secondary irrep component with k=(0,0,1) also present (third harmonic).
+The assumption of equal magnitude of all moments forces the presence of the third harmonic. 
+Possible multi-k arrangements for the same primary irrep were not considered 
+Not clear if all other possible 1k spin arrangements of higher symmetry for the same primary irrep were checked.
+;
+
+_parent_space_group.name_H-M_alt  'F m -3 c'
+_parent_space_group.IT_number                       226
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/3]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,3c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,3/4,1/12'
+
+
+
+_space_group_magn.number_BNS  20.37
+_space_group_magn.name_BNS  "C_A 222_1"
+_cell_length_a             10.21000
+_cell_length_b             10.21000
+_cell_length_c             30.63000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y+1/2,-z+1/6,+1 
+3 -x,y,-z+2/3,+1 
+4 -x,-y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y+1/2,z+1/2,-1 
+4 x+1/2,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Be1_1 Be 0.00000 0.00000 0.00000
+Be1_2 Be  0.50000 0.50000 0.16667
+Be1_3 Be  0.00000 0.00000 0.33333
+Be1_4 Be  0.50000 0.00000 0.33333
+Be2_1 Be 0.00000 0.11500 0.05917
+Be2_2 Be  0.00000 0.11500 0.94083
+Be2_3 Be  0.17750 0.00000 0.03833
+Be2_4 Be  0.17750 0.00000 0.96167
+Be2_5 Be  0.11500 0.17750 0.00000
+Be2_6 Be  0.88500 0.17750 0.00000
+Be2_7 Be  0.61500 0.50000 0.10750
+Be2_8 Be  0.61500 0.50000 0.22583
+Be2_9 Be  0.50000 0.67750 0.12833
+Be2_10 Be  0.50000 0.67750 0.20500
+Be2_11 Be  0.67750 0.61500 0.16667
+Be2_12 Be  0.67750 0.38500 0.16667
+Be2_13 Be  0.00000 0.11500 0.39250
+Be2_14 Be  0.17750 0.00000 0.37167
+Be2_15 Be  0.11500 0.17750 0.33333
+Be2_16 Be  0.61500 0.00000 0.27417
+Be2_17 Be  0.50000 0.17750 0.29500
+Be2_18 Be  0.67750 0.11500 0.33333
+Dy1_1 Dy 0.25000 0.25000 0.08333
+Dy1_2 Dy  0.75000 0.75000 0.25000
+Dy1_3 Dy  0.25000 0.75000 0.25000
+Dy1_4 Dy  0.75000 0.25000 0.08333
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Dy1_1 8.5(1) 0.00000 0.00000 mx,0,0    8.5(1)
+Dy1_2 1.48 8.37 0.00000 mx,my,0        8.5
+Dy1_3 1.48 8.37 0.00000 mx,my,0        8.5
+Dy1_4 8.5(1) 0.00000 0.00000 mx,0,0    8.5
+

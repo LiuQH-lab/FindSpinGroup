@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-10
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        83
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            144429
+_citation_year                  2011
+_citation_DOI                   10.1103/PhysRevB.83.144429
+
+loop_
+_citation_author_name
+"N. Emery"
+"E. J. Wildman"
+"J. M. S. Skakle"
+"A. C. Mclaughlin"
+"R. I. Smith"
+"A. N. Fitch"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  10
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5-  2  2  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 290K
+Above 10K up to 335K, only Mn moments are ordered in another with a different MSG (see entry #0.620)
+The direction of the moments on the basal plane is undetermined. A direction, which corresponds to a maximal symmetry has been chosen.
+See entry #0.622 for a similar model of this phase, but with a significantly different Mn moment magnitude, and different transitions temperatures.
+The value of the Mn moment magnitude in the text of the paper (3.54) differs from the one in the supplemental material. This latter has been assumed to be correct.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal symmetry
+2-dim irrep along a special direction as primary
+;
+
+_parent_space_group.name_H-M_alt  'P  4/n  m  m'
+_parent_space_group.IT_number                       129
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;1/4,-1/4,1/2'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/4,1/4,0'
+
+_space_group_magn.number_BNS  59.407
+_space_group_magn.name_BNS  "P m' m n"
+_cell_length_a             4.04831(2)
+_cell_length_b             4.04831
+_cell_length_c             8.8808(2)
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z,+1 
+3 x,-y,z,+1 
+4 x+1/2,y+1/2,-z,+1 
+5 -x+1/2,y+1/2,-z,-1 
+6 -x,-y,z,-1 
+7 -x+1/2,-y+1/2,-z,-1 
+8 -x,y,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.00000 0.00000 0.00000
+Nd1 Nd 0.00000 0.50000 0.63033(9)
+As1 As 0.00000 0.50000 0.1746(2)
+O1 O 0.50000 0.50000 0.50000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 0.00000 -3.33(4) 0.00000 0,my,0   3.33(4)
+Nd1 0.00000 -1.93(4) 0.00000 0,my,0  1.93(4)
+

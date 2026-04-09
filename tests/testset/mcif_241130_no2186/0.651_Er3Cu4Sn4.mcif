@@ -1,0 +1,118 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 16/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-16
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Acta Cryst. B"
+_citation_journal_volume        77
+_citation_page_first            219
+_citation_page_last             224
+_citation_article_id            .
+_citation_year                  2021
+_citation_DOI                   10.1107/S205252062100127X
+
+loop_
+_citation_author_name
+"S. Baran"
+"A. Deptuch"
+"B. Penc"
+"A. Hoser"
+"A. Szytula"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  6
+_experiment_temperature  3.7
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA2-  1  1  .  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Below 2K, Er2 is also ordered with an incommensurate modulation (see entry #1.1.120)
+This corrects a previous model proposed by the same group (Wawrzynska et al, J._Phys. _Condens._Matter (2003) 15,5279; DOI:10.1088/0953-8984/15/30/310)
+The figures in the paper are not consistent with the description in the text and tables, which has been assumed correct.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'C 2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,1/4'
+
+
+
+_space_group_magn.number_BNS  12.63
+_space_group_magn.name_BNS  "C_c 2/m"
+_cell_length_a             16.08310
+_cell_length_b             4.38870
+_cell_length_c             13.74640
+_cell_angle_alpha          90.00
+_cell_angle_beta           115.75
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z+1/2,+1 
+3 -x,-y,-z+1/2,+1 
+4 x,-y,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y+1/2,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Er1 Er 0.00000 0.00000 0.25000
+Er2 Er 0.12900 0.00000 0.05850
+Cu1 Cu 0.32100 0.00000 0.25900
+Cu2 Cu 0.33800 0.00000 0.07600
+Sn1 Sn 0.21600 0.00000 0.36550
+Sn2 Sn 0.50600 0.00000 0.10400
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Er1 0.00000 8.86(7) 0.00000 0,my,0  8.86(7)
+Er2 0.00000 0.00000 0.00000 0,my,0  0.00
+

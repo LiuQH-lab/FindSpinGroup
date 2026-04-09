@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 23/04/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-04-23
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Solid State Communications"
+_citation_journal_volume        8
+_citation_page_first            1653
+_citation_page_last             1655
+_citation_article_id            ?
+_citation_year                  1970
+_citation_DOI                   10.1016/0038-1098(70)90484-9
+
+loop_
+_citation_author_name
+"E. Kren"
+"G. Kadar"
+
+
+
+_atomic_positions_source_database_code_ICSD  198472
+_atomic_positions_source_other               .
+
+_transition_temperature  460
+_experiment_temperature  300
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4+ 1  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD?
+Mn moment: 2.4(2)
+Mn moment components given non-ignificant digits to yield the reported modulus.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+1-dim irrep as primary
+Weak FM is reported, but it is inconsistent with the MSG of the structure
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  194.268
+_space_group_magn.name_BNS  "P 6_3'/m' m' c"
+_cell_length_a             5.36300
+_cell_length_b             5.36300
+_cell_length_c             4.32700
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y,x-y,z,+1
+3 -x+y,-x,z,+1
+4 x,x-y,-z+1/2,+1
+5 -x+y,y,-z+1/2,+1
+6 -y,-x,-z+1/2,+1
+7 -x,-y,-z,+1
+8 y,-x+y,-z,+1
+9 x-y,x,-z,+1
+10 -x,-x+y,z+1/2,+1
+11 x-y,-y,z+1/2,+1
+12 y,x,z+1/2,+1
+13 x-y,x,z+1/2,-1
+14 -x,-y,z+1/2,-1
+15 y,-x+y,z+1/2,-1
+16 x-y,-y,-z,-1
+17 y,x,-z,-1
+18 -x,-x+y,-z,-1
+19 -x+y,-x,-z+1/2,-1
+20 x,y,-z+1/2,-1
+21 -y,x-y,-z+1/2,-1
+22 -x+y,y,z,-1
+23 -y,-x,z,-1
+24 x,x-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ga1 Ga 0.333333 0.666667 0.25000 1.
+Ga2 Ga 0.833333 0.666667 0.25000 0.05
+Mn1 Mn 0.833333 0.666667 0.25000 0.95
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 2.68 1.96 0.0 mx,my,0
+

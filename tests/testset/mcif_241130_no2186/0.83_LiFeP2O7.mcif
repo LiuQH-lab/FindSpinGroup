@@ -1,0 +1,138 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:54:34
+# Database entry: 0.83 LiFeP2O7
+# Cif-like file for the case 0.83
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Li Fe P2 O7'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Solid State Sciences"
+_citation_journal_volume        4
+_citation_page_first            973
+_citation_page_last             978
+_citation_article_id            .
+_citation_year                  2002
+_citation_DOI                   10.1016/S1293-2558(02)01347-X
+
+loop_
+_citation_author_name
+"G. Rousse"
+"J. Rodriguez-Carvajal"
+"C. Wurm"
+"C. Masquelier"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   95751
+_atomic_positions_source_other               .
+
+_transition_temperature     22
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+1-dim active irrep
+Weak FE along y is symmetry-allowed
+;
+
+_parent_space_group.name_H-M_alt  'P  2_1'
+_parent_space_group.IT_number                       4
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  4.7
+_space_group_magn.name_BNS  "P  2_1"
+_space_group_magn.point_group_name  "2"
+_space_group_magn.point_group_number  "3.1.6"
+_cell_length_a                 4.80910
+_cell_length_b                 8.05740
+_cell_length_c                 6.92800
+_cell_angle_alpha              90.00
+_cell_angle_beta               109.38
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Li1 Li 0.80300 0.38400 0.81900 1
+Fe1 Fe 0.21950 0.25000 0.23400 1
+P1 P 0.79390 0.47040 0.41660 1
+P2 P 0.60080 0.07090 0.98020 1
+O1 O 0.40290 0.07220 0.10990 1
+O2 O 0.81410 0.21560 0.01980 1
+O3 O 0.13180 0.06160 0.38130 1
+O4 O 0.06190 0.43020 0.36110 1
+O5 O 0.24810 0.40560 0.01030 1
+O6 O 0.39850 0.10160 0.74750 1
+O7 O 0.60820 0.31970 0.41830 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 4.84(4) 0.0 0.9(1) mx,my,mz
+

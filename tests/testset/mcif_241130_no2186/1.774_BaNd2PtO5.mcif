@@ -1,0 +1,152 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/09/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-12-09
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ba1 Nd2 Pt1 O5"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        7
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            074407
+_citation_year                  2023
+_citation_DOI                   10.1103/PhysRevMaterials.7.074407
+
+loop_
+_citation_author_name
+"C. M. Pasco"
+"B. K. Rai"
+"M. Frontzek"
+"G. Sala"
+"M. B. Stone"
+"B. C. Chakoumakos"
+"V. O. Garlea"
+"A. D. Christianson"
+"A. F. May"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     1.9
+_experiment_temperature     0.3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mA5+ 2 2 general primary 4 .
+mA2+A3+ 2 2 general primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+The values of the angles of the moment spherical coordinates given in the article have been interchanged to make them consistent with the Figure depicting the spin arrangement.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two primary irreps are nvolved. The canting of the spins out of the xy plane correspond to the second physically irreducible irrep mA2+A3+. This canting decreases the symmetry from monoclinic to triclinic.
+;
+
+_parent_space_group.name_H-M_alt  'P 4/m b m'
+_parent_space_group.IT_number                       127
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a+1/2c,-1/2a+1/2b,-a+b+c;0,0,0'
+
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 13.438(6)
+_cell_length_b                 13.438(6)
+_cell_length_c                 11.801(12)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x+1/2,y,z+1/2,+1 
+4 x+1/2,y+1/2,z,+1 
+5 x+1/2,y+1/2,z+1/2,-1 
+6 x+1/2,y,z,-1 
+7 x,y+1/2,z,-1 
+8 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Pt1_1 Pt 0.00000 0.25000 0.00000 1
+Pt1_2 Pt 0.25000 0.00000 0.00000 1
+Nd1_1 Nd 0.0871(3) 0.3371(3) 0.25000 1
+Nd1_2 Nd 0.1629(3) 0.0871(3) 0.25000 1
+Ba1_1 Ba 0.00000 0.00000 0.00000 1
+Ba1_2 Ba 0.25000 0.25000 0.00000 1
+O1_1 O 0.3222(7) 0.5722(7) 0.1255 1
+O1_2 O 0.6778(7) 0.9278(7) 0.1255 1
+O1_3 O 0.9278(7) 0.3222(7) 0.1255 1
+O1_4 O 0.5722(7) 0.6778(7) 0.1255 1
+O2_1 O 0.00000 0.00000 0.25000 1
+O2_2 O 0.25000 0.25000 0.25000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Nd1_1 -1.15 -2.08 0.77 mx,my,mz 2.50 241 72
+Nd1_2 -2.36 0.29 0.77 mx,my,mz 2.50 173 72
+

@@ -1,0 +1,146 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:15:08
+# Database entry: 1.136 AgCrS2
+# Cif-like file for the case 1.136
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Ag Cr S2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Phys. Rev. B "
+_citation_journal_volume        83
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            184413
+_citation_year                  2011
+_citation_DOI                   10.1103/PhysRevB.83.184413
+
+loop_
+_citation_author_name
+"F. Damay"
+"C. Martin"
+"V. Hardy"
+"G. Andre"
+"S. Petit"
+"A. Maignan"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     41
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mC1CA1 6 2 general primary 2 .
+GM1 1 1 . secondary 6 yes
+GM3 2 2 special secondary 6 yes
+L1 3 1 . secondary 8 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+simultaneous structural transition to a monoclinic structure reported to have Cm symmetry with transformation: (-1/3a+1/3b-2/c,-a-b,-1/3a+1/3b+1/3c;0,0,0)from the parent R3m unit cell.
+Positional structure from a 10K measurement with the mentioned space group Cm
+The propagation vector is reported erroneously to be (0,0,1/4) in the monoclinic setting. It is in fact (1,0,1/4).
+Here the paramagnetic structure is taken as parent and the propagation vector is given in the rombohedral parent setting (hexagonal).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal symmetry (two possible)
+the supposedly simultaneous structural transition is probably part of the magnetic transition, the monoclinic structural distortion being a magnetically induced effect.
+structural distortion modes compatible with the magnetic symmetry break are detected.
+;
+
+_parent_space_group.name_H-M_alt  'R  3m'
+_parent_space_group.IT_number                       160
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [-3/4 3/4 -3/4]
+
+_parent_space_group.child_transform_Pp_abc  '-1/3a+1/3b-2/3c,-a-b,-4/3a+4/3b+4/3c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-c,-b,-2a+c;0,0,0'
+
+
+_space_group_magn.number_BNS  8.35
+_space_group_magn.name_BNS  "C_c  m"
+_space_group_magn.point_group_name  "m1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                 13.7861
+_cell_length_b                 3.5042
+_cell_length_c                 28.4528
+_cell_angle_alpha              90.00
+_cell_angle_beta               155.276
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+3 x+1/2,y+1/2,z,-1
+4 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Cr1_1 Cr 0.00000 0.00000 0.00000 1
+Cr1_2 Cr 0.50000 0.50000 0.25000 1
+Ag1_1 Ag 0.8459 0.00000 0.0381 1
+Ag1_2 Ag 0.3459 0.50000 0.2881 1
+S1_1 S 0.7263 0.00000 0.0665 1
+S1_2 S 0.2263 0.50000 0.3165 1
+S2_1 S 0.2688 0.00000 0.1841 1
+S2_2 S 0.7688 0.50000 0.4341 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cr1_1 0.0 2.66(2) 0.0 0,my,0
+Cr1_2 0.0 2.66(2) 0.0 0,my,0
+

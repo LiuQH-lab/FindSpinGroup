@@ -1,0 +1,150 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/13/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-05-13
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "K1 Er1 Se2"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        107
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            L100411
+_citation_year                  2023
+_citation_DOI                   10.1103/PhysRevB.107.L100411
+
+loop_
+_citation_author_name
+"G. Ding"
+"H. Wo"
+"R. L. Luo"
+"Y. Gu"
+"Y. Gu"
+"R. Bewley"
+"G. Chen"
+"J. Zhao"
+
+_temperature_position_structure         0.045
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "Xing et al., PHYSICAL REVIEW B (2021) 103,144413; DOI: 10.1103/PhysRevB.103.144413"
+
+_transition_temperature     0.2
+_experiment_temperature     0.020
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL2- 3 1 . primary 1 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure is not given. Here the one reported at 0.045K by Xing et al. (PHYSICAL REVIEW B (2021) 103,144413) is used
+The data is assumed to be for measurements done at 0.020K, which is the lowest temperature mentioned.
+See #1.578 for another report of this structure with the same MSG, but with a very different magnitude of the Er moment
+; 
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim small irrep as primary
+The irrep star has 3 k-vectors. Alternative multi-k structures involving more than one k-vector of the star, which possibly could also fit the data were not considered.
+;
+
+_parent_space_group.name_H-M_alt  'R -3 m'
+_parent_space_group.IT_number                       166
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/3a+1/3b-1/3c,b,2/3a+2/3b+1/3c;0,0,1/4'
+
+
+_space_group_magn.number_BNS  12.63
+_space_group_magn.name_BNS  "C_c 2/m"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 8.29060
+_cell_length_b                 4.14530
+_cell_length_c                 45.42000
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-2x+y,-z+1/2,+1 
+3 -x,-y,-z+1/2,+1 
+4 x,2x-y,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/6,y+2/3,z+5/6,+1 
+3 x+1/3,y+1/3,z+2/3,+1 
+4 x+1/2,y,z+1/2,+1 
+5 x+2/3,y+2/3,z+1/3,+1 
+6 x+5/6,y+1/3,z+1/6,+1 
+7 x+1/3,y+1/3,z+1/6,-1 
+8 x+1/2,y,z,-1 
+9 x+2/3,y+2/3,z+5/6,-1 
+10 x+5/6,y+1/3,z+2/3,-1 
+11 x,y,z+1/2,-1 
+12 x+1/6,y+2/3,z+1/3,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+K1 K 0.00000 0.00000 0.00000 1
+Er1 Er 0.00000 0.00000 0.25000 1
+Se1 Se 0.00000 0.00000 0.11770 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Er1 0.0 9.58(7) 0.0 0,my,0 9.58(7) ? ?
+

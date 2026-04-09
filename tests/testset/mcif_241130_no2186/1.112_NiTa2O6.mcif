@@ -1,0 +1,145 @@
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 19/03/2016 18:12:01
+# icsd_247807.cif
+
+data_5yOhtAoR
+_audit_creation_date            2016-03-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        89
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            014423
+_citation_year                  2014
+_citation_DOI                   10.1103/PhysRevB.89.014423
+
+loop_
+_citation_author_name
+"Law, J.M."
+
+
+_atomic_positions_source_database_code_ICSD  247807
+_atomic_positions_source_other               .
+
+_Neel_temperature         12
+_magn_diffrn_temperature  2.00(1)
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mS2 4  1  special primary  2  .
+MS4 4  1  special primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+spin modulus: 1.93(5) 
+The spin components include non significant digits in order to give the reported spin modulus.
+Another model was reported previously in J. Magn. Magn. Mat. 184 (1998) 111-115 (see entry #1.172). Apparently, this earlier model is essentially different from this one, as it has a different non-centrosymmetric MSSG, although the active irreps are the same. The model was extracted from the figure provided in the article, but it was sufficient to detect a different non-equivalent spin arrangement. 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two different primary irreps active. Each consecutive spin layer arrangement along the z axis corresponds to a different primary irrep.
+2-dim extended small irrep.
+;
+
+
+_parent_space_group.name_H-M                       'P 4_2/m n m '
+_parent_space_group.IT_number                       136
+_parent_space_group.transform_to_standard_Pp_abc    'a,b,c;0,0,0'
+
+loop_
+_magnetic_propagation_vector_seq_id
+_magnetic_propagation_vector_kxkykz
+k1 '1/4,-1/4,1/2'
+
+_magnetic_space_group.standard_setting              'no'
+_magnetic_space_group.transform_from_parent_Pp_abc  '4a,4b,2c;0,0,0'
+_magnetic_space_group.transform_to_standard_Pp_abc  '1/4a-1/4b-1/2c,1/4a+1/4b,c;0,1/8,0'
+
+loop_
+_magnetic_atom_site_moment_symmetry_constraints_label
+_atom_site_magnetic_moment_symmetry_constraints_mxmymz
+Ni1_1 mx,-mx,mz
+Ni1_2 mx,-mx,mz
+
+
+_space_group.magn_number_BNS 14.82
+_space_group.magn_name_BNS "P_c 2_1/c"
+_cell_length_a             18.86720
+_cell_length_b             18.86720
+_cell_length_c             18.24760
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop.magn_id
+_space_group_symop.magn_operation_xyz
+_space_group_symop.magn_operation_mxmymz
+1 x,y,z,+1 mx,my,mz
+2 y,x+1/4,-z+1/2,+1 my,mx,-mz
+3 -x,-y+1/4,-z,+1 mx,my,mz
+4 -y+1/4,-x+1/4,z+1/2,+1 my,mx,-mz
+
+loop_
+_space_group_symop.magn_centering_id
+_space_group_symop.magn_centering_xyz
+_space_group_symop.magn_centering_mxmymz
+1 x,y,z,+1 mx,my,mz
+2 x,y+1/2,z+1/2,+1 mx,my,mz
+3 x+1/4,y+1/4,z,+1 mx,my,mz
+4 x+1/4,y+3/4,z+1/2,+1 mx,my,mz
+5 x+1/2,y,z+1/2,+1 mx,my,mz
+6 x+1/2,y+1/2,z,+1 mx,my,mz
+7 x+3/4,y+1/4,z+1/2,+1 mx,my,mz
+8 x+3/4,y+3/4,z,+1 mx,my,mz
+9 x,y,z+1/2,-1 -mx,-my,-mz
+10 x,y+1/2,z,-1 -mx,-my,-mz
+11 x+1/4,y+1/4,z+1/2,-1 -mx,-my,-mz
+12 x+1/4,y+3/4,z,-1 -mx,-my,-mz
+13 x+1/2,y,z,-1 -mx,-my,-mz
+14 x+1/2,y+1/2,z+1/2,-1 -mx,-my,-mz
+15 x+3/4,y+1/4,z,-1 -mx,-my,-mz
+16 x+3/4,y+3/4,z+1/2,-1 -mx,-my,-mz
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ni1_1 Ni  0.00000 0.00000 0.00000 
+Ni1_2 Ni  0.12500 0.12500 0.25000
+Ta1_1 Ta  0.00000 0.00000 0.16600 
+Ta1_2 Ta  0.12500 0.12500 0.41600 
+Ta1_3 Ta  0.12500 0.12500 0.08400 
+Ta1_4 Ta  0.00000 0.00000 0.83400 
+O1_1 O  0.07675 0.07675 0.00000 
+O1_2 O  0.04825 0.20175 0.25000 
+O1_3 O  0.20175 0.04825 0.25000 
+O2_1 O  0.07425 0.07425 0.16350 
+O2_2 O  0.05075 0.19925 0.41350 
+O2_3 O  0.19925 0.05075 0.41350 
+O2_4 O  0.05075 0.19925 0.08650 
+O2_5 O  0.19925 0.05075 0.08650 
+O2_6 O  0.07425 0.07425 0.83650  
+
+
+loop_
+_atom_site_moment_label
+_atom_site_moment_crystalaxis_x
+_atom_site_moment_crystalaxis_y
+_atom_site_moment_crystalaxis_z
+Ni1_1 1.365 -1.365 0.00000
+Ni1_2 -1.365 1.365 0.00000
+

@@ -1,0 +1,148 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/26/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    “Gd2 Ba Cu O5”
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW RESEARCH"
+_citation_journal_volume        2
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            023271
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevResearch.2.023271
+
+loop_
+_citation_author_name
+"P. Yanda"
+"I. V. Golosovsky"
+"I. Mirebeau"
+"N. V. Ter-Oganessian"
+"J. Rodriguez-Carvajal"
+"A. Sundaresan"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     6
+_experiment_temperature     1.3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mZ2 2 2 special primary 12 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure (except lattice parameters) from a determination at room temperature.
+Between 11.8K and 6K an incommensurate magnetic phase is observed with (0,0,g) with g close to 0.5. 
+The present model varies slightly from the one represented graphically in the original article, and it is in accordance with a planned corrigendum of the article (private communication from J. Rodriguez-Carvajal).
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+2-dim irrep along a special direction as primary
+Polar along x in the parent Pnma setting
+Type II multiferroic (spin induced ferroelectricity along x)
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc   'c,b,-a;0,1/4,1/8'
+
+
+_space_group_magn.number_BNS  29.104
+_space_group_magn.name_BNS  "P_a c a 2_1"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 12.2185
+_cell_length_b                 5.67790
+_cell_length_c                 14.3290
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y+1/2,z+1/2,+1 
+3 x+1/2,y,-z+3/4,+1 
+4 x+1/2,-y+1/2,-z+1/4,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Gd1_1 Gd 0.28860 0.25000 0.05780 1
+Gd1_2 Gd 0.21140 0.75000 0.30780 1
+Gd2_1 Gd 0.07380 0.25000 0.19077 1
+Gd2_2 Gd 0.42620 0.75000 0.44077 1
+Cu_1 Cu 0.65950 0.25000 0.35645 1
+Cu_2 Cu 0.84048 0.75000 0.60645 1
+Ba1_1 Ba 0.90560 0.25000 0.46565 1 
+Ba1_2 Ba  0.59440 0.75000 0.71565 1
+O1_1 O 0.43250 0.98800 0.08525  1
+O1_2 O  0.06750 0.01200 0.33525 1
+O2_1 O 0.22510 0.50500 0.17250  1
+O2_2 O  0.27490 0.49500 0.42250 1
+O3_1 O 0.09400 0.25000 0.03450  1
+O3_2 O  0.40600 0.75000 0.28450 1
+
+
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Gd1_1 -6.75(8) 0.0 -1.295(16) mx,0,mz  6.87
+Gd1_2 -0.347(4) 0.0 6.86(8) mx,0,mz    6.87
+Gd2_1 6.17(9) 0.0 2.38(3) mx,0,mz      6.61
+Gd2_2 -2.56(4) 0.0 -6.10(9) mx,0,mz    6.61
+Cu_1 0.272(3) 0.0 -0.969(10) mx,0,mz   1.01
+Cu_2 -0.330(4) 0.0 -0.950(10) mx,0,mz  1.01
+

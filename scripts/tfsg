@@ -1,0 +1,141 @@
+#!/bin/bash
+
+set -euo pipefail
+
+DEFAULT_SERVER_REPO_ROOT="/share/home/yuyt/project/fsg-2026/FindSpinGroup"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ -n "${FSG_REPO_ROOT:-}" ]]; then
+  REPO_ROOT="$FSG_REPO_ROOT"
+elif [[ -d "$SCRIPT_DIR/../src/findspingroup" ]]; then
+  REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+else
+  REPO_ROOT="$DEFAULT_SERVER_REPO_ROOT"
+fi
+
+INPUT_DIR="$REPO_ROOT/tests/testset/mcif_241130_no2186"
+OUTPUT_ROOT="$REPO_ROOT/output/mcif_241130_no2186_run"
+BASELINE_SUITE="mcif_241130_no2186"
+BASELINE_ROOT="$REPO_ROOT/batch_baselines"
+EXPORT_TXT="selected.txt"
+EXPORT_FIELDS="index,phase,properties.ss_w_soc"
+SPACE_TOL="0.02"
+MTOL="0.02"
+MEIGTOL="0.00002"
+MATRIX_TOL="0.01"
+SBATCH_BIN="${SBATCH_BIN:-sbatch}"
+
+usage() {
+  cat <<EOF
+Usage: tfsg [options]
+
+Default behavior:
+  submit the standard mcif batch test under:
+    $INPUT_DIR
+
+Options:
+  --repo-root PATH         Override repository root.
+  --input-dir PATH         Override input mcif directory.
+  --output-root PATH       Override output root directory.
+  --baseline-suite NAME    Override baseline suite name.
+  --baseline-root PATH     Override baseline root directory.
+  --space-tol FLOAT        Override space tolerance.
+  --mtol FLOAT             Override magnetic tolerance.
+  --meigtol FLOAT          Override eigen tolerance.
+  --matrix-tol FLOAT       Override matrix tolerance.
+  --export-txt NAME        Override exported txt filename.
+  --export-fields CSV      Override exported fields, comma separated.
+  --dry-run                Print submission command without calling sbatch.
+  --help                   Show this message.
+
+Examples:
+  tfsg
+  tfsg --space-tol 0.01 --mtol 0.01 --matrix-tol 0.005
+  tfsg --input-dir /share/home/yuyt/project/fsg-2026/FindSpinGroup/testset/error_set \\
+       --output-root /share/home/yuyt/project/fsg-2026/FindSpinGroup/output/error_set_run \\
+       --baseline-suite error_set
+EOF
+}
+
+DRY_RUN=0
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --repo-root)
+      REPO_ROOT="$2"
+      shift 2
+      ;;
+    --input-dir)
+      INPUT_DIR="$2"
+      shift 2
+      ;;
+    --output-root)
+      OUTPUT_ROOT="$2"
+      shift 2
+      ;;
+    --baseline-suite)
+      BASELINE_SUITE="$2"
+      shift 2
+      ;;
+    --baseline-root)
+      BASELINE_ROOT="$2"
+      shift 2
+      ;;
+    --space-tol)
+      SPACE_TOL="$2"
+      shift 2
+      ;;
+    --mtol)
+      MTOL="$2"
+      shift 2
+      ;;
+    --meigtol)
+      MEIGTOL="$2"
+      shift 2
+      ;;
+    --matrix-tol)
+      MATRIX_TOL="$2"
+      shift 2
+      ;;
+    --export-txt)
+      EXPORT_TXT="$2"
+      shift 2
+      ;;
+    --export-fields)
+      EXPORT_FIELDS="$2"
+      shift 2
+      ;;
+    --dry-run)
+      DRY_RUN=1
+      shift
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+SUBMIT_SCRIPT="$REPO_ROOT/scripts/submit_batch_mcif.sh"
+
+if [[ ! -f "$SUBMIT_SCRIPT" ]]; then
+  echo "Submit script does not exist: $SUBMIT_SCRIPT" >&2
+  exit 2
+fi
+
+if [[ $DRY_RUN -eq 1 ]]; then
+  SBATCH_BIN="echo"
+fi
+
+SPACE_TOL="$SPACE_TOL" \
+MTOL="$MTOL" \
+MEIGTOL="$MEIGTOL" \
+MATRIX_TOL="$MATRIX_TOL" \
+EXPORT_TXT="$EXPORT_TXT" \
+EXPORT_FIELDS="$EXPORT_FIELDS" \
+SBATCH_BIN="$SBATCH_BIN" \
+bash "$SUBMIT_SCRIPT" "$INPUT_DIR" "$OUTPUT_ROOT" "$BASELINE_SUITE" "$BASELINE_ROOT"

@@ -1,0 +1,124 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 27/01/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-01-27
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        25
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            086004
+_citation_year                  2013
+_citation_DOI                   10.1088/0953-8984/25/8/086004
+
+loop_
+_citation_author_name
+"S. Landsgesell"
+"E. Blumenrother"
+"K. Prokes"
+
+
+
+_atomic_positions_source_database_code_ICSD  290417
+_atomic_positions_source_other               .
+
+_transition_temperature  76
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5+  2  2  special  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Direction of the moments on the basal plane undetermined. A high-symmetry direction is assumed.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim irrep along a special direction as primary
+FM along x is symmetry allowed
+;
+
+_parent_space_group.name_H-M_alt  'I 4/m m m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,b,-a;0,0,0'
+
+
+
+_space_group_magn.number_BNS  71.536
+_space_group_magn.name_BNS  "I m' m' m"
+_cell_length_a             4.08560
+_cell_length_b             4.08560
+_cell_length_c             18.68500
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,-z,+1
+3 -x,-y,-z,+1
+4 -x,y,z,+1
+5 -x,-y,z,-1
+6 -x,y,-z,-1
+7 x,y,-z,-1
+8 x,-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1 La 0.00000 0.00000 0.68310 1.
+Fe1_1 Fe 0.00000 0.50000 0.00000 0.5
+Fe1_2 Fe  0.50000 0.00000 0.00000 0.5
+Mn1_1 Mn 0.00000 0.50000 0.00000 0.5
+Mn1_2 Mn  0.50000 0.00000 0.00000 0.5
+O1 O 0.00000 0.50000 0.25000 1.
+O2 O 0.00000 0.00000 0.50000 1.
+Se1 Se 0.00000 0.00000 0.09950 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1_1 3.44(5) 0.00000 0.00000 mx,0,0  3.44(5)
+Fe1_2 -3.44 0.00000 0.00000 mx,0,0    3.44
+Mn1_1 3.44 0.00000 0.00000 mx,0,0     3.44
+Mn1_2 -3.44 0.00000 0.00000 mx,0,0    3.44
+

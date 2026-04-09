@@ -1,0 +1,158 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:00:58
+# Database entry: 0.145 Co3TeO6
+# Cif-like file for the case 0.145
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Co3 Te O6'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Materials Research Bulletin"
+_citation_journal_volume        47
+_citation_page_first            63
+_citation_page_last             72
+_citation_article_id            .
+_citation_year                  2012
+_citation_DOI                   10.1016/j.materresbull.2011.10.003
+
+loop_
+_citation_author_name
+"S. Ivanov"
+"R. Tellgren"
+"C. Ritter"
+"P. Nordblad"
+"R. Mathieu"
+"G. Andre"
+"N. Golubko"
+"E. Politova"
+"M. Weil"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   183805
+_atomic_positions_source_other               .
+
+_transition_temperature     21.1
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+At higher temperatures, between 26K and 21.1K an incommensurate phase is reported. Below 17.4K another phase with propagation vector (0,1/2,1/4) is observed.
+Value of the moment of Co5 atoms given in Table 4 are not consistent with Figure 7 in the same reference. Figure 7 has been assumed to be correct and the spin values of Co5 atoms have been interchanged to agree with the Figure.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+1-dim irrep active.
+Linear magnetoelectric: alpha_12, alpha_32, alpha_21, alpha_23 are non-zero.
+The material has been reported to be multiferroic below 20K (Phys. Rev B (2011) 84,180404(R)), but the symmetry of this magnetic structure is inconsistent with the existence of ferroelectricity. Also the commensurate magnetic ordering with k=(0,1/2,1/4) reported in the same reference (see another entry in MAGNDATA) is not consistent with multiferroicity.
+;
+
+_parent_space_group.name_H-M_alt  'C  2/c'
+_parent_space_group.IT_number                       15
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  15.87
+_space_group_magn.name_BNS  "C  2'/c"
+_space_group_magn.point_group_name  "2'/m"
+_space_group_magn.point_group_number  "5.3.14"
+_cell_length_a                 14.78320
+_cell_length_b                 8.83960
+_cell_length_c                 10.34280
+_cell_angle_alpha              90.00
+_cell_angle_beta               95.03
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x,-y,z+1/2,+1
+3 -x,y,-z+1/2,-1
+4 -x,-y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Co1 Co 0.00000 0.30620 0.25000 1
+Co2 Co 0.85220 0.63980 0.22180 1
+Co3 Co 0.51390 0.29830 0.07000 1
+Co4 Co 0.67120 0.71020 0.05130 1
+Co5 Co 0.80910 0.63870 0.56650 1
+Te1 Te 0.00000 0.50000 0.00000 1
+Te2 Te 0.66370 0.50890 0.30060 1
+O1 O 0.93280 0.66070 0.55820 1
+O2 O 0.59370 0.65110 0.20210 1
+O3 O 0.59530 0.36820 0.20250 1
+O4 O 0.75550 0.48140 0.65980 1
+O5 O 0.93170 0.49240 0.34020 1
+O6 O 0.58790 0.48260 0.43060 1
+O7 O 0.92850 0.35840 0.55980 1
+O8 O 0.74130 0.67210 0.40040 1
+O9 O 0.71890 0.34820 0.38980 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 -0.7(4) 0.0 0.7(5) mx,0,mz
+Co2 1.8(1) 0.7(1) 2.1(1) mx,my,mz
+Co3 -2.2(1) 0.6(2) -1.9(1) mx,my,mz
+Co4 0.8(4) 0.2(3) 0.8(5) mx,my,mz
+Co5 2.1(1) -0.9 1.9(1) mx,my,mz
+

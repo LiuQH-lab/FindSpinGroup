@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:11:17
+# Database entry: 1.85 alpha-Mn
+# Cif-like file for the case 1.85
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'a l p h a -Mn'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Journal of Applied Physics"
+_citation_journal_volume        76
+_citation_page_first            7049
+_citation_page_last             7051
+_citation_article_id            .
+_citation_year                  1994
+_citation_DOI                   10.1063/1.358024
+
+loop_
+_citation_author_name
+"A.C. Lawson"
+"A.C. Larson"
+"M.C. Aronson"
+"S. Johnson"
+"Z. Fisk"
+"P.C. Canfield"
+"J.D. Thompson"
+"R.B.V. Dreele"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     95
+_experiment_temperature     15
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mH5 3 3 special primary 13 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+cell parameters only approximate (taken from a Figure).
+tetragonal strain and atomic position splitting due to the symmetry break produced by the magnetic ordering are reported.
+Shubnikov magnetic space group used in the original reference
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+The propagation vector could also be taken as (1,1,1), point H.
+The active irrep mH5 is 3-dim, and has 5 special directions with 5 different possible magnetic space groups.
+;
+
+_parent_space_group.name_H-M_alt  'I  -43m'
+_parent_space_group.IT_number                       217
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,a,-c;0,0,0'
+
+
+_space_group_magn.number_BNS  114.282
+_space_group_magn.name_BNS  "P_I  -42_1c"
+_space_group_magn.point_group_name  "-42m1'"
+_space_group_magn.point_group_number  "14.2.49"
+_cell_length_a                 8.877
+_cell_length_b                 8.877
+_cell_length_c                 8.873
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z+1/2,+1
+3 x+1/2,-y+1/2,-z+1/2,+1
+4 -x,-y,z,+1
+5 -y,x,-z,+1
+6 y,-x,-z,+1
+7 -y+1/2,-x+1/2,z+1/2,+1
+8 y+1/2,x+1/2,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.00000 0.00000 0.00000 1
+Mn2 Mn 0.3192(2) 0.3192 0.3173(3) 1
+Mn3_1 Mn 0.3621(1) 0.3621 0.0408(2) 1
+Mn3_2 Mn 0.3533(2) 0.0333(1) 0.3559(2) 1
+Mn4_1 Mn 0.0921(2) 0.0921 0.2790(3) 1
+Mn4_2 Mn 0.0895(2) 0.2850(1) 0.0894(2) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 0.0 0.0 2.83(13) 0,0,mz
+Mn2 0.14(12) 0.14 1.82(6) mx,mx,mz
+Mn3_1 0.43(8) 0.43 0.43(8) mx,mx,mz
+Mn3_2 -0.25(10) -0.25(10) -0.32(4) mx,my,mz
+Mn4_1 0.27(8) 0.27 -0.45(8) mx,mx,mz
+Mn4_2 -0.08(4) -0.45(8) 0.48(5) mx,my,mz
+

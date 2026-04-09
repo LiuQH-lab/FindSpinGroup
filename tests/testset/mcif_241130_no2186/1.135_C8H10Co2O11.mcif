@@ -1,0 +1,145 @@
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 24/03/2015 17:37:21
+# sull250_labels_modified_vesta.cif
+
+data_5yOhtAoR
+_audit_creation_date            2015-03-24
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorganic Chemistry"
+_citation_journal_volume        53
+_citation_page_first            5674
+_citation_page_last             5683
+_citation_article_id            ?
+_citation_year                  2014
+_citation_DOI                   10.1021/ic500443t
+
+loop_
+_citation_author_name
+"P. Daz-Gallifa"
+"O. Fabelo"
+"J. Pasan"
+"L. Canadillas-Delgado"
+"J. Rodriguez-Carvajal"
+"F. Lloret"
+"M. Julve"
+"C. Ruiz-Perez"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_Neel_temperature         5
+_magn_diffrn_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+?  ?  ?  ?  ?  ?  ?
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+positional structure from a measurement at 100K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep active: equivalence between MSG and irrep assignment
+;
+
+_magnetic_space_group_standard_setting  'no'
+_parent_space_group.name_H-M              'P -1'
+_parent_space_group.IT_number             2
+
+loop_
+_magnetic_propagation_vector_seq_id
+_magnetic_propagation_vector_kxkykz
+k1 '1/2,0,0'
+
+_magnetic_space_group.transform_from_parent_Pp_abc  '2a,b,c;0,0,0'
+_magnetic_space_group.transform_to_standard_Pp_abc  '-c,b,a;1/4,0,0'
+
+loop_
+_magnetic_atom_site_moment_symmetry_constraints_label
+_atom_site_magnetic_moment_symmetry_constraints_mxmymz
+Co1 mx,my,mz
+Co2 mx,my,mz
+Co3 mx,my,mz
+
+
+_space_group.magn_number_BNS 2.7
+_space_group.magn_name_BNS "P_S -1"
+_cell_length_a             15.04800
+_cell_length_b             9.32000
+_cell_length_c             9.74400
+_cell_angle_alpha          89.01
+_cell_angle_beta           71.16
+_cell_angle_gamma          74.82
+
+loop_
+_space_group_symop.magn_id
+_space_group_symop.magn_operation_xyz
+_space_group_symop.magn_operation_mxmymz
+1 x,y,z,+1 mx,my,mz
+2 -x+1/2,-y,-z,+1 mx,my,mz
+
+loop_
+_space_group_symop.magn_centering_id
+_space_group_symop.magn_centering_xyz
+_space_group_symop.magn_centering_mxmymz
+1 x,y,z,+1 mx,my,mz
+2 x+1/2,y,z,-1 -mx,-my,-mz
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1 Co  0.22463 0.17400 0.51141
+Co2 Co  0.25000 0.50000 0.50000
+Co3 Co  0.25000 0.50000 0.00000
+C1 C  0.09025 0.33480 0.99550
+C2 C  0.06300 0.32040 0.15730
+H2 H  0.02105 0.41870 0.20920
+C3 C  0.01575 0.19590 0.22620
+H3 H  0.03030 0.11010 0.15480
+C4 C  0.14630 0.26090 0.22200
+H4 H  0.20495 0.19490 0.14760
+C5 C  0.08390 0.16680 0.32100
+H5 H  0.04805 0.22090 0.41910
+C6 C  0.13845 0.01070 0.33730
+C7 C  0.17405 0.37860 0.28940
+C8 C  0.40980 0.24510 0.31950
+O1 O  0.19220 0.48460 0.21746
+O2 O  0.17660 0.36904 0.41924
+O3 O  0.04045 0.29570 0.92980
+O4 O  0.16125 0.38850 0.93369
+O5 O  0.12065 0.89960 0.29690
+O6 O  0.20550 0.00493 0.39512
+O7 O  0.37615 0.38173 0.36000
+O8 O  0.36425 0.14708 0.35756
+O9 O  0.24630 0.32601 0.64691
+O10 O  0.09110 0.17450 0.66023
+O11 O  0.14585 0.71210 0.02760
+
+loop_
+_atom_site_moment_label
+_atom_site_moment_crystalaxis_x
+_atom_site_moment_crystalaxis_y
+_atom_site_moment_crystalaxis_z
+Co1 -2.62(13) 1.2(3) 1.67(14)
+Co2 -2.9(3) 2.3(3) 2.40(18)
+Co3 1.78(19) -0.24(1) -3.04(18)
+

@@ -1,0 +1,151 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 13/11/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-11-13
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Inorg. Chem."
+_citation_journal_volume        57
+_citation_page_first            10312
+_citation_page_last             10322
+_citation_article_id            .
+_citation_year                  2018
+_citation_DOI                   10.1021/acs.inorgchem.8b01542
+
+loop_
+_citation_author_name
+"S.J. Cassidy"
+"F. Orlandi"
+"P. Manuel"
+"J. Hadermann"
+"A. Scrimshire"
+"P.A. Bingham"
+"S.J. Clarke"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  4829
+_atomic_positions_source_other               .
+
+_transition_temperature  52
+_experiment_temperature  20
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mU2  2  2  general  primary  8  .
+mS3+S4+ 2  2  general primary 8  .
+mS1-S2- 2  2  general secondary 4  no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Above 52K two other magnetic phases are reported. A 1k commensurate one up to 92K with only Fe2 magnetically ordered, and an incommensurate one between 92K and 118K.
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Two irreps as primary, one for the Fe2 ordering and a different one for Fe1. They represent two order parameters with different temperature orderings (92K for Fe1 (irrep mU2) and 52K for Fe1 (irrep mS3+S4+))
+;
+
+_parent_space_group.name_H-M_alt  'P b a m'
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+k2 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,-2b,-2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a+b,c,a;0,0,0'
+
+
+
+_space_group_magn.number_BNS  9.40
+_space_group_magn.name_BNS  "C_c c"
+_cell_length_a             15.58900
+_cell_length_b             20.39580
+_cell_length_c             7.97860
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x+1/2,y,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+3 x,y+1/2,z+1/2,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Sr1_1 Sr 0.04465 0.82565 0.00000
+Sr1_2 Sr 0.95535 0.17435 0.00000
+Sr1_3 Sr 0.20535 0.57565 0.00000
+Sr1_4 Sr 0.29465 0.92435 0.00000
+Sr1_5 Sr 0.04465 0.82565 0.50000
+Sr1_6 Sr 0.95535 0.17435 0.50000
+Sr1_7 Sr 0.20535 0.57565 0.50000
+Sr1_8 Sr 0.29465 0.92435 0.50000
+Fe1_1 Fe 0.00000 0.00000 0.00000
+Fe1_2 Fe 0.50000 0.50000 0.00000
+Fe1_3 Fe 0.25000 0.75000 0.00000
+Fe1_4 Fe 0.75000 0.25000 0.00000
+Fe2_1 Fe 0.12995 0.95500 0.75000
+Fe2_2 Fe 0.37995 0.79500 0.25000
+Fe2_3 Fe 0.12005 0.70500 0.25000
+Fe2_4 Fe 0.87005 0.04500 0.75000
+Se1_1 Se 0.20015 0.83250 0.75000
+Se1_2 Se 0.79985 0.16750 0.75000
+Se1_3 Se 0.04985 0.58250 0.75000
+Se1_4 Se 0.45015 0.91750 0.75000
+O1_1 O 0.00000 0.75000 0.75000
+O1_2 O 0.25000 0.00000 0.75000
+O2_1 O 0.11585 0.95700 0.00000
+O2_2 O 0.88415 0.04300 0.00000
+O2_3 O 0.13415 0.70700 0.00000
+O2_4 O 0.36585 0.79300 0.00000
+O2_5 O 0.11585 0.95700 0.50000
+O2_6 O 0.88415 0.04300 0.50000
+O2_7 O 0.13415 0.70700 0.50000
+O2_8 O 0.36585 0.79300 0.50000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1_1  3.10(2) -1.34(7) 0.0   mx,my,0   3.38(3)
+Fe1_2  3.10    -1.34    0.0   mx,my,0   3.38
+Fe1_3 -3.10    -1.34    0.0   mx,my,0   3.38
+Fe1_4 -3.10    -1.34    0.0   mx,my,0   3.38
+Fe2_1 -0.69(2) 0.59(5) 3.18(1) mx,my,mz  3.31(1)
+Fe2_2  0.69    0.59   -3.18    mx,my,mz  3.31
+Fe2_3  0.69    0.59   -3.18    mx,my,mz  3.31
+Fe2_4 -0.69    0.59    3.18    mx,my,mz  3.31
+

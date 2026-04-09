@@ -1,0 +1,141 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/26/2024
+
+data_5yOhtAoR
+_audit_creation_date            2024-12-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Mn1 Si1 N2"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        7
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            104406
+_citation_year                  2023
+_citation_DOI                   10.1103/PhysRevMaterials.7.104406
+
+loop_
+_citation_author_name
+"Linus Kautzsch"
+"Alexandru B. Georgescu"
+"Danilo Puggioni"
+"Greggory Kent"
+"Keith M. Taddei"
+"Aiden Reilly"
+"Ram Seshadri"
+"James M. Rondinelli"
+"Stephen D. Wilson"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     433
+_experiment_temperature     60
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM4 1 1 . primary 3 .
+mGM2 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+FM on the plane xz in the MSG setting
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+two primary 1-dim irreps 
+;
+
+_parent_space_group.name_H-M_alt  'P n a 2_1'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'c,a,b-c;1/4,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  7.26
+_space_group_magn.name_BNS  "P c'"
+_space_group_magn.point_group_name  "m'"
+_space_group_magn.point_group_number  "4.3.11"
+_cell_length_a                 5.07489
+_cell_length_b                 5.26769
+_cell_length_c                 8.25693
+_cell_angle_alpha              90.0000
+_cell_angle_beta               127.863
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x,-y,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1 Mn 0.62605 0.82751 0.62439 1
+Mn2 Mn 0.87727 0.67249 0.37561 1
+N1 N 0.07729 0.86302 0.65918 1
+N2 N 0.25893 0.63698 0.34082 1
+N3 N 0.43851 0.79924 0.09157 1
+N4 N 0.75537 0.70076 -0.0916 1
+Si1 Si 0.13133 0.81806 0.12504 1
+Si2 Si 0.38125 0.68194 0.87496 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1 4.891 -0.007 0.953 mx,my,mz 4.37 ? ?
+Mn2 -4.896 -0.002 -0.963 mx,my,mz 4.37 ? ?
+

@@ -1,0 +1,149 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/29/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-09-29
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Cs Mn2 F6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Am. Chem. Soc."
+_citation_journal_volume        143
+_citation_page_first            11554
+_citation_page_last             11567
+_citation_article_id            .
+_citation_year                  2021
+_citation_DOI                   10.1021/jacs.1c04245
+
+loop_
+_citation_author_name
+"V. V. Klepov"
+"K. A. Pace"
+"A. A. Berseneva"
+"J. B. Felder"
+"S. Calder"
+"G. Morrison"
+"Q. Zhang"
+"M. J. Kirkham"
+"D. S. Parker"
+"H.-C. zur Loye"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    301
+_temperature_cell_parameters            301
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "."
+
+_transition_temperature     10
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3+ 1 1 . primary 5 .
+mGM1+ 1 1 . primary 4 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure including cell parameters and except magnetic atoms from a determination at 301K
+FM along a in the parent space group
+Above 10K and magnetic phase is observed below 10K  (see #0.727)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,a,-b+c;0,0,0'
+
+_space_group_magn.number_BNS  14.75
+_space_group_magn.name_BNS  "P 2_1/c"
+_space_group_magn.point_group_name  "2/m"
+_space_group_magn.point_group_number  "5.1.12"
+_cell_length_a                 7.3013
+_cell_length_b                 7.7141
+_cell_length_c                 10.1926
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z+1/2,+1 
+3 -x,-y,-z,+1 
+4 -x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1_1 Mn 0.00000 0.00000 0.50000 1
+Mn1_2 Mn 0.50000 0.00000 0.00000 1
+Mn2 Mn 0.28619 0.25000 0.73938 1
+Cs1 Cs 0.99408 0.25000 0.12889 1
+F1 F 0.93570 0.25000 0.45320 1
+F2_1 F 0.63723 0.51890 0.15403 1
+F2_2 F 0.86277 0.48110 0.65403 1
+F3_1 F 0.28952 0.56702 0.08931 1
+F3_2 F 0.21048 0.43298 0.58931 1
+F4 F 0.04500 0.25000 0.83652 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Mn1_1 0.037 3.4 0.012 mx,my,mz 3.401 ? ?
+Mn1_2 0.426 3.483 0.312 mx,my,mz 3.523 ? ?
+Mn2 -0.056 3.961 -1.166 mx,my,mz 4.13 ? ?
+

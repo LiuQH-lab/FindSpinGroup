@@ -1,0 +1,156 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 16:52:32
+# Database entry: 0.68 BiFe0.5Sc0.5O3
+# Cif-like file for the case 0.68
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Bi Fe0 .5Sc0 .5O3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        89
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            174414
+_citation_year                  2014
+_citation_DOI                   10.1103/PhysRevB.89.174414
+
+loop_
+_citation_author_name
+"D.D. Khalyavin"
+"A.N. Salak"
+"N.M. Olekhnovich"
+"A.V. Pushkarev"
+"Y.V. Radyush"
+"P. Manuel"
+"I.P. Raevski"
+"M.L. Zheludkevich"
+"M.G.S. Ferreira"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     220
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+ 1 1 . primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+weak ferromagnetism is allowed along the z-axis.
+The moments in the two independent Fe atoms are made equal.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+allowed ferromagnetic mz component. It transforms as mGM2+.
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  62.446
+_space_group_magn.name_BNS  "P  n'  m'  a"
+_space_group_magn.point_group_name  "m'm'm"
+_space_group_magn.point_group_number  "8.4.27"
+_cell_length_a                 5.6932
+_cell_length_b                 15.9039
+_cell_length_c                 11.4511
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,-y,z+1/2,+1
+3 -x,-y,-z,+1
+4 x+1/2,y,-z+1/2,+1
+5 x+1/2,-y+1/2,-z+1/2,-1
+6 -x,y+1/2,-z,-1
+7 -x+1/2,y+1/2,z+1/2,-1
+8 x,-y+1/2,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Bi1 Bi 0.31011 0.01048 0.13298 1.0000
+Bi2 Bi 0.30139 0.25000 0.11177 1.0000
+Bi3 Bi 0.21820 0.25000 0.63493 1.0000
+Fe1 Fe 0.76448 0.86823 0.12237 0.5000
+Sc1 Sc 0.76448 0.86823 0.12237 0.5000
+Fe2 Fe 0.75585 0.37829 0.12449 0.5000
+Sc2 Sc 0.75585 0.37829 0.12449 0.5000
+O1 O -0.04055 0.87239 -0.01449 1.0000
+O2 O -0.00086 0.84436 0.50140 1.0000
+O3 O 0.56685 0.89838 0.77950 1.0000
+O4 O 0.52994 0.39881 0.75980 1.0000
+O5 O 0.69807 -0.00201 0.07582 1.0000
+O6 O 0.71845 0.25000 0.15681 1.0000
+O7 O 0.82485 0.25000 0.65913 1.0000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.0 -2.10(6) 0.0 mx,my,mz
+Sc1 0.0 -2.1 0.0 mx,my,mz
+Fe2 0.0 -2.1 0.0 mx,my,mz
+Sc2 0.0 -2.1 0.0 mx,my,mz
+

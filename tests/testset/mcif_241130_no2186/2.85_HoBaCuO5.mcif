@@ -1,0 +1,157 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/27/2022
+# From the magCIF file in the supplementary material of the paper 
+
+data_5yOhtAoR
+_audit_creation_date            2022-01-27
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ho Ba Cu O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        104
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            144401
+_citation_year                  2021
+_citation_DOI                   10.1103/PhysRevB.104.144401
+
+loop_
+_citation_author_name
+"P. Yanda"
+"F. Orlandi"
+"P. Manuel"
+"N. Boudjada"
+"J. Rodriguez-Carvajal"
+"A. Sundaresan"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     8
+_experiment_temperature     2.3
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1 2 2 special primary 9 .
+mGM4- 1 1 . primary 6 .
+mGM3- 1 1 . secondary 3 No
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Between 17.5K and 8K another magnetic phase exists (see #1.651)
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Two irreps active, one of them (mY1) already present in the phase oberved at higher temperature
+A secondary irrep is allowed by the MSG, but the amplitudes of its modes are null in the reported model
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,a-b;0,1/4,0'
+
+_space_group_magn.number_BNS  14.77
+_space_group_magn.name_BNS  "P 2_1'/c"
+_space_group_magn.point_group_name  "2'/m"
+_space_group_magn.point_group_number  "5.3.14"
+_cell_length_a                 12.1776(3)
+_cell_length_b                 11.3235(3)
+_cell_length_c                 7.1228(2)
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,-z+1/2,+1 
+3 -x+1/2,-y,z+1/2,-1 
+4 -x,-y+1/2,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ho1_1 Ho 0.2868(9) 0.12500 0.1164(14) 1
+Ho1_2 Ho 0.2868(9) 0.62500 0.1164(14) 1
+Ho2_1 Ho 0.0745(5) 0.12500 0.3957(10) 1
+Ho2_2 Ho 0.0745(5) 0.62500 0.3957(10) 1
+Cu1_1 Cu 0.6581(13) 0.12500 0.7077(16) 1
+Cu1_2 Cu 0.6581(13) 0.62500 0.7077(16) 1
+Ba1_1 Ba 0.903(2) 0.12500 0.932(2) 1
+Ba1_2 Ba 0.903(2) 0.62500 0.932(2) 1
+O1_1 O 0.4350(10) 0.9991(13) 0.1646(12) 1
+O1_2 O 0.4350(10) 0.4991(13) 0.1646(12) 1
+O1_3 O 0.9350(10) 0.2509(13) 0.3354(12) 1
+O1_4 O 0.9350(10) 0.7509(13) 0.3354(12) 1
+O2_1 O 0.2275(9) 0.7534(18) 0.351(2) 1
+O2_2 O 0.2275(9) 0.2534(18) 0.351(2) 1
+O2_3 O 0.7275(9) 0.4966(18) 0.149(2) 1
+O2_4 O 0.7275(9) 0.9966(18) 0.149(2) 1
+O3_1 O 0.1020(16) 0.12500 0.085(2) 1
+O3_2 O 0.1020(16) 0.62500 0.085(2) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ho1_1 7.17(12) 0.0 0.82(14)  mx,my,mz 7.21 ? ?
+Ho1_2 -2.59(12) 0.0 2.86(14) mx,my,mz 3.86 ? ?
+Ho2_1 1.05(12) 0.0 -8.46(17) mx,my,mz 8.52 ? ?
+Ho2_2 1.17(12) 0.0 -8.32(17) mx,my,mz 8.40 ? ?
+Cu1_1 -0.77(11) 0.0 0.65(13)  mx,my,mz 1.01 ? ?
+Cu1_2 0.69(11) 0.0 0.17(13)  mx,my,mz  0.71 ? ?
+

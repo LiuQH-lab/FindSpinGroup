@@ -1,0 +1,171 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/02/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-02-02
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        100
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            241115(R)
+_citation_year                  2019
+_citation_DOI                   10.1103/PhysRevB.100.241115
+
+loop_
+_citation_author_name
+"S. Gao"
+"M. Hirschberger"
+"O. Zaharko"
+"T. Nakajima"
+"T. Kurumaji"
+"A. Kikkawa"
+"J. Shiogai"
+"A. Tsukazaki"
+"S. Kimura"
+"S. Awaji"
+"Y. Taguchi"
+"T.-h. Arima"
+"Y. Tokura"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  252218
+_atomic_positions_source_other               .
+
+_transition_temperature  7
+_experiment_temperature  2.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK5  4  2  special  primary  2  .
+mK6  4  2  special  primary  4  .
+mK3  2  1  special  secondary 2 no
+mK4  2  1  special  secondary 1 no
+MGM2+ 1  1  . secondary 1  yes
+mGM4+ 1  1  . secondary 1  yes
+mGM5+ 2  2  special secondary 1 no
+mGM6+ 2  2  special secondary 2 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional parameters and unit cell are taken here from a room temperature model in the ICSD
+Phase under magnetic field larger than 0.6T and smaller than 1.2T
+Above 1.2T another phase is reported (see #2.32).
+The refinement was done within a (1/3,1/3,0) dataset, but the spin arrangement includes a k=0 component forced by the constraints of the model.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Four different irreps are present in the spin arrangement, two with propagation vector (1/3,1/3,0),both primary, and two with k=0 as secondary, corresponding to a third harmonic.
+The original reference assigns C2' as the MSG of the structures, the structure is however centrosymmetric and the correct MSG C2'/m' is used here.
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-1/3a+1/3b,-a-b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  12.62
+_space_group_magn.name_BNS  "C 2'/m'"
+_cell_length_a             26.22120
+_cell_length_b             26.22120
+_cell_length_c             9.49820
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 y,x,-z,-1
+4 -y,-x,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z,+1
+3 x+2/3,y+1/3,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Dy1_1 Dy 0.06419 0.12838 0.25000
+Dy1_2 Dy  0.06419 0.93581 0.25000
+Dy1_3 Dy  0.06419 0.46171 0.25000
+Dy1_4 Dy  0.87163 0.26915 0.25000
+Dy1_5 Dy  0.06419 0.26915 0.25000
+Ru1_1 Ru 0.00000 0.00000 0.00000
+Ru1_2 Ru  0.00000 0.00000 0.50000
+Ru1_3 Ru  0.00000 0.33333 0.00000
+Ru1_4 Ru  0.00000 0.33333 0.50000
+Ru2_1 Ru 0.16667 0.00000 0.00000
+Ru2_2 Ru  0.16667 0.16667 0.00000
+Ru2_3 Ru  0.16667 0.00000 0.50000
+Ru2_4 Ru  0.16667 0.16667 0.50000
+Ru2_5 Ru  0.16667 0.33333 0.00000
+Ru2_6 Ru  0.16667 0.33333 0.50000
+Ru2_7 Ru  0.16667 0.83333 0.00000
+Ru2_8 Ru  0.16667 0.83333 0.50000
+Al1_1 Al 0.18711 0.37422 0.25000
+Al1_2 Al  0.18711 0.81289 0.25000
+Al1_3 Al  0.18711 0.70755 0.25000
+Al1_4 Al  0.62578 0.14622 0.25000
+Al1_5 Al  0.18711 0.14622 0.25000
+Al2_1 Al 0.72082 0.44164 0.92376
+Al2_2 Al  0.72082 0.27918 0.92376
+Al2_3 Al  0.27918 0.55836 0.42376
+Al2_4 Al  0.27918 0.72082 0.42376
+Al2_5 Al  0.72082 0.77497 0.92376
+Al2_6 Al  0.55836 0.61251 0.92376
+Al2_7 Al  0.72082 0.61251 0.92376
+Al2_8 Al  0.27918 0.89169 0.42376
+Al2_9 Al  0.44164 0.05415 0.42376
+Al2_10 Al  0.27918 0.05415 0.42376
+Al3_1 Al 0.11111 0.22222 0.48480
+Al3_2 Al  0.22222 0.11111 0.98480
+Al3_3 Al  0.11111 0.88889 0.48480
+Al3_4 Al  0.22222 0.77778 0.98480
+Al4_1 Al 0.00000 0.00000 0.25000
+Al4_2 Al  0.00000 0.33333 0.25000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Dy1_1 2.52 5.04 8.21 mx,my,mz
+Dy1_2 -2.520 2.52 -8.21 mx,-mx,mz
+Dy1_3 2.52 5.04 8.21 mx,my,mz
+Dy1_4 5.04 2.52 -8.21 mx,my,mz
+Dy1_5 2.52 -2.52 8.21 mx,my,mz
+

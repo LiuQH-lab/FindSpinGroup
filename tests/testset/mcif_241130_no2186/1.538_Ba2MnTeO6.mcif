@@ -1,0 +1,135 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 05/04/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-04-05
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        102
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            094413
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevB.102.094413
+
+loop_
+_citation_author_name
+"L. Li"
+"N. Narayanan"
+"S. Jin"
+"J. Yu"
+"Z. Liu"
+"H. Sun"
+"C.-W. Wang"
+"V. K. Peterson"
+"Y. Liu"
+"S. Danilkin"
+"D.-X. Yao"
+"D. Yu"
+"M. Wang"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_temperature_position_structure         70
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature  20
+_experiment_temperature  3.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mF2+  3  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 70K
+Mn moment angle with the basal plane: 41 degrees
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim small irrep as primary
+The irrep star has 3 k-vectors. Possible alternative multi-k structures involving more than one k-vector ot the star are not mentioned, and probably can fit equally well the data.
+;
+
+_parent_space_group.name_H-M_alt  'R -3 m'
+_parent_space_group.IT_number                       166
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/6a-1/6b-1/3c,1/2a+1/2b,1/6a-1/6b+2/3c;0,0,0'
+
+_space_group_magn.number_BNS  14.83
+_space_group_magn.name_BNS  "P_A 2_1/c"
+_cell_length_a             11.50680
+_cell_length_b             11.50680
+_cell_length_c             14.10520
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 y+1/3,x+1/6,-z+1/3,+1 
+3 -x,-y,-z,+1 
+4 -y+1/3,-x+1/6,z+1/3,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/6,y+5/6,z+2/3,+1 
+3 x+1/3,y+2/3,z+1/3,+1 
+4 x+1/2,y+1/2,z,+1 
+5 x+2/3,y+1/3,z+2/3,+1 
+6 x+5/6,y+1/6,z+1/3,+1 
+7 x+1/3,y+1/6,z+1/3,-1 
+8 x+1/2,y,z,-1 
+9 x+2/3,y+5/6,z+2/3,-1 
+10 x+5/6,y+2/3,z+1/3,-1 
+11 x,y+1/2,z,-1 
+12 x+1/6,y+1/3,z+2/3,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.00000 0.00000 0.00000
+Ba1 Ba 0.00000 0.00000 0.26400
+Te1 Te 0.00000 0.00000 0.50000
+O1_1 O 0.07877 0.92123 0.57607
+O1_2 O  0.07877 0.15753 0.57607
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 1.96 -1.96 -2.95 mx,-mx,mz  4.49(5)
+

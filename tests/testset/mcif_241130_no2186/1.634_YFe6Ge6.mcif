@@ -1,0 +1,144 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/18/2021
+
+data_5yOhtAoR
+_audit_creation_date            2021-11-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Y Fe6 Ge6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        10
+_citation_page_first            5383
+_citation_page_last             5388
+_citation_article_id            .
+_citation_year                  1998
+_citation_DOI                   10.1088/0953-8984/10/24/015
+
+loop_
+_citation_author_name
+"J. M. Cadogan"
+"D. H. Ryan"
+"I. P. Swainson"
+"O. Moze"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     486(1)
+_experiment_temperature     295
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1- 1 1 . primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The positional structure from the paper, maintained here, is probably wrong (Ge5 is too close to Fe3, see figure).
+At 2K the moment magnitude increases to 1.88(6)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'b,c,a;1/4,1/4,0'
+
+_space_group_magn.number_BNS  52.318
+_space_group_magn.name_BNS  "P_B n n a"
+_space_group_magn.point_group_name  "mmm1'"
+_space_group_magn.point_group_number  "8.2.25"
+_cell_length_a                 8.12450
+_cell_length_b                 17.70510
+_cell_length_c                 5.12610
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y,-z+1/2,+1 
+3 -x,-y,z+1/2,+1 
+4 x,-y,-z,+1 
+5 -x+1/2,-y+1/2,-z,+1 
+6 x+1/2,-y+1/2,z+1/2,+1 
+7 x+1/2,y+1/2,-z+1/2,+1 
+8 -x+1/2,y+1/2,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Y1 Y 0.00000 0.00000 0.00000 1
+Fe1 Fe 0.25000 0.25000 0.00000 1
+Fe2 Fe 0.25100 0.00000 0.00000 1
+Fe3 Fe 0.25100 0.12500 0.25000 1
+Ge1 Ge 0.00000 0.95700 0.25000 1
+Ge2 Ge 0.00000 0.45700 0.25000 1
+Ge3 Ge 0.00000 0.78900 0.25000 1
+Ge4 Ge 0.00000 0.28900 0.25000 1
+Ge5 Ge 0.34800 0.12500 0.25000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 1.42(8) 0.0 0.0 mx,my,mz 1.42(8) ? ?
+Fe2 1.42(8) 0.0 0.0 mx,0,0 1.42(8) ? ?
+Fe3 1.42(8) 0.0 0.0 mx,my,0 1.42(8) ? ?
+

@@ -1,0 +1,126 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        97
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            174417
+_citation_year                  2018
+_citation_DOI                   10.1103/PhysRevB.97.174417
+
+loop_
+_citation_author_name
+"F. Li"
+"V. Pomjakushin"
+"T. Mazet"
+"R. Sibille"
+"B. Malaman"
+"R. Yadav"
+"L. Keller"
+"M. Medarde"
+"K. Conder"
+"E. Pomjakushina"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  200
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mLD3  4  2  special  primary  2  .
+mGM1+ 1  1    .      secondary 1 yes
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+A collinear model with MSG C2/c fits equally well the experimental data (see #1.0.16). Mossbauer experiments favor this second collinear model, but they are not conclusive.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4 possible)
+4-dim irrep active. 14 non-equivalent MSGs are possible for this irrep.
+A secondary spin mode associated with the irrep mGM1+ and producing the spin canting out of the xy plane (mz component) is quite large.
+In the original reference (Table II), the magnetic structure is described using a basis different than the one of the paramagnetic structure, for which the MSG is in standard setting. Here however, we use the same basis as the one of the parent structure. The transformation to a standard setting of the MSG only requires the indicated origin shift (a change of a,b,c unit cell basis vectors is not necessary).
+;
+
+_parent_space_group.name_H-M_alt  'R -3c'
+_parent_space_group.IT_number                       167
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/3,0,1/12'
+
+
+
+_space_group_magn.number_BNS  154.41
+_space_group_magn.name_BNS  "P 3_2 2 1"
+_cell_length_a             5.48220
+_cell_length_b             5.48220
+_cell_length_c             13.40520
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+1/3,x-y+2/3,z+2/3,+1
+3 -x+y+2/3,-x+1/3,z+1/3,+1
+4 x-y,-y,-z+1/2,+1
+5 y+1/3,x+2/3,-z+1/6,+1
+6 -x+2/3,-x+y+1/3,-z+5/6,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1_1 La 0.00000 0.00000 0.25000 0.333
+La1_2 La  0.00000 0.00000 0.75000 0.333
+Sr1_1 Sr 0.00000 0.00000 0.25000 0.667
+Sr1_2 Sr  0.00000 0.00000 0.75000 0.667
+Fe1 Fe 0.00000 0.00000 0.00000 1.
+O1_1 O 0.51812 0.00000 0.25000 1.
+O1_2 O  0.00000 0.51812 0.25000 1.
+O1_3 O  0.48188 0.00000 0.75000 1.
+O1_4 O  0.00000 0.48188 0.75000 1.
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 1.46(7) 3.67(2) 1.32(2) mx,my,mz

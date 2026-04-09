@@ -1,0 +1,155 @@
+#Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 06/08/2018 15:57:11
+# Database entry: 1.0.2 URu0.96Rh0.04Si2
+# Cif-like file for the case 1.0.2
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-06-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'U Ru0 .96Rh0 .04Si2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Phys. Rev. Lett."
+_citation_journal_volume        110
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            216406
+_citation_year                  2012
+_citation_DOI                   10.1103/physrevlett.110.216406
+
+loop_
+_citation_author_name
+"K. Kuwahara"
+"S. Yoshii"
+"H. Nojiri"
+"D. Aoki"
+"W. Knafo"
+"F. Duc"
+"X. Fabreges"
+"G.W. Scheerer"
+"P. Frings"
+"G.L.J.A. Rikken"
+"F. Bourdarot"
+"L.P. Regnault"
+"J. Flouquet"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   656245
+_atomic_positions_source_other               "."
+
+_transition_temperature     ?
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mSM4(k1) 4 1 . primary ? ?
+mGM3+(k2) 1 1 . secondary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+magnetic field induced phase.
+phase for fields along z above 26T.
+neutron diffraction single crystal.
+Ferrimagnetic.
+The model includes a k=0 ferromagnetic mode to make all spin moduli equal, and therefore a magnetic contribution to nuclear Bragg peaks.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic symmetry
+k-maximal magnetic symmetry (from 6 possible)
+1-dim small irrep
+;
+
+_parent_space_group.name_H-M_alt  'I  4/m  m  m'
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [2/3 0 0]
+k2 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '3a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+_space_group_magn.number_BNS  71.536
+_space_group_magn.name_BNS  "I  m'  m'  m"
+_space_group_magn.point_group_name  "m'm'm"
+_space_group_magn.point_group_number  "8.4.27"
+_cell_length_a                 12.4260
+_cell_length_b                 4.1420
+_cell_length_c                 9.6240
+_cell_angle_alpha              90.0000
+_cell_angle_beta               90.0000
+_cell_angle_gamma              90.0000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z,+1
+3 -x,-y,-z,+1
+4 x,y,-z,+1
+5 x,-y,-z,-1
+6 -x,y,-z,-1
+7 -x,y,z,-1
+8 x,-y,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+U1_1 U 0.00000 0.00000 0.00000 1.0000
+U1_2 U 0.33333 0.00000 0.00000 1.0000
+Rh1_1 Rh 0.50000 0.00000 0.25000 0.0400
+Rh1_2 Rh 0.16667 0.00000 0.25000 0.0400
+Ru1_1 Ru 0.50000 0.00000 0.25000 0.9600
+Ru1_2 Ru 0.16667 0.00000 0.25000 0.9600
+Si1_1 Si 0.00000 0.00000 0.62900 1.0000
+Si1_2 Si 0.33333 0.00000 0.62900 1.0000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+U1_1 0.0 0.0 -0.6 0,0,mz
+U1_2 0.0 0.0 0.6 0,0,mz
+

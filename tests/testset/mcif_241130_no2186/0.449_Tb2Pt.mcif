@@ -1,0 +1,121 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 26/10/2020
+
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-26
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "phys. stat. sol. (a)"
+_citation_journal_volume        73
+_citation_page_first            475
+_citation_page_last             481
+_citation_article_id            ?
+_citation_year                  1982
+_citation_DOI                   10.1002/pssa.2210730222
+
+loop_
+_citation_author_name
+"A. Castets"
+"D. Gignoux"
+"J.C. Gomez-Sal"
+"F. Rodriguez-Gonzalez"
+"E. Roudaut"
+
+
+
+_atomic_positions_source_database_code_ICSD  105806
+_atomic_positions_source_other               .
+
+_transition_temperature  98
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  4  .
+mGM3+  1  1  .  primary  4  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a measurement at 120K
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+Two 1-dim irreps active as primary irreps: two order parameters involved in the sense of Landau theory
+Each independent Tb site in the parent structure order according to a different irrep.
+FM on the plane xz
+;
+
+_parent_space_group.name_H-M_alt  'P n m a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  11.54
+_space_group_magn.name_BNS  "P 2_1'/m'"
+_cell_length_a             7.14700
+_cell_length_b             4.77200
+_cell_length_c             8.76300
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,y+1/2,-z,-1
+4 x,-y+1/2,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Pt1_1 Pt 0.27400 0.25000 0.10400
+Pt1_2 Pt  0.22600 0.75000 0.60400
+Tb1_1 Tb 0.86800 0.25000 0.07300
+Tb1_2 Tb  0.63200 0.75000 0.57300
+Tb2_1 Tb 0.96800 0.25000 0.77300
+Tb2_2 Tb  0.53200 0.75000 0.27300
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Tb1_1 5.2 0.00000 2.0 mx,0,mz   5.6
+Tb1_2 5.2 0.00000 -2.0 mx,0,mz  5.6
+Tb2_1 3.0 0.00000 4.7 mx,0,mz   5.6
+Tb2_2 -3.0 0.00000 4.7 mx,0,mz  5.6
+
+

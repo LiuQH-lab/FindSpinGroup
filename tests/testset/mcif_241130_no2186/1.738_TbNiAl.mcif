@@ -1,0 +1,143 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/09/2023
+
+data_5yOhtAoR
+_audit_creation_date            2023-02-09
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Tb1 Ni1 Al1"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        8
+_citation_page_first            11213
+_citation_page_last             11229
+_citation_article_id            .
+_citation_year                  1996
+_citation_DOI                   10.1088/0953-8984/8/50/043
+
+loop_
+_citation_author_name
+"A. Donni"
+"G. Ehlers"
+"H. Maletta"
+"P. Fischer"
+"H. Kitazawa"
+"M. Zolliker"
+
+_temperature_position_structure         60
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "Ehlers and Maletta, Z. Phys. B 99, 145-150 (1996)[DOI:10.1007/BF02769926]"
+
+_transition_temperature     47
+_experiment_temperature     28
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mL2 3 1 . primary 2 .
+
+_exptl_crystal_magnetic_properties_details
+;
+See also Ehlers and Maletta, Z. Phys. B 99, 145-150 (1996)[DOI:10.1007/BF02769926]
+NPD
+Position structure from a determination at 60K
+Below 23K another magnetic phase is reported (see #2.99)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim small irrep
+The irrep star has 3 k-vectors, which allows multi-k arrangements for the same active irrep
+;
+
+_parent_space_group.name_H-M_alt  'P -6 2 m'
+_parent_space_group.IT_number                       189
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,a+b,b;0,0,0'
+
+_space_group_magn.number_BNS  46.247
+_space_group_magn.name_BNS  "I_a m a 2"
+_space_group_magn.point_group_name  "mm21'"
+_space_group_magn.point_group_number  "7.2.21"
+_cell_length_a                 13.79400
+_cell_length_b                 6.89700
+_cell_length_c                 7.95200
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-2x+y,-z,+1 
+3 x,y,-z+1/2,+1 
+4 -x,-2x+y,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z+1/2,+1 
+3 x,y,z+1/2,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tb1_1 Tb 0.27205 0.00000 0.25000 1
+Tb1_2 Tb 0.00000 0.54410 0.25000 1
+Al1_1 Al 0.11600 0.00000 0.00000 1
+Al1_2 Al 0.00000 0.23200 0.00000 1
+Ni1 Ni 0.00000 0.00000 0.25000 1
+Ni2 Ni 0.16667 0.66667 0.00000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tb1_1 0.0 0.0 7.9(2) 0,0,mz 7.9(2) ? ?
+Tb1_2 0.0 0.0 1.2(3) 0,0,mz 1.2(3) ? ?
+

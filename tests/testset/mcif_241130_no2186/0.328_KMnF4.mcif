@@ -1,0 +1,116 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 31/03/2020
+
+
+data_5yOhtAoR
+_audit_creation_date            2020-03-31
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys.:Condens. Matter"
+_citation_journal_volume        5
+_citation_page_first            4909
+_citation_page_last             4928
+_citation_article_id            ?
+_citation_year                  1993
+_citation_DOI                   10.1088/0953-8984/5/28/007
+
+loop_
+_citation_author_name
+"M.C. Moron"
+"F. Palacio"
+"J. Rodriguez-Carvajal"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  73590
+_atomic_positions_source_other               .
+
+_transition_temperature  5.2
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  6  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at 19.1K
+Non-standard parent setting P2_1/a
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/a'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  '-c,b,a;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,b,a;0,0,0'
+
+
+
+_space_group_magn.number_BNS  14.79
+_space_group_magn.name_BNS  "P 2_1'/c'"
+_cell_length_a             7.68300
+_cell_length_b             7.62900
+_cell_length_c             5.74440
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.40
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x+1/2,y+1/2,-z,-1
+4 x+1/2,-y+1/2,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.00000 0.00000 0.00000
+Mn2 Mn 0.50000 0.00000 0.00000
+F1 F 0.00180 0.23530 0.12010
+F2 F 0.26250 0.02090 0.90310
+F3 F 0.05620 0.92420 0.28920
+F4 F 0.93530 0.56530 0.28880
+K1 K 0.74650 0.30500 0.48700
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 2.55(4) 0.42(7) 1.18(7) mx,my,mz
+Mn2 -2.55 -0.42 -1.18 mx,my,mz
+

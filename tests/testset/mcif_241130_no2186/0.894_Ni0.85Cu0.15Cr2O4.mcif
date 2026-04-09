@@ -1,0 +1,145 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 10/15/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-10-15
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Ni0.85 Cu0.15 Cr2 O4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B?"
+_citation_journal_volume        91
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            024407
+_citation_year                  2015
+_citation_DOI                   10.1103/PhysRevB.91.024407
+
+loop_
+_citation_author_name
+"M. Reehuis"
+"M. Tovar"
+"D. M. Tobbens"
+"P. Pattison"
+"A. Hoser"
+"B. Lake"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  241306
+_atomic_positions_source_other               .
+
+_transition_temperature     85(3)
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5+ 2 2 general primary 8 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The structural distortion that lowers the efective space group from I4_1/amd to Fddd is very small. We therefore keep here the tetragonal space group as the parent symmetry when irreps are considered. The magnetic structure is however described within the Fddd setting, as in the paper.
+Ferrimagnetic along x in the Fddd setting. 
+Although in the paper, this structures is stated to be very similar to that of CuCr2O4 (see #0.891), the FI direction x in the present case is not along the parent tetragonal axis, but lies on the tetragonal basal plane. 
+The moment of the shared Ni/Cu site is a global average moment for the site as a whole. Here, due to the format used, this moment is assigned separately to each atom.
+;
+
+_active_magnetic_irreps_details
+; 
+1k magnetic structure
+2-dim irrep along a general direction. This differs from CuCr2O4, where two primary irreps are necessary, due to the different relation of the Fddd unit cell with respect to the parent (see #0.891)
+The structure allows FM not only along x, but on the whole plane xy (Fddd setting), which in this cases is the basal plane of the parent tetragonal space group.
+;
+
+_parent_space_group.name_H-M_alt  'I 4_1/a m d'
+_parent_space_group.IT_number                       141
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+b,c;1/4,3/4,1/4'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-1/2a-1/2b;0,0,0'
+
+_space_group_magn.number_BNS  15.89
+_space_group_magn.name_BNS  "C 2'/c'"
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 8.0565(3)
+_cell_length_b                 8.3129(3)
+_cell_length_c                 8.5384(3)
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+3 -x+1/4,-y+1/4,z,-1 
+4 x+1/4,y+1/4,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x,y+1/2,z+1/2,+1 
+3 x+1/2,y,z+1/2,+1 
+4 x+1/2,y+1/2,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Ni1 Ni 0.12500 0.12500 0.12500 0.85
+Cu1 Cu 0.12500 0.12500 0.12500 0.15
+Cr1_1 Cr 0.50000 0.50000 0.50000 1
+Cr1_2 Cr 0.25000 0.50000 0.25000 1
+O1_1 O 0.2557(2) 0.2615(2) 0.2676(2) 1
+O1_2 O 0.2557(2) -0.0115(2) -0.0176(2) 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Cu1 -1.88(15) 0.0 0.0 mx,my,0 1.88(15) ? ?
+Ni1  -1.88(15) 0.0 0.0 mx,my,0 1.88(15) ? ?
+Cr1_1 1.23(10) 0.0 1.83(4) mx,my,mz 2.20(7) ? ?
+Cr1_2 1.23(7) 0.0 -1.83(4) mx,my,mz 2.20(7) ? ?
+

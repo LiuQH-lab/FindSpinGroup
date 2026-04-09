@@ -1,0 +1,178 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/22/2024
+# From a file submitted by O. Zaharko
+
+data_5yOhtAoR
+_audit_creation_date            2024-12-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Tb1 Fe6 Ge6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Magn. Magn. Mater."
+_citation_journal_volume        187
+_citation_page_first            293
+_citation_page_last             308
+_citation_article_id            .
+_citation_year                  1998
+_citation_DOI                   10.1016/S0304-8853(98)00148-6
+
+loop_
+_citation_author_name
+"O. Zaharko"
+"P. Schobinger-Papamantellos"
+"C. Ritter"
+"J. Rodriguez-Carvajal"
+"K. H. J. Buschow"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  86194
+_atomic_positions_source_other               .
+
+_transition_temperature     9.5
+_experiment_temperature     1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1- 1 1 . primary 7 .
+mY2+ 1 1 . primary 4 .
+mY2- 1 1 . primary 8 .
+mGM3+ 1 1 . primary 7 .
+mGM4- 1 1 . secondary 3 no
+mGM3- 1 1 . secondary 3 no
+mGM4+ 1 1 . secondary 8 no
+mY1+ 1 1 . secondary 2 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+This sample was annealed at 925 deg C, no density modulation between Tb and Ge was detected
+Atomic parameters are refined from the data collected at 293 K.
+This magnetic structure occurs below T1=9.5K
+FM allowed on the plane xy. Non-compensated F only along x of the Tb moments 
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure k1=0 and k2= (0 1 0) (or (1,0,0))
+4 different primary irreps with respect to the parent Cmcm space group are involved in the spin arrangement: mY1- and mY2- for the Fe spins, while the Tb ordering involves mGM3+ and mY2+, with weights of the same order of magnitude. 
+;
+
+_parent_space_group.name_H-M_alt  'C m c m'
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [1 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;1/4,1/4,0'
+
+
+_space_group_magn.number_BNS  4.9
+_space_group_magn.name_BNS  "P 2_1'"
+_space_group_magn.point_group_name  "2'"
+_space_group_magn.point_group_number  "3.3.8"
+_cell_length_a                 8.13070
+_cell_length_b                 17.69900
+_cell_length_c                 5.12620
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y+1/2,z+1/2,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Tb1_1 Tb 0.00000 0.12570 0.25000 1
+Tb1_2 Tb 0.00000 0.87430 0.75000 1
+Ge1_1 Ge 0.00000 -0.04300 0.25000 1
+Ge1_2 Ge 0.00000 0.04300 0.75000 1
+Ge2_1 Ge 0.00000 0.45690 0.25000 1
+Ge2_2 Ge 0.00000 0.54310 0.75000 1
+Ge3_1 Ge 0.00000 0.78660 0.25000 1
+Ge3_2 Ge 0.00000 0.21340 0.75000 1
+Ge4_1 Ge 0.00000 0.29360 0.25000 1
+Ge4_2 Ge 0.00000 0.70640 0.75000 1
+Ge5_1 Ge 0.34770 0.12480 0.25000 1
+Ge5_2 Ge 0.65230 0.87520 0.75000 1
+Ge6_1 Ge 0.65230 0.12480 0.25000 1
+Ge6_2 Ge 0.34770 0.87520 0.75000 1
+Fe1_1 Fe 0.25000 0.25000 0.00000 1
+Fe1_2 Fe 0.75000 0.75000 0.50000 1
+Fe1_3 Fe 0.75000 0.25000 0.50000 1
+Fe1_4 Fe 0.25000 0.75000 0.00000 1
+Fe2_1 Fe 0.25020 0.00000 0.00000 1
+Fe2_2 Fe 0.74980 0.00000 0.50000 1
+Fe2_3 Fe 0.74980 0.00000 0.00000 1
+Fe2_4 Fe 0.25020 0.00000 0.50000 1
+Fe3_1 Fe 0.74980 0.87460 0.25000 1
+Fe3_2 Fe 0.25020 0.12540 0.75000 1
+Fe3_3 Fe 0.25020 0.87460 0.25000 1
+Fe3_4 Fe 0.74980 0.12540 0.75000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Tb1_1 6.9 0.0 4.13 Mx,My,Mz 8.04 ? ?
+Tb1_2 6.9 0.0 4.13 Mx,My,Mz 8.04 ? ?
+Fe1_1 2.01 0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe1_2 -2.01 -0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe1_3 -2.01 -0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe1_4 2.01 0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe2_1 2.01 0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe2_2 -2.01 -0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe2_3 -2.01 -0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe2_4 2.01 0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe3_1 -2.01 -0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe3_2 2.01 0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe3_3 2.01 0.94 0.0 Mx,My,Mz 2.22 ? ?
+Fe3_4 -2.01 -0.94 0.0 Mx,My,Mz 2.22 ? ?
+

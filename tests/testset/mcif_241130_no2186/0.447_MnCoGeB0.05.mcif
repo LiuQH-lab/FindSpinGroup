@@ -1,0 +1,141 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 20/10/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-10-20
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        4
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            104407
+_citation_year                  2020
+_citation_DOI                   10.1103/PhysRevMaterials.4.104407
+
+loop_
+_citation_author_name
+"X. Miao"
+"Y. Gong"
+"L. Caron"
+"Y. You"
+"G. Xu"
+"D. Sheptyakov"
+"P. Manuel"
+"F. Qian"
+"Y. Zhang"
+"F. Xu"
+"N. van Dijk"
+"E. Bruck"
+
+
+
+_atomic_positions_source_database_code_ICSD  623486
+_atomic_positions_source_other               .
+
+_transition_temperature  260
+_experiment_temperature  75K
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  2  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Two magnetic transitions are detected. One at 260K where the moments are aligned along c (parent hexagonal setting) with only irrep mGM2+ active, and a second one at 75K, where the Mn moment adquires an additional component on the hexagonal basal plane.
+FM along c
+Unit cell parameters are not reported. Here those of a model at room temperature retrieved from the ICSD (623486) is used.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (3 possible)
+1-dim irrep as primary
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  194.270
+_space_group_magn.name_BNS  "P 6_3/m m' c'"
+_cell_length_a             4.06700
+_cell_length_b             4.06700
+_cell_length_c             5.28400
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 x-y,x,z+1/2,+1
+3 -y,x-y,z,+1
+4 -x,-y,z+1/2,+1
+5 -x+y,-x,z,+1
+6 y,-x+y,z+1/2,+1
+7 -x,-y,-z,+1
+8 -x+y,-x,-z+1/2,+1
+9 y,-x+y,-z,+1
+10 x,y,-z+1/2,+1
+11 x-y,x,-z,+1
+12 -y,x-y,-z+1/2,+1
+13 x-y,-y,-z,-1
+14 y,x,-z,-1
+15 -x,-x+y,-z,-1
+16 x,x-y,-z+1/2,-1
+17 -x+y,y,-z+1/2,-1
+18 -y,-x,-z+1/2,-1
+19 -x+y,y,z,-1
+20 -y,-x,z,-1
+21 x,x-y,z,-1
+22 -x,-x+y,z+1/2,-1
+23 x-y,-y,z+1/2,-1
+24 y,x,z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ge1 Ge 0.33333 0.66667 0.25000
+Mn1 Mn 0.00000 0.00000 0.00000
+Co1 Co 0.33333 0.66667 0.75000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 0.00000 0.00000 2.01(2) 0,0,mz 2.01(2)
+Co1 0.00000 0.00000 0.72(4) 0,0,mz 0.72(4)
+

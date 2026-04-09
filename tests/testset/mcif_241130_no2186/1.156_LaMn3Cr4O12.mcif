@@ -1,0 +1,156 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:16:57
+# Database entry: 1.156 LaMn3Cr4O12
+# Cif-like file for the case 1.156
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'La Mn3 Cr4 O1 2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW LETTERS"
+_citation_journal_volume        115
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            087601
+_citation_year                  2015
+_citation_DOI                   10.1103/PhysRevLett.115.087601
+
+loop_
+_citation_author_name
+"X. Wang"
+"Y. Chai"
+"L. Zhou"
+"H. Cao"
+"C.-d. Cruz"
+"J. Yang"
+"J. Dai"
+"Y. Yin"
+"Z. Yuan"
+"S. Zhang"
+"R. Yu"
+"M. Azuma"
+"Y. Shimakawa"
+"H. Zhang"
+"S. Dong"
+"Y. Sun"
+"C. Jin"
+"Y. Long"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     50
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mH4+ 3 3 special primary 3 .
+mH4- 3 3 special primary 4 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Moments moduli Cr: 2.89(6), Mn: 3.40(8)
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+mH4+ irrep mode for Mn
+mH4- irrep mode for Cr
+Separate phase transitions for the ordering of Cr and Mn. Cr moments order at 150K.
+MSG (also the irreps) allows non-collinearity with off-axis moment components.
+Polar symmetry along the (1,1,1) direction. Type II multiferroic.
+Magnetic point group is 31' (the reference incorrectly assigns the magnetic point group 3)
+;
+
+_parent_space_group.name_H-M_alt  'I  m  -3'
+_parent_space_group.IT_number                       204
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 1 1]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-b,b-c,a+b+c;0,0,0'
+
+
+_space_group_magn.number_BNS  146.12
+_space_group_magn.name_BNS  "R_I  3"
+_space_group_magn.point_group_name  "31'"
+_space_group_magn.point_group_number  "16.2.61"
+_cell_length_a                 7.39805(9)
+_cell_length_b                 7.39805(9)
+_cell_length_c                 7.39805(9)
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 z,x,y,+1
+3 y,z,x,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1 La 0.00000 0.00000 0.00000 1
+Mn1 Mn 0.00000 0.50000 0.50000 1
+Cr1_1 Cr 0.25000 0.25000 0.25000 1
+Cr1_2 Cr 0.75000 0.75000 0.25000 1
+O1_1 O 0.00000 0.3104(4) 0.1771(4) 1
+O1_2 O 0.00000 0.6896 0.1771 1
+O1_3 O 0.00000 0.3104 0.8229 1
+O1_4 O 0.00000 0.6896 0.8229 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Mn1 1.96 1.96 1.96 mx,my,mz
+Cr1_1 1.67 1.67 1.67 mx,mx,mx
+Cr1_2 1.67 1.67 1.67 mx,my,mz
+

@@ -1,0 +1,143 @@
+#Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 06/08/2018 15:57:01
+# Database entry: 0.53 RbyFe2-xSe2
+# Cif-like file for the case 0.53
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-06-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Rb y Fe2 -x Se2'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "J. Phys.: Condens. Matter"
+_citation_journal_volume        23
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            156003
+_citation_year                  2011
+_citation_DOI                   10.1088/0953-8984/23/15/156003
+
+loop_
+_citation_author_name
+"V.Y. Pomjakushin"
+"E.V. Pomjakushina"
+"A. Krzton-Maziopa"
+"K. Conder"
+"Z. Shermadini"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               "."
+
+_transition_temperature     560
+_experiment_temperature     300
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3+GM4+ 2 2 general primary . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+an alternative tetragonal ordering is also proposed (see corresponding entry)
+Two independent moments made equal in the model
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+physically irreducible irrep
+Symmetry allows for the slightly occupied Fe1 site a moment on the xy plane.
+;
+
+_parent_space_group.name_H-M_alt  'I  4/m'
+_parent_space_group.IT_number                       87
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-a-b,c,b;0,0,0'
+
+
+_space_group_magn.number_BNS  12.62
+_space_group_magn.name_BNS  "C  2'/m'  "
+_space_group_magn.point_group_name  "2'/m'"
+_space_group_magn.point_group_number  "5.5.16"
+_cell_length_a                 8.79960
+_cell_length_b                 8.79960
+_cell_length_c                 14.57620
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,+1
+3 -x,-y,z,-1
+4 x,y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z+1/2,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Rb1 Rb 0.00000 0.00000 0.00000 0.59
+Rb2_1 Rb 0.39900 0.80300 0.00000 0.24
+Rb2_2 Rb 0.19700 0.39900 0.00000 0.24
+Fe1 Fe 0.00000 0.50000 0.25000 0.099
+Fe2_1 Fe2+ 0.29580 0.59200 0.25240 1.0
+Fe2_2 Fe2+ 0.40800 0.29580 0.25240 1.0
+Se1_1 Se 0.38800 0.79400 0.64950 1.0
+Se1_2 Se 0.20600 0.38800 0.64950 1.0
+Se2 Se 0.00000 0.00000 0.64500 1.0
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 0.0 0.0 0.0 mx,my,0
+Fe2_1 0.0 0.0 2.08(6) mx,my,mz
+Fe2_2 0.0 0.0 -2.08 mx,my,mz
+

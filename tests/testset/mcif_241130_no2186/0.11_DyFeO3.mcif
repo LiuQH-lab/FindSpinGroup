@@ -1,0 +1,134 @@
+#Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 06/08/2018 13:05:30
+# Database entry: 0.11 DyFeO3
+# Cif-like file for the case 0.11
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-06-08
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Dy Fe O3'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "Phys. Rev. Lett."
+_citation_journal_volume        101
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            097205
+_citation_year                  2008
+_citation_DOI                   10.1103/physrevlett.101.097205
+
+loop_
+_citation_author_name
+"Y. Tokunaga"
+"S. Iguchi"
+"T. Arima"
+"Y. Tokura"
+
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD   280091
+_atomic_positions_source_other               "."
+
+_transition_temperature     4
+_experiment_temperature     ?
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1- 1 1 . primary ? ?
+mGM4+ 1 1 . primary ? ?
+
+_exptl_crystal_magnetic_properties_details
+;
+stable for large magnetic field along b (Pnma setting)
+symmetry allows a FM component along b
+arbitrary spin values
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+;
+
+_parent_space_group.name_H-M_alt  'P  n  m  a'
+_parent_space_group.IT_number                       62
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,c,-b;0,0,0'
+
+
+_space_group_magn.number_BNS  33.148
+_space_group_magn.name_BNS  "P  n'  a'  2_1"
+_space_group_magn.point_group_name  "m'm'2"
+_space_group_magn.point_group_number  "7.4.23"
+_cell_length_a                 5.59570
+_cell_length_b                 7.62900
+_cell_length_c                 5.30090
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,-z,+1
+3 -x+1/2,y+1/2,z+1/2,-1
+4 x+1/2,y,-z+1/2,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Dy1 Dy 0.06665 0.25000 0.98275 1
+Fe1 Fe 0.00000 0.00000 0.50000 1
+O1 O 0.46260 0.25000 0.10810 1
+O2_1 O 0.69670 0.94430 0.30750 1
+O2_2 O 0.80330 0.05570 0.80750 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Dy1 1. 0.0 0.0 mx,my,mz
+Fe1 1. 0.3 0.0 mx,my,mz
+

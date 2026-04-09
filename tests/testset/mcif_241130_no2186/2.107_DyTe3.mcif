@@ -1,0 +1,202 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/05/2024 
+# From an file submitted by S. Esser
+
+data_DyTe3
+_audit_creation_date            2024-07-05
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Dy Te3"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Nat. Commun."
+_citation_journal_volume        15
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            4291
+_citation_year                  2024
+_citation_DOI                   10.1038/s41467-024-47127-5
+
+loop_
+_citation_author_name
+"S. Akatsuka"
+"S. Esser"
+"S. Okumura"
+"R. Yambe"
+"R. Yamada"
+"M.M. Hirschmann"
+"S. Aji"
+"J.S. White"
+"S. Gao"
+"Y. Onuki"
+"T.-h. Arima"
+"T. Nakajima"
+"M. Hirschberger"
+
+_atomic_positions_source_database_code_ICSD  630341
+_atomic_positions_source_other               .
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_transition_temperature     3.6
+_experiment_temperature     2.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT1 2 2 special primary 2 .
+mH4(1,0,1/5) 2 1 general primary 4 .
+mH2(1,0,1/5) 2 1 general primary? 4 yes
+mH4(1,0,3/5) 2 1 general secondary 4 yes
+mH4(1,0,3/5) 2 1 general secondary 4 yes
+mY2+ 1 1 . secondary 1 yes
+mY4+ 1 1 . secondary 1 yes
+mY1- 1 1 . secondary 1 yes
+mY3- 1 1 . secondary 1 no
+mH1(1,0,1/10) 2 1 general secondary 2 no
+mH3(1,0,1/10) 2 1 general secondary 2 no
+mH1(1,0,3/10) 2 1 general secondary 2 no
+mH3(1,0,3/10) 2 1 general secondary 2 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Positional structure from ICSD 630341, lattice parameters refined at base-T
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure in zero field
+Magnetic order breaks the symmetry into a polar group. Polarity is on the plane perpendicular to a, in the parent setting.
+Propagation vector k1 is actually incommensurate with k1 = [0 1 0.21] in the parent setting, phase relation to AFM part (0 1 1/2) is therefore not fixed. Here a commensurate approximation is described. 
+Magnetic space group analysis assumes crystallographic Cmcm parent structure, ignoring possible symmetry reduction to C2cm by charge order proposed in DOI: 10.1021/ja0641608
+According to the irrep decomposition performed in this database with ISODISTORT of the reported model, spin modes for three different irreps have prevailing amplitudes corresponding to the propagation vectors (1,0,1/2) and (1,0,1/5), but two of them are sufficient to reach the realised MSG. Secondary irreps coresponding to higher harmonics with propagation vectors (1,0,3/5) and (1,0,0) have also a significant contribution to the proposed spin arrangement. 
+;
+
+_parent_space_group.name_H-M_alt  "C m c m"
+_parent_space_group.IT_number                       63
+_parent_space_group.transform_Pp_abc  "a,b,c;0,0,0"
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1 0 1/5]
+k2 [1 0 1/2]
+
+
+_parent_space_group.child_transform_Pp_abc  'b,a,-a-10c;0,3/4,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+_space_group_magn.number_BNS  "7.30"
+_space_group_magn.name_BNS  "P_C c"
+_space_group_magn.point_group_name  "m.1'"
+_space_group_magn.point_group_number  "4.2.10"
+_cell_length_a                     25.38100
+_cell_length_b                     4.30200
+_cell_length_c                     49.94913
+_cell_angle_alpha                  90.00000
+_cell_angle_beta                   120.53981
+_cell_angle_gamma                  90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1   x,y,z,+1
+2   x,-y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1   x,y,z,+1
+2   x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Dy1 Dy 0.14478 0.75000 -0.02500 1.0000
+Dy2 Dy 0.04478 0.75000 0.87500 1.0000
+Dy3 Dy -0.05522 0.75000 0.77500 1.0000
+Dy4 Dy 0.84478 0.75000 0.67500 1.0000
+Dy5 Dy 0.74478 0.75000 0.57500 1.0000
+Dy6 Dy 0.25522 0.25000 -0.07500 1.0000
+Dy7 Dy 0.15522 0.25000 0.82500 1.0000
+Dy8 Dy 0.05522 0.25000 0.72500 1.0000
+Dy9 Dy -0.04478 0.25000 0.62500 1.0000
+Dy10 Dy 0.85522 0.25000 0.52500 1.0000
+Te1 Te -0.00036 0.75000 -0.07500 1.0000
+Te2 Te -0.09964 0.75000 -0.02500 1.0000
+Te3 Te 0.89964 0.75000 0.82500 1.0000
+Te4 Te 0.80036 0.75000 0.87500 1.0000
+Te5 Te 0.79964 0.75000 0.72500 1.0000
+Te6 Te 0.70036 0.75000 0.77500 1.0000
+Te7 Te 0.69964 0.75000 0.62500 1.0000
+Te8 Te 0.60036 0.75000 0.67500 1.0000
+Te9 Te 0.59964 0.75000 0.52500 1.0000
+Te10 Te 0.50036 0.75000 0.57500 1.0000
+Te11 Te 0.26859 0.75000 -0.02500 1.0000
+Te12 Te 0.63141 0.75000 -0.07500 1.0000
+Te13 Te 0.16859 0.75000 0.87500 1.0000
+Te14 Te 0.53141 0.75000 0.82500 1.0000
+Te15 Te 0.06859 0.75000 0.77500 1.0000
+Te16 Te 0.43141 0.75000 0.72500 1.0000
+Te17 Te -0.03141 0.75000 0.67500 1.0000
+Te18 Te 0.33141 0.75000 0.62500 1.0000
+Te19 Te 0.86859 0.75000 0.57500 1.0000
+Te20 Te 0.23141 0.75000 0.52500 1.0000
+Te21 Te 0.35031 0.75000 -0.07500 1.0000
+Te22 Te 0.54969 0.75000 -0.02500 1.0000
+Te23 Te 0.25031 0.75000 0.82500 1.0000
+Te24 Te 0.44969 0.75000 0.87500 1.0000
+Te25 Te 0.15031 0.75000 0.72500 1.0000
+Te26 Te 0.34969 0.75000 0.77500 1.0000
+Te27 Te 0.05031 0.75000 0.62500 1.0000
+Te28 Te 0.24969 0.75000 0.67500 1.0000
+Te29 Te -0.04969 0.75000 0.52500 1.0000
+Te30 Te 0.14969 0.75000 0.57500 1.0000
+
+loop_
+ _atom_site_moment_label
+ _atom_site_moment_crystalaxis_x
+ _atom_site_moment_crystalaxis_y
+ _atom_site_moment_crystalaxis_z
+ _atom_site_moment.symmform
+ _atom_site_moment.magnitude
+ _atom_site_moment.spherical_azimuthal
+ _atom_site_moment.spherical_polar
+Dy1 6.877 6.235 3.088 Mx,My,Mz     8.61     ?     ?
+Dy2 -1.397 -6.235 -6.524 Mx,My,Mz  8.61     ?     ?
+Dy3 -5.358 6.235 -6.458 Mx,My,Mz   8.61     ?     ?
+Dy4 -3.434 -6.235 3.403 Mx,My,Mz   8.61     ?     ?
+Dy5 3.544 6.235 6.893 Mx,My,Mz     8.61     ?     ?
+Dy6 4.989 6.235 6.632 Mx,My,Mz     8.61     ?     ?
+Dy7 4.331 -6.235 -2.419 Mx,My,Mz   8.61     ?     ?
+Dy8 -3.292 6.235 -6.890 Mx,My,Mz   8.61     ?     ?
+Dy9 -6.869 -6.235 -3.989 Mx,My,Mz  8.61     ?     ?
+Dy10 0.788 6.235 6.299 Mx,My,Mz    8.61     ?     ?
+

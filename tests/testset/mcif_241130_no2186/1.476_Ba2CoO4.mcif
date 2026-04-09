@@ -1,0 +1,124 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 01/12/2020 01:07:20
+# parent_RT_P21-n.cif
+
+data_5yOhtAoR
+_audit_creation_date            2020-12-01
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Status Solidi RRL"
+_citation_journal_volume        13
+_citation_page_first            .
+_citation_page_last             ,
+_citation_article_id            1800537
+_citation_year                  2019
+_citation_DOI                   10.1002/pssr.201800537
+
+loop_
+_citation_author_name
+"G. Ryu"
+"H. Guo"
+"L. Zhao"
+"M.T. Fernandez-Diaz"
+"Y. Drees"
+"Z.W. Li"
+"Z. Hu"
+"A.C. Komarek"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  25
+_experiment_temperature  1.8
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1-  1  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep as primary
+Non standard setting P2_1/n of the parent structure
+See #1.477 for a very different model of the same phase with the same MSG, and see #1.302 for a very different model with different magnetic symmetry.
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2a-c,b,3/2a-1/2c;1/4,0,0'
+
+
+
+_space_group_magn.number_BNS  14.80
+_space_group_magn.name_BNS  "P_a 2_1/c"
+_cell_length_a             11.83830
+_cell_length_b             7.62830
+_cell_length_c             20.84570
+_cell_angle_alpha          90.00
+_cell_angle_beta           91.27
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/4,y+1/2,-z+3/4,+1
+3 -x+1/2,-y,-z,+1
+4 x+3/4,-y+1/2,z+3/4,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y,z+1/2,+1
+3 x,y,z+1/2,-1
+4 x+1/2,y,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Co1 Co 0.37383 0.27562 0.03991
+Ba1 Ba 0.37740 0.85082 0.04108
+Ba2 Ba 0.12122 0.49187 0.09503
+O1 O 0.38105 0.50790 0.04105
+O2 O 0.25525 0.19920 0.08230
+O3 O 0.00045 0.17900 0.07225
+O4 O 0.35920 0.18600 0.45985
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Co1 2.97(5) -1.13(5) -1.30(9) mx,my,mz 3.5(1)
+
+

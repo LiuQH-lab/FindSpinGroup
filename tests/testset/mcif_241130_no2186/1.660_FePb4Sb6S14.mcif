@@ -1,0 +1,142 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 02/19/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-02-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Fe Pb4 Sb6 S14"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        284
+_citation_page_first            92
+_citation_page_last             96
+_citation_article_id            .
+_citation_year                  2004
+_citation_DOI                   10.1016/j.jmmm.2004.06.031
+
+loop_
+_citation_author_name
+"P. Leone"
+"G. Andre"
+"C. Doussier"
+"Y. Moelo"
+
+_temperature_position_structure         293
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  98580
+_atomic_positions_source_other               .
+
+_transition_temperature     5
+_experiment_temperature     1.4
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mY1- 1 1 . primary 3 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Position structure from a determination at room temperature
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+1-dim irrep
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/c'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 0 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-2c,b,a-c;1/4,0,0'
+
+_space_group_magn.number_BNS  14.80
+_space_group_magn.name_BNS  "P_a 2_1/c"
+_space_group_magn.point_group_name  "2/m1'"
+_space_group_magn.point_group_number  "5.2.13"
+_cell_length_a                 8.04700
+_cell_length_b                 19.07400
+_cell_length_c                 15.73700
+_cell_angle_alpha              90.00
+_cell_angle_beta               91.89
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,y+1/2,-z+1/2,+1 
+3 -x+1/2,-y,-z,+1 
+4 x+1/2,-y+1/2,z+1/2,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Pb1 Pb 0.22075 0.23983 0.57470 1
+Pb2 Pb 0.23190 0.14056 0.81770 1
+Sb1 Sb 0.44095 0.04877 0.60418 1
+Sb2 Sb 0.45545 0.93675 0.81978 1
+Sb3 Sb 0.44070 0.15908 0.36996 1
+Fe1 Fe 0.25000 0.00000 0.00000 1
+S1 S 0.22740 0.10210 0.49700 1
+S2 S 0.47460 0.15910 0.68260 1
+S3 S 0.48835 0.04370 0.90420 1
+S4 S 0.46505 0.26910 0.44790 1
+S5 S 0.23450 0.00380 0.71410 1
+S6 S 0.21150 0.29640 0.77570 1
+S7 S 0.25630 0.39370 0.58120 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Fe1 2.8(1) 1.5(1) -0.5(2) mx,my,mz 3.3(1) ? ?
+

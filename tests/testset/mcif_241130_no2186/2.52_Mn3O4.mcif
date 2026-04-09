@@ -1,0 +1,159 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 12/10/2020
+
+
+data_5yOhtAoR
+_audit_creation_date            12/10/2020
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys. Chem. Solids"
+_citation_journal_volume        32
+_citation_page_first            2429
+_citation_page_last             2437
+_citation_article_id            ?
+_citation_year                  1971
+_citation_DOI                   10.1016/S0022-3697(71)80239-1
+
+loop_
+_citation_author_name
+"B. Boucher"
+"R. Buhl"
+"M. Perrin"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  76088
+_atomic_positions_source_other               .
+
+_transition_temperature  33
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM5+ 2 2 special primary 4 .
+mSM3  4 2 general primary 8 .
+mGM3+ 1 1  .      primary? 3 .
+mGM4+ 1 1  .      secondary? 2 yes
+mGM2- 1 1  .      secondary? 1 yes
+mGM5- 2 2 special secondary  1 no
+mSM1  4 2 general secondary  6 no
+mM2   2 2 general secondary  6 no
+mM3   2 2 special secondary  2 no
+mM4   2 2 special secondary  3 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positional structure from a measurement at 300K, except for the unit cell parameters
+Parent reference space group in non-standard setting (origin 1)
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Despite the regularity and assumed correlations between the spins, the structure has very low symmetry and it implies the presence of spin arrangements corresponding to 5 different irreps.
+In order to explain the symmetry of the proposed model, at least three of the five irreps involved have to be considered as primary, corresponding to three different symmetry-breaking order parameters.
+The structure is probably wrong. See #2.29 for a very different model of this phase with much higher symmetry.  This alternative structure involves only two irreps, which are in fact those with much larger weight in the present structure.
+For a comparison of the two structures, an origin shift (0,-1/8,1/8) has to be taken into account.
+;
+
+_parent_space_group.name_H-M_alt  'I4_1/a m d'
+_parent_space_group.IT_number                       141
+_parent_space_group.transform_Pp_abc  'a,b,c;0,-1/4,1/8'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [0 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-c,-a,b;0,0,0'
+
+
+_space_group_magn.number_BNS  7.26
+_space_group_magn.name_BNS  "P c'"
+_cell_length_a             5.756
+_cell_length_b             11.512
+_cell_length_c             9.439
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,y+1/2,z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Mn1_1 Mn 0.0000 0.0000 0.0000 1
+Mn1_2 Mn 0.5000 0.7500 0.5000 1
+Mn1_3 Mn 0.0000 0.2500 0.2500 1
+Mn1_4 Mn 0.5000 0.5000 0.7500 1
+Mn2_1 Mn 0.0000 0.8750 0.6250 1
+Mn2_2 Mn 0.5000 0.3750 0.1250 1
+Mn2_3 Mn 0.5000 0.1250 0.1250 1
+Mn2_4 Mn 0.0000 0.6250 0.6250 1
+Mn2_5 Mn 0.2500 0.2500 0.8750 1
+Mn2_6 Mn 0.2500 0.7500 0.8750 1
+Mn2_7 Mn 0.7500 0.0000 0.3750 1
+Mn2_8 Mn 0.7500 0.5000 0.3750 1
+O1_1 O 0.0000 0.1104 0.3834 1
+O1_2 O 0.5000 0.6104 0.3666 1
+O1_3 O 0.0000 0.1396 0.8666 1
+O1_4 O 0.5000 0.6396 0.8834 1
+O1_5 O 0.7792 0.2500 0.6334 1
+O1_6 O 0.7208 0.7500 0.1166 1
+O1_7 O 0.2208 0.0000 0.6166 1
+O1_8 O 0.2792 0.5000 0.1334 1
+O1_9 O 0.7208 0.2500 0.1166 1
+O1_10 O 0.7792 0.7500 0.6334 1
+O1_11 O 0.2792 0.0000 0.1334 1
+O1_12 O 0.2208 0.5000 0.6166 1
+O1_13 O 0.5000 0.3604 0.8834 1
+O1_14 O 0.0000 0.8604 0.8666 1
+O1_15 O 0.5000 0.8896 0.3666 1
+O1_16 O 0.0000 0.3896 0.3834 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1_1 0.0000 -4.53 -1.07 mx,my,mz 4.65
+Mn1_2 0.0000 -4.53 -1.07 mx,my,mz 4.65
+Mn1_3 0.0000 -4.53 1.07 mx,my,mz  4.65
+Mn1_4 0.0000 -4.53 1.07 mx,my,mz  4.65
+Mn2_1 0.0000 1.25 -3.32 mx,my,mz  3.55
+Mn2_2 0.0000 1.25 3.32 mx,my,mz   3.55
+Mn2_3 0.0000 1.25 -3.32 mx,my,mz  3.55
+Mn2_4 0.0000 1.25 3.32 mx,my,mz   3.55
+Mn2_5 -1.29 1.43 2.98 mx,my,mz    3.55
+Mn2_6 -1.29 1.43 -2.98 mx,my,mz   3.55
+Mn2_7 -1.29 1.43 2.98 mx,my,mz    3.55
+Mn2_8 -1.29 1.43 -2.98 mx,my,mz   3.55
+
+

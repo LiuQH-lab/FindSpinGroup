@@ -1,0 +1,129 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 16/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-16
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Magnetism and Magnetic Materials"
+_citation_journal_volume        92
+_citation_page_first            359
+_citation_page_last             365
+_citation_article_id            .
+_citation_year                  1991
+_citation_DOI                   10.1016/0304-8853(91)90849-6
+
+loop_
+_citation_author_name
+"M. Leblanc"
+"G. Ferey"
+"P. Lacorre"
+"J. Pannetier"
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_temperature_position_structure         .
+_temperature_atom_positions             170              
+_temperature_non-magn_atom_positions    .
+
+_transition_temperature  35
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2+  1  1  .  primary  5  .
+mM2+   1  1  .  primary  5  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Between 157K and 35K another phase with only Fe1 sites having non-zero  magnetic moments along b is reported. This previous phase only involves the irrep mGM2+ (k=0) (see #0.582).
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+k-maximal magnetic symmetry
+Two 1-dim irreps as primary, one with k1=0 for Fe1 and one with k2=(0,1,1/2) for Fe2 and the x and z moment components of Fe1: Two order parameters with two distinct phase transitions.
+Weak ferromagnet. FM on the plane ac.
+;
+
+_parent_space_group.name_H-M_alt  'C 2/m'
+_parent_space_group.IT_number                       12
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+k2 [0 1 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a-c,b,a;0,0,0'
+
+
+
+_space_group_magn.number_BNS  12.62
+_space_group_magn.name_BNS  "C 2'/m'"
+_cell_length_a             7.54300
+_cell_length_b             7.43140
+_cell_length_c             14.77300
+_cell_angle_alpha          90.00
+_cell_angle_beta           117.26
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x,-y,-z,+1 
+3 -x,y,-z,-1 
+4 x,-y,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z+1/2,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Fe1_1 Fe 0.25000 0.25000 0.25000
+Fe1_2 Fe  0.75000 0.25000 0.25000
+Fe2_1 Fe 0.00000 0.50000 0.00000
+Fe2_2 Fe  0.50000 0.00000 0.00000
+F1 F 0.00000 0.29920 0.25000
+F2_1 F 0.17810 0.00000 0.21970
+F2_2 F  0.67810 0.50000 0.21970
+F3_1 F 0.13360 0.29620 0.10630
+F3_2 F  0.63360 0.79620 0.10630
+O1_1 O 0.24700 0.00000 0.02775
+O1_2 O  0.74700 0.50000 0.02775
+H1_1 H 0.20900 0.10020 0.05400
+H1_2 H  0.70900 0.60020 0.05400
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1_1 1.65000 4.03000 0.43000 mx,my,mz     4.30(12)
+Fe1_2 -1.65000 -4.03000 -0.43000 mx,my,mz  4.30
+Fe2_1 4.20000 0.00000 3.23000 mx,0,mz      3.97(13)
+Fe2_2 -4.20000 0.00000 -3.23000 mx,0,mz    3.97
+

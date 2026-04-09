@@ -1,0 +1,143 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/21/2022
+# from a file submitted by Aleksandra Deptuch
+
+data_5yOhtAoR
+_audit_creation_date            2022-07-21
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "Er5 Pd2 In4"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "J. Alloys Compd."
+_citation_journal_volume        877
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            160171
+_citation_year                  2021
+_citation_DOI                   10.1016/j.jallcom.2021.160171
+
+loop_
+_citation_author_name
+"S. Baran"
+"A. Deptuch"
+"M. Reehuis"
+"Yu. Tyvanchuk"
+"F. Yokaichiya"
+"A. Szytula"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    .
+_temperature_cell_parameters            .
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     16
+_experiment_temperature     11.9
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM3+ 1 1 . primary 6 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD. Ferrimagnetic 
+FM along a
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+1-dim irrep
+Moment at site Er2 remains zero, and becomes non-null at a lower unspecified temperature, according to a different irrep, breaking further the symmetry into a monoclinic MSG (see #0.847 and #0.848).
+;
+
+_parent_space_group.name_H-M_alt  "P b a m"
+_parent_space_group.IT_number                       55
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,a,c;0,0,0'
+
+_space_group_magn.number_BNS  55.358
+_space_group_magn.name_BNS  "P b' a m'"
+_space_group_magn.point_group_name  "m'm'm"
+_space_group_magn.point_group_number  "8.4.27"
+_cell_length_a                 17.9423
+_cell_length_b                 7.9139
+_cell_length_c                 3.57195
+_cell_angle_alpha              90.00000
+_cell_angle_beta               90.00000
+_cell_angle_gamma              90.00000
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 x+1/2,-y+1/2,-z,+1 
+3 -x,-y,-z,+1 
+4 -x+1/2,y+1/2,z,+1 
+5 -x+1/2,y+1/2,-z,-1 
+6 -x,-y,z,-1 
+7 x+1/2,-y+1/2,z,-1 
+8 x,y,-z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Er1 Er 0.00000 0.00000 0.00000 1
+Er2 Er 0.22141 0.25092 0.00000 1
+Er3 Er 0.42397 0.12283 0.00000 1
+Pd1 Pd 0.30442 0.04361 0.50000 1
+In1 In 0.56675 0.20622 0.50000 1
+In2 In 0.85696 0.05900 0.50000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Er1 -2.5(2) 5.9(2) 0.0 mx,my,0 6.5(2) ? ?
+Er2 0.0 0.0 0.0 mx,my,0 0.0 ? ?
+Er3 0.0 -3.1(1) 0.0 mx,my,0 3.1(1) ? ?
+

@@ -1,0 +1,153 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 03/14/2022
+
+data_5yOhtAoR
+_audit_creation_date            2022-03-14
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    "La2 Ni Ir O6"
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         ?
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW MATERIALS"
+_citation_journal_volume        6
+_citation_page_first            .
+_citation_page_last             .
+_citation_article_id            014407
+_citation_year                  2022
+_citation_DOI                   10.1103/PhysRevMaterials.6.014407
+
+loop_
+_citation_author_name
+"S. Sharma"
+"C. Ritter"
+"D. T. Adroja"
+"G. B. Stenning"
+"A. Sundaresan"
+"S. Langridge"
+
+_temperature_position_structure         .
+_temperature_atom_positions             .
+_temperature_non-magn_atom_positions    293
+_temperature_cell_parameters            1.5
+
+_atomic_positions_source_database_code_ICSD  79494
+_atomic_positions_source_other               .
+
+_transition_temperature     74
+_experiment_temperature     1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mE1+E2+ 2 2 general primary 12 .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Positions of non-magnetic atoms are not given in the paper. Here those of a room temperature determination by another work and retrieved from the ICSD are used.
+Lattice parameters are those reported in the paper at 1.5K
+Non standard parent setting P2_1/n
+Split sites were contrained to have the same magnitude for their moment components.
+Three models fit equally well the data. The one described here corresponds to the one shown in Fig. 8(a) of the paper. The other two models have either opposite moments in the two split sites of Ni and Ir (Fig. 8(b)) instead of equal ones, or opposite components mx and my, while mz is equal (Fig. 8(c)).
+Any of these three models differ considerably from the one that was previously reported by another group(see #1.661).
+The modulus of the Ir moment is given after setting the mz with large error to zero.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+2-dim physically irreducible irrep
+The irrep label used here is for the standard setting P2_1/c of the parent space group
+;
+
+_parent_space_group.name_H-M_alt  'P 2_1/n'
+_parent_space_group.IT_number                       14
+_parent_space_group.transform_Pp_abc  'a,b,-a+c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'c,-1/2a+1/2b,-2a+b+2c;-1/4,0,1/2'
+
+_space_group_magn.number_BNS  2.7
+_space_group_magn.name_BNS  "P_S -1"
+_space_group_magn.point_group_name  "-11'"
+_space_group_magn.point_group_number  "2.2.4"
+_cell_length_a                 11.1249
+_cell_length_b                 11.2410
+_cell_length_c                 7.88048
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -x+1/2,-y,-z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/2,y+1/2,z,+1 
+3 x,y+1/2,z,-1 
+4 x+1/2,y,z,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+La1_1 La 0.25000 0.27195 0.74980 1
+La1_2 La 0.00000 0.52195 0.75020 1
+Ni1_1 Ni 0.25000 0.00000 0.00000 1
+Ni1_2 Ni 0.00000 0.25000 0.50000 1
+Ir1_1 Ir 0.25000 0.00000 0.50000 1
+Ir1_2 Ir 0.00000 0.25000 0.00000 1
+O1_1 O 0.11000 0.09750 0.46000 1
+O1_2 O 0.14000 0.34750 0.04000 1
+O2_1 O 0.15000 0.35800 0.46000 1
+O2_2 O 0.10000 0.60800 0.04000 1
+O3_1 O 0.21000 0.49000 0.74000 1
+O3_2 O 0.04000 0.74000 0.76000 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+_atom_site_moment.spherical_azimuthal
+_atom_site_moment.spherical_polar
+Ni1_1 1.30(5) 0.22(6) 0.43(22) mx,my,mz 1.39(8) ? ?
+Ni1_2 1.30(5) 0.22(6) 0.43(22) mx,my,mz 1.39(8) ? ?
+Ir1_1 0.14(6) 0.32(8) 0.14(24) mx,my,mz 0.35(3) ? ?
+Ir1_2 0.14(6) 0.32(8) 0.14(24) mx,my,mz 0.35(3) ? ?
+

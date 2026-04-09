@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 16/02/2021 
+
+
+data_5yOhtAoR
+_audit_creation_date            2021-02-16
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Journal of Alloys and Compounds"
+_citation_journal_volume        607
+_citation_page_first            104
+_citation_page_last             109
+_citation_article_id            .
+_citation_year                  2014
+_citation_DOI                   10.1016/j.jallcom.2014.04.049
+
+loop_
+_citation_author_name
+"A. Gagor"
+"P. Zajdel"
+"D. Tobbens"
+
+_atomic_positions_source_database_code_ICSD  191592
+_atomic_positions_source_other               .
+
+_transition_temperature  4.5
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mH2H3  4  2  special  primary  2  .
+mA1+   1  1  .      secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Above 220K, the system has P-3m symmetry
+Not mentioned in the article, but probably the used NPD data is unsensitive to the absolute global orientation of spin configuration on the xy plane (the MSG does not depend on it), and the orientation described in the article is just an arbitrary choice.
+A collinear model with 1/3 of the Fe sites having null moments that equally fits the data is also described in the supplementary material of the article. This alternative model is also associated with the same primary irrep mH2H3, but for a different direction within the 4-dim (physically irreducible) irrep. Its MSG is P_S-1 (a-b,a+2b,2c;0,1/2,1/2). 
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+4 dimensional irrep along a special direction as primary
+The non-zero z moment component allowed by the MSG, which is zero in the model, corresponds to the secondary irrep mA1+ with wave vector (0 0 1/2). This component takes into account a possible induced secondary magnetic degree of freedom, which can become spontaneous through coupling with the primary order parameter and can be considered a third harmonic of the modulation.
+The MSG is polar along c, while the paramagnetic phase is non-polar. This allows magnetically induced ferroelectricity along c (type II multiferroic).
+;
+
+_parent_space_group.name_H-M_alt  'P -3'
+_parent_space_group.IT_number                       147
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '3a,3b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2/3a+1/3b,-1/3a+1/3b,c;8/9,1/9,0'
+
+
+
+_space_group_magn.number_BNS  143.3
+_space_group_magn.name_BNS  "P_c 3"
+_cell_length_a             16.69380
+_cell_length_b             16.69380
+_cell_length_c             15.95920
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y,x-y+1/3,z,+1 
+3 -x+y+2/3,-x,z,+1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+2 x+1/3,y+2/3,z,+1 
+3 x+2/3,y+1/3,z,+1 
+4 x,y,z+1/2,-1 
+5 x+1/3,y+2/3,z+1/2,-1 
+6 x+2/3,y+1/3,z+1/2,-1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cs1 Cs 0.00000 0.00000 0.25000
+Fe1 Fe 0.00000 0.00000 0.00000
+Mo1_1 Mo 0.11111 0.22222 0.10635
+Mo1_2 Mo  0.22222 0.11111 0.89365
+Mo1_3 Mo  0.22222 0.44444 0.89365
+Mo1_4 Mo  0.22222 0.77778 0.89365
+O1_1 O 0.11111 0.22222 0.21410
+O1_2 O  0.22222 0.11111 0.78590
+O1_3 O  0.22222 0.44444 0.78590
+O1_4 O  0.22222 0.77778 0.78590
+O2_1 O 0.07737 0.10787 0.07355
+O2_2 O  0.89213 0.96950 0.07355
+O2_3 O  0.03050 0.92263 0.07355
+O2_4 O  0.92263 0.89213 0.92645
+O2_5 O  0.10787 0.03050 0.92645
+O2_6 O  0.96950 0.07737 0.92645
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Fe1 4.630 2.315 0.00000 mx,my,mz  4.01(5)
+

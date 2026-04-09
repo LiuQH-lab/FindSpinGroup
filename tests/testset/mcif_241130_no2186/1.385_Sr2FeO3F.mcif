@@ -1,0 +1,124 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 07/05/2020
+
+data_5yOhtAoR
+_audit_creation_date            2020-05-07
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Mater. Chem."
+_citation_journal_volume        2005
+_citation_page_first            3093
+_citation_page_last             3103
+_citation_article_id            ?
+_citation_year                  ?
+_citation_DOI                   10.1039/B505617A
+
+loop_
+_citation_author_name
+"A.L. Hector"
+"C.S. Knee"
+"A.I. MacDonald"
+"D.J. Price"
+"M.T. Weller"
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  ?
+_experiment_temperature  2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mM1  2  2  special  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Transition temperature not reported
+Structure of one of the three phases that are assumed coexisting in the material at 2K. Phase fraction: 0.816
+Moments and positions have been constrained to be equal in the three phases.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+The symmetry group assigned in the original reference is incorrect. The correct MSG is used here.
+2-dim along a special direction as primary
+Structure described in the standard setting of the MSG
+;
+
+_parent_space_group.name_H-M_alt  'P 4/n m m'
+_parent_space_group.IT_number                       129
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  '-a+b,-a-b,c;7/4,1/4,0'
+_space_group_magn.transform_BNS_Pp_abc  ‘a,b,c;0,0,0’
+
+
+
+_space_group_magn.number_BNS  113.273
+_space_group_magn.name_BNS  "P_C -4 2_1 m"
+_cell_length_a             5.45320
+_cell_length_b             5.45320
+_cell_length_c             13.14600
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+1/2,-z,+1
+3 x+1/2,-y+1/2,-z,+1
+4 -x,-y,z,+1
+5 y,-x,-z,+1
+6 -y,x,-z,+1
+7 y+1/2,x+1/2,z,+1
+8 -y+1/2,-x+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Fe1 Fe 0.25000 0.25000 0.22790
+Sr1 Sr 0.25000 0.75000 0.37820
+Sr2 Sr 0.25000 0.75000 0.10510
+O1 O 0.25000 0.25000 0.08200
+O2_1 O 0.00000 0.00000 0.25380
+O2_2 O 0.00000 0.50000 0.25380
+F1 F 0.25000 0.25000 0.43480
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Fe1 2.643(18) 2.643 0.00000 mx,mx,0
+
+

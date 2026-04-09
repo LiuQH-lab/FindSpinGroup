@@ -1,0 +1,127 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 09/09/2018 01:17:35
+
+data_5yOhtAoR
+_audit_creation_date            2018-09-09
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Solid State Chem."
+_citation_journal_volume        264
+_citation_page_first            119
+_citation_page_last             123
+_citation_article_id            ?
+_citation_year                  2018
+_citation_DOI                   10.1016/j.jssc.2018.05.018
+
+loop_
+_citation_author_name
+"S.J. Herkelrath"
+"J.N. Blandy"
+"S.J. Clarke"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature  180
+_experiment_temperature  5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mX3+  2  1  special  primary  1  .
+mX4+  2  1  special  primary  1  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+ISODISTORT and TOPAS employed
+Atomic positions and unit cell from an experiment at 298K.
+The setting used to describe the spin arrangement in the original reference is inconsistent with the figure in the article. We have corrected interchanging the spin components guided by the figure in the article.
+The spin arrangement is not described in the standard setting of the reported MSG. An origin shift is required.
+A fully equivalent arrangement corresponding to a domain related structure is obtained by switching the direction  of the moments of the layer at z=1/2. The symmetry of this equivalent structure is given by the same MSG, but in this case in its standard setting.
+A similar structure reported for Sr2CoO2Ag2Se2 (see entry #2.23)
+;
+
+_active_magnetic_irreps_details
+;
+2k magnetic structure
+Two irreps active as primary
+The fact that the reported model is a multi-k structure is not mentioned in the original report
+A collinear model (probably 1k structure) is reported to fit equally well the experimental data.
+The authors have chosen the tetragonal model (implying a multi-k arrangement) because of its higher symmetry.
+;
+
+_parent_space_group.name_H-M_alt  'I  4/m  m  m  '
+_parent_space_group.IT_number                       139
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 0]
+k2 [1/2 -1/2 0]
+
+_parent_space_group.child_transform_Pp_abc  'a+b,-a+b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;1/2,0,0'
+
+
+
+_space_group_magn.number_BNS  86.73
+_space_group_magn.name_BNS  "P_C  4_2/n"
+_cell_length_a             5.96050
+_cell_length_b             5.96050
+_cell_length_c             20.01930
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+1/2,x,z+1/2,+1
+3 y,-x+1/2,z+1/2,+1
+4 -x+1/2,-y+1/2,z,+1
+5 -x,-y,-z,+1
+6 y+1/2,-x,-z+1/2,+1
+7 -y,x+1/2,-z+1/2,+1
+8 x+1/2,y+1/2,-z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/2,y+1/2,z,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ba1 Ba 0.00000 0.00000 0.41233
+Co1 Co 0.00000 0.00000 0.00000
+O1_1 O 0.25000 0.25000 0.00000
+O1_2 O 0.25000 0.75000 0.00000
+Ag1_1 Ag 0.25000 0.25000 0.25000
+Ag1_2 Ag 0.25000 0.75000 0.25000
+Se1 Se 0.00000 0.00000 0.16187
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Co1 3.89(3) 0.80(3) 0.00000 mx,my,0
+

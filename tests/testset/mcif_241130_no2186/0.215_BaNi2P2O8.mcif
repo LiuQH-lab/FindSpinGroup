@@ -1,0 +1,113 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+
+
+data_5yOhtAoR
+_audit_creation_date            2018-10-22
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Magn. Magn. Mater."
+_citation_journal_volume        15-18
+_citation_page_first            1021
+_citation_page_last             1022
+_citation_article_id            ?
+_citation_year                  1980
+_citation_DOI                   10.1016/0304-8853(80)90869-0
+
+loop_
+_citation_author_name
+"L. Regnault"
+"J. Henry"
+"J. Rossat-Mignod"
+"A.D. Combarieu"
+
+
+
+_atomic_positions_source_database_code_ICSD  411629
+_atomic_positions_source_other               .
+
+_transition_temperature  24
+_experiment_temperature  4.2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM2-GM3-  2  2  general  primary  2  .
+mGM1-    1  1   .   secondary 1 no
+
+_exptl_crystal_magnetic_properties_details
+;
+Neutron diffraction with no further specification
+m components given with non-significant digits to yield the reported moment modulus: 2.0(2)
+;
+
+_active_magnetic_irreps_deta.ils
+;
+1k magnetic structure
+2-dim irrep (physically irreducible) active
+The symmetry-allowed mz spin component corresponds to a secondary irrep.
+;
+
+_parent_space_group.name_H-M_alt  'R -3'
+_parent_space_group.IT_number                       148
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '2/3a+1/3b+1/3c,1/3a+2/3b-1/3c,-1/3a+1/3b+1/3c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  2.6
+_space_group_magn.name_BNS  "P -1'"
+_cell_length_a             4.80000
+_cell_length_b             4.80000
+_cell_length_c             23.27300
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,-z,-1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x+1/3,y+2/3,z+2/3,+1
+3 x+2/3,y+1/3,z+1/3,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Ni1 Ni 0.00000 0.00000 0.16894
+P1 P 0.00000 0.00000 0.57336
+Ba1 Ba 0.00000 0.00000 0.00000
+O1 O 0.00000 0.00000 0.63796
+O2_1 O 0.34240 0.36430 0.21847
+O2_2 O  0.63570 0.97810 0.21847
+O2_3 O  0.02190 0.65760 0.21847
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Ni1 2.310 1.155 0.00000 mx,my,mz

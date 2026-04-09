@@ -1,0 +1,130 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 18/03/2021 
+
+data_5yOhtAoR
+_audit_creation_date            2021-03-18
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "AIP Conference Proceedings 10, 684 (1973)"
+_citation_journal_volume        10
+_citation_page_first            684
+_citation_page_last             ?
+_citation_article_id            .
+_citation_year                  1973
+_citation_DOI                   10.1063/1.2946992
+
+loop_
+_citation_author_name
+"M. Eibschutz"
+"R. C. Sherwood"
+"F. S. L. Hsu"
+"C. E. Cox"
+
+_atomic_positions_source_database_code_ICSD  2782
+_atomic_positions_source_other               .
+
+_temperature_position_structure         293
+_temperature_atom_positions             .              
+_temperature_non-magn_atom_positions    .
+
+_transition_temperature  8.3
+_experiment_temperature  4.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mK5  4  2  special  primary  1  .
+mGM2+ 1  1  .  secondary  1  no
+
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Position structure from another study at 293K
+Probably the absolute orientation of the spin arrangement on the basal plane is undetermined. The orientation chosen is one of the non-equivalent possible ones that maximize the symmetry of the system.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry
+4-dim irrep along a special direction as primary
+A secondary irrep spin ordering is allowed corresponding to the possible non-zero mz moment Mn component. It is a k=0 FM mode along c.
+Consequently weak FM along c is to be expected, if this is the absolute orientation on the basal plane of the spins (For their other possible (perpendicular) orientation of maximal symmetry (MSG: P-6m2 N. 189.221) , no secondary irrep is allowed, mz=0, and weak FM is not possible).
+;
+
+_parent_space_group.name_H-M_alt  'P 6_3/m m c'
+_parent_space_group.IT_number                       194
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/3 1/3 0]
+
+_parent_space_group.child_transform_Pp_abc  'a-b,a+2b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;-1/3,0,1/4'
+
+
+
+_space_group_magn.number_BNS  189.225
+_space_group_magn.name_BNS  "P -6 2' m'"
+_cell_length_a             13.17920
+_cell_length_b             13.17920
+_cell_length_c             6.52000
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          120.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1 
+2 -y+2/3,x-y+1/3,z,+1 
+3 -x+y+1/3,-x+2/3,z,+1 
+4 -x+y+1/3,-x+2/3,-z+1/2,+1 
+5 x,y,-z+1/2,+1 
+6 -y+2/3,x-y+1/3,-z+1/2,+1 
+7 x-y,-y,-z+1/2,-1 
+8 y+2/3,x+1/3,-z+1/2,-1 
+9 -x+1/3,-x+y+2/3,-z+1/2,-1 
+10 -x+1/3,-x+y+2/3,z,-1 
+11 x-y,-y,z,-1 
+12 y+2/3,x+1/3,z,-1 
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1 
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Mn1 Mn 0.00000 0.00000 0.00000
+Cs1_1 Cs 0.33333 0.00000 0.75000
+Cs1_2 Cs 0.66666 0.00000 0.25000
+Cs1_3 Cs 0.33333 0.33333 0.25000
+Br1_1 Br 0.33333 0.82837 0.25000
+Br1_2 Br 0.17163 0.50497 0.25000
+Br1_3 Br 0.33333 0.50497 0.75000
+Br1_4 Br 0.49503 0.82837 0.75000
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+_atom_site_moment.magnitude
+Mn1 3.0(3) 0.00000 0.0 mx,0,mz  3.0(3)
+

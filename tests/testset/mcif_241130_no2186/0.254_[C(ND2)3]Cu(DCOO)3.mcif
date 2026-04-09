@@ -1,0 +1,133 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 16/09/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-09-16
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "J. Phys. Chem. C"
+_citation_journal_volume        123
+_citation_page_first            18551
+_citation_page_last             18559
+_citation_article_id            ?
+_citation_year                  2019
+_citation_DOI                   10.1021/acs.jpcc.9b04368
+
+loop_
+_citation_author_name
+"M. Viswanathan"
+"S.G. Bhat"
+"A.K. Bera"
+"J. Rodriguez-Carvajal"
+
+
+
+
+_atomic_positions_source_database_code_ICSD  248006
+_atomic_positions_source_other               .
+
+_transition_temperature  ?
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mGM1  1  1  .  primary  3  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+The report does not include the positional structure
+Positional structure used here is a room temperature structure for the non-deuterated compound retrieved from the icsd.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (4-possible)
+one primary irrep (1-dim)
+This is one of the two models that could not be distinguished (for the second one see #0.255).
+;
+
+_parent_space_group.name_H-M_alt  'P n a 2_1'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 0 0]
+
+_parent_space_group.child_transform_Pp_abc  'a,b,c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  'a,b,c;0,0,0'
+
+
+
+_space_group_magn.number_BNS  33.144
+_space_group_magn.name_BNS  "P n a 2_1"
+_cell_length_a             8.52120
+_cell_length_b             9.03210
+_cell_length_c             11.34970
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x,-y,z+1/2,+1
+3 -x+1/2,y+1/2,z+1/2,+1
+4 x+1/2,-y+1/2,z,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Cu1 Cu 0.99625 0.00076 0.49850
+O1 O 0.86350 0.84890 0.56950
+O2 O 0.70880 0.65290 0.55890
+O3 O 0.99980 0.11000 0.65140
+O4 O 0.01200 0.10850 0.84500
+O5 O 0.16810 0.12320 0.43580
+O6 O 0.32190 0.31890 0.42420
+C1 C 0.74830 0.77750 0.52750
+H1 H 0.68950 0.82280 0.46870
+C2 C 0.00730 0.04460 0.74850
+H2 H 0.00950 0.94170 0.74820
+C3 C 0.20680 0.25390 0.46130
+H3 H 0.14190 0.30530 0.51290
+C4 C 0.00600 0.50070 0.74700
+N1 N 0.01470 0.64540 0.74400
+H4 H 0.07940 0.69100 0.78950
+H5 H 0.95560 0.69480 0.69680
+N2 N 0.09590 0.42450 0.81880
+H6 H 0.16080 0.46960 0.86430
+H7 H 0.08980 0.32950 0.82030
+N3 N 0.90860 0.42970 0.67530
+H8 H 0.85080 0.47870 0.62690
+H9 H 0.90320 0.33470 0.67730
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Cu1 0.00000 0.63 0.00000 mx,my,mz
+

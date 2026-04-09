@@ -1,0 +1,134 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 25/08/2019
+
+
+data_5yOhtAoR
+_audit_creation_date            2019-08-25
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_citation_journal_abbrev        "Phys. Rev. B"
+_citation_journal_volume        44
+_citation_page_first            4716
+_citation_page_last             4719
+_citation_article_id            ?
+_citation_year                  1991
+_citation_DOI                   10.1103/PhysRevB.44.4716
+
+loop_
+_citation_author_name
+"J.L. Garcia-Muoz"
+"J. Rodriguez-Carvajal"
+"X. Obradors"
+"M. Vallet-Reg"
+"J. Gonzalez-Calbet"
+"M. Parras"
+
+
+
+_atomic_positions_source_database_code_ICSD  79432
+_atomic_positions_source_other               .
+
+_transition_temperature  8.5
+_experiment_temperature  1.5
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+mT1  2  2  special  primary  24  .
+
+_exptl_crystal_magnetic_properties_details
+;
+NPD
+Above 8.5K and below 13.5K only Cu spins are ordered
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (2 possible)
+2-dim irrep active along a special direction
+;
+
+_parent_space_group.name_H-M_alt  'P n a 2_1'
+_parent_space_group.IT_number                       33
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  'a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '-b,a,-1/2b+1/2c;3/4,0,1/4'
+
+
+
+_space_group_magn.number_BNS  7.27
+_space_group_magn.name_BNS  "P_a c"
+_cell_length_a             10.72900
+_cell_length_b             6.87100
+_cell_length_c             24.70620
+_cell_angle_alpha          90.00
+_cell_angle_beta           90.00
+_cell_angle_gamma          90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -x+1/2,y+3/4,z+1/4,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x,y+1/2,z,-1
+4 x,y,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+Yb1_1 Yb 0.20880 0.11345 0.00000
+Yb1_2 Yb  0.79120 0.88655 0.25000
+Yb2_1 Yb 0.04160 0.11155 0.16520
+Yb2_2 Yb  0.95840 0.88845 0.41520
+Cu1_1 Cu 0.99070 0.33050 0.05650
+Cu1_2 Cu  0.00930 0.66950 0.30650
+Cu2_1 Cu 0.26080 0.33050 0.10850
+Cu2_2 Cu  0.73920 0.66950 0.35850
+O1_1 O 0.17400 0.36450 0.17850
+O1_2 O  0.82600 0.63550 0.42850
+O2_1 O 0.32300 0.35900 0.03200
+O2_2 O  0.67700 0.64100 0.28200
+O3_1 O 0.12500 0.15650 0.08250
+O3_2 O  0.87500 0.84350 0.33250
+O4_1 O 0.42800 0.38900 0.13150
+O4_2 O  0.57200 0.61100 0.38150
+O5_1 O 0.42500 0.11400 0.23800
+O5_2 O  0.57500 0.88600 0.48800
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Yb1_1 0.6(1) 1.2(1) 0.00000 mx,my,mz
+Yb1_2 0.6 1.2 0.00000 mx,my,mz
+Yb2_1 -0.6 1.2 0.00000 mx,my,mz
+Yb2_2 -0.6 1.2 0.00000 mx,my,mz
+Cu1_1 0.00000 -1.1(1) 0.00000 mx,my,mz
+Cu1_2 0.00000 -1.1 0.00000 mx,my,mz
+Cu2_1 0.00000 -1.1 0.00000 mx,my,mz
+Cu2_2 0.00000 -1.1 0.00000 mx,my,mz

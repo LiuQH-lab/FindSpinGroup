@@ -1,0 +1,157 @@
+#\#CIF_2.0
+# Created by the Bilbao Crystallographic Server
+# http://www.cryst.ehu.es
+# Date: 11/19/2017 17:11:08
+# Database entry: 1.82 Nd2RhIn8
+# Cif-like file for the case 1.82
+
+
+data_5yOhtAoR
+_audit_creation_date            2017-11-19
+_audit_creation_method          "Bilbao Crystallographic Server"
+
+_chemical_name_systematic
+;
+;
+_chemical_name_common                    ?
+_chemical_formula_moiety                 ?
+_chemical_formula_structural             ?
+_chemical_formula_analytical             ?
+_chemical_formula_iupac                  ?
+_chemical_formula_sum                    'Nd2 Rh In8'
+_chemical_formula_weight                 ?
+_chemical_melting_point                  ?
+_chemical_compound_source                ?
+_chemical_absolute_configuration         .
+
+
+_citation_journal_abbrev        "PHYSICAL REVIEW B"
+_citation_journal_volume        89
+_citation_page_first            ?
+_citation_page_last             ?
+_citation_article_id            184409
+_citation_year                  2014
+_citation_DOI                   10.1103/physrevb.89.184409
+
+loop_
+_citation_author_name
+"P. Čermak"
+"P. Javorsky"
+"M. Kratochvilova"
+"K. Pajskr"
+"M. Klicpera"
+"B. Ouladdiaf"
+"M.-H. Lemee-Cailleau"
+"J. Rodriguez-Carvajal"
+"M. Boehm"
+
+
+
+
+
+_atomic_positions_source_database_code_ICSD  .
+_atomic_positions_source_other               .
+
+_transition_temperature     10.63
+_experiment_temperature     2
+
+loop_
+_irrep_id
+_irrep_dimension
+_irrep_small_dimension
+_irrep_direction_type
+_irrep_action
+_irrep_modes_number
+_irrep_presence
+? ? ? ? ? . .
+
+_exptl_crystal_magnetic_properties_details
+;
+NSD
+Table of atomic positions in article apparently erroneous. They do not correspond to the figure shown. They have been corrected here.
+;
+
+_active_magnetic_irreps_details
+;
+1k magnetic structure
+k-maximal magnetic symmetry (6 possible)
+1-dim irrep active
+;
+
+_parent_space_group.name_H-M_alt  'P  4/m  m  m'
+_parent_space_group.IT_number                       123
+_parent_space_group.transform_Pp_abc  'a,b,c;0,0,0'
+
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [1/2 1/2 1/2]
+
+_parent_space_group.child_transform_Pp_abc  '2a,2b,2c;0,0,0'
+_space_group_magn.transform_BNS_Pp_abc  '1/2a-1/2b,1/2a+1/2b,c;0,0,1/4'
+
+
+_space_group_magn.number_BNS  140.550
+_space_group_magn.name_BNS  "I_c  4/m  c  m"
+_space_group_magn.point_group_name  "4/mmm1'"
+_space_group_magn.point_group_number  "15.2.54"
+_cell_length_a                 9.26420
+_cell_length_b                 9.26420
+_cell_length_c                 24.22600
+_cell_angle_alpha              90.00
+_cell_angle_beta               90.00
+_cell_angle_gamma              90.00
+
+loop_
+_space_group_symop_magn_operation.id
+_space_group_symop_magn_operation.xyz
+1 x,y,z,+1
+2 -y+1/2,x+1/2,z,+1
+3 y+1/2,-x+1/2,z,+1
+4 y+1/2,x+1/2,-z,+1
+5 -y+1/2,-x+1/2,-z,+1
+6 -x,-y,z,+1
+7 -x,y,-z,+1
+8 x,-y,-z,+1
+9 -x,-y,-z+1/2,+1
+10 y+1/2,-x+1/2,-z+1/2,+1
+11 -y+1/2,x+1/2,-z+1/2,+1
+12 -y+1/2,-x+1/2,z+1/2,+1
+13 y+1/2,x+1/2,z+1/2,+1
+14 x,y,-z+1/2,+1
+15 x,-y,z+1/2,+1
+16 -x,y,z+1/2,+1
+
+loop_
+_space_group_symop_magn_centering.id
+_space_group_symop_magn_centering.xyz
+1 x,y,z,+1
+2 x,y+1/2,z+1/2,+1
+3 x+1/2,y,z+1/2,+1
+4 x+1/2,y+1/2,z,+1
+5 x,y,z+1/2,-1
+6 x,y+1/2,z,-1
+7 x+1/2,y,z,-1
+8 x+1/2,y+1/2,z+1/2,-1
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_occupancy
+Nd Nd 0.00000 0.00000 0.15415 1
+Rh Rh 0.00000 0.00000 0.00000 1
+In1 In 0.00000 0.25000 0.25000 1
+In2 In 0.00000 0.25000 0.06060 1
+In3 In 0.25000 0.25000 0.15295 1
+
+loop_
+_atom_site_moment.label
+_atom_site_moment.crystalaxis_x
+_atom_site_moment.crystalaxis_y
+_atom_site_moment.crystalaxis_z
+_atom_site_moment.symmform
+Nd 0.0 0.0 2.53(9) 0,0,mz
+
