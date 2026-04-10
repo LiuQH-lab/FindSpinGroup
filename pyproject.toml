@@ -47,7 +47,12 @@ include = ["findspingroup*"]
 namespaces = false
 
 [tool.setuptools.package-data]
-findspingroup = ["core/identify_index/databases/*.db", "examples/*.mcif"]
+findspingroup = [
+    "core/identify_index/databases/*.db",
+    "core/identify_index/data/*.json",
+    "core/identify-py-222/databases/*.db",
+    "examples/*.mcif",
+]
 
 [project.scripts]
 fsg = "findspingroup.cli:main"
