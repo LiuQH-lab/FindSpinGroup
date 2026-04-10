@@ -34,6 +34,7 @@ SPACE_TOL="${SPACE_TOL:-0.02}"
 MTOL="${MTOL:-0.02}"
 MEIGTOL="${MEIGTOL:-0.00002}"
 MATRIX_TOL="${MATRIX_TOL:-0.01}"
+BATCH_ROUTE="${BATCH_ROUTE:-full}"
 EXPORT_RUNTIME_ROWS="${EXPORT_RUNTIME_ROWS:-1}"
 EXPORT_ROWS_JSONL_NAME="${EXPORT_ROWS_JSONL_NAME:-export_rows.jsonl}"
 EXPORT_ROWS_XLSX_NAME="${EXPORT_ROWS_XLSX_NAME:-export_rows.xlsx}"
@@ -85,6 +86,8 @@ CMD=(
   "$MEIGTOL"
   --matrix-tol
   "$MATRIX_TOL"
+  --route
+  "$BATCH_ROUTE"
 )
 
 if [[ -n "$BASELINE_SUITE" ]]; then
@@ -132,6 +135,7 @@ else
   echo "Baseline suite: <auto from input dir>"
 fi
 echo "Tolerances  : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRIX_TOL"
+echo "Batch route : $BATCH_ROUTE"
 if [[ -n "$EXPORT_TXT" ]]; then
   echo "Export txt  : $EXPORT_TXT"
 else

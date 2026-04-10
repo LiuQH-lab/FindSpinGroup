@@ -1,11 +1,13 @@
 import json
 import importlib
+import sys
 import numpy as np
 import pytest
 
 import findspingroup.core.identify_symmetry_from_ops as identify_symmetry_from_ops_module
 import findspingroup.structure.group as group_module
-from findspingroup import find_spin_group, find_spin_group_from_data
+from findspingroup import find_spin_group, find_spin_group_basic, find_spin_group_from_data
+from findspingroup import find_spin_group_acc_primitive, write_ssg_operation_matrices
 from findspingroup.core.identify_index.functions import (
     find_stand_gen_maps,
     is_matrix_equal,
@@ -85,6 +87,101 @@ def _serialize_gspg_pairs(ops):
         ]
         for spin_rotation, space_rotation in ops
     ]
+
+
+def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
+    def _unexpected(*args, **kwargs):
+        raise AssertionError("unexpected heavy-route call")
+
+    monkeypatch.setattr(find_spin_group_module, "_compute_tensor_outputs", _unexpected)
+    monkeypatch.setattr(find_spin_group_module, "generate_scif", _unexpected)
+
+    payload = find_spin_group_basic("examples/0.800_MnTe.mcif")
+
+    assert payload["index"] == "194.164.1.1.L"
+    assert payload["conf"] == "Collinear"
+    assert payload["acc_symbol"] == "6/mmmP"
+    assert payload["g0_number"] == 194
+    assert payload["l0_number"] == 164
+    assert payload["space_group_number"] == 194
+    assert payload["nsspg"] == "-1"
+    assert payload["sspg"] == "∞/mm"
+    assert "msg_symbol" in payload
+
+
+def test_cli_basic_mode_prints_json(monkeypatch, capsys):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["findspingroup", "examples/0.800_MnTe.mcif", "--mode", "basic"],
+    )
+
+    import findspingroup.cli as cli_module
+
+    cli_module.main()
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["index"] == "194.164.1.1.L"
+    assert payload["conf"] == "Collinear"
+    assert payload["acc_symbol"] == "6/mmmP"
+
+
+def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypatch):
+    def _unexpected(*args, **kwargs):
+        raise AssertionError("unexpected heavy-route call")
+
+    monkeypatch.setattr(find_spin_group_module, "_compute_tensor_outputs", _unexpected)
+    monkeypatch.setattr(find_spin_group_module, "generate_scif", _unexpected)
+
+    payload = find_spin_group_acc_primitive("examples/0.800_MnTe.mcif")
+
+    assert payload["index"] == "194.164.1.1.L"
+    assert payload["conf"] == "Collinear"
+    assert payload["acc_symbol"] == "6/mmmP"
+    assert payload["acc_primitive_cell_setting"] == "acc_primitive"
+    assert payload["acc_primitive_cell_detail"] is not None
+    assert payload["acc_primitive_poscar"]
+    assert payload["acc_primitive_ssg_operation_matrices"]
+    assert payload["acc_primitive_poscar_spin_frame_ssg_operation_matrices"]
+
+
+def test_write_ssg_operation_matrices_writes_json(tmp_path):
+    payload = find_spin_group_acc_primitive("examples/0.800_MnTe.mcif")
+    output_path = tmp_path / "acc_primitive_ops.json"
+
+    write_ssg_operation_matrices(output_path, payload["acc_primitive_ssg_operation_matrices"])
+
+    loaded = json.loads(output_path.read_text(encoding="utf-8"))
+    assert isinstance(loaded, list)
+    assert loaded
+    assert sorted(loaded[0].keys()) == ["index", "real_rotation", "spin_rotation", "translation"]
+
+
+def test_cli_acc_primitive_mode_prints_json_and_writes_matrix_file(monkeypatch, capsys, tmp_path):
+    output_path = tmp_path / "ops.json"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "findspingroup",
+            "examples/0.800_MnTe.mcif",
+            "--mode",
+            "acc-primitive",
+            "--write-ssg-matrices",
+            str(output_path),
+        ],
+    )
+
+    import findspingroup.cli as cli_module
+
+    cli_module.main()
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["index"] == "194.164.1.1.L"
+    assert payload["acc_symbol"] == "6/mmmP"
+    assert output_path.is_file()
+    written = json.loads(output_path.read_text(encoding="utf-8"))
+    assert len(written) == len(payload["acc_primitive_ssg_operation_matrices"])
 
 
 def _serialize_effective_mpg_ops(ops):
