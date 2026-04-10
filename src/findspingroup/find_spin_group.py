@@ -1337,6 +1337,20 @@ def _serialize_gspg_ops(ops) -> list[list[list[list[float]]]]:
     ]
 
 
+def _serialize_ssg_operation_matrices(
+    ops: list[SpinSpaceGroupOperation],
+) -> list[dict]:
+    return [
+        {
+            "index": idx + 1,
+            "spin_rotation": np.asarray(op.spin_rotation, dtype=float).tolist(),
+            "real_rotation": np.asarray(op.rotation, dtype=float).tolist(),
+            "translation": np.asarray(op.translation, dtype=float).tolist(),
+        }
+        for idx, op in enumerate(ops)
+    ]
+
+
 def _serialize_effective_mpg_ops(ops) -> list[list]:
     return [
         [
@@ -3516,6 +3530,222 @@ def _find_spin_group_from_parsed(
     return MagSymmetryResult(cell,symmetry,properties)
 
 
+def _find_spin_group_basic_from_parsed(
+    source_name: str,
+    lattice_factors,
+    positions,
+    elements,
+    occupancies,
+    moments,
+    tol_cfg: Tolerances,
+) -> dict:
+    input_cell = CrystalCell(
+        lattice_factors,
+        positions,
+        occupancies,
+        elements,
+        moments,
+        spin_setting="in_lattice",
+        tol=tol_cfg,
+    )
+    magnetic_primitive_cell, transformation_input_to_primitive = input_cell.get_primitive_structure(
+        magnetic=True
+    )
+    identify_result = identify_spin_space_group_result(
+        magnetic_primitive_cell,
+        find_primitive=False,
+        tol=tol_cfg,
+    )
+    ssg_primitive: SpinSpaceGroup = identify_result.ssg
+    input_space_group = identify_result.input_space_group
+    input_space_group_number = None if input_space_group is None else input_space_group.number
+    input_space_group_symbol = None if input_space_group is None else input_space_group.symbol
+
+    identify_index_details = None
+    identify_info = None
+    try:
+        identify_index_details = _identify_ssg_index_details(
+            source_name,
+            ssg_primitive,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        identify_info = identify_index_details["index"]
+    except ValueError as exc:
+        if not _should_degrade_identify_index_error(exc):
+            raise
+        warnings.warn(
+            f"Identify-index output unavailable for {source_name}: {exc}. "
+            "Continuing with identify-index-derived outputs set to None.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+
+    try:
+        msg_dataset_primitive = get_magnetic_symmetry_dataset(
+            magnetic_primitive_cell.to_spglib(mag=True),
+            symprec=tol_cfg.space,
+            mag_symprec=tol_cfg.moment,
+        )
+        spglib_msg_num = msg_dataset_primitive.uni_number
+        mpg_symbol = MSGMPG_DB.OG_NUM_TO_MPG[
+            MSGMPG_DB.BNS_TO_OG_NUM[MSGMPG_DB.MSG_INT_TO_BNS[spglib_msg_num][0]]
+        ]["pointgroup_no"]
+    except Exception:
+        mpg_symbol = None
+
+    magnetic_phase_payload = classify_magnetic_phase(
+        conf=ssg_primitive.conf,
+        full_spin_part_point_group_hm=ssg_primitive.spin_part_point_group_symbol_hm,
+        full_spin_part_point_group_s=ssg_primitive.spin_part_point_group_symbol_s,
+        net_moment=magnetic_primitive_cell.net_moment,
+        mpg_identifier=mpg_symbol,
+        is_ss_gp=ssg_primitive.is_spinsplitting[-1],
+    )
+
+    transformation_primitive_to_acc_primitive = (
+        np.asarray(ssg_primitive.acc_primitive_trans, dtype=float),
+        np.asarray(ssg_primitive.acc_primitive_origin_shift, dtype=float),
+    )
+    acc_magnetic_primitive_cell = magnetic_primitive_cell.transform(*transformation_primitive_to_acc_primitive)
+    acc_magnetic_primitive_ssg = ssg_primitive.transform(*transformation_primitive_to_acc_primitive)
+    acc_primitive_ossg = _ossg_oriented_spin_frame_ssg(
+        acc_magnetic_primitive_ssg,
+        acc_magnetic_primitive_cell,
+    )
+    internal_msg_info = acc_primitive_ossg.msg_info
+    msg_num = None if internal_msg_info is None else internal_msg_info.get("msg_int_num")
+    msg_symbol = None if internal_msg_info is None else internal_msg_info.get("msg_bns_symbol")
+    msg_parent_info = msg_parent_space_group_info(msg_num)
+
+    ssg_space_group_number = int(ssg_primitive.G0_num)
+
+    return {
+        "index": identify_info or ssg_primitive.index,
+        "g0_symbol": ssg_primitive.G0_symbol,
+        "g0_number": int(ssg_primitive.G0_num),
+        "l0_symbol": ssg_primitive.L0_symbol,
+        "l0_number": int(ssg_primitive.L0_num),
+        "it": int(ssg_primitive.it),
+        "ik": int(ssg_primitive.ik),
+        "nsspg": ssg_primitive.n_spin_part_point_group_symbol_hm,
+        "sspg": ssg_primitive.spin_part_point_group_symbol_hm,
+        "acc_symbol": ssg_primitive.acc,
+        "space_group_symbol": input_space_group_symbol,
+        "space_group_number": input_space_group_number,
+        "msg_symbol": msg_symbol,
+        "msg_bns_number": msg_parent_info["bns_number"],
+        "msg_og_number": msg_parent_info["og_number"],
+        "empg": ssg_primitive.gspg.empg_symbol,
+        "conf": ssg_primitive.conf,
+        "magnetic_phase": magnetic_phase_payload["phase"],
+        "is_alter": magnetic_phase_payload["is_alter"],
+        "is_som": magnetic_phase_payload["is_spin_orbit_magnet"],
+        "sg_is_polar": space_group_is_polar(input_space_group_number),
+        "sg_is_chiral": space_group_is_chiral(input_space_group_number),
+        "ssg_is_polar": space_group_is_polar(ssg_space_group_number),
+        "ssg_is_chiral": space_group_is_chiral(ssg_space_group_number),
+        "msg_is_polar": msg_parent_info["is_polar"],
+        "msg_is_chiral": msg_parent_info["is_chiral"],
+    }
+
+
+def _find_spin_group_acc_primitive_from_parsed(
+    source_name: str,
+    lattice_factors,
+    positions,
+    elements,
+    occupancies,
+    moments,
+    tol_cfg: Tolerances,
+) -> dict:
+    input_cell = CrystalCell(
+        lattice_factors,
+        positions,
+        occupancies,
+        elements,
+        moments,
+        spin_setting="in_lattice",
+        tol=tol_cfg,
+    )
+    magnetic_primitive_cell, transformation_input_to_primitive = input_cell.get_primitive_structure(
+        magnetic=True
+    )
+    identify_result = identify_spin_space_group_result(
+        magnetic_primitive_cell,
+        find_primitive=False,
+        tol=tol_cfg,
+    )
+    ssg_primitive: SpinSpaceGroup = identify_result.ssg
+
+    identify_index_details = None
+    identify_info = None
+    try:
+        identify_index_details = _identify_ssg_index_details(
+            source_name,
+            ssg_primitive,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        identify_info = identify_index_details["index"]
+    except ValueError as exc:
+        if not _should_degrade_identify_index_error(exc):
+            raise
+        warnings.warn(
+            f"Identify-index output unavailable for {source_name}: {exc}. "
+            "Continuing with identify-index-derived outputs set to None.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+
+    transformation_primitive_to_acc_primitive = (
+        np.asarray(ssg_primitive.acc_primitive_trans, dtype=float),
+        np.asarray(ssg_primitive.acc_primitive_origin_shift, dtype=float),
+    )
+    acc_primitive_cell = magnetic_primitive_cell.transform(*transformation_primitive_to_acc_primitive)
+    acc_primitive_ssg = ssg_primitive.transform(*transformation_primitive_to_acc_primitive)
+    transformation_input_to_acc_primitive = _chain_setting_transform(
+        transformation_input_to_primitive[0],
+        transformation_input_to_primitive[1],
+        transformation_primitive_to_acc_primitive[0],
+        transformation_primitive_to_acc_primitive[1],
+    )
+    acc_primitive_poscar = acc_primitive_cell.to_poscar(source_name)
+    acc_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_primitive_cell)
+    poscar_spin_frame_to_acc_real_cartesian = np.linalg.inv(
+        acc_real_cartesian_to_poscar_spin_frame
+    )
+    acc_primitive_ssg_in_poscar_spin_frame = acc_primitive_ssg.transform_spin(
+        acc_real_cartesian_to_poscar_spin_frame
+    )
+
+    return {
+        "index": identify_info or ssg_primitive.index,
+        "acc_symbol": ssg_primitive.acc,
+        "conf": ssg_primitive.conf,
+        "acc_primitive_cell_setting": ACC_PRIMITIVE_SETTING,
+        "acc_primitive_cell_detail": _serialize_cell_snapshot(acc_primitive_cell),
+        "acc_primitive_poscar": acc_primitive_poscar,
+        "acc_primitive_ssg_setting": ACC_PRIMITIVE_SETTING,
+        "acc_primitive_ssg_international_linear": acc_primitive_ssg.international_symbol_linear,
+        "acc_primitive_ssg_operation_matrices": _serialize_ssg_operation_matrices(
+            list(acc_primitive_ssg.ops)
+        ),
+        "acc_primitive_poscar_spin_frame_setting": ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING,
+        "acc_primitive_poscar_spin_frame_ssg_operation_matrices": _serialize_ssg_operation_matrices(
+            list(acc_primitive_ssg_in_poscar_spin_frame.ops)
+        ),
+        "acc_primitive_real_cartesian_to_poscar_spin_frame": np.asarray(
+            acc_real_cartesian_to_poscar_spin_frame, dtype=float
+        ).tolist(),
+        "poscar_spin_frame_to_acc_primitive_real_cartesian": np.asarray(
+            poscar_spin_frame_to_acc_real_cartesian, dtype=float
+        ).tolist(),
+        "T_input_to_acc_primitive": (
+            np.asarray(transformation_input_to_acc_primitive[0], dtype=float).tolist(),
+            np.asarray(transformation_input_to_acc_primitive[1], dtype=float).tolist(),
+        ),
+    }
+
+
 def find_spin_group_from_data(
     source_name: str,
     lattice_factors,
@@ -3540,6 +3770,54 @@ def find_spin_group_from_data(
         tol_cfg,
         source_metadata=source_metadata,
         parser_atol=None,
+    )
+
+
+def find_spin_group_basic_from_data(
+    source_name: str,
+    lattice_factors,
+    positions,
+    elements,
+    occupancies,
+    moments,
+    space_tol=0.02,
+    mtol=0.02,
+    meigtol=0.00002,
+    matrix_tol=0.01,
+) -> dict:
+    tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
+    return _find_spin_group_basic_from_parsed(
+        source_name,
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        tol_cfg,
+    )
+
+
+def find_spin_group_acc_primitive_from_data(
+    source_name: str,
+    lattice_factors,
+    positions,
+    elements,
+    occupancies,
+    moments,
+    space_tol=0.02,
+    mtol=0.02,
+    meigtol=0.00002,
+    matrix_tol=0.01,
+) -> dict:
+    tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
+    return _find_spin_group_acc_primitive_from_parsed(
+        source_name,
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        tol_cfg,
     )
 
 
@@ -3580,3 +3858,57 @@ def find_spin_group(
         source_metadata=source_metadata,
         parser_atol=parser_atol,
     )
+
+
+def find_spin_group_basic(
+    cif: str,
+    space_tol=0.02,
+    mtol=0.02,
+    meigtol=0.00002,
+    matrix_tol=0.01,
+    parser_atol=0.02,
+) -> dict:
+    tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
+    parsed, _source_metadata = parse_structure_file(cif, atol=parser_atol, return_metadata=True)
+    lattice_factors, positions, elements, occupancies, labels, moments = parsed
+    return _find_spin_group_basic_from_parsed(
+        cif,
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        tol_cfg,
+    )
+
+
+def find_spin_group_acc_primitive(
+    cif: str,
+    space_tol=0.02,
+    mtol=0.02,
+    meigtol=0.00002,
+    matrix_tol=0.01,
+    parser_atol=0.02,
+) -> dict:
+    tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
+    parsed, _source_metadata = parse_structure_file(cif, atol=parser_atol, return_metadata=True)
+    lattice_factors, positions, elements, occupancies, labels, moments = parsed
+    return _find_spin_group_acc_primitive_from_parsed(
+        cif,
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        tol_cfg,
+    )
+
+
+def write_ssg_operation_matrices(path: str | Path, operations: list[dict]) -> Path:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        json.dumps(operations, indent=2, ensure_ascii=False, sort_keys=True, cls=NumpyEncoder) + "\n",
+        encoding="utf-8",
+    )
+    return output_path

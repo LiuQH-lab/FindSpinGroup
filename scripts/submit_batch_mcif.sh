@@ -22,6 +22,7 @@ Environment overrides:
   MTOL           current: ${MTOL:-0.02}
   MEIGTOL        current: ${MEIGTOL:-0.00002}
   MATRIX_TOL     current: ${MATRIX_TOL:-0.01}
+  BATCH_ROUTE    current: ${BATCH_ROUTE:-full}
   EXPORT_TXT     current: ${EXPORT_TXT:-selected.txt}
   EXPORT_FIELDS  current: ${EXPORT_FIELDS:-index,phase,properties.ss_w_soc}
   INCLUDE_G0_SELF_AUDIT current: ${INCLUDE_G0_SELF_AUDIT:-0}
@@ -46,9 +47,16 @@ SPACE_TOL="${SPACE_TOL:-0.02}"
 MTOL="${MTOL:-0.02}"
 MEIGTOL="${MEIGTOL:-0.00002}"
 MATRIX_TOL="${MATRIX_TOL:-0.01}"
+BATCH_ROUTE="${BATCH_ROUTE:-full}"
 
 EXPORT_TXT="${EXPORT_TXT:-selected.txt}"
-EXPORT_FIELDS="${EXPORT_FIELDS:-index,phase,properties.ss_w_soc}"
+if [[ -n "${EXPORT_FIELDS+x}" ]]; then
+  EXPORT_FIELDS="${EXPORT_FIELDS}"
+elif [[ "$BATCH_ROUTE" == "basic" ]]; then
+  EXPORT_FIELDS="index,magnetic_phase,acc_symbol"
+else
+  EXPORT_FIELDS="index,phase,properties.ss_w_soc"
+fi
 
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
   usage
@@ -90,6 +98,7 @@ echo "Output root    : $OUTPUT_ROOT"
 echo "Baseline suite : $BASELINE_SUITE"
 echo "Baseline root  : $BASELINE_ROOT"
 echo "Tolerances     : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRIX_TOL"
+echo "Batch route    : $BATCH_ROUTE"
 echo "Export txt     : ${EXPORT_TXT:-<none>}"
 echo "Export fields  : ${EXPORT_FIELDS:-<none>}"
 echo "G0 self audit  : ${INCLUDE_G0_SELF_AUDIT:-0}"
@@ -111,6 +120,7 @@ SPACE_TOL="$SPACE_TOL" \
 MTOL="$MTOL" \
 MEIGTOL="$MEIGTOL" \
 MATRIX_TOL="$MATRIX_TOL" \
+BATCH_ROUTE="$BATCH_ROUTE" \
 EXPORT_TXT="$EXPORT_TXT" \
 EXPORT_FIELDS="$EXPORT_FIELDS" \
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}" \

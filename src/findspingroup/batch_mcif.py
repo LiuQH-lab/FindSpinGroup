@@ -11,7 +11,12 @@ from pathlib import Path
 
 import numpy as np
 
-from .find_spin_group import NumpyEncoder, audit_spatial_transform_effect, find_spin_group
+from .find_spin_group import (
+    NumpyEncoder,
+    audit_spatial_transform_effect,
+    find_spin_group,
+    find_spin_group_basic,
+)
 from .structure.group import SpinSpaceGroup
 from .version import __version__
 
@@ -326,6 +331,8 @@ def _normalize_jsonable(value):
 
 
 def _build_export_root(result) -> dict:
+    if isinstance(result, dict):
+        return _normalize_jsonable(dict(result))
     payload = _normalize_jsonable(dict(result.to_dict()))
     payload["phase"] = result.magnetic_phase
     payload["properties"] = result.properties_summary()
@@ -708,6 +715,7 @@ def run_mcif_batch(
     files: list[Path],
     output_dir: Path,
     *,
+    route: str = "full",
     space_tol: float = 0.02,
     mtol: float = 0.02,
     meigtol: float = 0.00002,
@@ -721,6 +729,11 @@ def run_mcif_batch(
     quiet: bool = False,
     include_g0_self_audit: bool = False,
 ) -> dict:
+    if route not in {"full", "basic"}:
+        raise ValueError(f"Unsupported batch route: {route}")
+    if route != "full" and include_g0_self_audit:
+        raise ValueError("--include-g0-self-audit is only supported for route='full'.")
+
     output_dir.mkdir(parents=True, exist_ok=True)
     records_path = output_dir / "records.jsonl"
     full_results_path = output_dir / "full_results.jsonl"
@@ -743,14 +756,24 @@ def run_mcif_batch(
         case_id = _normalize_case_id(file_path)
         case_start = time.perf_counter()
         try:
-            result = find_spin_group(
-                str(file_path),
-                space_tol=space_tol,
-                mtol=mtol,
-                meigtol=meigtol,
-                matrix_tol=matrix_tol,
-            )
-            snapshot = result.to_summary_dict()
+            if route == "basic":
+                result = find_spin_group_basic(
+                    str(file_path),
+                    space_tol=space_tol,
+                    mtol=mtol,
+                    meigtol=meigtol,
+                    matrix_tol=matrix_tol,
+                )
+                snapshot = dict(result)
+            else:
+                result = find_spin_group(
+                    str(file_path),
+                    space_tol=space_tol,
+                    mtol=mtol,
+                    meigtol=meigtol,
+                    matrix_tol=matrix_tol,
+                )
+                snapshot = result.to_summary_dict()
             duration = round(time.perf_counter() - case_start, 6)
             runtime_record = {
                 "case_id": case_id,
@@ -759,8 +782,6 @@ def run_mcif_batch(
                 "status": "ok",
                 "duration_seconds": duration,
                 "result": snapshot,
-                "group_identifiers": _build_group_identifier_payload(result),
-                "tensor_summary": _build_tensor_summary(result),
             }
             full_runtime_record = {
                 "case_id": case_id,
@@ -769,9 +790,13 @@ def run_mcif_batch(
                 "status": "ok",
                 "duration_seconds": duration,
                 "result": _build_export_root(result),
-                "tensor_summary": _build_tensor_summary(result),
             }
-            if include_g0_self_audit:
+            if route == "full":
+                runtime_record["group_identifiers"] = _build_group_identifier_payload(result)
+                tensor_summary = _build_tensor_summary(result)
+                runtime_record["tensor_summary"] = tensor_summary
+                full_runtime_record["tensor_summary"] = tensor_summary
+            if route == "full" and include_g0_self_audit:
                 g0_self_audit = _build_g0_self_audit(result)
                 runtime_record["g0_self_audit"] = g0_self_audit
                 full_runtime_record["g0_self_audit"] = g0_self_audit
@@ -843,6 +868,7 @@ def run_mcif_batch(
         "output_dir": output_dir.resolve().as_posix(),
         "full_results_jsonl": full_results_path.resolve().as_posix(),
         "package_version": __version__,
+        "route": route,
         "run_tag": run_tag,
         "started_at": started_at,
         "finished_at": _isoformat_now(),
@@ -881,6 +907,7 @@ def run_mcif_batch_with_auto_baseline(
     *,
     baseline_root: Path,
     suite_name: str,
+    route: str = "full",
     space_tol: float = 0.02,
     mtol: float = 0.02,
     meigtol: float = 0.00002,
@@ -918,6 +945,7 @@ def run_mcif_batch_with_auto_baseline(
     summary = run_mcif_batch(
         files,
         output_dir,
+        route=route,
         space_tol=space_tol,
         mtol=mtol,
         meigtol=meigtol,
@@ -1020,6 +1048,12 @@ def _parse_args() -> argparse.Namespace:
         type=Path,
         required=True,
         help="Directory for batch artifacts such as baseline.json and records.jsonl.",
+    )
+    parser.add_argument(
+        "--route",
+        choices=["full", "basic"],
+        default="full",
+        help="Choose the full pipeline or the lightweight basic route for each case.",
     )
     parser.add_argument("--space-tol", type=float, default=0.02)
     parser.add_argument("--mtol", type=float, default=0.02)
@@ -1180,6 +1214,7 @@ def main() -> None:
         "mtol": args.mtol,
         "meigtol": args.meigtol,
         "matrix_tol": args.matrix_tol,
+        "route": args.route,
         "limit": args.limit,
         "shard_index": args.shard_index,
         "shard_count": args.shard_count,
@@ -1203,6 +1238,7 @@ def main() -> None:
             args.output_dir,
             baseline_root=baseline_root.resolve(),
             suite_name=baseline_suite,
+            route=args.route,
             space_tol=args.space_tol,
             mtol=args.mtol,
             meigtol=args.meigtol,
@@ -1217,6 +1253,7 @@ def main() -> None:
         summary = run_mcif_batch(
             files,
             args.output_dir,
+            route=args.route,
             space_tol=args.space_tol,
             mtol=args.mtol,
             meigtol=args.meigtol,

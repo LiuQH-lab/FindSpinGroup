@@ -121,6 +121,37 @@ def _fake_tensor_summary(tag: str) -> dict:
     }
 
 
+def _fake_basic_payload(index: str) -> dict:
+    return {
+        "g0_symbol": f"G0:{index}",
+        "g0_number": 1,
+        "l0_symbol": f"L0:{index}",
+        "l0_number": 2,
+        "it": 3,
+        "ik": 4,
+        "nsspg": "2",
+        "sspg": "mm2",
+        "index": index,
+        "acc_symbol": f"acc:{index}",
+        "space_group_symbol": "P1",
+        "space_group_number": 1,
+        "msg_symbol": f"msg:{index}",
+        "msg_bns_number": "1.1",
+        "msg_og_number": "1.1.1",
+        "empg": f"empg:{index}",
+        "conf": f"conf:{index}",
+        "magnetic_phase": f"phase:{index}",
+        "is_alter": "",
+        "is_som": "",
+        "sg_is_polar": False,
+        "sg_is_chiral": False,
+        "ssg_is_polar": False,
+        "ssg_is_chiral": False,
+        "msg_is_polar": False,
+        "msg_is_chiral": False,
+    }
+
+
 def _roundtrip_index_from_scif_text(tmp_path: Path, file_name: str, scif_text: str):
     scif_path = tmp_path / file_name
     scif_path.write_text(scif_text, encoding="utf-8")
@@ -402,6 +433,97 @@ def test_run_mcif_batch_writes_baseline_meta_and_export_txt(tmp_path):
     assert full_record["result"]["msg_bns_number"] == "63.457"
     assert full_record["result"]["msg_og_number"] == "63.1.511"
     assert summary["full_results_jsonl"].endswith("full_results.jsonl")
+
+
+def test_run_mcif_batch_basic_route_uses_lightweight_pipeline(monkeypatch, tmp_path):
+    source_file = _write_fake_mcif(tmp_path, "basic_only.mcif")
+
+    def fake_basic(path: str, **kwargs):
+        assert Path(path).name == "basic_only.mcif"
+        return _fake_basic_payload("BASIC.IDX")
+
+    def fail_full(*args, **kwargs):
+        raise AssertionError("full route should not be called")
+
+    monkeypatch.setattr(batch_mcif, "find_spin_group_basic", fake_basic)
+    monkeypatch.setattr(batch_mcif, "find_spin_group", fail_full)
+
+    summary = run_mcif_batch(
+        [source_file],
+        tmp_path / "basic_batch",
+        route="basic",
+        export_fields=["index", "magnetic_phase", "acc_symbol"],
+        export_txt_path=tmp_path / "basic_batch" / "selected.txt",
+        quiet=True,
+    )
+
+    export_lines = (tmp_path / "basic_batch" / "selected.txt").read_text(encoding="utf-8").splitlines()
+    records = (tmp_path / "basic_batch" / "records.jsonl").read_text(encoding="utf-8").splitlines()
+    full_records = (tmp_path / "basic_batch" / "full_results.jsonl").read_text(encoding="utf-8").splitlines()
+
+    assert summary["route"] == "basic"
+    assert summary["success_count"] == 1
+    assert summary["error_count"] == 0
+    assert export_lines == [
+        'basic_only.mcif: {"acc_symbol": "acc:BASIC.IDX", "index": "BASIC.IDX", "magnetic_phase": "phase:BASIC.IDX"}'
+    ]
+    record = json.loads(records[0])
+    full_record = json.loads(full_records[0])
+    assert record["result"]["index"] == "BASIC.IDX"
+    assert "group_identifiers" not in record
+    assert "tensor_summary" not in record
+    assert full_record["result"]["magnetic_phase"] == "phase:BASIC.IDX"
+
+
+def test_run_mcif_batch_with_auto_baseline_supports_basic_route(monkeypatch, tmp_path):
+    source_file = _write_fake_mcif(tmp_path, "basic_auto.mcif")
+    baseline_root = tmp_path / "baseline_store"
+
+    def fake_basic(path: str, **kwargs):
+        assert Path(path).name == "basic_auto.mcif"
+        return _fake_basic_payload("BASIC.AUTO")
+
+    def fail_full(*args, **kwargs):
+        raise AssertionError("full route should not be called")
+
+    monkeypatch.setattr(batch_mcif, "find_spin_group_basic", fake_basic)
+    monkeypatch.setattr(batch_mcif, "find_spin_group", fail_full)
+
+    first_summary = run_mcif_batch_with_auto_baseline(
+        [source_file],
+        tmp_path / "run1",
+        baseline_root=baseline_root,
+        suite_name="basic_suite",
+        route="basic",
+        quiet=True,
+    )
+    second_summary = run_mcif_batch_with_auto_baseline(
+        [source_file],
+        tmp_path / "run2",
+        baseline_root=baseline_root,
+        suite_name="basic_suite",
+        route="basic",
+        quiet=True,
+    )
+
+    auto_paths = batch_mcif._resolve_auto_baseline_paths(
+        baseline_root=baseline_root,
+        suite_name="basic_suite",
+        space_tol=0.02,
+        mtol=0.02,
+        meigtol=0.00002,
+        matrix_tol=0.01,
+    )
+    stored_baseline = json.loads(auto_paths["baseline_json"].read_text(encoding="utf-8"))
+    case_id = batch_mcif._normalize_case_id(source_file)
+
+    assert first_summary["route"] == "basic"
+    assert first_summary["auto_baseline"]["action"] == "created"
+    assert second_summary["route"] == "basic"
+    assert second_summary["auto_baseline"]["action"] == "used_existing"
+    assert second_summary["comparison"]["mismatch_count"] == 0
+    assert "tensor_summary" not in stored_baseline[case_id]
+    assert stored_baseline[case_id]["result"]["index"] == "BASIC.AUTO"
 
 
 def test_run_mcif_batch_export_tolerates_missing_identify_index_details(monkeypatch, tmp_path):
