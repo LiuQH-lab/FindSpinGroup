@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from findspingroup import find_spin_group, find_spin_group_from_data
 from findspingroup.io import parse_poscar_file, parse_structure_file
@@ -243,6 +244,22 @@ def test_parse_poscar_file_defaults_missing_magmom_to_zero(tmp_path):
     parsed = parse_poscar_file(poscar_path)
 
     assert all(np.allclose(moment, np.zeros(3), atol=1e-12) for moment in parsed[5])
+
+
+def test_parse_poscar_file_can_require_embedded_magmom(tmp_path):
+    original = find_spin_group("examples/0.800_MnTe.mcif")
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(
+        _rewrite_generated_poscar_without_magmom(original.acc_primitive_magnetic_cell_poscar),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="embedded MAGMOM payload"):
+        parse_poscar_file(
+            poscar_path,
+            allow_incar_magmom=False,
+            require_embedded_magmom=True,
+        )
 
 
 def test_parse_poscar_file_tolerates_relaxed_magmom_comment_format(tmp_path):

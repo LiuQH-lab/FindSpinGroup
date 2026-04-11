@@ -5,6 +5,7 @@ from .find_spin_group import (
     find_spin_group,
     find_spin_group_acc_primitive,
     find_spin_group_basic,
+    find_spin_group_poscar_ssg,
     write_ssg_operation_matrices,
 )
 
@@ -14,7 +15,7 @@ def main():
     parser.add_argument("cif_file", help="Path to the CIF file")
     parser.add_argument(
         "--mode",
-        choices=["full", "basic", "acc-primitive"],
+        choices=["full", "basic", "acc-primitive", "poscar-ssg"],
         default="full",
         help="Choose the full pipeline or the lightweight identification route.",
     )
@@ -63,6 +64,15 @@ def main():
                     else "acc_primitive_poscar_spin_frame_ssg_operation_matrices"
                 )
                 write_ssg_operation_matrices(args.write_ssg_matrices, payload[key])
+            print(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True))
+        elif args.mode == "poscar-ssg":
+            payload = find_spin_group_poscar_ssg(
+                args.cif_file,
+                space_tol=args.space_tol,
+                mtol=args.mtol,
+                meigtol=args.meigtol,
+                matrix_tol=args.matrix_tol,
+            )
             print(json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True))
         else:
             result = find_spin_group(

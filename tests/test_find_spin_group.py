@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import json
 import importlib
 import sys
@@ -6,8 +8,14 @@ import pytest
 
 import findspingroup.core.identify_symmetry_from_ops as identify_symmetry_from_ops_module
 import findspingroup.structure.group as group_module
-from findspingroup import find_spin_group, find_spin_group_basic, find_spin_group_from_data
-from findspingroup import find_spin_group_acc_primitive, write_ssg_operation_matrices
+from findspingroup import (
+    find_spin_group,
+    find_spin_group_acc_primitive,
+    find_spin_group_basic,
+    find_spin_group_from_data,
+    find_spin_group_poscar_ssg,
+    write_ssg_operation_matrices,
+)
 from findspingroup.core.identify_index.functions import (
     find_stand_gen_maps,
     is_matrix_equal,
@@ -53,7 +61,7 @@ from findspingroup.find_spin_group import (
     _translations_equivalent_mod_pure_translations,
     combine_parametric_solutions,
 )
-from findspingroup.io import parse_cif_file, parse_scif_metadata
+from findspingroup.io import parse_cif_file, parse_poscar_file, parse_scif_metadata
 from findspingroup.structure import SpinSpaceGroup
 from findspingroup.structure.cell import CrystalCell, standardize_lattice
 from findspingroup.utils.international_symbol import (
@@ -182,6 +190,79 @@ def test_cli_acc_primitive_mode_prints_json_and_writes_matrix_file(monkeypatch, 
     assert output_path.is_file()
     written = json.loads(output_path.read_text(encoding="utf-8"))
     assert len(written) == len(payload["acc_primitive_ssg_operation_matrices"])
+
+
+def test_find_spin_group_poscar_ssg_reports_embedded_magnetic_primitive_case(tmp_path):
+    original = find_spin_group("examples/0.800_MnTe.mcif")
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(original.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
+
+    payload = find_spin_group_poscar_ssg(str(poscar_path))
+    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
+        poscar_path,
+        allow_incar_magmom=False,
+        require_embedded_magmom=True,
+    )
+    input_cell = CrystalCell(
+        lattice_factors,
+        positions,
+        occupancies,
+        elements,
+        moments,
+        spin_setting="in_lattice",
+    )
+    input_identify = identify_spin_space_group_result(
+        input_cell,
+        find_primitive=False,
+    )
+    input_ossg = _ossg_oriented_spin_frame_ssg(input_identify.ssg, input_cell)
+
+    assert payload["is_input_magnetic_primitive"] is True
+    assert payload["input_ssg_may_be_incomplete"] is False
+    assert payload["warning"] is None
+    assert payload["index"] == original.index
+    assert payload["database_ssg_symbol"] == input_identify.ssg.international_symbol_linear
+    assert payload["msg_number"] == input_ossg.msg_int_num
+    assert payload["msg_symbol"] == input_ossg.msg_bns_symbol
+    assert payload["input_ssg_ops"]
+    assert payload["input_msg_ops"]
+
+
+def test_find_spin_group_poscar_ssg_warns_for_nonprimitive_input_cell(tmp_path):
+    original = find_spin_group("tests/testset/mcif_241130_no2186/0.1000_Fe4O5.mcif")
+    conventional_cell = CrystalCell(
+        original.acc_conventional_cell_detail["lattice"],
+        original.acc_conventional_cell_detail["positions"],
+        original.acc_conventional_cell_detail["occupancies"],
+        original.acc_conventional_cell_detail["elements"],
+        original.acc_conventional_cell_detail["moments"],
+        spin_setting="in_lattice",
+    )
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(conventional_cell.to_poscar("Fe4O5_conventional"), encoding="utf-8")
+
+    payload = find_spin_group_poscar_ssg(str(poscar_path))
+
+    assert payload["is_input_magnetic_primitive"] is False
+    assert payload["input_ssg_may_be_incomplete"] is True
+    assert "not a magnetic primitive cell" in payload["warning"]
+    assert abs(payload["T_input_to_input_magnetic_primitive_determinant"]) != pytest.approx(1.0)
+    assert payload["index"] is not None
+    assert payload["database_ssg_symbol"] is not None
+    assert payload["input_ssg_ops"]
+    assert payload["input_msg_ops"]
+
+
+def test_find_spin_group_poscar_ssg_requires_embedded_magmom(tmp_path):
+    original = find_spin_group("examples/0.800_MnTe.mcif")
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(
+        "\n".join(original.acc_primitive_magnetic_cell_poscar.splitlines()[:-1]) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="embedded MAGMOM payload"):
+        find_spin_group_poscar_ssg(str(poscar_path))
 
 
 def _serialize_effective_mpg_ops(ops):
