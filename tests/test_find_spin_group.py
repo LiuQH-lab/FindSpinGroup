@@ -899,6 +899,15 @@ def test_describe_point_operation_keeps_near_hex_threefold_as_3_not_2():
     assert info["symbol"] == "3^{1}_{001}"
 
 
+def test_mn3sn_seitz_symbols_do_not_emit_illegal_minus6_power2_tokens():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.199_Mn3Sn.mcif")
+
+    joined = "\n".join(result.g0_standard_ssg_seitz + result.primitive_magnetic_cell_ssg_seitz)
+
+    assert "-6^{2}_{001}" not in joined
+    assert "-6^{5}_{001}" in joined
+
+
 def test_describe_point_operation_keeps_near_improper_fourfold_as_minus4():
     matrix = np.array(
         [
