@@ -908,6 +908,18 @@ def test_mn3sn_seitz_symbols_do_not_emit_illegal_minus6_power2_tokens():
     assert "-6^{5}_{001}" in joined
 
 
+def test_mn3sn_cartesian_standard_spin_axes_prefer_symbolic_components_over_alpha_beta():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.199_Mn3Sn.mcif")
+
+    g0_joined = "\n".join(result.g0_standard_ssg_seitz)
+    l0_joined = "\n".join(result.l0_standard_ssg_seitz)
+
+    assert "alpha,beta,0" not in g0_joined
+    assert "alpha,beta,0" not in l0_joined
+    assert "sqrt(3)/2" in g0_joined
+    assert "sqrt(3)/2" in l0_joined
+
+
 def test_describe_point_operation_keeps_near_improper_fourfold_as_minus4():
     matrix = np.array(
         [
@@ -2265,6 +2277,29 @@ def test_find_spin_group_exposes_msg_acc_for_conb3s6_tripleq():
 
     assert result.acc == "6mmP"
     assert result.msg_acc == "3m1P"
+
+
+def test_mag_symmetry_result_exposes_core_group_identifiers():
+    result = find_spin_group("examples/0.800_MnTe.mcif")
+    payload = result.to_dict()
+
+    assert result.G0_symbol == "P6_3/mmc"
+    assert result.G0_num == 194
+    assert result.L0_symbol == "P-3m1"
+    assert result.L0_num == 164
+    assert result.it == 2
+    assert result.ik == 1
+    assert result.spin_part_point_group == "∞/mm"
+    assert result.SSPG_symbol_hm == "∞/mm"
+    assert result.SSPG_symbol_s == "D∞h"
+    assert result.input_space_group_symbol == "P6_3/mmc"
+    assert result.input_space_group_number == 194
+    assert payload["G0_symbol"] == "P6_3/mmc"
+    assert payload["L0_num"] == 164
+    assert payload["spin_part_point_group"] == "∞/mm"
+    assert payload["SSPG_symbol_hm"] == "∞/mm"
+    assert payload["SSPG_symbol_s"] == "D∞h"
+    assert payload["input_space_group_number"] == 194
 
 
 def test_find_spin_group_exposes_explicit_gspg_payload_for_coplanar_case():
