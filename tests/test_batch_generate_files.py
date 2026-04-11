@@ -84,12 +84,7 @@ def _fake_summary(index: str) -> dict:
         "acc": f"acc:{index}",
         "properties": {"ss_w_soc": f"prop:{index}"},
         "gspg": {
-            "output_mode": f"mode:{index}",
-            "effective_mpg_symbol": f"empg:{index}",
-            "symbol_mode": f"symbol_mode:{index}",
-            "npg_symbol_s": f"npg:{index}",
-            "spin_only_component_symbol_s": f"ss:{index}",
-            "tentative_symbol_s": f"tentative:{index}",
+            "symbol_linear": f"symbol:{index}",
         },
     }
 
@@ -605,10 +600,7 @@ def test_run_mcif_batch_exports_new_setting_alias_fields(tmp_path):
             "msg_spin_polarizations_setting",
             "spin_polarizations_acc_poscar_spin_frame_setting",
             "msg_spin_polarizations_acc_poscar_spin_frame_setting",
-            "gspg_output_mode",
-            "gspg_effective_mpg_symbol",
             "gspg_symbol_linear",
-            "gspg_spin_only_symbol_s",
         ],
         export_txt_path=tmp_path / "settings.txt",
         quiet=True,
@@ -625,10 +617,7 @@ def test_run_mcif_batch_exports_new_setting_alias_fields(tmp_path):
         "msg_spin_polarizations_setting": "acc_primitive_poscar_spin_frame",
         "spin_polarizations_acc_poscar_spin_frame_setting": "acc_primitive_poscar_spin_frame",
         "msg_spin_polarizations_acc_poscar_spin_frame_setting": "acc_primitive_poscar_spin_frame",
-        "gspg_output_mode": "reduced_point_part_with_spin_only_annotation",
-        "gspg_effective_mpg_symbol": "6/mmm1'",
         "gspg_symbol_linear": "-1|6_{3}/ -1|m 1|m -1|m ∞_{110}m|1",
-        "gspg_spin_only_symbol_s": "C∞v",
     }
 
 
@@ -668,33 +657,13 @@ def test_run_mcif_batch_exports_convention_selected_fields(tmp_path):
         (
             "tests/testset/mcif_241130_no2186/1.325_PrMn2O5.mcif",
             {
-                "output_mode": "reduced_point_part_with_spin_only_annotation",
-                "effective_mpg_symbol": "m1'",
                 "symbol_linear": "1|m ∞_{001}/mm|1",
-                "point_part_linear": "1|m",
-                "spin_only_part_linear": "∞_{001}/mm|1",
-                "real_space_setting": "L0std",
-                "spin_frame_setting": "ossg_oriented_spin_frame",
-                "symbol_mode": "point_part_and_spin_only",
-                "npg_symbol_s": "Ci",
-                "spin_only_component_symbol_s": "D∞h",
-                "tentative_symbol_s": None,
             },
         ),
         (
             "tests/testset/mcif_241130_no2186/1.498_Cu6(SiO3)6(H2O)6.mcif",
             {
-                "output_mode": "explicit_ops",
-                "effective_mpg_symbol": "-31'",
                 "symbol_linear": "3^{2}_{001}|-3 -1|1",
-                "point_part_linear": "3^{2}_{001}|-3",
-                "spin_only_part_linear": "-1|1",
-                "real_space_setting": "G0std",
-                "spin_frame_setting": "ossg_oriented_spin_frame",
-                "symbol_mode": "point_part_and_spin_only",
-                "npg_symbol_s": "S6",
-                "spin_only_component_symbol_s": "Ci",
-                "tentative_symbol_s": None,
             },
         ),
     ],
@@ -925,34 +894,9 @@ def test_auto_baseline_blocks_overwrite_when_previous_ok_case_changes(monkeypatc
             "actual": "conf:IDX_A_CHANGED",
         },
         {
-            "field": "result.gspg.effective_mpg_symbol",
-            "expected": "empg:IDX_A",
-            "actual": "empg:IDX_A_CHANGED",
-        },
-        {
-            "field": "result.gspg.npg_symbol_s",
-            "expected": "npg:IDX_A",
-            "actual": "npg:IDX_A_CHANGED",
-        },
-        {
-            "field": "result.gspg.output_mode",
-            "expected": "mode:IDX_A",
-            "actual": "mode:IDX_A_CHANGED",
-        },
-        {
-            "field": "result.gspg.spin_only_component_symbol_s",
-            "expected": "ss:IDX_A",
-            "actual": "ss:IDX_A_CHANGED",
-        },
-        {
-            "field": "result.gspg.symbol_mode",
-            "expected": "symbol_mode:IDX_A",
-            "actual": "symbol_mode:IDX_A_CHANGED",
-        },
-        {
-            "field": "result.gspg.tentative_symbol_s",
-            "expected": "tentative:IDX_A",
-            "actual": "tentative:IDX_A_CHANGED",
+            "field": "result.gspg.symbol_linear",
+            "expected": "symbol:IDX_A",
+            "actual": "symbol:IDX_A_CHANGED",
         },
         {
             "field": "result.index",
