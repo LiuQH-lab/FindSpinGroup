@@ -12,7 +12,6 @@ from fractions import Fraction
 from typing import TYPE_CHECKING
 
 import numpy as np
-import scipy.cluster
 import collections
 
 
@@ -1423,14 +1422,18 @@ def cluster_sites(
             of mass (None if there are no origin atoms). clustered_sites is a
             dict of {(avg_dist, species_and_occu): [list of sites]}
     """
-    # Cluster works for dim > 2 data. We just add a dummy 0 for second
-    # coordinate.
+    # The previous implementation used scipy.cluster.hierarchy.fclusterdata on
+    # [[dist, 0], ...] with criterion="distance". Because the data is 1D, that
+    # is equivalent to single-link clustering on sorted radii: consecutive
+    # distances remain in the same cluster while their gap is <= tol.
     dists: list[list[float]] = [[float(np.linalg.norm(site.coords)), 0] for site in mol]
-
-    f_cluster = scipy.cluster.hierarchy.fclusterdata(dists, tol, criterion="distance")
+    f_cluster = _cluster_radial_distances_single_link([dist[0] for dist in dists], tol)
     clustered_dists: dict[str, list[list[float]]] = defaultdict(list)
     for idx in range(len(mol)):
         clustered_dists[f_cluster[idx]].append(dists[idx])
+    # Keep the historical averaging contract exactly as before: the legacy
+    # SciPy path clustered points of the form [radius, 0] and then averaged the
+    # full 2D placeholders, not just the radial coordinate.
     avg_dist = {key: np.mean(val) for key, val in clustered_dists.items()}
     clustered_sites = defaultdict(list)
     origin_site = None
@@ -1442,6 +1445,43 @@ def cluster_sites(
         else:
             clustered_sites[avg_dist[f_cluster[idx]], site.species].append(site)
     return origin_site, clustered_sites
+
+
+def _cluster_radial_distances_single_link(
+    distances: Sequence[float],
+    tol: float,
+) -> np.ndarray:
+    """Cluster 1D radii using the same connectivity contract as SciPy single-link.
+
+    The old implementation called ``scipy.cluster.hierarchy.fclusterdata`` on
+    points of the form ``[radius, 0]`` with ``criterion="distance"``. Since all
+    points lie on a line, the resulting clusters are exactly the connected
+    components obtained after sorting the radii and breaking whenever the gap
+    between consecutive values exceeds ``tol``.
+
+    Returns 1-based cluster labels aligned with the original input order.
+    """
+    if len(distances) == 0:
+        return np.empty(0, dtype=int)
+
+    values = np.asarray(distances, dtype=float)
+    order = np.argsort(values, kind="stable")
+    labels = np.empty(len(values), dtype=int)
+
+    current_label = 1
+    first_idx = int(order[0])
+    labels[first_idx] = current_label
+    previous_value = values[first_idx]
+
+    for sorted_idx in order[1:]:
+        idx = int(sorted_idx)
+        current_value = values[idx]
+        if current_value - previous_value > tol:
+            current_label += 1
+        labels[idx] = current_label
+        previous_value = current_value
+
+    return labels
 
 
 def find_in_coord_list(coord_list, coord, atol: float = 1e-8):
