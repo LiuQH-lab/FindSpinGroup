@@ -2404,6 +2404,7 @@ def test_find_spin_group_exposes_explicit_gspg_payload_for_coplanar_case():
     oriented_ssg = SpinSpaceGroup(result.convention_ssg_ops)
 
     assert repr(oriented_ssg.gspg) == result.gspg_symbol_linear
+    assert oriented_ssg.gspg.empg_symbol == result.gspg_effective_mpg_symbol
     assert result.gspg_ops == _serialize_gspg_pairs(oriented_ssg.gspg.ops)
     assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.raw_ops)
     assert result.gspg_symbol_linear == "1|m 2_{001}|m 2_{001}|2 m|1"
@@ -2420,6 +2421,7 @@ def test_find_spin_group_reports_collinear_gspg_as_nssg_times_spin_only():
 
     assert result.conf == "Collinear"
     assert repr(oriented_ssg.gspg) == result.gspg_symbol_linear
+    assert oriented_ssg.gspg.empg_symbol == result.gspg_effective_mpg_symbol
     assert result.gspg_ops == _serialize_gspg_pairs(expected_nssg_point_ops)
     assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.raw_ops)
     assert len(result.gspg_ops) < len(oriented_ssg.gspg.raw_ops)
