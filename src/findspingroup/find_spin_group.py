@@ -875,44 +875,14 @@ class MagSymmetryResult:
             'symbol_calibration_tol',
             self.acc_primitive_ssg_symbol_calibration_tol,
         )
-        self.gspg_output_mode = symmetry.get('gspg_output_mode', None)
         self.gspg_ops = symmetry.get('gspg_ops', None)
         self.gspg_raw_ops = symmetry.get('gspg_raw_ops', None)
-        self.gspg_public_ops_are_reduced = symmetry.get(
-            'gspg_public_ops_are_reduced',
-            None,
-        )
-        self.gspg_real_space_setting = symmetry.get('gspg_real_space_setting', None)
-        self.gspg_spin_frame_setting = symmetry.get('gspg_spin_frame_setting', None)
-        self.gspg_symbol_calibration_tol = symmetry.get('gspg_symbol_calibration_tol', None)
-        self.gspg_effective_mpg_ops = symmetry.get('gspg_effective_mpg_ops', None)
-        self.gspg_effective_mpg_symbol = symmetry.get('gspg_effective_mpg_symbol', None)
-        self.gspg_effective_k_point_group_ops = symmetry.get(
-            'gspg_effective_k_point_group_ops',
-            None,
-        )
+        self.gspg_ops_xyz_uvw = symmetry.get('gspg_ops_xyz_uvw', None)
+        self.gspg_spin_only_ops = symmetry.get('gspg_spin_only_ops', None)
+        self.gspg_spin_only_ops_xyz_uvw = symmetry.get('gspg_spin_only_ops_xyz_uvw', None)
+        self.gspg_collinear_axis = symmetry.get('gspg_collinear_axis', None)
         self.gspg_symbol_linear = symmetry.get('gspg_symbol_linear', None)
         self.gspg_symbol_latex = symmetry.get('gspg_symbol_latex', None)
-        self.gspg_point_part_linear = symmetry.get('gspg_point_part_linear', None)
-        self.gspg_point_part_latex = symmetry.get('gspg_point_part_latex', None)
-        self.gspg_spin_only_part_linear = symmetry.get('gspg_spin_only_part_linear', None)
-        self.gspg_spin_only_part_latex = symmetry.get('gspg_spin_only_part_latex', None)
-        self.gspg_symbol_mode = symmetry.get('gspg_symbol_mode', None)
-        self.gspg_npg_symbol_hm = symmetry.get('gspg_npg_symbol_hm', None)
-        self.gspg_npg_symbol_s = symmetry.get('gspg_npg_symbol_s', None)
-        self.gspg_spin_only_symbol_hm = symmetry.get('gspg_spin_only_symbol_hm', None)
-        self.gspg_spin_only_symbol_s = symmetry.get('gspg_spin_only_symbol_s', None)
-        self.gspg_spin_only_component_symbol_hm = symmetry.get(
-            'gspg_spin_only_component_symbol_hm',
-            None,
-        )
-        self.gspg_spin_only_component_symbol_s = symmetry.get(
-            'gspg_spin_only_component_symbol_s',
-            None,
-        )
-        self.gspg_symbol_tentative_hm = symmetry.get('gspg_symbol_tentative_hm', None)
-        self.gspg_symbol_tentative_s = symmetry.get('gspg_symbol_tentative_s', None)
-        self.gspg_detail = symmetry.get('gspg_detail', None)
         self.g0_standard_ssg_ops = symmetry.get('g0_standard_ssg_ops', None)
         self.g0_standard_ssg_seitz = symmetry.get('g0_standard_ssg_seitz', None)
         self.g0_standard_ssg_seitz_latex = symmetry.get('g0_standard_ssg_seitz_latex', None)
@@ -1126,17 +1096,7 @@ class MagSymmetryResult:
 
     def gspg_summary(self):
         return {
-            'output_mode': self.gspg_output_mode,
-            'effective_mpg_symbol': self.gspg_effective_mpg_symbol,
             'symbol_linear': self.gspg_symbol_linear,
-            'point_part_linear': self.gspg_point_part_linear,
-            'spin_only_part_linear': self.gspg_spin_only_part_linear,
-            'real_space_setting': self.gspg_real_space_setting,
-            'spin_frame_setting': self.gspg_spin_frame_setting,
-            'symbol_mode': self.gspg_symbol_mode,
-            'npg_symbol_s': self.gspg_npg_symbol_s,
-            'spin_only_component_symbol_s': self.gspg_spin_only_component_symbol_s,
-            'tentative_symbol_s': self.gspg_symbol_tentative_s,
         }
 
     def to_summary_dict(self):
@@ -1337,6 +1297,44 @@ def _serialize_gspg_ops(ops) -> list[list[list[list[float]]]]:
     ]
 
 
+def _gspg_time_reversal_from_spin_rotation(spin_rotation: np.ndarray, *, tol: float = 1e-6) -> int | None:
+    det = float(np.linalg.det(np.asarray(spin_rotation, dtype=float)))
+    if abs(det - 1.0) < tol:
+        return 1
+    if abs(det + 1.0) < tol:
+        return -1
+    return None
+
+
+def _serialize_gspg_xyz_uvw_ops(
+    ops,
+    *,
+    tol: float = 1e-6,
+    translation: np.ndarray | None = None,
+) -> list[dict]:
+    zero_translation = np.zeros(3) if translation is None else np.asarray(translation, dtype=float)
+    payload = []
+    for idx, (spin_rotation, real_rotation) in enumerate(ops):
+        spin_rotation = np.asarray(spin_rotation, dtype=float)
+        real_rotation = np.asarray(real_rotation, dtype=float)
+        time_reversal = _gspg_time_reversal_from_spin_rotation(spin_rotation, tol=tol)
+        xyzt = affine_matrix_to_xyz_expression(real_rotation, zero_translation)
+        if time_reversal is not None:
+            xyzt = f"{xyzt},{time_reversal:+d}"
+        payload.append(
+            {
+                "index": idx + 1,
+                "xyzt": xyzt,
+                "uvw": affine_matrix_to_xyz_expression(spin_rotation),
+                "time_reversal": time_reversal,
+                "spin_rotation": spin_rotation.tolist(),
+                "real_rotation": real_rotation.tolist(),
+                "translation": zero_translation.tolist(),
+            }
+        )
+    return payload
+
+
 def _serialize_ssg_operation_matrices(
     ops: list[SpinSpaceGroupOperation],
 ) -> list[dict]:
@@ -1395,39 +1393,30 @@ def _build_gspg_payload(
     real_space_setting: str,
     spin_frame_setting: str,
 ) -> dict:
-    if ssg.conf == "Collinear":
-        nssg_point_ops = deduplicate_matrix_pairs(
-            [[op[0], op[1]] for op in ssg.nssg],
-            tol=ssg.tol,
-        )
-        presented_ops = nssg_point_ops
-        output_mode = "reduced_point_part_with_spin_only_annotation"
-    else:
-        presented_ops = ssg.gspg_ops_raw
-        output_mode = "explicit_ops"
+    presented_ops = ssg.gspg.ops
+    raw_ops = ssg.gspg.raw_ops
+    output_mode = (
+        "reduced_point_part_with_spin_only_annotation"
+        if ssg.gspg.public_ops_are_reduced
+        else "explicit_ops"
+    )
+
+    spin_only_ops = [
+        [np.asarray(rotation, dtype=float), np.eye(3)]
+        for rotation in ssg.gspg_spin_only_ops
+    ]
 
     return {
-        "gspg_output_mode": output_mode,
         "gspg_ops": _serialize_gspg_ops(presented_ops),
-        "gspg_raw_ops": _serialize_gspg_ops(ssg.gspg_ops_raw),
-        "gspg_public_ops_are_reduced": ssg.conf == "Collinear",
-        "gspg_real_space_setting": real_space_setting,
-        "gspg_spin_frame_setting": spin_frame_setting,
-        "gspg_symbol_calibration_tol": ssg.symbol_calibration_tol,
-        "gspg_effective_mpg_ops": _serialize_effective_mpg_ops(
-            ssg.gspg.effective_magnetic_point_group
+        "gspg_raw_ops": _serialize_gspg_ops(raw_ops),
+        "gspg_ops_xyz_uvw": _serialize_gspg_xyz_uvw_ops(presented_ops, tol=ssg.tol),
+        "gspg_spin_only_ops": _serialize_gspg_ops(spin_only_ops),
+        "gspg_spin_only_ops_xyz_uvw": _serialize_gspg_xyz_uvw_ops(spin_only_ops, tol=ssg.tol),
+        "gspg_collinear_axis": (
+            None if ssg.gspg.collinear_axis is None else np.asarray(ssg.gspg.collinear_axis, dtype=float).tolist()
         ),
-        "gspg_effective_mpg_symbol": ssg.gspg.empg_symbol,
-        "gspg_effective_k_point_group_ops": _serialize_rotation_ops(ssg.ekPG),
-        "gspg_spin_only_symbol_hm": ssg.gspg.spin_only_symbol_hm,
-        "gspg_spin_only_symbol_s": ssg.gspg.spin_only_symbol_s,
         "gspg_symbol_linear": ssg.gspg.symbol_linear,
         "gspg_symbol_latex": ssg.gspg.symbol_latex,
-        "gspg_point_part_linear": ssg.gspg.point_part_linear,
-        "gspg_point_part_latex": ssg.gspg.point_part_latex,
-        "gspg_spin_only_part_linear": ssg.gspg.spin_only_linear,
-        "gspg_spin_only_part_latex": ssg.gspg.spin_only_latex,
-        "gspg_detail": ssg.gspg.to_dict(),
     }
 
 
@@ -1441,32 +1430,6 @@ def _spin_only_component_symbols(ssg: SpinSpaceGroup) -> tuple[str, str]:
 
     info = identify_point_group([np.asarray(op[0], dtype=float) for op in ssg.sog], _id=True)
     return info[0], info[4]
-
-
-def _build_gspg_symbol_payload(ssg: SpinSpaceGroup) -> dict:
-    npg_hm = ssg.n_spin_part_point_group_symbol_hm
-    npg_s = ssg.n_spin_part_point_group_symbol_s
-    spin_only_hm = ssg.gspg.spin_only_symbol_hm
-    spin_only_s = ssg.gspg.spin_only_symbol_s
-
-    if ssg.international_symbol_type == "t":
-        symbol_mode = "npg_x_spin_only"
-        tentative_hm = npg_hm if spin_only_hm == "1" else f"{npg_hm} x {spin_only_hm}"
-        tentative_s = npg_s if spin_only_s == "C1" else f"{npg_s} x {spin_only_s}"
-    else:
-        symbol_mode = "point_part_and_spin_only"
-        tentative_hm = None
-        tentative_s = None
-
-    return {
-        "gspg_symbol_mode": symbol_mode,
-        "gspg_npg_symbol_hm": npg_hm,
-        "gspg_npg_symbol_s": npg_s,
-        "gspg_spin_only_component_symbol_hm": spin_only_hm,
-        "gspg_spin_only_component_symbol_s": spin_only_s,
-        "gspg_symbol_tentative_hm": tentative_hm,
-        "gspg_symbol_tentative_s": tentative_s,
-    }
 
 
 def _compose_setting_transform(
@@ -3096,7 +3059,6 @@ def _find_spin_group_from_parsed(
         real_space_setting=convention_setting,
         spin_frame_setting=OSSG_ORIENTED_SPIN_FRAME_SETTING,
     )
-    gspg_symbol_payload = _build_gspg_symbol_payload(public_ossg_ssg)
     msg_parent_info = msg_parent_space_group_info(msg_num)
     ossg_space_group_number = None if identify_index_details is None else identify_index_details.get("G0_id")
     acc_primitive_output_poscar = acc_primitive_output_cell.to_poscar(source_name)
@@ -3513,8 +3475,7 @@ def _find_spin_group_from_parsed(
                 'spin_polarizations_acc_poscar_spin_frame': SS_poscar,
                 'spin_polarizations_acc_poscar_spin_frame_setting': ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING,
                 'msg_symbol':msg_symbol,
-                **gspg_payload,
-                **gspg_symbol_payload}
+                **gspg_payload}
     properties = {
         'ss_w_soc':ss_w_soc,
         'ss_wo_soc':ss_wo_soc,

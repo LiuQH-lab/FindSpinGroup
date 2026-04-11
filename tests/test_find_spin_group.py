@@ -2403,32 +2403,11 @@ def test_find_spin_group_exposes_explicit_gspg_payload_for_coplanar_case():
     result = find_spin_group("tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif")
     oriented_ssg = SpinSpaceGroup(result.convention_ssg_ops)
 
-    assert result.gspg_output_mode == "explicit_ops"
     assert repr(oriented_ssg.gspg) == result.gspg_symbol_linear
-    assert result.gspg_spin_only_symbol_hm == oriented_ssg.gspg.spin_only_symbol_hm
-    assert result.gspg_spin_only_symbol_s == oriented_ssg.gspg.spin_only_symbol_s
     assert result.gspg_ops == _serialize_gspg_pairs(oriented_ssg.gspg.ops)
-    assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.ops)
-    assert result.gspg_public_ops_are_reduced is False
-    assert result.gspg_real_space_setting == "G0std"
-    assert result.gspg_spin_frame_setting == "ossg_oriented_spin_frame"
-    assert result.gspg_symbol_calibration_tol == oriented_ssg.symbol_calibration_tol
-    assert result.gspg_effective_mpg_ops == _serialize_effective_mpg_ops(
-        oriented_ssg.gspg.effective_magnetic_point_group
-    )
-    assert result.gspg_effective_mpg_symbol == oriented_ssg.gspg.empg_symbol
-    assert result.gspg_detail == oriented_ssg.gspg.to_dict()
-    assert result.gspg_effective_k_point_group_ops == _serialize_rotation_ops(oriented_ssg.ekPG)
-    assert result.gspg_point_part_linear == oriented_ssg.gspg.point_part_linear
-    assert result.gspg_spin_only_part_linear == oriented_ssg.gspg.spin_only_linear
+    assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.raw_ops)
     assert result.gspg_symbol_linear == "1|m 2_{001}|m 2_{001}|2 m|1"
-    assert result.gspg_symbol_mode == "npg_x_spin_only"
-    assert result.gspg_npg_symbol_hm == oriented_ssg.n_spin_part_point_group_symbol_hm
-    assert result.gspg_npg_symbol_s == oriented_ssg.n_spin_part_point_group_symbol_s
-    assert result.gspg_spin_only_component_symbol_hm == "m"
-    assert result.gspg_spin_only_component_symbol_s == "Cs"
-    assert result.gspg_symbol_tentative_hm == "2 x m"
-    assert result.gspg_symbol_tentative_s == "C2 x Cs"
+    assert result.gspg_collinear_axis is None
 
 
 def test_find_spin_group_reports_collinear_gspg_as_nssg_times_spin_only():
@@ -2440,28 +2419,49 @@ def test_find_spin_group_reports_collinear_gspg_as_nssg_times_spin_only():
     )
 
     assert result.conf == "Collinear"
-    assert result.gspg_output_mode == "reduced_point_part_with_spin_only_annotation"
     assert repr(oriented_ssg.gspg) == result.gspg_symbol_linear
-    assert result.gspg_spin_only_symbol_hm == "∞m"
-    assert result.gspg_spin_only_symbol_s == "C∞v"
     assert result.gspg_ops == _serialize_gspg_pairs(expected_nssg_point_ops)
-    assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.ops)
-    assert result.gspg_public_ops_are_reduced is True
-    assert result.gspg_real_space_setting == "G0std"
-    assert result.gspg_spin_frame_setting == "ossg_oriented_spin_frame"
-    assert len(result.gspg_ops) < len(oriented_ssg.gspg.ops)
-    assert result.gspg_effective_mpg_symbol == oriented_ssg.gspg.empg_symbol
-    assert result.gspg_point_part_linear == oriented_ssg.gspg.point_part_linear
-    assert result.gspg_spin_only_part_linear == oriented_ssg.gspg.spin_only_linear
+    assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.raw_ops)
+    assert len(result.gspg_ops) < len(oriented_ssg.gspg.raw_ops)
     assert result.gspg_symbol_linear == "-1|6_{3}/ -1|m 1|m -1|m ∞_{110}m|1"
-    assert result.gspg_symbol_mode == "npg_x_spin_only"
-    assert result.gspg_npg_symbol_hm == "-1"
-    assert result.gspg_npg_symbol_s == "Ci"
-    assert result.gspg_spin_only_component_symbol_hm == "∞m"
-    assert result.gspg_spin_only_component_symbol_s == "C∞v"
-    assert result.gspg_symbol_tentative_hm == "-1 x ∞m"
-    assert result.gspg_symbol_tentative_s == "Ci x C∞v"
-    assert result.gspg_detail == oriented_ssg.gspg.to_dict()
+    assert result.gspg_collinear_axis == pytest.approx(oriented_ssg.gspg.collinear_axis.tolist())
+
+
+def test_find_spin_group_exposes_gspg_xyz_uvw_and_spin_only_exports_for_collinear_case():
+    result = find_spin_group("examples/0.800_MnTe.mcif")
+    oriented_ssg = SpinSpaceGroup(result.convention_ssg_ops)
+
+    assert result.conf == "Collinear"
+    assert result.gspg_collinear_axis == pytest.approx(oriented_ssg.gspg.collinear_axis.tolist())
+    assert len(result.gspg_raw_ops) >= len(result.gspg_ops)
+    assert result.gspg_spin_only_ops
+    assert result.gspg_spin_only_ops_xyz_uvw
+    assert all("xyzt" in item and "uvw" in item for item in result.gspg_ops_xyz_uvw)
+    assert all("xyzt" in item and "uvw" in item for item in result.gspg_spin_only_ops_xyz_uvw)
+
+
+@pytest.mark.parametrize(
+    ("path", "expected_linear"),
+    [
+        ("tests/testset/mcif_241130_no2186/0.454_PrScSb.mcif", "∞_{001}/mm|1"),
+        ("tests/testset/mcif_241130_no2186/0.1001_PbMn2Ni6Te3O18.mcif", "∞_{001}m|1"),
+    ],
+)
+def test_find_spin_group_distinguishes_collinear_spin_only_cinfv_vs_dinfh(
+    path,
+    expected_linear,
+):
+    result = find_spin_group(path)
+
+    assert result.conf == "Collinear"
+    assert expected_linear in result.gspg_symbol_linear
+
+
+def test_find_spin_group_keeps_explicit_public_gspg_ops_for_coplanar_case():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.1004_CsO2.mcif")
+
+    assert result.conf == "Coplanar"
+    assert result.gspg_ops == result.gspg_raw_ops
 
 
 @pytest.mark.parametrize(
@@ -2475,37 +2475,19 @@ def test_find_spin_group_uses_componentized_gspg_symbol_fallback_for_type_k_and_
     result = find_spin_group(path)
 
     assert result.primitive_magnetic_cell_ssg_type == expected_type
-    assert result.gspg_symbol_mode == "point_part_and_spin_only"
     assert result.gspg_symbol_linear is not None
-    assert result.gspg_point_part_linear is not None
-    assert result.gspg_spin_only_part_linear is not None
-    assert result.gspg_npg_symbol_hm is not None
-    assert result.gspg_npg_symbol_s is not None
-    assert result.gspg_spin_only_component_symbol_hm is not None
-    assert result.gspg_spin_only_component_symbol_s is not None
-    assert result.gspg_symbol_tentative_hm is None
-    assert result.gspg_symbol_tentative_s is None
 
 
 def test_find_spin_group_uses_gspg_r_eq_i_spin_only_for_collinear_type_k_case():
     result = find_spin_group("tests/testset/mcif_241130_no2186/1.325_PrMn2O5.mcif")
 
     assert result.conf == "Collinear"
-    assert result.gspg_real_space_setting == "L0std"
-    assert result.gspg_spin_only_symbol_hm == "∞/mm"
-    assert result.gspg_spin_only_symbol_s == "D∞h"
-    assert result.gspg_point_part_linear == "1|m"
-    assert result.gspg_spin_only_part_linear == "∞_{001}/mm|1"
     assert result.gspg_symbol_linear == "1|m ∞_{001}/mm|1"
 
 
 def test_find_spin_group_uses_oriented_path_for_public_type_g_gspg_symbol():
     result = find_spin_group("tests/testset/mcif_241130_no2186/1.498_Cu6(SiO3)6(H2O)6.mcif")
 
-    assert result.gspg_real_space_setting == "G0std"
-    assert result.gspg_spin_frame_setting == "ossg_oriented_spin_frame"
-    assert result.gspg_point_part_linear == "3^{1}_{001}|-3"
-    assert result.gspg_spin_only_part_linear == "-1|1"
     assert result.gspg_symbol_linear == "3^{1}_{001}|-3 -1|1"
 
 
@@ -2516,8 +2498,6 @@ def test_find_spin_group_public_gspg_is_derived_from_public_ossg():
     assert result.convention_ssg_international_linear == public_ossg.international_symbol_linear_current_frame
     assert result.convention_ssg_international_latex == public_ossg.international_symbol_latex_current_frame
     assert result.gspg_symbol_linear == public_ossg.gspg.symbol_linear
-    assert result.gspg_point_part_linear == public_ossg.gspg.point_part_linear
-    assert result.gspg_spin_only_part_linear == public_ossg.gspg.spin_only_linear
 
 
 def test_find_spin_group_exposes_poscar_spin_frame_transform_and_polarizations():
@@ -2981,10 +2961,7 @@ def test_result_payload_can_be_json_serialized_for_web_app():
     assert '"spin_polarizations_acc_poscar_spin_frame"' in encoded
     assert '"acc_primitive_real_cartesian_to_poscar_spin_frame"' in encoded
     assert '"msg_spin_polarizations_acc_poscar_spin_frame"' in encoded
-    assert '"gspg_output_mode"' in encoded
-    assert '"gspg_effective_mpg_symbol"' in encoded
     assert '"gspg_symbol_linear"' in encoded
-    assert '"gspg_point_part_linear"' in encoded
-    assert '"gspg_spin_only_part_linear"' in encoded
-    assert '"gspg_symbol_mode"' in encoded
-    assert '"gspg_spin_only_component_symbol_s"' in encoded
+    assert '"gspg_ops_xyz_uvw"' in encoded
+    assert '"gspg_spin_only_ops_xyz_uvw"' in encoded
+    assert '"gspg_collinear_axis"' in encoded
