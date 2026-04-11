@@ -1784,7 +1784,15 @@ class SpinSpaceGroup:
             effective_k_point_group, tol=self.tol)
 
     def get_general_spin_point_group_operations(self)->'GeneralizedSpinPointGroup':
-        ops = self.gspg_ops_raw
+        if self.conf == "Collinear":
+            ops = deduplicate_matrix_pairs(
+                [[np.asarray(op[0], dtype=float), np.asarray(op[1], dtype=float)] for op in self.nssg],
+                tol=self.tol,
+            )
+            raw_ops = self.gspg_ops_raw
+        else:
+            ops = self.gspg_ops_raw
+            raw_ops = ops
         point_part_linear = self.international_symbol.get("point_part_linear", "")
         point_part_latex = self.international_symbol.get("point_part_latex", "")
         spin_only_linear = self.gspg_spin_only_symbol["linear"]
@@ -1795,6 +1803,9 @@ class SpinSpaceGroup:
 
         return GeneralizedSpinPointGroup(
             ops,
+            raw_ops=raw_ops,
+            configuration=self.conf,
+            collinear_axis=self.collinear_axis,
             symbol_linear=symbol_linear,
             symbol_latex=symbol_latex,
             point_part_linear=point_part_linear,
@@ -2167,6 +2178,9 @@ class GeneralizedSpinPointGroup:
         self,
         ops,
         *,
+        raw_ops=None,
+        configuration: str | None = None,
+        collinear_axis=None,
         symbol_linear: str | None = None,
         symbol_latex: str | None = None,
         point_part_linear: str | None = None,
@@ -2178,6 +2192,12 @@ class GeneralizedSpinPointGroup:
         tol: float = 1e-3,
     ):
         self.ops = ops
+        self.raw_ops = ops if raw_ops is None else raw_ops
+        self.configuration = configuration
+        self.collinear_axis = (
+            None if collinear_axis is None else np.asarray(collinear_axis, dtype=float)
+        )
+        self.public_ops_are_reduced = self.raw_ops is not self.ops and len(self.raw_ops) != len(self.ops)
         self.symbol_linear = symbol_linear
         self.symbol_latex = symbol_latex
         self.point_part_linear = point_part_linear
@@ -2227,6 +2247,16 @@ class GeneralizedSpinPointGroup:
                 ]
                 for spin_rotation, space_rotation in self.ops
             ],
+            "raw_ops": [
+                [
+                    np.asarray(spin_rotation, dtype=float).tolist(),
+                    np.asarray(space_rotation, dtype=float).tolist(),
+                ]
+                for spin_rotation, space_rotation in self.raw_ops
+            ],
+            "configuration": self.configuration,
+            "collinear_axis": None if self.collinear_axis is None else self.collinear_axis.tolist(),
+            "public_ops_are_reduced": self.public_ops_are_reduced,
             "symbol_linear": self.symbol_linear,
             "symbol_latex": self.symbol_latex,
             "point_part_linear": self.point_part_linear,
@@ -2253,7 +2283,7 @@ class GeneralizedSpinPointGroup:
 
     def get_effective_magnetic_point_group(self):
         effective_magnetic_point_group = []
-        for i in self.ops:
+        for i in self.raw_ops:
             if abs(np.linalg.det(i[0]) - 1) < self.tol:
                 effective_magnetic_point_group.append([1, i[1]])
             elif abs(np.linalg.det(i[0]) + 1) < self.tol:
