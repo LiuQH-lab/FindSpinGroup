@@ -118,7 +118,14 @@ def _read_incar_magmom_payload(poscar_filename: str) -> str | None:
     return payload
 
 
-def _extract_magmom_vectors(lines: list[str], n_sites: int, *, poscar_filename: str) -> np.ndarray:
+def _extract_magmom_vectors(
+    lines: list[str],
+    n_sites: int,
+    *,
+    poscar_filename: str,
+    allow_incar_magmom: bool = True,
+    require_embedded_magmom: bool = False,
+) -> np.ndarray:
     pattern = re.compile(r"^\s*#*\s*magmom\s*=\s*(.*)$", re.IGNORECASE)
     magmom_index = None
     magmom_text = None
@@ -129,10 +136,15 @@ def _extract_magmom_vectors(lines: list[str], n_sites: int, *, poscar_filename: 
             magmom_text = match.group(1).strip()
             break
     if magmom_index is None or magmom_text is None:
-        magmom_text = _read_incar_magmom_payload(poscar_filename)
-        if magmom_text is None:
-            return np.zeros((n_sites, 3), dtype=float)
-        return _parse_magmom_payload(magmom_text, n_sites)
+        if require_embedded_magmom:
+            raise ValueError(
+                "POSCAR magnetic routes require an embedded MAGMOM payload in the POSCAR file."
+            )
+        if allow_incar_magmom:
+            magmom_text = _read_incar_magmom_payload(poscar_filename)
+            if magmom_text is not None:
+                return _parse_magmom_payload(magmom_text, n_sites)
+        return np.zeros((n_sites, 3), dtype=float)
 
     trailing_lines = [segment.strip() for segment in lines[magmom_index + 1 :] if segment.strip()]
     if trailing_lines:
@@ -141,7 +153,12 @@ def _extract_magmom_vectors(lines: list[str], n_sites: int, *, poscar_filename: 
     return _parse_magmom_payload(magmom_text, n_sites)
 
 
-def parse_poscar_file(filename):
+def parse_poscar_file(
+    filename,
+    *,
+    allow_incar_magmom: bool = True,
+    require_embedded_magmom: bool = False,
+):
     text = _read_text(filename)
     lines = [line.rstrip() for line in text.splitlines() if line.strip()]
     if len(lines) < 8:
@@ -195,7 +212,13 @@ def parse_poscar_file(filename):
         pass
 
     positions = positions % 1.0
-    magmom_vectors = _extract_magmom_vectors(lines[mode_index + 1 + n_sites :], n_sites, poscar_filename=str(filename))
+    magmom_vectors = _extract_magmom_vectors(
+        lines[mode_index + 1 + n_sites :],
+        n_sites,
+        poscar_filename=str(filename),
+        allow_incar_magmom=allow_incar_magmom,
+        require_embedded_magmom=require_embedded_magmom,
+    )
     # POSCAR MAGMOM vectors are written in the file's Cartesian spin frame. Convert
     # them back into the parser's in-lattice convention expected by downstream APIs.
     moments_in_lattice = transform_moments(magmom_vectors, calculate_lattice_params(lattice_matrix), inverse=True)

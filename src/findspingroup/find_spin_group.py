@@ -22,7 +22,7 @@ from findspingroup.core.identify_index.contract_222 import (
 )
 from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
 from findspingroup.data import MSGMPG_DB
-from findspingroup.io import parse_structure_file
+from findspingroup.io import parse_poscar_file, parse_structure_file
 from findspingroup.io.scif_generator import (
     _format_scif_symbolic_scalar,
     affine_matrix_to_xyz_expression,
@@ -75,6 +75,7 @@ def _format_spin_only_direction(direction) -> str:
 ACC_PRIMITIVE_SETTING = "acc_primitive"
 ACC_CONVENTIONAL_SETTING = "acc_conventional"
 INPUT_MAGNETIC_PRIMITIVE_SETTING = "input_magnetic_primitive"
+INPUT_POSCAR_SETTING = "input_poscar"
 ACC_PRIMITIVE_CARTESIAN_SETTING = "acc_primitive_cartesian"
 ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING = "acc_primitive_poscar_spin_frame"
 OSSG_ORIENTED_SPIN_FRAME_SETTING = "ossg_oriented_spin_frame"
@@ -1286,6 +1287,22 @@ def _serialize_ssg_operation_matrices(
             "spin_rotation": np.asarray(op.spin_rotation, dtype=float).tolist(),
             "real_rotation": np.asarray(op.rotation, dtype=float).tolist(),
             "translation": np.asarray(op.translation, dtype=float).tolist(),
+        }
+        for idx, op in enumerate(ops)
+    ]
+
+
+def _serialize_msg_operation_matrices(
+    ops: list[SpinSpaceGroupOperation],
+    *,
+    tol: float,
+) -> list[dict]:
+    return [
+        {
+            "index": idx + 1,
+            "time_reversal": int(op.magnetic_time_reversal(atol=tol)),
+            "real_rotation": np.asarray(op[1], dtype=float).tolist(),
+            "translation": np.asarray(op[2], dtype=float).tolist(),
         }
         for idx, op in enumerate(ops)
     ]
@@ -3613,9 +3630,8 @@ def _find_spin_group_acc_primitive_from_parsed(
     identify_index_details = None
     identify_info = None
     try:
-        identify_index_details = _identify_ssg_index_details(
+        identify_index_details = ssg_primitive.identify_index_details(
             source_name,
-            ssg_primitive,
             tol=tol_cfg.m_matrix_tol,
         )
         identify_info = identify_index_details["index"]
@@ -3754,6 +3770,87 @@ def find_spin_group_acc_primitive_from_data(
     )
 
 
+def _find_spin_group_poscar_ssg_from_parsed(
+    source_name: str,
+    lattice_factors,
+    positions,
+    elements,
+    occupancies,
+    moments,
+    tol_cfg: Tolerances,
+) -> dict:
+    input_cell = CrystalCell(
+        lattice_factors,
+        positions,
+        occupancies,
+        elements,
+        moments,
+        spin_setting="in_lattice",
+        tol=tol_cfg,
+    )
+    input_identify_result = identify_spin_space_group_result(
+        input_cell,
+        find_primitive=False,
+        tol=tol_cfg,
+    )
+    input_ssg: SpinSpaceGroup = input_identify_result.ssg
+    input_magnetic_primitive_cell, transformation_input_to_input_magnetic_primitive = (
+        input_cell.get_primitive_structure(magnetic=True)
+    )
+    primitive_transform = np.asarray(
+        transformation_input_to_input_magnetic_primitive,
+        dtype=float,
+    )
+    primitive_det = float(np.linalg.det(primitive_transform))
+    is_input_magnetic_primitive = bool(np.isclose(abs(primitive_det), 1.0, atol=1e-6))
+
+    identify_index_details = None
+    identify_info = None
+    try:
+        identify_index_details = input_ssg.identify_index_details(
+            source_name,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        identify_info = identify_index_details["index"]
+    except ValueError as exc:
+        if not _should_degrade_identify_index_error(exc):
+            raise
+        warnings.warn(
+            f"Identify-index output unavailable for {source_name}: {exc}. "
+            "Continuing with identify-index-derived outputs set to None.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+
+    input_ossg = _ossg_oriented_spin_frame_ssg(input_ssg, input_cell)
+    warning = None
+    if not is_input_magnetic_primitive:
+        warning = (
+            "Input cell is not a magnetic primitive cell; the input-cell SSG may be missing "
+            "symmetry operations relative to the magnetic primitive setting."
+        )
+
+    return {
+        "index": identify_info or input_ssg.index,
+        "is_input_magnetic_primitive": is_input_magnetic_primitive,
+        "input_ssg_may_be_incomplete": not is_input_magnetic_primitive,
+        "warning": warning,
+        "database_ssg_symbol": input_ssg.international_symbol_linear,
+        "msg_number": input_ossg.msg_int_num,
+        "msg_symbol": input_ossg.msg_bns_symbol,
+        "msg_bns_number": input_ossg.msg_bns_num,
+        "input_ssg_setting": INPUT_POSCAR_SETTING,
+        "input_ssg_spin_frame_setting": "in_lattice",
+        "input_ssg_ops": _serialize_ssg_operation_matrices(list(input_ssg.ops)),
+        "input_msg_setting": INPUT_POSCAR_SETTING,
+        "input_msg_spin_frame_setting": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+        "input_msg_ops": _serialize_msg_operation_matrices(list(input_ossg.msg_ops), tol=input_ossg.tol),
+        "T_input_to_input_magnetic_primitive": primitive_transform.tolist(),
+        "T_input_to_input_magnetic_primitive_determinant": primitive_det,
+        "input_magnetic_primitive_cell_detail": _serialize_cell_snapshot(input_magnetic_primitive_cell),
+    }
+
+
 def find_spin_group(
     cif: str,
     space_tol=0.02,
@@ -3828,6 +3925,30 @@ def find_spin_group_acc_primitive(
     lattice_factors, positions, elements, occupancies, labels, moments = parsed
     return _find_spin_group_acc_primitive_from_parsed(
         cif,
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        tol_cfg,
+    )
+
+
+def find_spin_group_poscar_ssg(
+    poscar: str,
+    space_tol=0.02,
+    mtol=0.02,
+    meigtol=0.00002,
+    matrix_tol=0.01,
+) -> dict:
+    tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
+    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
+        poscar,
+        allow_incar_magmom=False,
+        require_embedded_magmom=True,
+    )
+    return _find_spin_group_poscar_ssg_from_parsed(
+        poscar,
         lattice_factors,
         positions,
         elements,

@@ -1590,6 +1590,14 @@ class SpinSpaceGroup:
     def international_symbol_type(self):
         return self.international_symbol["type"]
 
+    def identify_index_details(self, file_name: str, *, tol: float = 0.001):
+        from findspingroup.find_spin_group import _identify_ssg_index_details
+
+        return _identify_ssg_index_details(file_name, self, tol=tol)
+
+    def identify_index(self, file_name: str, *, tol: float = 0.001):
+        return self.identify_index_details(file_name, tol=tol)["index"]
+
     @cached_property
     def symbol_calibration_tol(self):
         return calibrated_symbol_tol(self.tol)
