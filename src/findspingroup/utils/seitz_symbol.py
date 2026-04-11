@@ -392,16 +392,64 @@ def _axis_parameter_subscript(
     return ",".join(rendered)
 
 
+def _symbolic_component_token(
+    value: float,
+    *,
+    tol: float = 1e-4,
+) -> tuple[str, str] | None:
+    numeric = float(value)
+    if abs(numeric) < tol:
+        return "0", "0"
+
+    sign = "-" if numeric < 0 else ""
+    magnitude = abs(numeric)
+    candidates = [
+        (1.0, "1", "1"),
+        (0.5, "1/2", r"\frac{1}{2}"),
+        (math.sqrt(2.0) / 2.0, "sqrt(2)/2", r"\frac{\sqrt{2}}{2}"),
+        (math.sqrt(3.0) / 2.0, "sqrt(3)/2", r"\frac{\sqrt{3}}{2}"),
+        (1.0 / math.sqrt(3.0), "1/sqrt(3)", r"\frac{1}{\sqrt{3}}"),
+        (math.sqrt(2.0 / 3.0), "sqrt(2/3)", r"\sqrt{\frac{2}{3}}"),
+    ]
+    for candidate_value, linear_token, latex_token in candidates:
+        if abs(magnitude - candidate_value) < tol:
+            return f"{sign}{linear_token}", f"{sign}{latex_token}"
+    return None
+
+
+def _vector_to_symbolic_subscript(
+    axis: np.ndarray,
+    *,
+    tol: float = 1e-4,
+) -> tuple[str, str] | None:
+    axis = _canonicalize_axis(axis, tol=tol)
+    linear_parts: list[str] = []
+    latex_parts: list[str] = []
+    for value in axis:
+        token = _symbolic_component_token(float(value), tol=tol)
+        if token is None:
+            return None
+        linear_parts.append(token[0])
+        latex_parts.append(token[1])
+    return ",".join(linear_parts), ",".join(latex_parts)
+
+
 def _point_axis_metadata(
     *,
     axis_kind: str | None,
     axis_direction: tuple[int, int, int] | None,
     axis_parameter_values: tuple[float, float, float] | None,
+    axis_symbolic_subscript_linear: str | None = None,
+    axis_symbolic_subscript_latex: str | None = None,
 ) -> dict:
     if axis_kind == "direction" and axis_direction is not None:
         sub_linear = _direction_subscript(axis_direction)
         sub_latex = _direction_subscript(axis_direction)
         parameter_values = None
+    elif axis_kind == "symbolic":
+        sub_linear = axis_symbolic_subscript_linear
+        sub_latex = axis_symbolic_subscript_latex
+        parameter_values = axis_parameter_values
     elif axis_kind == "parameter":
         sub_linear = _axis_parameter_subscript(axis_parameter_values, latex=False)
         sub_latex = _axis_parameter_subscript(axis_parameter_values, latex=True)
@@ -458,6 +506,7 @@ def format_point_seitz_symbol(
     axis_direction: tuple[int, int, int] | None,
     axis_parameter_values: tuple[float, float, float] | None,
     rotation_power: int | None,
+    axis_symbolic_subscript_linear: str | None = None,
 ) -> str:
     symbol = hm_symbol
     if rotation_power is not None:
@@ -465,6 +514,8 @@ def format_point_seitz_symbol(
 
     if axis_kind == "direction" and axis_direction is not None:
         symbol += f"_{{{_direction_subscript(axis_direction)}}}"
+    elif axis_kind == "symbolic" and axis_symbolic_subscript_linear is not None:
+        symbol += f"_{{{axis_symbolic_subscript_linear}}}"
     elif axis_kind == "parameter":
         symbol += f"_{{{_axis_parameter_subscript(axis_parameter_values, latex=False)}}}"
 
@@ -477,6 +528,7 @@ def format_point_seitz_symbol_latex(
     axis_direction: tuple[int, int, int] | None,
     axis_parameter_values: tuple[float, float, float] | None,
     rotation_power: int | None,
+    axis_symbolic_subscript_latex: str | None = None,
 ) -> str:
     symbol = _to_latex_point_token(hm_symbol)
     if rotation_power is not None:
@@ -484,6 +536,8 @@ def format_point_seitz_symbol_latex(
 
     if axis_kind == "direction" and axis_direction is not None:
         symbol += f"_{{{_direction_subscript(axis_direction)}}}"
+    elif axis_kind == "symbolic" and axis_symbolic_subscript_latex is not None:
+        symbol += f"_{{{axis_symbolic_subscript_latex}}}"
     elif axis_kind == "parameter":
         symbol += f"_{{{_axis_parameter_subscript(axis_parameter_values, latex=True)}}}"
 
@@ -621,13 +675,20 @@ def _describe_point_operation_impl(
     axis_kind = None
     axis_direction = None
     axis_parameter_values = None
+    axis_symbolic_subscript_linear = None
+    axis_symbolic_subscript_latex = None
     if axis is not None:
         axis_direction = _vector_to_integer_direction(axis, max_denom=max_axis_denom, tol=max(5 * tol, 1e-4))
         if axis_direction is not None:
             axis_kind = "direction"
         else:
-            axis_kind = "parameter"
             axis_parameter_values = _axis_to_parameter_values(axis, tol=max(tol, 1e-8))
+            symbolic_subscript = _vector_to_symbolic_subscript(axis, tol=max(5 * tol, 1e-4))
+            if symbolic_subscript is not None:
+                axis_kind = "symbolic"
+                axis_symbolic_subscript_linear, axis_symbolic_subscript_latex = symbolic_subscript
+            else:
+                axis_kind = "parameter"
 
     known_token_info = _nearest_known_point_operation_token(matrix, tol=tol)
     if known_token_info is not None:
@@ -647,6 +708,7 @@ def _describe_point_operation_impl(
         axis_direction=axis_direction,
         axis_parameter_values=axis_parameter_values,
         rotation_power=rotation_power,
+        axis_symbolic_subscript_linear=axis_symbolic_subscript_linear,
     )
     symbol_latex = format_point_seitz_symbol_latex(
         hm_symbol=hm_symbol,
@@ -654,11 +716,14 @@ def _describe_point_operation_impl(
         axis_direction=axis_direction,
         axis_parameter_values=axis_parameter_values,
         rotation_power=rotation_power,
+        axis_symbolic_subscript_latex=axis_symbolic_subscript_latex,
     )
     axis_metadata = _point_axis_metadata(
         axis_kind=axis_kind,
         axis_direction=axis_direction,
         axis_parameter_values=axis_parameter_values,
+        axis_symbolic_subscript_linear=axis_symbolic_subscript_linear,
+        axis_symbolic_subscript_latex=axis_symbolic_subscript_latex,
     )
 
     return {
@@ -778,19 +843,29 @@ def canonicalize_group_seitz_descriptions(
                 max_denom=max_axis_denom,
                 tol=max(5 * tol, 1e-4),
             )
+            axis_symbolic_subscript_linear = None
+            axis_symbolic_subscript_latex = None
             if axis_direction is not None:
                 info["axis_kind"] = "direction"
                 info["axis_direction"] = axis_direction
                 info["axis_euler_deg"] = None
                 info["axis_parameter_values"] = None
             else:
-                info["axis_kind"] = "parameter"
-                info["axis_direction"] = None
-                info["axis_euler_deg"] = None
                 info["axis_parameter_values"] = _axis_to_parameter_values(
                     canonical_axis,
                     tol=max(tol, 1e-8),
                 )
+                symbolic_subscript = _vector_to_symbolic_subscript(
+                    canonical_axis,
+                    tol=max(5 * tol, 1e-4),
+                )
+                if symbolic_subscript is not None:
+                    info["axis_kind"] = "symbolic"
+                    axis_symbolic_subscript_linear, axis_symbolic_subscript_latex = symbolic_subscript
+                else:
+                    info["axis_kind"] = "parameter"
+                info["axis_direction"] = None
+                info["axis_euler_deg"] = None
 
             info["symbol"] = format_point_seitz_symbol(
                 hm_symbol=info["hm_symbol"],
@@ -798,6 +873,7 @@ def canonicalize_group_seitz_descriptions(
                 axis_direction=info.get("axis_direction"),
                 axis_parameter_values=info.get("axis_parameter_values"),
                 rotation_power=info.get("rotation_power"),
+                axis_symbolic_subscript_linear=axis_symbolic_subscript_linear,
             )
             info["symbol_latex"] = format_point_seitz_symbol_latex(
                 hm_symbol=info["hm_symbol"],
@@ -805,12 +881,15 @@ def canonicalize_group_seitz_descriptions(
                 axis_direction=info.get("axis_direction"),
                 axis_parameter_values=info.get("axis_parameter_values"),
                 rotation_power=info.get("rotation_power"),
+                axis_symbolic_subscript_latex=axis_symbolic_subscript_latex,
             )
             info.update(
                 _point_axis_metadata(
                     axis_kind=info.get("axis_kind"),
                     axis_direction=info.get("axis_direction"),
                     axis_parameter_values=info.get("axis_parameter_values"),
+                    axis_symbolic_subscript_linear=axis_symbolic_subscript_linear,
+                    axis_symbolic_subscript_latex=axis_symbolic_subscript_latex,
                 )
             )
 

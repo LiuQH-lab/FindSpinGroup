@@ -549,6 +549,14 @@ class MagSymmetryResult:
             self.T_input_to_mag_primitive,
         )
         self.T_input_to_acc_primitive = symmetry.get('T_input_to_acc_primitive', None)
+        self.G0_symbol = symmetry.get('G0_symbol', None)
+        self.G0_num = symmetry.get('G0_num', None)
+        self.L0_symbol = symmetry.get('L0_symbol', None)
+        self.L0_num = symmetry.get('L0_num', None)
+        self.it = symmetry.get('it', None)
+        self.ik = symmetry.get('ik', None)
+        self.SSPG_symbol_hm = symmetry.get('SSPG_symbol_hm', None)
+        self.SSPG_symbol_s = symmetry.get('SSPG_symbol_s', None)
         self.input_space_group_number = symmetry.get('input_space_group_number', None)
         self.input_space_group_symbol = symmetry.get('input_space_group_symbol', None)
         self.sg_has_real_space_inversion = symmetry.get('sg_has_real_space_inversion', None)
@@ -3230,6 +3238,14 @@ def _find_spin_group_from_parsed(
                 'magnetic_phase_details': magnetic_phase_details,
                 'acc':ssg_primitive.acc,
                 'msg_acc': msg_acc,
+                'G0_symbol': ssg_primitive.G0_symbol,
+                'G0_num': int(ssg_primitive.G0_num),
+                'L0_symbol': ssg_primitive.L0_symbol,
+                'L0_num': int(ssg_primitive.L0_num),
+                'it': int(ssg_primitive.it),
+                'ik': int(ssg_primitive.ik),
+                'SSPG_symbol_hm': ssg_primitive.spin_part_point_group_symbol_hm,
+                'SSPG_symbol_s': ssg_primitive.spin_part_point_group_symbol_s,
                 'input_space_group_number': input_space_group_number,
                 'input_space_group_symbol': input_space_group_symbol,
                 'sg_has_real_space_inversion': space_group_has_real_space_inversion(input_space_group_number),
