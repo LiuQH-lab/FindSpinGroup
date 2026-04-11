@@ -110,6 +110,96 @@ def _nearest_known_point_operation(
     return np.asarray(best_matrix, dtype=float)
 
 
+def _parse_direction_subscript_token(token: str) -> tuple[int, int, int]:
+    if "," in token:
+        parts = [part.strip() for part in token.split(",")]
+        if len(parts) != 3:
+            raise ValueError(f"Invalid direction token: {token}")
+        return int(parts[0]), int(parts[1]), int(parts[2])
+
+    values: list[int] = []
+    i = 0
+    while i < len(token):
+        sign = 1
+        if token[i] == "-":
+            sign = -1
+            i += 1
+        if i >= len(token) or not token[i].isdigit():
+            raise ValueError(f"Invalid direction token: {token}")
+        values.append(sign * int(token[i]))
+        i += 1
+    if len(values) != 3:
+        raise ValueError(f"Invalid direction token: {token}")
+    return int(values[0]), int(values[1]), int(values[2])
+
+
+def _parse_known_point_token(token: str) -> dict:
+    match = re.fullmatch(r"(?P<hm>-?\d+|m)(?:\^(?P<power>-?\d+))?(?:_\{(?P<axis>[^}]+)\})?", token)
+    if not match:
+        raise ValueError(f"Unsupported point-operation token: {token}")
+
+    hm_symbol = match.group("hm")
+    power_text = match.group("power")
+    axis_text = match.group("axis")
+    rotation_power = None if power_text is None else int(power_text)
+    axis_direction = None if axis_text is None else _parse_direction_subscript_token(axis_text)
+    axis_kind = "direction" if axis_direction is not None else None
+
+    axis_vector = None
+    if axis_direction is not None:
+        raw = np.asarray(axis_direction, dtype=float)
+        norm = np.linalg.norm(raw)
+        if norm > 0:
+            axis_vector = tuple(float(v) for v in raw / norm)
+
+    return {
+        "hm_symbol": hm_symbol,
+        "rotation_power": rotation_power,
+        "axis_kind": axis_kind,
+        "axis_direction": axis_direction,
+        "axis_parameter_values": None,
+        "axis_vector": axis_vector,
+    }
+
+
+@lru_cache(maxsize=1)
+def _known_point_operation_tokens() -> tuple[tuple[np.ndarray, dict], ...]:
+    items: list[tuple[np.ndarray, dict]] = []
+    for op_set in (operations, operations_hex):
+        for raw_matrix, _, token in op_set:
+            items.append((np.asarray(raw_matrix, dtype=float), _parse_known_point_token(token)))
+    return tuple(items)
+
+
+def _nearest_known_point_operation_token(
+    matrix: np.ndarray,
+    *,
+    tol: float = 1e-6,
+) -> dict | None:
+    matrix = np.asarray(matrix, dtype=float)
+    comparison_bases = [matrix, _orthogonalize_matrix(matrix)]
+
+    candidates: list[tuple[float, dict]] = []
+    for candidate_matrix, token_info in _known_point_operation_tokens():
+        best_dist = min(float(np.linalg.norm(basis_matrix - candidate_matrix)) for basis_matrix in comparison_bases)
+        candidates.append((best_dist, token_info))
+
+    if not candidates:
+        return None
+
+    candidates.sort(key=lambda item: item[0])
+    best_dist, best_info = candidates[0]
+    second_dist = candidates[1][0] if len(candidates) > 1 else math.inf
+
+    max_match_dist = max(1e-2, 4 * tol)
+    min_gap = max(1e-4, 2 * tol)
+    if best_dist > max_match_dist:
+        return None
+    if second_dist - best_dist < min_gap:
+        return None
+    return copy.deepcopy(best_info)
+
+
 def _spectral_order_hint(
     matrix: np.ndarray,
     *,
@@ -505,10 +595,28 @@ def _describe_point_operation_impl(
         if det_sign < 0:
             hm_fold = _hm_improper_fold(matrix, fold, tol=tol)
             hm_symbol = f"-{hm_fold}"
+            proper_component = -matrix
+            proper_ortho = _orthogonalize_matrix(proper_component)
+            if is_euclidean_orthogonal:
+                branch_num, branch_fold = _rotation_fraction(
+                    proper_ortho,
+                    axis,
+                    max_fold=max_order,
+                    tol=tol,
+                )
+            else:
+                branch_num, branch_fold = _rotation_fraction_from_eigenvalues(
+                    proper_component,
+                    max_fold=max_order,
+                    tol=tol,
+                )
+            if branch_fold != hm_fold:
+                branch_num = power_num
         else:
             hm_symbol = f"{fold}"
-        if fold > 2:
-            rotation_power = power_num
+            branch_num = power_num
+        if (hm_fold if det_sign < 0 else fold) > 2:
+            rotation_power = branch_num
 
     axis_kind = None
     axis_direction = None
@@ -520,6 +628,18 @@ def _describe_point_operation_impl(
         else:
             axis_kind = "parameter"
             axis_parameter_values = _axis_to_parameter_values(axis, tol=max(tol, 1e-8))
+
+    known_token_info = _nearest_known_point_operation_token(matrix, tol=tol)
+    if known_token_info is not None:
+        hm_symbol = known_token_info["hm_symbol"]
+        rotation_power = known_token_info["rotation_power"]
+        axis_kind = known_token_info["axis_kind"]
+        axis_direction = known_token_info["axis_direction"]
+        axis_parameter_values = known_token_info["axis_parameter_values"]
+        if known_token_info["axis_vector"] is None:
+            axis = None
+        else:
+            axis = np.asarray(known_token_info["axis_vector"], dtype=float)
 
     symbol = format_point_seitz_symbol(
         hm_symbol=hm_symbol,

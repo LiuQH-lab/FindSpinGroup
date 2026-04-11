@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from findspingroup import find_spin_group
+from findspingroup.data.POINT_GROUP_MATRIX import operations_hex
 from findspingroup.structure.group import SpinSpaceGroup
 from findspingroup.utils.seitz_symbol import (
     calibrated_symbol_tol,
@@ -145,3 +146,20 @@ def test_seitz_descriptions_and_symbol_lists_expose_latex_forms():
 
 def test_seitz_point_latex_keeps_minus_sign_prefix():
     assert format_point_seitz_symbol_latex("-3", "direction", (1, -1, 0), None, 1) == "-3^{1}_{1-10}"
+
+
+def test_describe_point_operation_uses_legacy_hex_minus6_branch_labels():
+    minus6_minus = None
+    for matrix, _, token in operations_hex:
+        if token == "-6^5_{001}":
+            minus6_minus = np.array(matrix, dtype=float)
+            break
+
+    assert minus6_minus is not None
+
+    info = describe_point_operation(minus6_minus, tol=1e-6)
+
+    assert info["hm_symbol"] == "-6"
+    assert info["rotation_power"] == 5
+    assert info["axis_direction"] == (0, 0, 1)
+    assert info["symbol"] == "-6^{5}_{001}"
