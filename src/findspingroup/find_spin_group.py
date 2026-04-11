@@ -883,6 +883,7 @@ class MagSymmetryResult:
         self.gspg_collinear_axis = symmetry.get('gspg_collinear_axis', None)
         self.gspg_symbol_linear = symmetry.get('gspg_symbol_linear', None)
         self.gspg_symbol_latex = symmetry.get('gspg_symbol_latex', None)
+        self.gspg_effective_mpg_symbol = symmetry.get('gspg_effective_mpg_symbol', None)
         self.g0_standard_ssg_ops = symmetry.get('g0_standard_ssg_ops', None)
         self.g0_standard_ssg_seitz = symmetry.get('g0_standard_ssg_seitz', None)
         self.g0_standard_ssg_seitz_latex = symmetry.get('g0_standard_ssg_seitz_latex', None)
@@ -1417,6 +1418,7 @@ def _build_gspg_payload(
         ),
         "gspg_symbol_linear": ssg.gspg.symbol_linear,
         "gspg_symbol_latex": ssg.gspg.symbol_latex,
+        "gspg_effective_mpg_symbol": ssg.gspg.empg_symbol,
     }
 
 
