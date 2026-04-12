@@ -81,6 +81,7 @@ def test_parse_poscar_file_roundtrips_generated_mnte_poscar(tmp_path):
         elements,
         occupancies,
         moments,
+        input_spin_setting="cartesian",
     )
 
     assert roundtrip.index == original.index
@@ -100,6 +101,7 @@ def test_parse_poscar_file_roundtrips_generated_non_orthogonal_acc_primitive_pos
         elements,
         occupancies,
         moments,
+        input_spin_setting="cartesian",
     )
 
     assert roundtrip.index == original.index
@@ -119,6 +121,7 @@ def test_parse_poscar_file_roundtrips_generated_precision_sensitive_pyrochlore_p
         elements,
         occupancies,
         moments,
+        input_spin_setting="cartesian",
     )
 
     assert roundtrip.index == original.index
@@ -138,6 +141,7 @@ def test_parse_poscar_file_roundtrips_generated_precision_sensitive_tetragonal_p
         elements,
         occupancies,
         moments,
+        input_spin_setting="cartesian",
     )
 
     assert roundtrip.index == original.index
@@ -172,6 +176,7 @@ def test_parse_structure_file_dispatches_poscar_suffix(tmp_path):
         parsed[2],
         parsed[3],
         parsed[5],
+        input_spin_setting="cartesian",
     )
 
     assert roundtrip.index == original.index
@@ -186,7 +191,15 @@ def test_parse_poscar_file_supports_selective_dynamics(tmp_path):
     )
 
     lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
-    roundtrip = find_spin_group_from_data(str(poscar_path), lattice_factors, positions, elements, occupancies, moments)
+    roundtrip = find_spin_group_from_data(
+        str(poscar_path),
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        input_spin_setting="cartesian",
+    )
 
     assert roundtrip.index == original.index
 
@@ -200,7 +213,15 @@ def test_parse_poscar_file_supports_cartesian_coordinates(tmp_path):
     )
 
     lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
-    roundtrip = find_spin_group_from_data(str(poscar_path), lattice_factors, positions, elements, occupancies, moments)
+    roundtrip = find_spin_group_from_data(
+        str(poscar_path),
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        input_spin_setting="cartesian",
+    )
 
     assert roundtrip.index == original.index
 
@@ -214,7 +235,15 @@ def test_parse_poscar_file_supports_three_component_scale_factors(tmp_path):
     )
 
     lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
-    roundtrip = find_spin_group_from_data(str(poscar_path), lattice_factors, positions, elements, occupancies, moments)
+    roundtrip = find_spin_group_from_data(
+        str(poscar_path),
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        input_spin_setting="cartesian",
+    )
 
     assert roundtrip.index == original.index
 
@@ -228,7 +257,15 @@ def test_parse_poscar_file_supports_negative_volume_scale(tmp_path):
     )
 
     lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
-    roundtrip = find_spin_group_from_data(str(poscar_path), lattice_factors, positions, elements, occupancies, moments)
+    roundtrip = find_spin_group_from_data(
+        str(poscar_path),
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        input_spin_setting="cartesian",
+    )
 
     assert roundtrip.index == original.index
 
@@ -271,7 +308,15 @@ def test_parse_poscar_file_tolerates_relaxed_magmom_comment_format(tmp_path):
     )
 
     lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
-    roundtrip = find_spin_group_from_data(str(poscar_path), lattice_factors, positions, elements, occupancies, moments)
+    roundtrip = find_spin_group_from_data(
+        str(poscar_path),
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        input_spin_setting="cartesian",
+    )
 
     assert roundtrip.index == original.index
 
@@ -292,7 +337,15 @@ def test_parse_poscar_file_reads_official_incar_magmom_vector_syntax(tmp_path):
     )
 
     lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
-    roundtrip = find_spin_group_from_data(str(poscar_path), lattice_factors, positions, elements, occupancies, moments)
+    roundtrip = find_spin_group_from_data(
+        str(poscar_path),
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        input_spin_setting="cartesian",
+    )
 
     assert roundtrip.index == original.index
 
