@@ -15,13 +15,26 @@ def parse_structure_file(filename, atol=0.02, return_metadata=False):
     suffix = path.suffix.lower()
     basename = path.name.lower()
     if suffix == '.scif':
-        return parse_scif_file(filename, atol=atol, return_metadata=return_metadata)
+        if return_metadata:
+            parsed, metadata = parse_scif_file(filename, atol=atol, return_metadata=True)
+            enriched = {} if metadata is None else dict(metadata)
+            enriched.setdefault("source_format", "scif")
+            enriched.setdefault("spin_setting", "in_lattice")
+            return parsed, enriched
+        return parse_scif_file(filename, atol=atol)
     if suffix in {'.vasp', '.poscar'} or basename in {'poscar', 'contcar'}:
         if return_metadata:
-            return parse_poscar_file(filename), None
+            return parse_poscar_file(filename), {
+                "source_format": "poscar",
+                "spin_setting": "cartesian",
+            }
         return parse_poscar_file(filename)
     if return_metadata:
-        return parse_cif_file(filename, atol=atol, return_metadata=True)
+        parsed, metadata = parse_cif_file(filename, atol=atol, return_metadata=True)
+        enriched = {} if metadata is None else dict(metadata)
+        enriched.setdefault("source_format", "cif")
+        enriched.setdefault("spin_setting", "in_lattice")
+        return parsed, enriched
     return parse_cif_file(filename, atol=atol)
 
 

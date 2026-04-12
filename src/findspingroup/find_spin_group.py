@@ -2812,6 +2812,7 @@ def _find_spin_group_from_parsed(
     tol_cfg: Tolerances,
     source_metadata: dict | None = None,
     parser_atol: float | None = None,
+    input_spin_setting: str = "in_lattice",
 ) -> MagSymmetryResult:
     input_cell = CrystalCell(
         lattice_factors,
@@ -2819,7 +2820,7 @@ def _find_spin_group_from_parsed(
         occupancies,
         elements,
         moments,
-        spin_setting="in_lattice",
+        spin_setting=input_spin_setting,
         tol=tol_cfg,
     )
     magnetic_primitive_cell: CrystalCell
@@ -3488,6 +3489,7 @@ def _find_spin_group_basic_from_parsed(
     occupancies,
     moments,
     tol_cfg: Tolerances,
+    input_spin_setting: str = "in_lattice",
 ) -> dict:
     input_cell = CrystalCell(
         lattice_factors,
@@ -3495,7 +3497,7 @@ def _find_spin_group_basic_from_parsed(
         occupancies,
         elements,
         moments,
-        spin_setting="in_lattice",
+        spin_setting=input_spin_setting,
         tol=tol_cfg,
     )
     magnetic_primitive_cell, transformation_input_to_primitive = input_cell.get_primitive_structure(
@@ -3607,6 +3609,7 @@ def _find_spin_group_acc_primitive_from_parsed(
     occupancies,
     moments,
     tol_cfg: Tolerances,
+    input_spin_setting: str = "in_lattice",
 ) -> dict:
     input_cell = CrystalCell(
         lattice_factors,
@@ -3614,7 +3617,7 @@ def _find_spin_group_acc_primitive_from_parsed(
         occupancies,
         elements,
         moments,
-        spin_setting="in_lattice",
+        spin_setting=input_spin_setting,
         tol=tol_cfg,
     )
     magnetic_primitive_cell, transformation_input_to_primitive = input_cell.get_primitive_structure(
@@ -3703,6 +3706,7 @@ def find_spin_group_from_data(
     occupancies,
     moments,
     source_metadata: dict | None = None,
+    input_spin_setting: str = "in_lattice",
     space_tol = 0.02,
     mtol = 0.02,
     meigtol = 0.00002,
@@ -3719,6 +3723,7 @@ def find_spin_group_from_data(
         tol_cfg,
         source_metadata=source_metadata,
         parser_atol=None,
+        input_spin_setting=input_spin_setting,
     )
 
 
@@ -3729,6 +3734,7 @@ def find_spin_group_basic_from_data(
     elements,
     occupancies,
     moments,
+    input_spin_setting="in_lattice",
     space_tol=0.02,
     mtol=0.02,
     meigtol=0.00002,
@@ -3743,6 +3749,7 @@ def find_spin_group_basic_from_data(
         occupancies,
         moments,
         tol_cfg,
+        input_spin_setting=input_spin_setting,
     )
 
 
@@ -3753,6 +3760,7 @@ def find_spin_group_acc_primitive_from_data(
     elements,
     occupancies,
     moments,
+    input_spin_setting="in_lattice",
     space_tol=0.02,
     mtol=0.02,
     meigtol=0.00002,
@@ -3767,10 +3775,22 @@ def find_spin_group_acc_primitive_from_data(
         occupancies,
         moments,
         tol_cfg,
+        input_spin_setting=input_spin_setting,
     )
 
 
-def _find_spin_group_poscar_ssg_from_parsed(
+def _has_explicit_magnetic_moments(moments, *, tol: float = 1e-8) -> bool:
+    if moments is None:
+        return False
+    array = np.asarray(moments, dtype=float)
+    if array.size == 0:
+        return False
+    if array.ndim == 1:
+        return bool(np.linalg.norm(array) > tol)
+    return bool(np.any(np.linalg.norm(array, axis=1) > tol))
+
+
+def _find_spin_group_input_ssg_from_parsed(
     source_name: str,
     lattice_factors,
     positions,
@@ -3778,22 +3798,24 @@ def _find_spin_group_poscar_ssg_from_parsed(
     occupancies,
     moments,
     tol_cfg: Tolerances,
+    *,
+    input_spin_setting: str,
+    source_format: str,
 ) -> dict:
+    if not _has_explicit_magnetic_moments(moments):
+        raise ValueError(
+            f"Input magnetic-SSG route requires explicit magnetic moments; none were found in {source_name}."
+        )
+
     input_cell = CrystalCell(
         lattice_factors,
         positions,
         occupancies,
         elements,
         moments,
-        spin_setting="in_lattice",
+        spin_setting=input_spin_setting,
         tol=tol_cfg,
     )
-    input_identify_result = identify_spin_space_group_result(
-        input_cell,
-        find_primitive=False,
-        tol=tol_cfg,
-    )
-    input_ssg: SpinSpaceGroup = input_identify_result.ssg
     input_magnetic_primitive_cell, transformation_input_to_input_magnetic_primitive = (
         input_cell.get_primitive_structure(magnetic=True)
     )
@@ -3804,14 +3826,19 @@ def _find_spin_group_poscar_ssg_from_parsed(
     primitive_det = float(np.linalg.det(primitive_transform))
     is_input_magnetic_primitive = bool(np.isclose(abs(primitive_det), 1.0, atol=1e-6))
 
-    identify_index_details = None
+    input_identify_result = identify_spin_space_group_result(
+        input_cell,
+        find_primitive=False,
+        tol=tol_cfg,
+    )
+    input_ssg: SpinSpaceGroup = input_identify_result.ssg
+
     identify_info = None
     try:
-        identify_index_details = input_ssg.identify_index_details(
+        identify_info = input_ssg.identify_index(
             source_name,
             tol=tol_cfg.m_matrix_tol,
         )
-        identify_info = identify_index_details["index"]
     except ValueError as exc:
         if not _should_degrade_identify_index_error(exc):
             raise
@@ -3823,6 +3850,14 @@ def _find_spin_group_poscar_ssg_from_parsed(
         )
 
     input_ossg = _ossg_oriented_spin_frame_ssg(input_ssg, input_cell)
+    magnetic_phase_payload = classify_magnetic_phase(
+        conf=input_ssg.conf,
+        full_spin_part_point_group_hm=input_ssg.spin_part_point_group_symbol_hm,
+        full_spin_part_point_group_s=input_ssg.spin_part_point_group_symbol_s,
+        net_moment=input_cell.net_moment,
+        mpg_identifier=input_ossg.mpg_num,
+        is_ss_gp=input_ssg.is_spinsplitting[-1],
+    )
     warning = None
     if not is_input_magnetic_primitive:
         warning = (
@@ -3830,24 +3865,79 @@ def _find_spin_group_poscar_ssg_from_parsed(
             "symmetry operations relative to the magnetic primitive setting."
         )
 
+    input_poscar = None
+    if source_format != "poscar":
+        input_poscar = _cartesianized_input_cell(input_cell).to_poscar(Path(source_name).name)
+
+    primitive_identify_result = input_identify_result
+    primitive_ssg = input_ssg
+    primitive_ossg = input_ossg
+    primitive_identify_info = identify_info or input_ssg.index
+    magnetic_primitive_poscar = None
+    if not is_input_magnetic_primitive:
+        primitive_identify_result = identify_spin_space_group_result(
+            input_magnetic_primitive_cell,
+            find_primitive=False,
+            tol=tol_cfg,
+        )
+        primitive_ssg = primitive_identify_result.ssg
+        try:
+            primitive_identify_info = primitive_ssg.identify_index(
+                source_name,
+                tol=tol_cfg.m_matrix_tol,
+            )
+        except ValueError as exc:
+            if not _should_degrade_identify_index_error(exc):
+                raise
+            warnings.warn(
+                f"Primitive identify-index output unavailable for {source_name}: {exc}. "
+                "Continuing with primitive identify-index-derived outputs set to None.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            primitive_identify_info = primitive_ssg.index
+        primitive_ossg = _ossg_oriented_spin_frame_ssg(primitive_ssg, input_magnetic_primitive_cell)
+        transformation_primitive_to_acc_primitive = (
+            np.asarray(primitive_ssg.acc_primitive_trans, dtype=float),
+            np.asarray(primitive_ssg.acc_primitive_origin_shift, dtype=float),
+        )
+        acc_primitive_cell = input_magnetic_primitive_cell.transform(*transformation_primitive_to_acc_primitive)
+        magnetic_primitive_poscar = _cartesianized_input_cell(acc_primitive_cell).to_poscar(
+            f"{Path(source_name).name}_magnetic_primitive"
+        )
+
     return {
-        "index": identify_info or input_ssg.index,
-        "is_input_magnetic_primitive": is_input_magnetic_primitive,
-        "input_ssg_may_be_incomplete": not is_input_magnetic_primitive,
-        "warning": warning,
-        "database_ssg_symbol": input_ssg.international_symbol_linear,
-        "msg_number": input_ossg.msg_int_num,
-        "msg_symbol": input_ossg.msg_bns_symbol,
-        "msg_bns_number": input_ossg.msg_bns_num,
-        "input_ssg_setting": INPUT_POSCAR_SETTING,
-        "input_ssg_spin_frame_setting": "in_lattice",
-        "input_ssg_ops": _serialize_ssg_operation_matrices(list(input_ssg.ops)),
-        "input_msg_setting": INPUT_POSCAR_SETTING,
-        "input_msg_spin_frame_setting": OSSG_ORIENTED_SPIN_FRAME_SETTING,
-        "input_msg_ops": _serialize_msg_operation_matrices(list(input_ossg.msg_ops), tol=input_ossg.tol),
-        "T_input_to_input_magnetic_primitive": primitive_transform.tolist(),
-        "T_input_to_input_magnetic_primitive_determinant": primitive_det,
-        "input_magnetic_primitive_cell_detail": _serialize_cell_snapshot(input_magnetic_primitive_cell),
+        "summary": {
+            "input_ssg_index": identify_info or input_ssg.index,
+            "primitive_ssg_index": primitive_identify_info,
+            "input_conf": input_ssg.conf,
+            "input_spin_only_direction": _format_spin_only_direction(input_ossg.sog_direction),
+            "input_magnetic_phase": magnetic_phase_payload["phase"],
+            "input_ssg_database_symbol": input_ssg.international_symbol_linear,
+            "input_msg_num": input_ossg.msg_int_num,
+            "input_msg_bns_number": input_ossg.msg_bns_num,
+            "primitive_msg_bns_number": primitive_ossg.msg_bns_num,
+            "input_msg_symbol": input_ossg.msg_bns_symbol,
+            "is_input_magnetic_primitive": is_input_magnetic_primitive,
+            "input_ssg_may_be_incomplete": not is_input_magnetic_primitive,
+            "warning": warning,
+        },
+        "ssg": {
+            "setting": INPUT_POSCAR_SETTING,
+            "spin_frame_setting": input_cell.spin_setting,
+            "ops": _serialize_ssg_operation_matrices(list(input_ssg.ops)),
+        },
+        "msg": {
+            "setting": INPUT_POSCAR_SETTING,
+            "spin_frame_setting": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+            "ops": _serialize_msg_operation_matrices(list(input_ossg.msg_ops), tol=input_ossg.tol),
+        },
+        "primitive_relation": {
+            "T_input_to_input_magnetic_primitive": primitive_transform.tolist(),
+            "determinant": primitive_det,
+        },
+        "input_poscar": input_poscar,
+        "magnetic_primitive_poscar": magnetic_primitive_poscar,
     }
 
 
@@ -3877,6 +3967,9 @@ def find_spin_group(
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     parsed, source_metadata = parse_structure_file(cif, atol=parser_atol, return_metadata=True)
     lattice_factors,positions, elements, occupancies, labels, moments = parsed
+    input_spin_setting = (
+        "in_lattice" if source_metadata is None else source_metadata.get("spin_setting", "in_lattice")
+    )
     return _find_spin_group_from_parsed(
         cif,
         lattice_factors,
@@ -3887,6 +3980,7 @@ def find_spin_group(
         tol_cfg,
         source_metadata=source_metadata,
         parser_atol=parser_atol,
+        input_spin_setting=input_spin_setting,
     )
 
 
@@ -3901,6 +3995,9 @@ def find_spin_group_basic(
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     parsed, _source_metadata = parse_structure_file(cif, atol=parser_atol, return_metadata=True)
     lattice_factors, positions, elements, occupancies, labels, moments = parsed
+    input_spin_setting = (
+        "in_lattice" if _source_metadata is None else _source_metadata.get("spin_setting", "in_lattice")
+    )
     return _find_spin_group_basic_from_parsed(
         cif,
         lattice_factors,
@@ -3909,6 +4006,7 @@ def find_spin_group_basic(
         occupancies,
         moments,
         tol_cfg,
+        input_spin_setting=input_spin_setting,
     )
 
 
@@ -3923,6 +4021,9 @@ def find_spin_group_acc_primitive(
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     parsed, _source_metadata = parse_structure_file(cif, atol=parser_atol, return_metadata=True)
     lattice_factors, positions, elements, occupancies, labels, moments = parsed
+    input_spin_setting = (
+        "in_lattice" if _source_metadata is None else _source_metadata.get("spin_setting", "in_lattice")
+    )
     return _find_spin_group_acc_primitive_from_parsed(
         cif,
         lattice_factors,
@@ -3931,6 +4032,49 @@ def find_spin_group_acc_primitive(
         occupancies,
         moments,
         tol_cfg,
+        input_spin_setting=input_spin_setting,
+    )
+
+
+def find_spin_group_input_ssg(
+    structure_file: str,
+    space_tol=0.02,
+    mtol=0.02,
+    meigtol=0.00002,
+    matrix_tol=0.01,
+) -> dict:
+    tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
+    path = Path(structure_file)
+    suffix = path.suffix.lower()
+    basename = path.name.lower()
+    if suffix in {".vasp", ".poscar"} or basename in {"poscar", "contcar"}:
+        lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
+            structure_file,
+            allow_incar_magmom=False,
+            require_embedded_magmom=True,
+        )
+        source_format = "poscar"
+        input_spin_setting = "cartesian"
+    else:
+        parsed, source_metadata = parse_structure_file(
+            structure_file,
+            return_metadata=True,
+        )
+        lattice_factors, positions, elements, occupancies, labels, moments = parsed
+        source_format = "unknown" if source_metadata is None else source_metadata.get("source_format", "unknown")
+        input_spin_setting = (
+            "in_lattice" if source_metadata is None else source_metadata.get("spin_setting", "in_lattice")
+        )
+    return _find_spin_group_input_ssg_from_parsed(
+        structure_file,
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        tol_cfg,
+        input_spin_setting=input_spin_setting,
+        source_format=source_format,
     )
 
 
@@ -3941,20 +4085,12 @@ def find_spin_group_poscar_ssg(
     meigtol=0.00002,
     matrix_tol=0.01,
 ) -> dict:
-    tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
-    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
+    return find_spin_group_input_ssg(
         poscar,
-        allow_incar_magmom=False,
-        require_embedded_magmom=True,
-    )
-    return _find_spin_group_poscar_ssg_from_parsed(
-        poscar,
-        lattice_factors,
-        positions,
-        elements,
-        occupancies,
-        moments,
-        tol_cfg,
+        space_tol=space_tol,
+        mtol=mtol,
+        meigtol=meigtol,
+        matrix_tol=matrix_tol,
     )
 
 
@@ -3963,6 +4099,84 @@ def write_ssg_operation_matrices(path: str | Path, operations: list[dict]) -> Pa
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(
         json.dumps(operations, indent=2, ensure_ascii=False, sort_keys=True, cls=NumpyEncoder) + "\n",
+        encoding="utf-8",
+    )
+    return output_path
+
+
+def _is_json_scalar(value) -> bool:
+    return value is None or isinstance(value, (str, int, float, bool))
+
+
+def _format_structured_json(value, indent: int = 0) -> str:
+    current_indent = "  " * indent
+    next_indent = "  " * (indent + 1)
+
+    if isinstance(value, dict):
+        if not value:
+            return "{}"
+        lines = ["{"]
+        items = list(value.items())
+        for idx, (key, item) in enumerate(items):
+            comma = "," if idx < len(items) - 1 else ""
+            rendered = _format_structured_json(item, indent + 1)
+            if "\n" not in rendered:
+                lines.append(f"{next_indent}{json.dumps(key, ensure_ascii=False)}: {rendered}{comma}")
+                continue
+            rendered_lines = rendered.splitlines()
+            lines.append(f"{next_indent}{json.dumps(key, ensure_ascii=False)}: {rendered_lines[0]}")
+            lines.extend(rendered_lines[1:-1])
+            lines.append(f"{rendered_lines[-1]}{comma}")
+        lines.append(f"{current_indent}}}")
+        return "\n".join(lines)
+
+    if isinstance(value, list):
+        if not value:
+            return "[]"
+        if all(_is_json_scalar(item) for item in value):
+            return json.dumps(value, ensure_ascii=False)
+        if all(isinstance(item, list) and all(_is_json_scalar(entry) for entry in item) for item in value):
+            lines = ["["]
+            for idx, row in enumerate(value):
+                comma = "," if idx < len(value) - 1 else ""
+                lines.append(f"{next_indent}{json.dumps(row, ensure_ascii=False)}{comma}")
+            lines.append(f"{current_indent}]")
+            return "\n".join(lines)
+        lines = ["["]
+        for idx, item in enumerate(value):
+            comma = "," if idx < len(value) - 1 else ""
+            rendered = _format_structured_json(item, indent + 1)
+            if "\n" not in rendered:
+                lines.append(f"{next_indent}{rendered}{comma}")
+                continue
+            rendered_lines = rendered.splitlines()
+            lines.append(f"{next_indent}{rendered_lines[0]}")
+            lines.extend(rendered_lines[1:-1])
+            lines.append(f"{rendered_lines[-1]}{comma}")
+        lines.append(f"{current_indent}]")
+        return "\n".join(lines)
+
+    return json.dumps(value, ensure_ascii=False)
+
+
+def write_poscar_ssg_symmetry_dat(path: str | Path, payload: dict) -> Path:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    document = {
+        "summary": payload.get("summary") or {},
+        "ssg": payload.get("ssg") or {},
+        "msg": payload.get("msg") or {},
+        "primitive_relation": payload.get("primitive_relation") or {},
+        "input_poscar": payload.get("input_poscar"),
+        "magnetic_primitive_poscar": payload.get("magnetic_primitive_poscar"),
+        "format": "findspingroup.poscar_ssg.v1",
+    }
+
+    normalized_document = json.loads(json.dumps(document, ensure_ascii=False, cls=NumpyEncoder))
+
+    output_path.write_text(
+        _format_structured_json(normalized_document) + "\n",
         encoding="utf-8",
     )
     return output_path

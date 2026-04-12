@@ -3,7 +3,7 @@ import re
 
 import numpy as np
 
-from ..structure.cell import calculate_lattice_params, transform_moments
+from ..structure.cell import calculate_lattice_params
 from ..utils.matrix_utils import evaluate_numeric_expression
 
 
@@ -219,13 +219,9 @@ def parse_poscar_file(
         allow_incar_magmom=allow_incar_magmom,
         require_embedded_magmom=require_embedded_magmom,
     )
-    # POSCAR MAGMOM vectors are written in the file's Cartesian spin frame. Convert
-    # them back into the parser's in-lattice convention expected by downstream APIs.
-    moments_in_lattice = transform_moments(magmom_vectors, calculate_lattice_params(lattice_matrix), inverse=True)
-
     elements = _expand_species(species, counts)
     occupancies = [1.0] * n_sites
     labels = _synthesize_labels(elements)
     lattice_factors = np.array(calculate_lattice_params(lattice_matrix), dtype=float)
 
-    return lattice_factors, positions, elements, occupancies, labels, moments_in_lattice
+    return lattice_factors, positions, elements, occupancies, labels, magmom_vectors

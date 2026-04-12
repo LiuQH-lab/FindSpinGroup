@@ -13,7 +13,9 @@ from findspingroup import (
     find_spin_group_acc_primitive,
     find_spin_group_basic,
     find_spin_group_from_data,
+    find_spin_group_input_ssg,
     find_spin_group_poscar_ssg,
+    write_poscar_ssg_symmetry_dat,
     write_ssg_operation_matrices,
 )
 from findspingroup.core.identify_index.functions import (
@@ -192,6 +194,62 @@ def test_cli_acc_primitive_mode_prints_json_and_writes_matrix_file(monkeypatch, 
     assert len(written) == len(payload["acc_primitive_ssg_operation_matrices"])
 
 
+def test_cli_without_explicit_file_autoselects_poscar_and_runs_basic(monkeypatch, capsys, tmp_path):
+    original = find_spin_group("examples/0.800_MnTe.mcif")
+    (tmp_path / "POSCAR").write_text(original.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
+    (tmp_path / "other.mcif").write_text(Path("examples/0.800_MnTe.mcif").read_text(encoding="utf-8"), encoding="utf-8")
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(sys, "argv", ["fsg"])
+
+    import findspingroup.cli as cli_module
+
+    cli_module.main()
+    stdout = capsys.readouterr()
+    payload = json.loads(stdout.out)
+
+    assert payload["index"] == "194.164.1.1.L"
+    assert payload["acc_symbol"] == "6/mmmP"
+    assert "Using POSCAR" in stdout.err or "Auto-selected structure file: POSCAR" in stdout.err
+
+
+def test_cli_write_outputs_input_ssg_bundle_into_current_directory(monkeypatch, capsys, tmp_path):
+    source = Path("tests/testset/mcif_241130_no2186/0.396_MnPtGa.mcif")
+    target = tmp_path / source.name
+    target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(sys, "argv", ["fsg", "-w", target.name])
+
+    import findspingroup.cli as cli_module
+
+    cli_module.main()
+    stdout = json.loads(capsys.readouterr().out)
+
+    assert stdout["written_files"] == [
+        "ssg_symm.json",
+        "input_poscar.vasp",
+        "magnetic_primitive_poscar.vasp",
+    ]
+    assert stdout["summary"]["input_ssg_index"] == "63.12.1.2.P2"
+    assert (tmp_path / "ssg_symm.json").is_file()
+    assert (tmp_path / "input_poscar.vasp").is_file()
+    assert (tmp_path / "magnetic_primitive_poscar.vasp").is_file()
+
+
+def test_cli_all_show_filters_full_route_fields(monkeypatch, capsys):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "--all", "--show", "msg_symbol", "examples/0.800_MnTe.mcif"],
+    )
+
+    import findspingroup.cli as cli_module
+
+    cli_module.main()
+    assert capsys.readouterr().out.strip() == "Cmcm"
+
+
 def test_find_spin_group_poscar_ssg_reports_embedded_magnetic_primitive_case(tmp_path):
     original = find_spin_group("examples/0.800_MnTe.mcif")
     poscar_path = Path(tmp_path) / "POSCAR"
@@ -209,23 +267,32 @@ def test_find_spin_group_poscar_ssg_reports_embedded_magnetic_primitive_case(tmp
         occupancies,
         elements,
         moments,
-        spin_setting="in_lattice",
+        spin_setting="cartesian",
     )
-    input_identify = identify_spin_space_group_result(
-        input_cell,
+    primitive_cell, _ = input_cell.get_primitive_structure(magnetic=True)
+    primitive_identify = identify_spin_space_group_result(
+        primitive_cell,
         find_primitive=False,
     )
-    input_ossg = _ossg_oriented_spin_frame_ssg(input_identify.ssg, input_cell)
+    primitive_ossg = _ossg_oriented_spin_frame_ssg(primitive_identify.ssg, primitive_cell)
 
-    assert payload["is_input_magnetic_primitive"] is True
-    assert payload["input_ssg_may_be_incomplete"] is False
-    assert payload["warning"] is None
-    assert payload["index"] == original.index
-    assert payload["database_ssg_symbol"] == input_identify.ssg.international_symbol_linear
-    assert payload["msg_number"] == input_ossg.msg_int_num
-    assert payload["msg_symbol"] == input_ossg.msg_bns_symbol
-    assert payload["input_ssg_ops"]
-    assert payload["input_msg_ops"]
+    assert payload["summary"]["is_input_magnetic_primitive"] is True
+    assert payload["summary"]["input_ssg_may_be_incomplete"] is False
+    assert payload["summary"]["warning"] is None
+    assert payload["summary"]["input_ssg_index"] == original.index
+    assert payload["summary"]["input_conf"] == original.conf
+    assert payload["summary"]["input_magnetic_phase"] == original.magnetic_phase
+    assert isinstance(payload["summary"]["input_spin_only_direction"], str)
+    assert payload["summary"]["input_ssg_database_symbol"] is not None
+    assert payload["summary"]["input_msg_num"] == primitive_ossg.msg_int_num
+    assert payload["summary"]["input_msg_bns_number"] == primitive_ossg.msg_bns_num
+    assert payload["summary"]["input_msg_symbol"] == primitive_ossg.msg_bns_symbol
+    assert payload["summary"]["primitive_ssg_index"] == original.index
+    assert payload["summary"]["primitive_msg_bns_number"] == primitive_ossg.msg_bns_num
+    assert payload["input_poscar"] is None
+    assert payload["magnetic_primitive_poscar"] is None
+    assert payload["ssg"]["ops"]
+    assert payload["msg"]["ops"]
 
 
 def test_find_spin_group_poscar_ssg_warns_for_nonprimitive_input_cell(tmp_path):
@@ -243,14 +310,21 @@ def test_find_spin_group_poscar_ssg_warns_for_nonprimitive_input_cell(tmp_path):
 
     payload = find_spin_group_poscar_ssg(str(poscar_path))
 
-    assert payload["is_input_magnetic_primitive"] is False
-    assert payload["input_ssg_may_be_incomplete"] is True
-    assert "not a magnetic primitive cell" in payload["warning"]
-    assert abs(payload["T_input_to_input_magnetic_primitive_determinant"]) != pytest.approx(1.0)
-    assert payload["index"] is not None
-    assert payload["database_ssg_symbol"] is not None
-    assert payload["input_ssg_ops"]
-    assert payload["input_msg_ops"]
+    assert payload["summary"]["is_input_magnetic_primitive"] is False
+    assert payload["summary"]["input_ssg_may_be_incomplete"] is True
+    assert "not a magnetic primitive cell" in payload["summary"]["warning"]
+    assert abs(payload["primitive_relation"]["determinant"]) != pytest.approx(1.0)
+    assert payload["summary"]["input_conf"] is not None
+    assert payload["summary"]["input_magnetic_phase"] is not None
+    assert payload["summary"]["input_ssg_index"] is not None
+    assert payload["summary"]["input_ssg_database_symbol"] is not None
+    assert payload["summary"]["primitive_ssg_index"] is not None
+    assert payload["summary"]["primitive_msg_bns_number"] is not None
+    assert payload["input_poscar"] is None
+    assert payload["magnetic_primitive_poscar"]
+    assert "# MAGMOM=" in payload["magnetic_primitive_poscar"]
+    assert payload["ssg"]["ops"]
+    assert payload["msg"]["ops"]
 
 
 def test_find_spin_group_poscar_ssg_requires_embedded_magmom(tmp_path):
@@ -263,6 +337,67 @@ def test_find_spin_group_poscar_ssg_requires_embedded_magmom(tmp_path):
 
     with pytest.raises(ValueError, match="embedded MAGMOM payload"):
         find_spin_group_poscar_ssg(str(poscar_path))
+
+
+def test_find_spin_group_input_ssg_emits_input_poscar_for_mcif_input():
+    payload = find_spin_group_input_ssg("examples/0.800_MnTe.mcif")
+
+    assert payload["summary"]["input_ssg_index"] == "194.164.1.1.L"
+    assert payload["ssg"]["spin_frame_setting"] == "in_lattice"
+    assert payload["input_poscar"]
+    assert "# MAGMOM=" in payload["input_poscar"]
+    if payload["summary"]["is_input_magnetic_primitive"]:
+        assert payload["magnetic_primitive_poscar"] is None
+    else:
+        assert payload["magnetic_primitive_poscar"]
+
+
+def test_find_spin_group_input_ssg_rejects_cif_without_explicit_moments(tmp_path):
+    source = Path("tests/testset/structure.cif").read_text(encoding="utf-8")
+    marker = "loop_\n_atom_site_moment.label"
+    no_moment_cif = source.split(marker, 1)[0].rstrip() + "\n"
+    tmp_cif = Path(tmp_path) / "no_moment_structure.cif"
+    tmp_cif.write_text(no_moment_cif, encoding="utf-8")
+
+    with pytest.raises(ValueError, match="requires explicit magnetic moments"):
+        find_spin_group_input_ssg(str(tmp_cif))
+
+
+def test_find_spin_group_input_ssg_reports_distinct_primitive_index_for_nonprimitive_mcif():
+    payload = find_spin_group_input_ssg("tests/testset/mcif_241130_no2186/0.396_MnPtGa.mcif")
+
+    assert payload["summary"]["is_input_magnetic_primitive"] is False
+    assert payload["summary"]["input_ssg_index"] == "63.12.1.2.P2"
+    assert payload["summary"]["primitive_ssg_index"] == "194.164.1.2.P2"
+    assert payload["summary"]["primitive_msg_bns_number"] == "63.462"
+    assert payload["summary"]["input_ssg_index"] != payload["summary"]["primitive_ssg_index"]
+    assert payload["input_poscar"]
+    assert payload["magnetic_primitive_poscar"]
+
+
+def test_write_poscar_ssg_symmetry_dat_writes_structured_json(tmp_path):
+    original = find_spin_group("examples/0.800_MnTe.mcif")
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(original.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
+
+    payload = find_spin_group_poscar_ssg(str(poscar_path))
+    output_path = tmp_path / "ssg_symm.dat"
+
+    write_poscar_ssg_symmetry_dat(output_path, payload)
+
+    text = output_path.read_text(encoding="utf-8")
+    document = json.loads(text)
+    assert document["format"] == "findspingroup.poscar_ssg.v1"
+    assert document["summary"] == payload["summary"]
+    assert document["ssg"] == payload["ssg"]
+    assert document["msg"] == payload["msg"]
+    assert document["primitive_relation"] == payload["primitive_relation"]
+    assert text.index('"summary"') < text.index('"ssg"') < text.index('"msg"')
+    lines = text.splitlines()
+    spin_rotation_line = next(idx for idx, line in enumerate(lines) if '"spin_rotation": [' in line)
+    assert lines[spin_rotation_line + 1].strip().startswith("[")
+    assert lines[spin_rotation_line + 2].strip().startswith("[")
+    assert lines[spin_rotation_line + 3].strip().startswith("[")
 
 
 def _serialize_effective_mpg_ops(ops):
