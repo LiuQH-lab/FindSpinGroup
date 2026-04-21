@@ -3816,8 +3816,13 @@ def _find_spin_group_input_ssg_from_parsed(
         spin_setting=input_spin_setting,
         tol=tol_cfg,
     )
+    identify_cell = (
+        input_cell
+        if input_cell.spin_setting == "cartesian"
+        else _cartesianized_input_cell(input_cell)
+    )
     input_magnetic_primitive_cell, transformation_input_to_input_magnetic_primitive = (
-        input_cell.get_primitive_structure(magnetic=True)
+        identify_cell.get_primitive_structure(magnetic=True)
     )
     primitive_transform = np.asarray(
         transformation_input_to_input_magnetic_primitive,
@@ -3826,16 +3831,16 @@ def _find_spin_group_input_ssg_from_parsed(
     primitive_det = float(np.linalg.det(primitive_transform))
     is_input_magnetic_primitive = bool(np.isclose(abs(primitive_det), 1.0, atol=1e-6))
 
-    input_identify_result = identify_spin_space_group_result(
-        input_cell,
+    primitive_identify_result = identify_spin_space_group_result(
+        input_magnetic_primitive_cell,
         find_primitive=False,
         tol=tol_cfg,
     )
-    input_ssg: SpinSpaceGroup = input_identify_result.ssg
+    primitive_ssg: SpinSpaceGroup = primitive_identify_result.ssg
 
-    identify_info = None
+    primitive_identify_info = None
     try:
-        identify_info = input_ssg.identify_index(
+        primitive_identify_info = primitive_ssg.identify_index(
             source_name,
             tol=tol_cfg.m_matrix_tol,
         )
@@ -3843,18 +3848,53 @@ def _find_spin_group_input_ssg_from_parsed(
         if not _should_degrade_identify_index_error(exc):
             raise
         warnings.warn(
-            f"Identify-index output unavailable for {source_name}: {exc}. "
-            "Continuing with identify-index-derived outputs set to None.",
+            f"Primitive identify-index output unavailable for {source_name}: {exc}. "
+            "Continuing with primitive identify-index-derived outputs set to None.",
             RuntimeWarning,
             stacklevel=2,
         )
+        primitive_identify_info = primitive_ssg.index
+    primitive_identify_info = primitive_identify_info or primitive_ssg.index
 
-    input_ossg = _ossg_oriented_spin_frame_ssg(input_ssg, input_cell)
+    primitive_ossg = _ossg_oriented_spin_frame_ssg(primitive_ssg, input_magnetic_primitive_cell)
+
+    if is_input_magnetic_primitive:
+        primitive_to_input = _invert_setting_transform(
+            primitive_transform,
+            np.zeros(3),
+        )
+        input_ssg = primitive_ssg.transform(*primitive_to_input)
+        identify_info = primitive_identify_info
+    else:
+        input_identify_result = identify_spin_space_group_result(
+            identify_cell,
+            find_primitive=False,
+            tol=tol_cfg,
+        )
+        input_ssg = input_identify_result.ssg
+        identify_info = None
+        try:
+            identify_info = input_ssg.identify_index(
+                source_name,
+                tol=tol_cfg.m_matrix_tol,
+            )
+        except ValueError as exc:
+            if not _should_degrade_identify_index_error(exc):
+                raise
+            warnings.warn(
+                f"Identify-index output unavailable for {source_name}: {exc}. "
+                "Continuing with identify-index-derived outputs set to None.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+        identify_info = identify_info or input_ssg.index
+
+    input_ossg = _ossg_oriented_spin_frame_ssg(input_ssg, identify_cell)
     magnetic_phase_payload = classify_magnetic_phase(
         conf=input_ssg.conf,
         full_spin_part_point_group_hm=input_ssg.spin_part_point_group_symbol_hm,
         full_spin_part_point_group_s=input_ssg.spin_part_point_group_symbol_s,
-        net_moment=input_cell.net_moment,
+        net_moment=identify_cell.net_moment,
         mpg_identifier=input_ossg.mpg_num,
         is_ss_gp=input_ssg.is_spinsplitting[-1],
     )
@@ -3867,42 +3907,11 @@ def _find_spin_group_input_ssg_from_parsed(
 
     input_poscar = None
     if source_format != "poscar":
-        input_poscar = _cartesianized_input_cell(input_cell).to_poscar(Path(source_name).name)
+        input_poscar = identify_cell.to_poscar(Path(source_name).name)
 
-    primitive_identify_result = input_identify_result
-    primitive_ssg = input_ssg
-    primitive_ossg = input_ossg
-    primitive_identify_info = identify_info or input_ssg.index
     magnetic_primitive_poscar = None
     if not is_input_magnetic_primitive:
-        primitive_identify_result = identify_spin_space_group_result(
-            input_magnetic_primitive_cell,
-            find_primitive=False,
-            tol=tol_cfg,
-        )
-        primitive_ssg = primitive_identify_result.ssg
-        try:
-            primitive_identify_info = primitive_ssg.identify_index(
-                source_name,
-                tol=tol_cfg.m_matrix_tol,
-            )
-        except ValueError as exc:
-            if not _should_degrade_identify_index_error(exc):
-                raise
-            warnings.warn(
-                f"Primitive identify-index output unavailable for {source_name}: {exc}. "
-                "Continuing with primitive identify-index-derived outputs set to None.",
-                RuntimeWarning,
-                stacklevel=2,
-            )
-            primitive_identify_info = primitive_ssg.index
-        primitive_ossg = _ossg_oriented_spin_frame_ssg(primitive_ssg, input_magnetic_primitive_cell)
-        transformation_primitive_to_acc_primitive = (
-            np.asarray(primitive_ssg.acc_primitive_trans, dtype=float),
-            np.asarray(primitive_ssg.acc_primitive_origin_shift, dtype=float),
-        )
-        acc_primitive_cell = input_magnetic_primitive_cell.transform(*transformation_primitive_to_acc_primitive)
-        magnetic_primitive_poscar = _cartesianized_input_cell(acc_primitive_cell).to_poscar(
+        magnetic_primitive_poscar = input_magnetic_primitive_cell.to_poscar(
             f"{Path(source_name).name}_magnetic_primitive"
         )
 
@@ -3915,6 +3924,7 @@ def _find_spin_group_input_ssg_from_parsed(
             "input_magnetic_phase": magnetic_phase_payload["phase"],
             "input_ssg_database_symbol": input_ssg.international_symbol_linear,
             "input_msg_num": input_ossg.msg_int_num,
+            "primitive_msg_num": primitive_ossg.msg_int_num,
             "input_msg_bns_number": input_ossg.msg_bns_num,
             "primitive_msg_bns_number": primitive_ossg.msg_bns_num,
             "input_msg_symbol": input_ossg.msg_bns_symbol,
@@ -3924,7 +3934,7 @@ def _find_spin_group_input_ssg_from_parsed(
         },
         "ssg": {
             "setting": INPUT_POSCAR_SETTING,
-            "spin_frame_setting": input_cell.spin_setting,
+            "spin_frame_setting": identify_cell.spin_setting,
             "ops": _serialize_ssg_operation_matrices(list(input_ssg.ops)),
         },
         "msg": {

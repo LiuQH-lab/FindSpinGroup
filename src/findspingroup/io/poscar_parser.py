@@ -3,7 +3,6 @@ import re
 
 import numpy as np
 
-from ..structure.cell import calculate_lattice_params
 from ..utils.matrix_utils import evaluate_numeric_expression
 
 
@@ -222,6 +221,4 @@ def parse_poscar_file(
     elements = _expand_species(species, counts)
     occupancies = [1.0] * n_sites
     labels = _synthesize_labels(elements)
-    lattice_factors = np.array(calculate_lattice_params(lattice_matrix), dtype=float)
-
-    return lattice_factors, positions, elements, occupancies, labels, magmom_vectors
+    return lattice_matrix, positions, elements, occupancies, labels, magmom_vectors

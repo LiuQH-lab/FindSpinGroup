@@ -288,6 +288,7 @@ def test_find_spin_group_poscar_ssg_reports_embedded_magnetic_primitive_case(tmp
     assert payload["summary"]["input_msg_bns_number"] == primitive_ossg.msg_bns_num
     assert payload["summary"]["input_msg_symbol"] == primitive_ossg.msg_bns_symbol
     assert payload["summary"]["primitive_ssg_index"] == original.index
+    assert payload["summary"]["primitive_msg_num"] == primitive_ossg.msg_int_num
     assert payload["summary"]["primitive_msg_bns_number"] == primitive_ossg.msg_bns_num
     assert payload["input_poscar"] is None
     assert payload["magnetic_primitive_poscar"] is None
@@ -343,7 +344,7 @@ def test_find_spin_group_input_ssg_emits_input_poscar_for_mcif_input():
     payload = find_spin_group_input_ssg("examples/0.800_MnTe.mcif")
 
     assert payload["summary"]["input_ssg_index"] == "194.164.1.1.L"
-    assert payload["ssg"]["spin_frame_setting"] == "in_lattice"
+    assert payload["ssg"]["spin_frame_setting"] == "cartesian"
     assert payload["input_poscar"]
     assert "# MAGMOM=" in payload["input_poscar"]
     if payload["summary"]["is_input_magnetic_primitive"]:
