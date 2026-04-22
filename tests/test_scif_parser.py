@@ -875,6 +875,46 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
     assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,4u"]
 
 
+@pytest.mark.parametrize(
+    ("source_path", "expected_name_chen", "expected_transform_chen"),
+    [
+        (
+            "tests/testset/mcif_241130_no2186/1.303_Dy3Ru4Al12.mcif",
+            "C m_{001}|2/ m_{001}|m : (1,1,-1;1)",
+            (
+                "a,b,a+c;0,0,0;"
+                "14.945805as-26.63911cs,-21.229528as-18.754205cs,-15.45099bs"
+            ),
+        ),
+        (
+            "tests/testset/mcif_241130_no2186/1.526_LiCoF4.mcif",
+            "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{alpha,0,gamma}m|1",
+            "a+c,b,c;0,0,0;as,bs,cs",
+        ),
+        (
+            "examples/2.116_Na3Co2SbO6.mcif",
+            "P 2_{001}|2/ 2_{001}|m : (1,2_{010},2_{010}) m_{010}|1",
+            "a,b,a+c;0,1/4,0;-32.178386bs,18.564426cs,-18.604651as-12.369292cs",
+        ),
+        (
+            "tests/testset/mcif_241130_no2186/1.570_La3OsO7.mcif",
+            "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{alpha,0,gamma}m|1",
+            "1/2c,-b,2a+c;0,1/2,0;as,bs,cs",
+        ),
+    ],
+)
+def test_generated_scif_transform_chen_reexpresses_identify_nofrac_in_export_frame(
+    source_path,
+    expected_name_chen,
+    expected_transform_chen,
+):
+    result = find_spin_group(source_path)
+    metadata = parse_scif_metadata(source_text=result.scif)
+
+    assert metadata["space_group_spin"]["spin_space_group_name_chen"] == expected_name_chen
+    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == expected_transform_chen
+
+
 def test_generated_scif_uses_solver_derived_symmform_uvw_for_mnte():
     result = find_spin_group("examples/0.800_MnTe.mcif")
     metadata = parse_scif_metadata(source_text=result.scif)
