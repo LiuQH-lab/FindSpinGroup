@@ -6,15 +6,25 @@ from pathlib import Path
 from typing import Any
 
 
+COPLANAR_222_MAP_NUMBER_CONTRACT = "identify_core_map_num_is_0924_num_of_mapping"
+COPLANAR_222_LOOKUP_FILE = "coplanar_222_lookup_v0924.json"
+
+
 def _data_path() -> Path:
-    return Path(__file__).resolve().parent / "data" / "coplanar_222_lookup_v0924.json"
+    return Path(__file__).resolve().parent / "data" / COPLANAR_222_LOOKUP_FILE
 
 
 @lru_cache(maxsize=1)
 def load_coplanar_222_lookup() -> dict[str, Any]:
     path = _data_path()
     with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+        payload = json.load(handle)
+    if payload.get("map_number_contract") != COPLANAR_222_MAP_NUMBER_CONTRACT:
+        raise ValueError(
+            f"Unexpected Coplanar+D2 lookup contract in {path}: "
+            f"{payload.get('map_number_contract')!r}. Expected {COPLANAR_222_MAP_NUMBER_CONTRACT!r}."
+        )
+    return payload
 
 
 def has_coplanar_222_lookup_group(
@@ -33,16 +43,16 @@ def _normalize_triplet(triplet: list[int] | tuple[int, ...]) -> str:
 def build_coplanar_222_lookup_key(
     lg: list[int] | tuple[int, int],
     ttk: list[int] | tuple[int, int, int],
-    old_map_num: int,
+    map_num: int,
 ) -> str:
-    return f"{_normalize_triplet(lg)}|{_normalize_triplet(ttk)}|{int(old_map_num)}"
+    return f"{_normalize_triplet(lg)}|{_normalize_triplet(ttk)}|{int(map_num)}"
 
 
 def get_coplanar_222_lookup_entry(
     lg: list[int] | tuple[int, int],
     ttk: list[int] | tuple[int, int, int],
-    old_map_num: int,
+    map_num: int,
 ) -> dict[str, Any] | None:
     payload = load_coplanar_222_lookup()
-    key = build_coplanar_222_lookup_key(lg, ttk, old_map_num)
-    return payload["by_old_map_num"].get(key)
+    key = build_coplanar_222_lookup_key(lg, ttk, map_num)
+    return payload["by_map_num"].get(key)

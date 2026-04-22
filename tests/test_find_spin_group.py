@@ -663,15 +663,50 @@ def test_find_spin_group_exposes_identify_transformations_for_coplanar_case():
     assert np.asarray(lattice_transform[0], dtype=float).shape == (3, 3)
     assert np.asarray(lattice_transform[1], dtype=float).shape == (3,)
 
-    space_transform = np.asarray(details["space_group_transformation"], dtype=float)
+    space_transform = details["space_group_transformation"]
     point_transform = np.asarray(details["point_group_transformation"], dtype=float)
-    assert space_transform.shape == (4, 4)
+    assert np.asarray(space_transform[0], dtype=float).shape == (3, 3)
+    assert np.asarray(space_transform[1], dtype=float).shape == (3,)
     assert point_transform.shape == (3, 3)
-    assert abs(np.linalg.det(space_transform[:3, :3])) > 1e-8
+    assert abs(np.linalg.det(np.asarray(space_transform[0], dtype=float))) > 1e-8
     assert abs(np.linalg.det(point_transform)) > 1e-8
 
     assert details["name_maps"]
     assert len(details["translation_maps"]) == 3
+
+
+def test_identify_transformations_send_167_tmptin_to_database_symbol_with_spin_transform():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.67_TmPtIn.mcif")
+    details = result.identify_index_details
+
+    space_transform = details["space_group_transformation"]
+    point_transform = np.asarray(details["point_group_transformation"], dtype=float)
+    database_std_ssg = (
+        SpinSpaceGroup(result.convention_ssg_ops)
+        .transform(
+            np.asarray(space_transform[0], dtype=float),
+            np.asarray(space_transform[1], dtype=float),
+        )
+        .transform_spin(point_transform)
+    )
+
+    assert result.index == "25.8.2.1.P3"
+    assert database_std_ssg.international_symbol_linear_current_frame == (
+        "P 2_{100}|m 2_{010}|m 2_{001}|2 : (1,2_{010},2_{010}) m_{010}|1"
+    )
+
+
+def test_scif_chen_transform_contract_for_167_tmptin_uses_current_lattice_scaled_spin_rows():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.67_TmPtIn.mcif")
+    metadata = parse_scif_metadata(source_text=result.scif)
+
+    assert metadata["space_group_spin"]["spin_space_group_number_chen"] == "25.8.2.1.P3"
+    assert metadata["space_group_spin"]["spin_space_group_name_chen"] == (
+        "P 2_{100}|m 2_{010}|m 2_{001}|2 : (1,2_{010},2_{010}) m_{010}|1"
+    )
+    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == (
+        "b,-a,c;0,1/2,0;26.098542cs,13.049617as,22.602bs"
+    )
 
 
 @pytest.mark.parametrize(
@@ -777,7 +812,7 @@ def test_find_spin_group_uses_p1_branch_for_parallel_coplanar_order_two_case():
     [
         ("tests/testset/mcif_241130_no2186/1.302_Ba2CoO4.mcif", "My"),
         ("tests/testset/mcif_241130_no2186/0.425_Na2CoP2O7.mcif", "My"),
-        ("tests/testset/mcif_241130_no2186/0.716_HoCrWO6.mcif", "Mz"),
+        ("tests/testset/mcif_241130_no2186/0.716_HoCrWO6.mcif", "Mx"),
     ],
 )
 def test_find_spin_group_exposes_total_coplanar_222_spin_transform(source_path, expected_target):
@@ -1376,6 +1411,37 @@ def test_find_spin_group_keeps_ktb3f10_out_of_identity_collapse_sentinel():
     assert result.identify_index_details["k_index"] == 1
     assert result.identify_index_details["equivalent_map_index"] == 2
     assert result.identify_index_details["point_group_id"] == 32
+
+
+@pytest.mark.parametrize(
+    ("path", "expected_index"),
+    [
+        ("tests/testset/mcif_241130_no2186/0.1010_C10H6MnN4O4.mcif", "14.1.1.1.P3"),
+        ("tests/testset/mcif_241130_no2186/2.96_GdMn2Si2.mcif", "139.115.2.1.P3"),
+        ("tests/testset/mcif_241130_no2186/1.647_Na2.4Ni2TeO6.mcif", "63.13.2.21.P3"),
+    ],
+)
+def test_find_spin_group_basic_matches_manual_checked_identify_222_index_changes(
+    path,
+    expected_index,
+):
+    payload = find_spin_group_basic(path)
+
+    assert payload["index"] == expected_index
+
+
+def test_find_spin_group_basic_does_not_fallback_when_identify_database_entry_is_missing():
+    with pytest.warns(RuntimeWarning, match="Identify-index output unavailable"):
+        payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+
+    assert payload["index"] is None
+
+
+def test_find_spin_group_acc_primitive_does_not_fallback_when_identify_database_entry_is_missing():
+    with pytest.warns(RuntimeWarning, match="Identify-index output unavailable"):
+        payload = find_spin_group_acc_primitive("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+
+    assert payload["index"] is None
 
 
 def test_find_spin_group_gracefully_degrades_when_identify_database_entry_is_missing():
