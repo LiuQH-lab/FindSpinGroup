@@ -378,6 +378,38 @@ def _direct_transform_to_pp_string(
     )
 
 
+def _chain_direct_setting_transform(
+    first_matrix: np.ndarray,
+    first_shift: np.ndarray,
+    second_matrix: np.ndarray,
+    second_shift: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    first_matrix = np.asarray(first_matrix, dtype=float)
+    first_shift = np.asarray(first_shift, dtype=float)
+    second_matrix = np.asarray(second_matrix, dtype=float)
+    second_shift = np.asarray(second_shift, dtype=float)
+    transform = second_matrix @ first_matrix
+    shift = normalize_vector_to_zero(second_matrix @ first_shift + second_shift, atol=1e-10)
+    return transform, shift
+
+
+def _normalize_identify_space_transform(transform_value) -> tuple[np.ndarray, np.ndarray] | None:
+    if transform_value is None:
+        return None
+    try:
+        transform_array = np.asarray(transform_value, dtype=float)
+    except (TypeError, ValueError):
+        transform_array = None
+    if transform_array is not None and transform_array.shape == (4, 4):
+        return transform_array[1:, 1:], transform_array[1:, 0]
+    if isinstance(transform_value, (list, tuple)) and len(transform_value) == 2:
+        matrix = np.asarray(transform_value[0], dtype=float)
+        shift = np.asarray(transform_value[1], dtype=float)
+        if matrix.shape == (3, 3) and shift.shape == (3,):
+            return matrix, shift
+    return None
+
+
 def _source_to_target_basis_pp_string(
     matrix: np.ndarray,
     shift: np.ndarray,
@@ -415,6 +447,7 @@ def _build_transform_chen_pp_abcs(
     source_name: str,
     cell_G0: CrystalCell,
     ssg: SpinSpaceGroup,
+    basis_tag_transforms: dict[str, tuple[np.ndarray, np.ndarray]],
     ssg_primitive: SpinSpaceGroup,
     identify_index_details: dict | None,
 ):
@@ -424,6 +457,8 @@ def _build_transform_chen_pp_abcs(
     transform_parts = _resolve_transform_chen_parts(
         cell_G0=cell_G0,
         ssg=ssg,
+        basis_tag_transforms=basis_tag_transforms,
+        ssg_primitive=ssg_primitive,
         identify_index_details=identify_index_details,
     )
     if transform_parts is None:
@@ -443,22 +478,24 @@ def _resolve_transform_chen_parts(
     *,
     cell_G0: CrystalCell,
     ssg: SpinSpaceGroup,
+    basis_tag_transforms: dict[str, tuple[np.ndarray, np.ndarray]],
+    ssg_primitive: SpinSpaceGroup,
     identify_index_details: dict | None,
 ):
     if identify_index_details is None:
         return None
 
     point_group_transformation = identify_index_details.get("point_group_transformation")
-    space_group_transformation = identify_index_details.get("space_group_transformation")
+    space_group_transformation = _normalize_identify_space_transform(
+        identify_index_details.get("space_group_transformation")
+    )
     if point_group_transformation is None or space_group_transformation is None:
         return None
 
-    current_to_chen_space = np.asarray(space_group_transformation, dtype=float)
-    if current_to_chen_space.shape != (4, 4):
-        return None
+    current_to_chen_space = space_group_transformation
 
-    space_matrix = current_to_chen_space[:3, :3]
-    space_shift = current_to_chen_space[:3, 3]
+    space_matrix = np.asarray(current_to_chen_space[0], dtype=float)
+    space_shift = np.asarray(current_to_chen_space[1], dtype=float)
     if abs(np.linalg.det(space_matrix)) < 1e-8:
         return None
 
@@ -550,11 +587,15 @@ def _build_chen_linear_name(
     source_name: str,
     cell_G0: CrystalCell,
     ssg: SpinSpaceGroup,
+    basis_tag_transforms: dict[str, tuple[np.ndarray, np.ndarray]],
+    ssg_primitive: SpinSpaceGroup,
     identify_index_details: dict | None,
 ) -> str | None:
     transform_parts = _resolve_transform_chen_parts(
         cell_G0=cell_G0,
         ssg=ssg,
+        basis_tag_transforms=basis_tag_transforms,
+        ssg_primitive=ssg_primitive,
         identify_index_details=identify_index_details,
     )
     if transform_parts is None:
@@ -1021,6 +1062,8 @@ def generate_scif(
         filename,
         cell_G0,
         ssg,
+        basis_tag_transforms,
+        ssg_primitive,
         identify_index_details,
     )
     latex_name = spin_space_group_name_latex
@@ -1046,6 +1089,7 @@ def generate_scif(
         filename,
         cell_G0,
         ssg,
+        basis_tag_transforms,
         ssg_primitive,
         identify_index_details,
     )

@@ -59,12 +59,11 @@ def find_ssg_map(L0_id, G0_id, it, ik, isonum, *, use_222_contract=False):
     """Find all matching SSG map records."""
     try:
         if use_222_contract and isonum == 14:
-            results = _query_ssg_map(db_path_222, L0_id, G0_id, it, ik, isonum)
-            if results:
-                return results
+            return _query_ssg_map(db_path_222, L0_id, G0_id, it, ik, isonum)
         return _query_ssg_map(db_path, L0_id, G0_id, it, ik, isonum)
     except sqlite3.OperationalError:
-        print(f"Database file not found: {os.path.abspath(db_path)}")
+        failed_db_path = db_path_222 if use_222_contract and isonum == 14 else db_path
+        print(f"Database file not found: {os.path.abspath(failed_db_path)}")
         return None
     except Exception as e:
         print(f"Failed to query SSG map: {str(e)}")

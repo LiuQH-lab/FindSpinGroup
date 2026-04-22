@@ -12,8 +12,10 @@ import openpyxl
 
 ROOT = Path(__file__).resolve().parents[1]
 EXCEL_PATH = ROOT / "SSG_磁维度分辨的所有数据_v0924.xlsx"
-OUTPUT_TXT_PATH = ROOT / "src" / "findspingroup" / "core" / "identify-py-222" / "output" / "output.txt"
+if not EXCEL_PATH.exists():
+    EXCEL_PATH = ROOT / "_noncore" / "references" / "SSG_磁维度分辨的所有数据_v0924.xlsx"
 JSON_PATH = ROOT / "src" / "findspingroup" / "core" / "identify_index" / "data" / "coplanar_222_lookup_v0924.json"
+MAP_NUMBER_CONTRACT = "identify_core_map_num_is_0924_num_of_mapping"
 
 SHEET_CONFIGS = {
     "T1 Coplanar": {"spin_col": 48, "index_col": 52},
@@ -58,30 +60,10 @@ def _direction_from_mirror(matrix: list[list[int]]) -> list[int]:
     return snapped.tolist()
 
 
-def _parse_output_mapping() -> dict[tuple[str, str, int], int]:
-    blocks = [block.strip() for block in OUTPUT_TXT_PATH.read_text(encoding="utf-8").split("****") if block.strip()]
-    mapping: dict[tuple[str, str, int], int] = {}
-    for block in blocks:
-        normalized = " ".join(line.strip() for line in block.splitlines())
-        parts = normalized.split(";", 5)
-        if len(parts) < 5:
-            raise ValueError(f"Cannot parse output block: {block!r}")
-        lg = parts[0].replace(" ", "")
-        ttk = parts[1].replace(" ", "")
-        map_id = int(parts[2])
-        old_map_num = int(parts[4])
-        key = (lg, ttk, map_id)
-        if key in mapping:
-            raise ValueError(f"Duplicate output mapping for {key!r}")
-        mapping[key] = old_map_num
-    return mapping
-
-
 def build_payload() -> dict[str, object]:
     wb = openpyxl.load_workbook(EXCEL_PATH, read_only=True, data_only=True)
-    output_mapping = _parse_output_mapping()
 
-    by_old_map_num: dict[str, dict[str, object]] = {}
+    by_map_num: dict[str, dict[str, object]] = {}
     source_rows: list[dict[str, object]] = []
     groups: set[str] = set()
     for sheet_name, sheet_cfg in SHEET_CONFIGS.items():
@@ -98,26 +80,20 @@ def build_payload() -> dict[str, object]:
             if str(row[5]).strip() != "222":
                 continue
 
-            map_id = int(row[3])
-            lookup_key = (current_lg, current_ttk, map_id)
-            if lookup_key not in output_mapping:
-                raise ValueError(f"Missing identify-py-222 output mapping for {lookup_key!r}")
-
-            old_map_num = output_mapping[lookup_key]
+            map_num = int(row[3])
             lg = _parse_int_triplet(current_lg)
             ttk = _parse_int_triplet(current_ttk)
             spin_only_matrix = _parse_flat_matrix(str(row[sheet_cfg["spin_col"] - 1]))
             spin_only_direction = _direction_from_mirror(spin_only_matrix)
             final_index = str(row[sheet_cfg["index_col"] - 1]).strip()
-            payload_key = f"{current_lg}|{current_ttk}|{old_map_num}"
+            payload_key = f"{current_lg}|{current_ttk}|{map_num}"
             groups.add(f"{current_lg}|{current_ttk}")
 
             entry = {
                 "sheet_name": sheet_name,
                 "lg": lg,
                 "ttk": ttk,
-                "map_id": map_id,
-                "old_map_num": old_map_num,
+                "map_num": map_num,
                 "point_group_id": int(row[4]),
                 "spin_only_matrix": spin_only_matrix,
                 "spin_only_direction": spin_only_direction,
@@ -125,9 +101,9 @@ def build_payload() -> dict[str, object]:
                 "configuration_suffix": final_index.split(".")[-1],
                 "source_excel_row": row_index,
             }
-            if payload_key in by_old_map_num:
-                raise ValueError(f"Duplicate (lg, ttk, old_map_num) lookup key {payload_key!r}")
-            by_old_map_num[payload_key] = entry
+            if payload_key in by_map_num:
+                raise ValueError(f"Duplicate (lg, ttk, map_num) lookup key {payload_key!r}")
+            by_map_num[payload_key] = entry
             source_rows.append(entry)
 
     suffix_counts: dict[str, int] = defaultdict(int)
@@ -136,20 +112,23 @@ def build_payload() -> dict[str, object]:
 
     return {
         "source_excel": EXCEL_PATH.name,
+        "map_number_contract": MAP_NUMBER_CONTRACT,
+        "map_number_source": "0924 workbook `num. of mapping`; this must equal identify core map_num",
         "source_sheets": list(SHEET_CONFIGS.keys()),
         "filter": {"F": 222},
         "row_count": len(source_rows),
         "suffix_counts": dict(sorted(suffix_counts.items())),
         "groups": sorted(groups),
-        "by_old_map_num": by_old_map_num,
+        "by_map_num": by_map_num,
     }
 
 
 def main() -> None:
-    JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
+    json_path = JSON_PATH
+    json_path.parent.mkdir(parents=True, exist_ok=True)
     payload = build_payload()
-    JSON_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(JSON_PATH)
+    json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(json_path)
     print(f"rows={payload['row_count']}")
 
 

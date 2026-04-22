@@ -59,12 +59,11 @@ def find_ssg_reduce(L0_id, G0_id, it, ik, iso, *, use_222_contract=False):
     """Find all matching SSG reduction records."""
     try:
         if use_222_contract and iso == 14:
-            results = _query_ssg_reduce(db_path_222, L0_id, G0_id, it, ik, iso)
-            if results:
-                return results
+            return _query_ssg_reduce(db_path_222, L0_id, G0_id, it, ik, iso)
         return _query_ssg_reduce(db_path, L0_id, G0_id, it, ik, iso)
     except sqlite3.OperationalError:
-        print(f"Database file not found: {os.path.abspath(db_path)}")
+        failed_db_path = db_path_222 if use_222_contract and iso == 14 else db_path
+        print(f"Database file not found: {os.path.abspath(failed_db_path)}")
         return []
     except Exception as ex:
         print(f"Failed to query SSG reduction records: {str(ex)}")
