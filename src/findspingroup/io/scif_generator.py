@@ -410,6 +410,44 @@ def _normalize_identify_space_transform(transform_value) -> tuple[np.ndarray, np
     return None
 
 
+def _express_identify_space_transform_in_export_frame(
+    identify_transform: tuple[np.ndarray, np.ndarray],
+    *,
+    basis_tag_transforms: dict[str, tuple[np.ndarray, np.ndarray]],
+    ssg_primitive: SpinSpaceGroup,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Identify-index space transforms are solved in the hidden `G0std_nofrac`
+    operation frame. The emitted SCIF, however, is written in the current export
+    frame. Re-express the identify transform in the emitted frame by conjugating
+    through the export -> G0std -> nofrac coordinate transform.
+    """
+    identify_matrix = np.asarray(identify_transform[0], dtype=float)
+    identify_shift = np.asarray(identify_transform[1], dtype=float)
+
+    export_to_g0std = basis_tag_transforms.get("G0std")
+    if export_to_g0std is None:
+        export_to_g0std = (np.eye(3), np.zeros(3))
+    export_to_g0std_matrix = np.asarray(export_to_g0std[0], dtype=float)
+    export_to_g0std_shift = np.asarray(export_to_g0std[1], dtype=float)
+
+    g0std_to_nofrac_matrix = (
+        np.asarray(ssg_primitive.transformation_to_G0std_id, dtype=float)
+        @ np.linalg.inv(np.asarray(ssg_primitive.transformation_to_G0std, dtype=float))
+    )
+    export_to_nofrac_matrix = g0std_to_nofrac_matrix @ export_to_g0std_matrix
+    export_to_nofrac_shift = g0std_to_nofrac_matrix @ export_to_g0std_shift
+    nofrac_to_export_matrix = np.linalg.inv(export_to_nofrac_matrix)
+
+    export_matrix = nofrac_to_export_matrix @ identify_matrix @ export_to_nofrac_matrix
+    export_shift = nofrac_to_export_matrix @ (
+        identify_matrix @ export_to_nofrac_shift
+        + identify_shift
+        - export_to_nofrac_shift
+    )
+    return export_matrix, normalize_vector_to_zero(export_shift, atol=1e-10)
+
+
 def _source_to_target_basis_pp_string(
     matrix: np.ndarray,
     shift: np.ndarray,
@@ -492,7 +530,11 @@ def _resolve_transform_chen_parts(
     if point_group_transformation is None or space_group_transformation is None:
         return None
 
-    current_to_chen_space = space_group_transformation
+    current_to_chen_space = _express_identify_space_transform_in_export_frame(
+        space_group_transformation,
+        basis_tag_transforms=basis_tag_transforms,
+        ssg_primitive=ssg_primitive,
+    )
 
     space_matrix = np.asarray(current_to_chen_space[0], dtype=float)
     space_shift = np.asarray(current_to_chen_space[1], dtype=float)
