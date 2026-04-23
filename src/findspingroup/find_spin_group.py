@@ -48,6 +48,7 @@ from findspingroup.utils.space_group_flags import (
     space_group_is_polar,
 )
 from findspingroup.utils.seitz_symbol import canonicalize_group_seitz_descriptions
+from findspingroup.version import __version__
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -1473,6 +1474,50 @@ def _cartesianized_input_cell(cell: CrystalCell) -> CrystalCell:
         moments=None if moments_cartesian is None else np.asarray(moments_cartesian, dtype=float),
         spin_setting=None if moments_cartesian is None else "cartesian",
         tol=cell.tol,
+    )
+
+
+def _cell_to_poscar_preserving_lattice(cell: CrystalCell, filename: str) -> str:
+    lattice, positions, types, moments = cell.to_spglib(mag=True)
+    rows = sorted(
+        zip(positions, types, moments),
+        key=lambda item: (
+            item[1],
+            item[2][0],
+            item[2][1],
+            item[2][2],
+            item[0][0],
+            item[0][1],
+            item[0][2],
+        ),
+    )
+    positions_sorted, types_sorted, moments_sorted = zip(*rows)
+
+    atom_name = ["initial"]
+    count = ["initial"]
+    for atom_type in types_sorted:
+        symbol = cell.atom_types_to_symbol[int(atom_type)]
+        if symbol != atom_name[-1]:
+            atom_name.append(symbol)
+            count.append(1)
+        else:
+            count[-1] += 1
+
+    return "\n".join(
+        [
+            filename + f"#FINDSPINGROUP(version{__version__})",
+            "1",
+            *(" ".join(f"{value:.10f}" for value in row) for row in np.asarray(lattice, dtype=float)),
+            " ".join(atom_name[1:]),
+            " ".join(map(str, count[1:])),
+            "direct",
+            *(" ".join(f"{value:.10f}" for value in position) for position in positions_sorted),
+            "# MAGMOM="
+            + " ".join(
+                " ".join(f"{value:.10f}" for value in moment)
+                for moment in moments_sorted
+            ),
+        ]
     )
 
 
@@ -3907,11 +3952,15 @@ def _find_spin_group_input_ssg_from_parsed(
 
     input_poscar = None
     if source_format != "poscar":
-        input_poscar = identify_cell.to_poscar(Path(source_name).name)
+        input_poscar = _cell_to_poscar_preserving_lattice(
+            identify_cell,
+            Path(source_name).name,
+        )
 
     magnetic_primitive_poscar = None
     if not is_input_magnetic_primitive:
-        magnetic_primitive_poscar = input_magnetic_primitive_cell.to_poscar(
+        magnetic_primitive_poscar = _cell_to_poscar_preserving_lattice(
+            input_magnetic_primitive_cell,
             f"{Path(source_name).name}_magnetic_primitive"
         )
 
