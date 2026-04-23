@@ -2847,6 +2847,23 @@ def test_find_spin_group_exposes_convention_spin_only_direction(path, expected_d
     assert result.convention_spin_only_direction == expected_direction
 
 
+def test_find_spin_group_exposes_convention_spin_only_direction_cartesian():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.977_NdPdIn.mcif")
+    nonzero_moments = [
+        np.asarray(moment, dtype=float)
+        for moment in result.convention_cell_detail["moments"]
+        if np.linalg.norm(moment) > 1e-8
+    ]
+    expected_direction = nonzero_moments[0] / np.linalg.norm(nonzero_moments[0])
+
+    assert result.convention_spin_only_direction_cartesian == "-0.383837,0.664825,0.640841"
+    assert np.allclose(
+        np.fromstring(result.convention_spin_only_direction_cartesian, sep=","),
+        expected_direction,
+        atol=1e-6,
+    )
+
+
 @pytest.mark.parametrize(
     ("path", "expect_identity_rotation", "expect_changed"),
     [
