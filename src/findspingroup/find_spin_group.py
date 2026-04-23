@@ -73,6 +73,33 @@ def _format_spin_only_direction(direction) -> str:
     return ",".join(values)
 
 
+def _normalize_spin_only_direction(direction) -> np.ndarray | None:
+    if direction is None:
+        return None
+    array = np.asarray(direction, dtype=float)
+    if array.size == 0:
+        return array
+    if array.ndim == 1:
+        norm = np.linalg.norm(array)
+        if norm < 1e-12:
+            return array
+        return array / norm
+
+    normalized = np.array(array, dtype=float, copy=True)
+    if normalized.shape[0] == 3:
+        for column_index in range(normalized.shape[1]):
+            norm = np.linalg.norm(normalized[:, column_index])
+            if norm >= 1e-12:
+                normalized[:, column_index] /= norm
+        return normalized
+
+    for row_index in range(normalized.shape[0]):
+        norm = np.linalg.norm(normalized[row_index])
+        if norm >= 1e-12:
+            normalized[row_index] /= norm
+    return normalized
+
+
 ACC_PRIMITIVE_SETTING = "acc_primitive"
 ACC_CONVENTIONAL_SETTING = "acc_conventional"
 INPUT_MAGNETIC_PRIMITIVE_SETTING = "input_magnetic_primitive"
@@ -852,6 +879,10 @@ class MagSymmetryResult:
         self.ossg_is_polar = symmetry.get('ossg_is_polar', None)
         self.ossg_is_chiral = symmetry.get('ossg_is_chiral', None)
         self.convention_spin_only_direction = symmetry.get('convention_spin_only_direction', "")
+        self.convention_spin_only_direction_cartesian = symmetry.get(
+            'convention_spin_only_direction_cartesian',
+            "",
+        )
         self.convention_ssg_seitz = symmetry.get('convention_ssg_seitz', None)
         self.convention_ssg_seitz_latex = symmetry.get('convention_ssg_seitz_latex', None)
         self.convention_ssg_seitz_descriptions = symmetry.get(
@@ -1146,6 +1177,22 @@ def _serialize_tensor_solution(solution, operations_count):
 
 def _lattice_column_matrix(cell: CrystalCell) -> np.ndarray:
     return np.asarray(cell.lattice_matrix, dtype=float).T
+
+
+def _cartesian_spin_only_direction_from_oriented(direction, cell: CrystalCell):
+    if direction is None:
+        return None
+    direction_array = np.asarray(direction, dtype=float)
+    if direction_array.size == 0:
+        return direction_array
+    lattice_col = _lattice_column_matrix(cell)
+    if direction_array.ndim == 1:
+        cartesian = lattice_col @ direction_array.reshape(3)
+    elif direction_array.shape[0] == 3:
+        cartesian = lattice_col @ direction_array
+    else:
+        cartesian = direction_array @ lattice_col.T
+    return _normalize_spin_only_direction(cartesian)
 
 
 def _cartesianize_similarity(matrix: np.ndarray, lattice_col: np.ndarray) -> np.ndarray:
@@ -3349,6 +3396,12 @@ def _find_spin_group_from_parsed(
                 'ossg_is_polar': space_group_is_polar(ossg_space_group_number),
                 'ossg_is_chiral': space_group_is_chiral(ossg_space_group_number),
                 'convention_spin_only_direction': _format_spin_only_direction(public_ossg_ssg.sog_direction),
+                'convention_spin_only_direction_cartesian': _format_spin_only_direction(
+                    _cartesian_spin_only_direction_from_oriented(
+                        public_ossg_ssg.sog_direction,
+                        convention_cell,
+                    )
+                ),
                 'convention_ssg_seitz': public_ossg_ssg.seitz_symbols,
                 'convention_ssg_seitz_latex': public_ossg_ssg.seitz_symbols_latex,
                 'convention_ssg_seitz_descriptions': _serialize_seitz_descriptions(
