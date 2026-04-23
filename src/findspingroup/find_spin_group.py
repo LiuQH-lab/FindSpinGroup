@@ -4102,6 +4102,28 @@ def find_spin_group_input_ssg(
     meigtol=0.00002,
     matrix_tol=0.01,
 ) -> dict:
+    """
+    Identify the spin-space-group operations in the input cell setting.
+
+    This route is intended for file-facing workflows that need the symmetry
+    operations of the cell supplied by the user, not only the standardized or
+    accepted primitive setting used by the full pipeline. The returned payload
+    includes input-cell SSG operations, input-cell oriented MSG operations,
+    summary identifiers, the relation to the input magnetic primitive cell, and
+    POSCAR text outputs when useful.
+
+    If the supplied cell is not already a magnetic primitive cell, the returned
+    input-cell SSG operations may be incomplete relative to the full symmetry of
+    the magnetic primitive cell. In that case the payload also includes
+    primitive-side identifiers and a warning, so callers can distinguish the
+    input-cell answer from the magnetic-primitive reference.
+
+    POSCAR inputs must contain an embedded ``MAGMOM`` payload; this route does
+    not read INCAR. CIF, mCIF, and SCIF inputs must contain explicit magnetic
+    moments. POSCAR moments are treated as Cartesian, while CIF/mCIF/SCIF
+    moments are converted into the route's Cartesian input-cell frame before
+    identification and export.
+    """
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     path = Path(structure_file)
     suffix = path.suffix.lower()
