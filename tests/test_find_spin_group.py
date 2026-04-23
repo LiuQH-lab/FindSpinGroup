@@ -376,6 +376,20 @@ def test_find_spin_group_input_ssg_reports_distinct_primitive_index_for_nonprimi
     assert payload["magnetic_primitive_poscar"]
 
 
+def test_find_spin_group_input_ssg_magnetic_primitive_poscar_preserves_lattice_setting(tmp_path):
+    payload = find_spin_group_input_ssg("tests/testset/mcif_241130_no2186/2.18_Sc2NiMnO6.mcif")
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(payload["magnetic_primitive_poscar"], encoding="utf-8")
+
+    roundtrip = find_spin_group_input_ssg(str(poscar_path))
+
+    assert payload["summary"]["is_input_magnetic_primitive"] is False
+    assert payload["summary"]["primitive_ssg_index"] == "2.2.2.2.P1"
+    assert roundtrip["summary"]["is_input_magnetic_primitive"] is True
+    assert roundtrip["summary"]["primitive_ssg_index"] == payload["summary"]["primitive_ssg_index"]
+    assert roundtrip["summary"]["primitive_msg_bns_number"] == payload["summary"]["primitive_msg_bns_number"]
+
+
 def test_write_poscar_ssg_symmetry_dat_writes_structured_json(tmp_path):
     original = find_spin_group("examples/0.800_MnTe.mcif")
     poscar_path = Path(tmp_path) / "POSCAR"
