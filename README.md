@@ -1,173 +1,170 @@
-# findspingroup
+# FINDSPINGROUP
 
-`findspingroup` is a Python toolkit for identifying and analyzing **Spin Space Group (SSG)** symmetry of magnetic crystal structures.  
-Given a magnetic CIF file, it determines the corresponding spin space group, constructs a standardized primitive magnetic cell, and provides symmetry- and property-related results for downstream first-principles workflows.
+`findspingroup` is a Python toolkit, command-line program, and
+[web application](https://app.findspingroup.com) for identifying and inspecting
+oriented spin space group (OSSG) symmetry in magnetic crystal structures.
 
-The project is designed for **research use**, **high-throughput screening**, and **integration with DFT pipelines**.
+It is designed for research workflows involving the interplay between
+exchange-driven magnetic geometry and spin-orbit coupling, which are described
+by spin space group (SSG) and magnetic space group (MSG) frameworks,
+respectively.
 
-## What it does
+Given a magnetic structure, FINDSPINGROUP identifies the OSSG, derives the
+corresponding MSG, and organizes crystallographic and physical information
+needed to analyze the material with and without spin-orbit coupling.
 
-Given a magnetic structure, `findspingroup` can:
+Main outputs can include:
 
-- identify the spin space group and index
-- construct primitive and standardized settings
-- expose symmetry operations and international-style symbols
-- export repo-generated `.scif` snapshots for roundtrip and workflow use
-- provide symmetry-constrained property outputs for downstream calculations
+- OSSG information and corresponding MSG information in matched settings;
+- spin Wyckoff positions and Wyckoff splitting from space group (SG) to OSSG and MSG;
+- spin Brillouin zones, high-symmetry k points, and symmetry-allowed spin-polarization components;
+- magnetic-phase classification, including unconventional cases such as altermagnets and spin-orbit magnets;
+- symmetry constraints on anomalous Hall conductivity, nonlinear tensors, and related physical responses;
+- chiral and polar group information with and without spin-orbit coupling;
+- `.scif` files for downstream spin-group-based tensor analysis and data exchange;
+- magnetic primitive-cell POSCAR files in relevant coordinate conventions;
+- KPOINTS files labeled with symmetry-allowed spin-polarization components.
 
 ## Installation
-
-### From PyPI
 
 ```bash
 pip install findspingroup
 ```
 
-Python version: `>= 3.11`
+Python `>= 3.11` is required.
 
-### From source
-
-```bash
-git clone https://github.com/LiuQH-lab/FindSpinGroup.git
-cd FindSpinGroup
-pip install -e .
-```
-
-## 30-second example
+## Quick Start
 
 ```python
 from findspingroup import example_path, find_spin_group
 
 result = find_spin_group(example_path("0.800_MnTe.mcif"))
+
+print(result.index)
+print(result.convention_ssg_international_linear)
+print(result.magnetic_phase)
+```
+
+## Command Line
+
+After installation, the package provides the `fsg` command.
+
+Print a lightweight summary for a file:
+
+```bash
+fsg path/to/structure.mcif
+```
+
+Input: a supported magnetic structure file, such as `.mcif`, `.scif`, or a
+POSCAR-like file with embedded `MAGMOM`.
+Output: a lightweight JSON summary printed to stdout.
+
+Write input-cell SSG / MSG operations and POSCAR helper files:
+
+```bash
+fsg -w path/to/structure.mcif
+```
+
+Input: a supported magnetic structure file. Output: files written in the current
+directory:
+
+- `ssg_symm.json`
+- `input_poscar.vasp`, for non-POSCAR inputs
+- `magnetic_primitive_poscar.vasp`, when the input cell is not magnetic primitive
+
+Use help to inspect the current command-line options:
+
+```bash
+fsg --help
+```
+
+## Python APIs
+
+### Full Analysis
+
+```python
+from findspingroup import find_spin_group
+
+result = find_spin_group("path/to/structure.mcif")
+
 print(result.index)
 print(result.acc)
 print(result.convention_ssg_international_linear)
+print(result.magnetic_phase)
 ```
 
-Minimal smoke check:
+`find_spin_group(...)` returns a `MagSymmetryResult` object with the full
+analysis result. See the
+[usage documentation](https://findspingroup.readthedocs.io/en/latest/usage/)
+for the main `MagSymmetryResult` attributes and route-specific outputs.
 
-```bash
-python - <<'PY'
-from findspingroup import example_path, find_spin_group
-result = find_spin_group(example_path("0.800_MnTe.mcif"))
-print(result.index)
-print(result.convention_ssg_international_linear)
-PY
+### Lightweight Basic Summary
+
+```python
+from findspingroup import find_spin_group_basic
+
+summary = find_spin_group_basic("path/to/structure.mcif")
+print(summary["index"])
+print(summary["magnetic_phase"])
 ```
 
-## Supported inputs
+This route avoids expensive downstream outputs that are not needed for simple
+identification.
 
-`findspingroup` accepts:
+### Input-Cell SSG Operations
 
-- standard `.cif`
-- magnetic `.mcif`
+```python
+from findspingroup import find_spin_group_input_ssg
+
+payload = find_spin_group_input_ssg("path/to/structure.mcif")
+
+print(payload["summary"])
+print(payload["ssg"]["ops"])
+print(payload["msg"]["ops"])
+```
+
+This route returns SSG operations in the **input cell setting**. If the input
+cell is not already magnetic primitive, those input-cell operations may be fewer
+than the full symmetry operations of the magnetic primitive cell. In that case,
+the payload includes primitive-side identifiers and a warning.
+
+## Supported Inputs
+
+`findspingroup` supports:
+
+- `.cif`
+- `.mcif`
 - repo-generated `.scif`
-- a narrow first-version magnetic `POSCAR` contract used by this project
+- POSCAR-like files with embedded magnetic moments
 
-## Main API
+Input notes:
 
-```python
-def find_spin_group(
-    cif: str,
-    space_tol: float = 0.02,
-    mtol: float = 0.02,
-    meigtol: float = 0.00002,
-    matrix_tol: float = 0.01,
-) -> MagSymmetryResult
-```
+- Magnetic inputs must contain explicit magnetic moments.
+- POSCAR inputs must include an embedded `MAGMOM` payload, for example a trailing
+  `# MAGMOM=...` line.
+- The input-SSG POSCAR route does not read `INCAR`.
+- POSCAR moments are treated as Cartesian.
+- CIF, mCIF, and SCIF moments are converted into the route's Cartesian input-cell
+  frame before operation export.
 
-The function returns a `MagSymmetryResult` object containing the symmetry analysis result.
+## Tolerances
 
-## Common outputs
-
-Useful fields on `MagSymmetryResult` include:
-
-- `index`
-- `acc`
-- `msg_num`
-- `msg_symbol`
-- `convention_ssg_international_linear`
-- `gspg_symbol_linear`
-- `scif`
-
-Example:
+The main APIs accept the same basic tolerance controls:
 
 ```python
-from findspingroup import example_path, find_spin_group
-
-result = find_spin_group(example_path("1.237_VCl2.mcif"))
-
-print("index:", result.index)
-print("acc:", result.acc)
-print("msg:", result.msg_symbol)
-print("convention:", result.convention_ssg_international_linear)
+find_spin_group(
+    "path/to/structure.mcif",
+    space_tol=0.02,
+    mtol=0.02,
+    meigtol=0.00002,
+    matrix_tol=0.01,
+)
 ```
 
-## Input details
-
-`findspingroup` supports standard `.cif`, magnetic `.mcif`, the current
-repo-generated `.scif` files, and a narrow first-version `POSCAR` parser for
-repo-generated magnetic POSCAR text.
-
-* **Standard CIF**: Uses structural positions.
-* **MCIF (Magnetic CIF)**: Supports files generated by **FINDSYM**, **ISOTROPY**, or **Vesta**.
-    * The parser looks for `_atom_site_moment` tags.
-    * It automatically handles magnetic vectors ($m_x, m_y, m_z$).
-* **SCIF**: Supports the current repo-generated `.scif` contract for generator /
-  parser roundtrip work.
-* **POSCAR**: Currently supports the repo-generated `CrystalCell.to_poscar(...)`
-  contract only.
-    * official POSCAR structural variants:
-      * `Direct`
-      * `Cartesian`
-      * optional `Selective dynamics`
-      * one / three scale factors
-      * negative target-volume scale
-    * optional trailing `# MAGMOM=` line
-      * if absent, moments default to zero
-      * multiple `#`, tabs, and extra spaces around `MAGMOM =` are tolerated
-    * if no inline `MAGMOM` is present, a sibling `INCAR` `MAGMOM` entry is
-      also supported
-      * repeated entries such as `6*0.0`
-      * `;` inline statements
-      * `\\` continuation
-      * `#` / `!` comments
-    * `NIONS` scalar form is currently promoted to the default z axis
-    * basename `POSCAR` / `CONTCAR` or suffix `.poscar` / `.vasp`
-    * species names are still required; VASP4 species-omitted files are not yet supported
-
-## `.scif` export and roundtrip
-
-`findspingroup` can export a repo-generated spinCIF-style `.scif` snapshot from a
-`MagSymmetryResult`, and can also parse that generated `.scif` back through the
-same public input path.
-
-```python
-from findspingroup import example_path, find_spin_group
-
-result = find_spin_group(example_path("0.800_MnTe.mcif"))
-
-# Default public `.scif` output: legacy profile in the oriented-G0 setting.
-scif_text = result.scif
-
-# The same output is also available explicitly.
-assert scif_text == result.to_scif(profile="legacy", cell_mode="g0std_oriented")
-
-# Additional export profiles / cell modes exist for audit and roundtrip work.
-scif_working = result.to_scif(profile="spincif_working", cell_mode="g0std_oriented")
-scif_primitive = result.to_scif(profile="legacy", cell_mode="magnetic_primitive")
-```
-
-Current `.scif` generator rules:
-
-- repo-local FINDSPINGROUP metadata is emitted under CIF-legal
-  `_space_group_spin.fsg_*` tags
-- symmetry-operation and transform coefficients keep full precision by default
-- values close to simple fractions or common square-root forms may be written as
-  symbolic expressions such as `1/3`, `2/3`, or `sqrt(6)/3`
-- repo-generated `.scif` files can be parsed back with `find_spin_group(...)`
-  and are regression-tested to preserve the identified `index`
+Use tighter tolerances only when the input structure is numerically clean enough
+to support them.
 
 ## License
-This project is licensed under the Apache License, Version 2.0.
-See the LICENSE file for details.
+
+This project is licensed under the Apache License, Version 2.0. See
+[`LICENSE`](LICENSE) for details.

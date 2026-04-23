@@ -2,50 +2,60 @@
 
 The package installs command-line entry points for single-case and batch use.
 
-## Single-case CLI
+Single-case entry points:
 
-Installed entry points include:
-
+- `fsg`
 - `findspingroup`
 - `findspin`
-- `fsg`
 
-Use `--help` to inspect the current interface:
+Use help to inspect the current interface:
 
 ```bash
-findspingroup --help
+fsg --help
 ```
+
+## Lightweight Summary
+
+Input: a supported magnetic structure file.
+
+```bash
+fsg path/to/structure.mcif
+```
+
+Output: a lightweight JSON summary printed to stdout.
+
+## Write Input-Cell SSG Files
+
+Input: a supported magnetic structure file.
+
+```bash
+fsg -w path/to/structure.mcif
+```
+
+Output: files written in the current directory:
+
+- `ssg_symm.json`
+- `input_poscar.vasp`, for non-POSCAR inputs
+- `magnetic_primitive_poscar.vasp`, when the input cell is not magnetic primitive
 
 ## Batch CLI
 
-Installed batch entry points include:
+Batch entry points:
 
+- `fsg-batch`
 - `findspingroup-batch`
 - `findspin-batch`
-- `fsg-batch`
 
 Show help:
 
 ```bash
-findspingroup-batch --help
+fsg-batch --help
 ```
 
-## Minimal batch example
+Minimal batch example:
 
 ```bash
-findspingroup-batch tests/testset/mcif_241130_no2186 \
+fsg-batch tests/testset/mcif_241130_no2186 \
   --output-dir /tmp/findspingroup_batch_smoke \
   --limit 5
 ```
-
-Common options:
-
-- `--output-dir`
-- `--baseline`
-- `--auto-baseline`
-- `--space-tol`
-- `--mtol`
-- `--meigtol`
-- `--matrix-tol`
-- `--export-field`
-- `--export-txt`

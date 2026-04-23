@@ -1,24 +1,31 @@
-# findspingroup
+# FINDSPINGROUP
 
-`findspingroup` is a Python toolkit for identifying and analyzing spin space
-group symmetry in magnetic crystal structures.
+`findspingroup` is a Python toolkit, command-line program, and
+[web application](https://app.findspingroup.com) for identifying and inspecting
+oriented spin space group (OSSG) symmetry in magnetic crystal structures.
 
-It is designed for:
+It is designed for research workflows involving the interplay between
+exchange-driven magnetic geometry and spin-orbit coupling, which are described
+by spin space group (SSG) and magnetic space group (MSG) frameworks,
+respectively.
 
-- magnetic symmetry identification from `.cif`, `.mcif`, and generated `.scif`
-- standardized primitive and conventional setting construction
-- symmetry-aware downstream workflows such as tensor analysis and k-point work
-- high-throughput screening on large magnetic structure sets
+Given a magnetic structure, FINDSPINGROUP identifies the OSSG, derives the
+corresponding MSG, and organizes crystallographic and physical information
+needed to analyze the material with and without spin-orbit coupling.
 
-## What you get
+## Main outputs
 
-Given a supported structure file, `findspingroup` can return:
+Main outputs can include:
 
-- the identified spin-space-group `index`
-- the arithmetic crystal class `acc`
-- MSG number and symbol
-- public convention symbols such as `convention_ssg_international_linear`
-- symmetry-derived outputs such as `.scif`, tensor summaries, and k-path data
+- OSSG information and corresponding MSG information in matched settings;
+- spin Wyckoff positions and Wyckoff splitting from space group (SG) to OSSG and MSG;
+- spin Brillouin zones, high-symmetry k points, and symmetry-allowed spin-polarization components;
+- magnetic-phase classification, including unconventional cases such as altermagnets and spin-orbit magnets;
+- symmetry constraints on anomalous Hall conductivity, nonlinear tensors, and related physical responses;
+- chiral and polar group information with and without spin-orbit coupling;
+- `.scif` files for downstream spin-group-based tensor analysis and data exchange;
+- magnetic primitive-cell POSCAR files in relevant coordinate conventions;
+- KPOINTS files labeled with symmetry-allowed spin-polarization components.
 
 ## Quick start
 
@@ -27,14 +34,14 @@ from findspingroup import example_path, find_spin_group
 
 result = find_spin_group(example_path("0.800_MnTe.mcif"))
 print(result.index)
-print(result.acc)
 print(result.convention_ssg_international_linear)
+print(result.magnetic_phase)
 ```
 
 ## Next steps
 
 - See [Installation](installation.md) for package installation options.
-- See [Usage](usage.md) for the main Python API.
+- See [Usage](usage.md) for `MagSymmetryResult`, basic summaries, and input-SSG outputs.
 - See [Examples](examples.md) for packaged sample inputs.
 - See [SCIF](scif.md) for `.scif` export and roundtrip notes.
 - See [CLI](cli.md) for command-line entry points.
