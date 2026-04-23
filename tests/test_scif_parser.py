@@ -14,6 +14,10 @@ from findspingroup.find_spin_group import (
 from findspingroup.core import Molecule, PointGroupAnalyzer
 from findspingroup.core.identify_spin_space_group import dedup_moments_with_tol
 from findspingroup.io import parse_cif_file, parse_scif_file, parse_scif_metadata, parse_scif_text
+from findspingroup.io.scif_generator import (
+    _parse_solver_component_expression,
+    _parse_solver_numeric_token,
+)
 from findspingroup.structure.cell import (
     CrystalCell,
     are_positions_equivalent,
@@ -160,8 +164,8 @@ def test_find_spin_group_exposes_mainline_scif_output():
     assert "loop_\n_atom_type_symbol\nMn\n" in result.scif
     assert "_space_group_spin.collinear_direction_xyz" in result.scif
     assert "_space_group_spin.collinear_direction_xyz '1,1,0'" in result.scif
-    assert f'_space_group_spin.number_Chen  "{result.index}"' in result.scif
-    assert "_space_group_spin.name_Chen" in result.scif
+    assert f'_space_group_spin.number_Chen_Liu  "{result.index}"' in result.scif
+    assert "_space_group_spin.name_Chen_Liu" in result.scif
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] is not None
     assert "_space_group_spin.fsg_spin_space_group_name_linear" not in result.scif
     assert (
@@ -561,6 +565,25 @@ def test_general_positions_to_matrix_parses_fraction_and_sqrt_uvw_coefficients()
     assert np.allclose(shift, [0.0, 0.0, 0.0], atol=1e-9)
 
 
+def test_solver_numeric_token_parses_symbolic_sqrt_coefficients():
+    assert np.isclose(_parse_solver_numeric_token("sqrt(3)"), np.sqrt(3))
+    assert np.isclose(_parse_solver_numeric_token("-sqrt(3)"), -np.sqrt(3))
+    assert np.isclose(_parse_solver_numeric_token("sqrt(3)/3"), np.sqrt(3) / 3)
+    assert np.isclose(_parse_solver_numeric_token("-sqrt(3)/3"), -np.sqrt(3) / 3)
+    assert np.isclose(_parse_solver_numeric_token("2*sqrt(3)/3"), 2 * np.sqrt(3) / 3)
+    assert np.isclose(_parse_solver_numeric_token("-2*sqrt(3)/3"), -2 * np.sqrt(3) / 3)
+
+
+def test_solver_component_expression_parses_symbolic_sqrt_coefficients():
+    coefficients = _parse_solver_component_expression(
+        "sqrt(3)/3*Sx-2*sqrt(6)/9Sy-1/3Sz"
+    )
+
+    assert np.isclose(coefficients["Sx"], np.sqrt(3) / 3)
+    assert np.isclose(coefficients["Sy"], -2 * np.sqrt(6) / 9)
+    assert np.isclose(coefficients["Sz"], -1 / 3)
+
+
 def test_parse_scif_data_roundtrips_back_into_findspingroup_324(tmp_path):
     original = find_spin_group("tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif")
     scif_path = Path(tmp_path) / "ca_fe_ti_324.scif"
@@ -785,7 +808,7 @@ def test_parse_scif_metadata_reads_mainline_output(tmp_path):
         "_space_group_spin.collinear_direction_xyz"
     )
     assert metadata["space_group_spin"]["source_tags"]["spin_space_group_number_chen"] == (
-        "_space_group_spin.number_Chen"
+        "_space_group_spin.number_Chen_Liu"
     )
     assert metadata["space_group_spin"]["spin_space_group_number_chen"] == result.index
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] is not None
@@ -793,7 +816,7 @@ def test_parse_scif_metadata_reads_mainline_output(tmp_path):
         result.convention_ssg_international_linear
     )
     assert metadata["space_group_spin"]["source_tags"]["spin_space_group_name_chen"] == (
-        "_space_group_spin.name_Chen"
+        "_space_group_spin.name_Chen_Liu"
     )
     assert metadata["space_group_spin"]["spin_space_group_name_linear"] == (
         result.convention_ssg_international_linear
@@ -830,8 +853,8 @@ def test_parse_scif_metadata_reads_mainline_output(tmp_path):
 def test_generated_scif_uses_cif_legal_fsg_tags_and_full_precision_operations():
     result = find_spin_group("tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif")
 
-    assert "_space_group_spin.number_Chen" in result.scif
-    assert "_space_group_spin.name_Chen" in result.scif
+    assert "_space_group_spin.number_Chen_Liu" in result.scif
+    assert "_space_group_spin.name_Chen_Liu" in result.scif
     assert " : " in result.convention_ssg_international_linear
     assert "_space_group_spin.fsg_spin_space_group_name_linear" not in result.scif
     assert "_space_group_spin.fsg_oriented_spin_space_group_name_linear" in result.scif
@@ -848,7 +871,7 @@ def test_generated_scif_uses_cif_legal_fsg_tags_and_full_precision_operations():
     assert "_space_group_spin.fsg.transform_to_input_Pp" not in result.scif
     assert "_space_group_spin.fsg_transform_to_parent_space_group_Pp" not in result.scif
     assert (
-        "_space_group_spin.transform_Chen_Pp_abcs  "
+        "_space_group_spin.transform_Chen_Liu_Pp_abcs  "
         "'a,b,c;0,0,0;-25.782269as+25.782269bs-6.445567cs,-25.782269bs-6.445567cs,25.782269as-6.445567cs'"
         in result.scif
     )
@@ -888,8 +911,8 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
         ),
         (
             "tests/testset/mcif_241130_no2186/1.526_LiCoF4.mcif",
-            "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{alpha,0,gamma}m|1",
-            "a+c,b,c;0,0,0;as,bs,cs",
+            "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{001}m|1",
+            "a+c,b,c;0,0,0;5.736417as-5.48785cs,4.6462bs,9.220398as+0.736873cs",
         ),
         (
             "examples/2.116_Na3Co2SbO6.mcif",
@@ -898,8 +921,8 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
         ),
         (
             "tests/testset/mcif_241130_no2186/1.570_La3OsO7.mcif",
-            "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{alpha,0,gamma}m|1",
-            "1/2c,-b,2a+c;0,1/2,0;as,bs,cs",
+            "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{001}m|1",
+            "1/2c,-b,2a+c;0,1/2,0;-2.739924as-5.573532cs,7.6198bs,13.190119as-3.782505cs",
         ),
     ],
 )
@@ -923,7 +946,12 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_mnte():
     assert "Sx,Sy,Sz" not in result.scif
     assert metadata["atom_site_spin_moment"]["symmform_uvw"] == ["u,u,0"]
     assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,u,0"]
-    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == "a,b,c;0,0,0;as,bs,cs"
+    assert metadata["space_group_spin"]["spin_space_group_name_chen"] == (
+        "P -1|6_{3}/ -1|m 1|m -1|c ∞_{001}m|1"
+    )
+    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == (
+        "a,b,c;0,0,0;3.59184as-3.59184bs,-6.71cs,2.07375as+2.07375bs"
+    )
 
 
 def test_generated_scif_uses_solver_derived_symmform_uvw_for_mn3sn():
