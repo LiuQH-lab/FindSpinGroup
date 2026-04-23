@@ -339,8 +339,11 @@ def _extract_scif_metadata(data: dict):
     ssg_name_key, ssg_name_value = _get_first_existing_with_key(
         data,
         [
+            '_space_group_spin.name_Chen_Liu',
             '_space_group_spin.name_Chen',
+            '_space_group_spin.spin_space_group_name_Chen_Liu',
             '_space_group_spin.spin_space_group_name_Chen',
+            '_space_group_spin.name_SpSG_Chen_Liu',
             '_space_group_spin.name_SpSG_Chen',
         ],
     )
@@ -354,14 +357,20 @@ def _extract_scif_metadata(data: dict):
     ssg_number_key, ssg_number_value = _get_first_existing_with_key(
         data,
         [
+            '_space_group_spin.number_Chen_Liu',
             '_space_group_spin.number_Chen',
+            '_space_group_spin.spin_space_group_number_Chen_Liu',
             '_space_group_spin.spin_space_group_number_Chen',
+            '_space_group_spin.number_SpSG_Chen_Liu',
             '_space_group_spin.number_SpSG_Chen',
         ],
     )
     transform_chen_key, transform_chen_value = _get_first_existing_with_key(
         data,
-        ['_space_group_spin.transform_Chen_Pp_abcs'],
+        [
+            '_space_group_spin.transform_Chen_Liu_Pp_abcs',
+            '_space_group_spin.transform_Chen_Pp_abcs',
+        ],
     )
     rotation_axis_key, rotation_axis_value = _get_first_existing_with_key(
         data,

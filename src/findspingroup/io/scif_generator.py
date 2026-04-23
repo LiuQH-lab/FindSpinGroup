@@ -42,9 +42,9 @@ def _scif_spin_tag_names() -> dict[str, str]:
         "rotation_axis": "_space_group_spin.rotation_axis",
         "rotation_axis_cartn": None,
         "rotation_angle": "_space_group_spin.rotation_angle",
-        "ssg_number": "_space_group_spin.number_Chen",
-        "ssg_name": "_space_group_spin.name_Chen",
-        "ssg_name_linear": "_space_group_spin.name_Chen",
+        "ssg_number": "_space_group_spin.number_Chen_Liu",
+        "ssg_name": "_space_group_spin.name_Chen_Liu",
+        "ssg_name_linear": "_space_group_spin.name_Chen_Liu",
     }
 
 
@@ -506,7 +506,7 @@ def _build_transform_chen_pp_abcs(
     spin_basis_rows = transform_parts["spin_basis_rows"]
 
     return (
-        f"_space_group_spin.transform_Chen_Pp_abcs  "
+        f"_space_group_spin.transform_Chen_Liu_Pp_abcs  "
         f"'{_direct_transform_to_pp_string(space_matrix, space_shift, ('a', 'b', 'c'), coeff_precision=6)};"
         f"{_format_basis_transform_rows(spin_basis_rows, ('as', 'bs', 'cs'))}'"
     )
@@ -543,7 +543,10 @@ def _resolve_transform_chen_parts(
 
     lattice_col = np.asarray(cell_G0.lattice_matrix, dtype=float).T
     if ssg.conf == "Collinear":
-        spin_basis_rows = np.eye(3)
+        spin_basis_rows = _build_collinear_chen_spin_basis_rows(
+            lattice_col=lattice_col,
+            collinear_axis=ssg.collinear_axis,
+        )
     else:
         standard_spin_ssg = ssg.transform_spin(lattice_col)
         spin_standardization = np.linalg.inv(
@@ -661,6 +664,22 @@ def _parse_solver_numeric_token(token: str) -> float:
         return -1.0
     if "/" in token and token.count("/") == 1 and re.fullmatch(r"[+-]?\d+/\d+", token):
         return float(Fraction(token))
+    number_pattern = r"(?:\d+(?:\.\d+)?|\d+/\d+)"
+    sqrt_match = re.fullmatch(
+        r"(?P<sign>[+-]?)"
+        rf"(?:(?P<num>{number_pattern})\*)?"
+        rf"sqrt\((?P<radicand>{number_pattern})\)"
+        rf"(?:/(?P<den>{number_pattern}))?",
+        token,
+    )
+    if sqrt_match is not None:
+        sign = -1.0 if sqrt_match.group("sign") == "-" else 1.0
+        numerator = sqrt_match.group("num")
+        denominator = sqrt_match.group("den")
+        radicand = sqrt_match.group("radicand")
+        numerator_value = 1.0 if numerator is None else float(Fraction(numerator))
+        denominator_value = 1.0 if denominator is None else float(Fraction(denominator))
+        return sign * numerator_value * math.sqrt(float(Fraction(radicand))) / denominator_value
     return float(token)
 
 
@@ -1180,7 +1199,7 @@ def generate_scif(
             ssg_name.rstrip(),
             transform_chen_pp_abcs
             if transform_chen_pp_abcs is not None
-            else "_space_group_spin.transform_Chen_Pp_abcs  .",
+            else "_space_group_spin.transform_Chen_Liu_Pp_abcs  .",
         ]
     )
     scif_repo_local_extensions = "\n".join(
