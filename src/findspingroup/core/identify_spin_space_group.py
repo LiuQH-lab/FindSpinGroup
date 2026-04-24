@@ -1,3 +1,4 @@
+import itertools
 from dataclasses import dataclass
 
 import numpy as np
@@ -170,12 +171,74 @@ def _candidate_directions_from_moments(moments):
                 add(moments[i] - moments[j])
                 add(np.cross(moments[i], moments[j]))
 
+    # The candidate set grows quadratically with the number of nonzero moments.
+    # Use spatial buckets to avoid an O(N^2) allclose scan while preserving the
+    # same final near-duplicate predicate for directions in neighboring buckets.
     unique = []
+    buckets = {}
+    bucket_width = 2e-5
+    neighbor_offsets = tuple(itertools.product((-1, 0, 1), repeat=3))
     for direction in candidates:
-        if any(np.allclose(direction, existing, atol=1e-6) for existing in unique):
+        key = tuple(np.floor(direction / bucket_width).astype(int).tolist())
+        duplicate = False
+        for offset in neighbor_offsets:
+            neighbor_key = (
+                key[0] + offset[0],
+                key[1] + offset[1],
+                key[2] + offset[2],
+            )
+            for existing in buckets.get(neighbor_key, ()):
+                if np.allclose(direction, existing, atol=1e-6):
+                    duplicate = True
+                    break
+            if duplicate:
+                break
+        if duplicate:
             continue
         unique.append(direction)
+        buckets.setdefault(key, []).append(direction)
     return unique
+
+
+def _candidate_chunk_size(moment_count, target_values=3_000_000):
+    return max(1, int(target_values // max(1, moment_count)))
+
+
+def _best_collinear_axis_from_candidates(moments, candidates):
+    candidates = np.asarray(candidates, dtype=float)
+    moments = np.asarray(moments, dtype=float)
+    best_index = 0
+    best_residual = float("inf")
+    chunk_size = _candidate_chunk_size(len(moments))
+    for start in range(0, len(candidates), chunk_size):
+        chunk = candidates[start : start + chunk_size]
+        residuals = np.linalg.norm(
+            np.cross(moments[None, :, :], chunk[:, None, :]),
+            axis=2,
+        ).max(axis=1)
+        local_index = int(np.argmin(residuals))
+        local_residual = float(residuals[local_index])
+        if local_residual < best_residual - 1e-10:
+            best_residual = local_residual
+            best_index = start + local_index
+    return candidates[best_index], best_residual
+
+
+def _best_coplanar_normal_from_candidates(moments, candidates):
+    candidates = np.asarray(candidates, dtype=float)
+    moments = np.asarray(moments, dtype=float)
+    best_index = 0
+    best_residual = float("inf")
+    chunk_size = _candidate_chunk_size(len(moments))
+    for start in range(0, len(candidates), chunk_size):
+        chunk = candidates[start : start + chunk_size]
+        residuals = np.abs(chunk @ moments.T).max(axis=1)
+        local_index = int(np.argmin(residuals))
+        local_residual = float(residuals[local_index])
+        if local_residual < best_residual - 1e-10:
+            best_residual = local_residual
+            best_index = start + local_index
+    return candidates[best_index], best_residual
 
 
 def _collinear_residual(moments, axis):
@@ -196,26 +259,12 @@ def _coplanar_residual(moments, plane_normal):
 
 def _best_collinear_axis(moments):
     candidates = _candidate_directions_from_moments(moments)
-    best_axis = candidates[0]
-    best_residual = _collinear_residual(moments, best_axis)
-    for axis in candidates[1:]:
-        residual = _collinear_residual(moments, axis)
-        if residual < best_residual - 1e-10:
-            best_axis = axis
-            best_residual = residual
-    return best_axis, best_residual
+    return _best_collinear_axis_from_candidates(moments, candidates)
 
 
 def _best_coplanar_normal(moments):
     candidates = _candidate_directions_from_moments(moments)
-    best_normal = candidates[0]
-    best_residual = _coplanar_residual(moments, best_normal)
-    for normal in candidates[1:]:
-        residual = _coplanar_residual(moments, normal)
-        if residual < best_residual - 1e-10:
-            best_normal = normal
-            best_residual = residual
-    return best_normal, best_residual
+    return _best_coplanar_normal_from_candidates(moments, candidates)
 
 
 def _configuration_details(moments, mtol):
@@ -230,8 +279,9 @@ def _configuration_details(moments, mtol):
             "coplanar_residual": 0.0,
         }
 
-    collinear_axis, collinear_residual = _best_collinear_axis(moments)
-    coplanar_normal, coplanar_residual = _best_coplanar_normal(moments)
+    candidates = _candidate_directions_from_moments(moments)
+    collinear_axis, collinear_residual = _best_collinear_axis_from_candidates(moments, candidates)
+    coplanar_normal, coplanar_residual = _best_coplanar_normal_from_candidates(moments, candidates)
     if collinear_residual <= mtol:
         configuration = "Collinear"
     elif coplanar_residual <= mtol:

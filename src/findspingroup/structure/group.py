@@ -638,6 +638,21 @@ def _op_bucket_key(op, atol: float):
     translation = tuple(np.round(np.asarray(op[2], dtype=float).reshape(-1), decimals))
     return spin_rotation, real_rotation, translation
 
+
+def _deduplicate_spin_space_ops(ops, *, tol: float, sort: bool = False):
+    ordered_ops = sorted(ops, key=op_key) if sort else list(ops)
+    unique_ops = []
+    bucketed_ops: dict[tuple, list] = {}
+    for op in ordered_ops:
+        bucket_key = _op_bucket_key(op, tol)
+        candidates = bucketed_ops.get(bucket_key, [])
+        if any(op.is_same_with(existing, atol=tol) for existing in candidates):
+            continue
+        unique_ops.append(op)
+        bucketed_ops.setdefault(bucket_key, []).append(op)
+    return unique_ops
+
+
 def check_divisible(a, b):
     if b == 0:
         raise ValueError("cannot divide by zero")
@@ -1015,17 +1030,8 @@ class SpinSpaceGroup:
         # duplicated operations, which corrupts downstream group-order
         # invariants such as it * ik.
         ordered_ops = sorted(self._input_ops, key=op_key)
-        unique_ops = []
         dedup_tol = min(self.tol, 1e-6)
-        bucketed_ops: dict[tuple, list[SpinSpaceGroupOperation]] = {}
-        for op in ordered_ops:
-            bucket_key = _op_bucket_key(op, dedup_tol)
-            candidates = bucketed_ops.get(bucket_key, [])
-            if any(op.is_same_with(existing, atol=dedup_tol) for existing in candidates):
-                continue
-            unique_ops.append(op)
-            bucketed_ops.setdefault(bucket_key, []).append(op)
-        return unique_ops
+        return _deduplicate_spin_space_ops(ordered_ops, tol=dedup_tol)
 
     @cached_property
     def spin_translation_group(self):
@@ -2009,12 +2015,7 @@ class SpinSpaceGroup:
             spin_only_op = SpinSpaceGroupOperation(-effective_rotation, np.eye(3), np.zeros(3))
             direct_candidates.append(spin_only_op @ op)
 
-        unique_ops = []
-        for op in sorted(direct_candidates, key=op_key):
-            if any(op.is_same_with(existing, atol=self.tol) for existing in unique_ops):
-                continue
-            unique_ops.append(op)
-        return unique_ops
+        return _deduplicate_spin_space_ops(direct_candidates, tol=self.tol, sort=True)
 
     def _build_collinear_msg_candidate_ops(self):
         promotion_rotations = self._collinear_spin_only_promotion_rotations()
@@ -2036,12 +2037,7 @@ class SpinSpaceGroup:
                 candidate_ops.append(spin_only_op @ op)
         candidate_ops.extend(direct_candidates)
 
-        unique_ops = []
-        for op in sorted(candidate_ops, key=op_key):
-            if any(op.is_same_with(existing, atol=self.tol) for existing in unique_ops):
-                continue
-            unique_ops.append(op)
-        return unique_ops
+        return _deduplicate_spin_space_ops(candidate_ops, tol=self.tol, sort=True)
 
     def get_pure_translations(self):
         pure_translations = []

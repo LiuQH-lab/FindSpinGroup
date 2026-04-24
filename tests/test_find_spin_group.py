@@ -31,11 +31,15 @@ from findspingroup.core.identify_index.functions.find_ssg_reduce import (
 from findspingroup.core.identify_spin_space_group import (
     NONMAGNETIC_MTOL_ERROR,
     UNSTABLE_MTOL_ERROR,
+    _candidate_directions_from_moments,
     dedup_moments_with_tol,
     get_pg,
     identify_spin_space_group,
     identify_spin_space_group_result,
     _classify_moment_configuration,
+    _collinear_residual,
+    _configuration_details,
+    _coplanar_residual,
 )
 from findspingroup.core.identify_symmetry_from_ops import (
     analyze_transition_matrix_problem,
@@ -66,6 +70,11 @@ from findspingroup.find_spin_group import (
 from findspingroup.io import parse_cif_file, parse_poscar_file, parse_scif_metadata
 from findspingroup.structure import SpinSpaceGroup
 from findspingroup.structure.cell import CrystalCell, standardize_lattice
+from findspingroup.structure.group import (
+    SpinSpaceGroupOperation,
+    _deduplicate_spin_space_ops,
+    op_key,
+)
 from findspingroup.utils.international_symbol import (
     _compose_setting_transform as _compose_symbol_setting_transform,
     _default_centering_vectors,
@@ -117,6 +126,80 @@ def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
     assert payload["nsspg"] == "-1"
     assert payload["sspg"] == "∞/mm"
     assert "msg_symbol" in payload
+
+
+def test_configuration_details_matches_candidate_residual_minimum():
+    moments = np.array(
+        [
+            [1.0, 0.0, 0.25],
+            [0.0, 1.0, -0.5],
+            [-1.0, 0.5, 0.75],
+            [0.5, -1.0, -0.25],
+            [0.25, 0.75, 1.0],
+            [-0.75, -0.25, -1.0],
+        ]
+    )
+
+    details = _configuration_details(moments, mtol=0.02)
+    candidates = _candidate_directions_from_moments(moments)
+
+    assert details["collinear_residual"] == pytest.approx(
+        min(_collinear_residual(moments, direction) for direction in candidates)
+    )
+    assert details["coplanar_residual"] == pytest.approx(
+        min(_coplanar_residual(moments, direction) for direction in candidates)
+    )
+
+
+def test_configuration_details_handles_large_noncollinear_moment_sets():
+    angles = np.linspace(0.0, 2.0 * np.pi, 96, endpoint=False)
+    moments = np.column_stack(
+        [
+            np.cos(angles),
+            np.sin(angles),
+            0.5 * np.cos(5.0 * angles) + 0.25 * np.sin(7.0 * angles),
+        ]
+    )
+
+    details = _configuration_details(moments, mtol=0.02)
+
+    assert details["configuration"] == "Noncoplanar"
+    assert details["collinear_residual"] > 0.02
+    assert details["coplanar_residual"] > 0.02
+
+
+def test_bucketed_spin_space_operation_dedup_matches_naive_tolerant_dedup():
+    identity = np.eye(3)
+    c2z = np.diag([-1.0, -1.0, 1.0])
+    mirror_xy = np.diag([1.0, 1.0, -1.0])
+    base_ops = [
+        SpinSpaceGroupOperation(identity, identity, np.zeros(3)),
+        SpinSpaceGroupOperation(c2z, c2z, np.array([0.5, 0.0, 0.0])),
+        SpinSpaceGroupOperation(mirror_xy, c2z, np.array([0.0, 0.5, 0.0])),
+    ]
+    near_duplicates = [
+        SpinSpaceGroupOperation(
+            op[0] + 1e-8 * np.eye(3),
+            op[1] - 1e-8 * np.eye(3),
+            op[2] + np.array([1e-8, 0.0, 0.0]),
+        )
+        for op in base_ops
+    ]
+    ops = base_ops + near_duplicates
+
+    expected = []
+    for op in sorted(ops, key=op_key):
+        if any(op.is_same_with(existing, atol=1e-5) for existing in expected):
+            continue
+        expected.append(op)
+
+    actual = _deduplicate_spin_space_ops(ops, tol=1e-5, sort=True)
+
+    assert len(actual) == len(expected)
+    assert all(
+        actual_op.is_same_with(expected_op, atol=1e-5)
+        for actual_op, expected_op in zip(actual, expected)
+    )
 
 
 def test_cli_basic_mode_prints_json(monkeypatch, capsys):
