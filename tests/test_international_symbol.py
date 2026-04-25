@@ -140,8 +140,10 @@ def test_seitz_descriptions_and_symbol_lists_expose_latex_forms():
     assert "translation_symbol_latex" in ssg.seitz_descriptions[0]
     assert ssg.seitz_descriptions[0]["symbol_latex"] == ssg.seitz_symbols_latex[0]
     assert ssg.seitz_symbols[0].startswith("{ ")
-    assert "tau_{" in ssg.seitz_symbols[0]
-    assert r"\tau_{(" in ssg.seitz_symbols_latex[0]
+    assert "tau_{" not in ssg.seitz_symbols[0]
+    assert r"\tau" not in ssg.seitz_symbols_latex[0]
+    assert ssg.seitz_descriptions[0]["translation_symbol"] == "0,0,0"
+    assert ssg.seitz_symbols[0].endswith("| 0,0,0 }")
 
 
 def test_seitz_point_latex_keeps_minus_sign_prefix():

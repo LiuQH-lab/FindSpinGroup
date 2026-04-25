@@ -813,8 +813,8 @@ class SpinSpaceGroupOperation:
         Output keys include:
             spin: point-operation info for Rs
             real: point-operation info for Rr
-            translation_symbol: formatted tau_{...}
-            symbol: combined label like { A || B | tau_{...} }
+            translation_symbol: formatted fractional translation like a,b,c
+            symbol: combined label like { A || B | a,b,c }
         """
         return describe_spin_space_operation(
             self.spin_rotation,
