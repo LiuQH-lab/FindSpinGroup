@@ -235,7 +235,22 @@ def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypa
     assert payload["acc_primitive_cell_detail"] is not None
     assert payload["acc_primitive_poscar"]
     assert payload["acc_primitive_ssg_operation_matrices"]
+    assert payload["acc_primitive_ssg_ops_cartesian"]
+    assert payload["acc_primitive_ssg_seitz_cartesian"]
+    assert payload["acc_primitive_ssg_seitz_latex_cartesian"]
+    assert payload["acc_primitive_ssg_ops_oriented"]
+    assert payload["acc_primitive_ssg_seitz_oriented"]
+    assert payload["acc_primitive_ssg_seitz_latex_oriented"]
     assert payload["acc_primitive_poscar_spin_frame_ssg_operation_matrices"]
+    assert payload["acc_primitive_spin_only_direction_cartesian"] == "1/2,sqrt(3)/2,0"
+    assert payload["acc_primitive_spin_only_direction_poscar_spin_frame"] == "1/2,sqrt(3)/2,0"
+    assert payload["acc_primitive_wp_chain"]
+    assert np.asarray(payload["T_input_to_acc_primitive"][0], dtype=float).shape == (3, 3)
+    assert np.asarray(payload["T_input_to_acc_primitive"][1], dtype=float).shape == (3,)
+    assert np.asarray(payload["T_acc_primitive_to_G0std"][0], dtype=float).shape == (3, 3)
+    assert np.asarray(payload["T_acc_primitive_to_G0std"][1], dtype=float).shape == (3,)
+    assert np.asarray(payload["T_acc_primitive_to_L0std"][0], dtype=float).shape == (3, 3)
+    assert np.asarray(payload["T_acc_primitive_to_L0std"][1], dtype=float).shape == (3,)
 
 
 def test_write_ssg_operation_matrices_writes_json(tmp_path):
@@ -2190,6 +2205,24 @@ def test_find_spin_group_exposes_standard_setting_payloads_for_web_app():
     assert np.asarray(result.T_L0std_to_primitive[1], dtype=float).shape == (3,)
     assert result.T_G0std_to_acc_primitive == result.T_G0std_to_primitive
     assert result.T_L0std_to_acc_primitive == result.T_L0std_to_primitive
+    assert np.asarray(result.T_acc_primitive_to_G0std[0], dtype=float).shape == (3, 3)
+    assert np.asarray(result.T_acc_primitive_to_G0std[1], dtype=float).shape == (3,)
+    assert np.asarray(result.T_acc_primitive_to_L0std[0], dtype=float).shape == (3, 3)
+    assert np.asarray(result.T_acc_primitive_to_L0std[1], dtype=float).shape == (3,)
+
+    g0_to_acc_matrix = np.asarray(result.T_G0std_to_acc_primitive[0], dtype=float)
+    g0_to_acc_shift = np.asarray(result.T_G0std_to_acc_primitive[1], dtype=float)
+    acc_to_g0_matrix = np.asarray(result.T_acc_primitive_to_G0std[0], dtype=float)
+    acc_to_g0_shift = np.asarray(result.T_acc_primitive_to_G0std[1], dtype=float)
+    assert np.allclose(acc_to_g0_matrix @ g0_to_acc_matrix, np.eye(3), atol=1e-8)
+    assert np.allclose(acc_to_g0_matrix @ g0_to_acc_shift + acc_to_g0_shift, np.zeros(3), atol=1e-8)
+
+    l0_to_acc_matrix = np.asarray(result.T_L0std_to_acc_primitive[0], dtype=float)
+    l0_to_acc_shift = np.asarray(result.T_L0std_to_acc_primitive[1], dtype=float)
+    acc_to_l0_matrix = np.asarray(result.T_acc_primitive_to_L0std[0], dtype=float)
+    acc_to_l0_shift = np.asarray(result.T_acc_primitive_to_L0std[1], dtype=float)
+    assert np.allclose(acc_to_l0_matrix @ l0_to_acc_matrix, np.eye(3), atol=1e-8)
+    assert np.allclose(acc_to_l0_matrix @ l0_to_acc_shift + acc_to_l0_shift, np.zeros(3), atol=1e-8)
 
 
 @pytest.mark.parametrize(
@@ -2744,6 +2777,28 @@ def test_scif_transform_tags_use_basis_relation_contract():
     assert result.convention_ssg_symbol_calibration_tol is not None
     assert result.primitive_magnetic_cell_ssg_seitz_descriptions
     assert result.acc_primitive_ssg_seitz_descriptions
+    assert result.acc_primitive_wp_chain
+    assert result.acc_primitive_ssg_ops_cartesian
+    assert result.acc_primitive_ssg_seitz_cartesian
+    assert result.acc_primitive_ssg_seitz_latex_cartesian
+    assert result.acc_primitive_ssg_ops_oriented
+    assert result.acc_primitive_ssg_seitz_oriented
+    assert result.acc_primitive_ssg_seitz_latex_oriented
+    assert len(result.acc_primitive_ssg_ops_cartesian) == len(result.acc_primitive_ssg_seitz_cartesian)
+    assert len(result.acc_primitive_ssg_ops_oriented) == len(result.acc_primitive_ssg_seitz_oriented)
+    for seitz_symbols in (
+        result.acc_primitive_ssg_seitz_cartesian,
+        result.acc_primitive_ssg_seitz_latex_cartesian,
+        result.acc_primitive_ssg_seitz_oriented,
+        result.acc_primitive_ssg_seitz_latex_oriented,
+        result.convention_ssg_seitz,
+        result.convention_ssg_seitz_latex,
+    ):
+        assert seitz_symbols
+        assert "tau" not in seitz_symbols[0]
+        assert "0,0,0" in seitz_symbols[0]
+    assert result.acc_primitive_spin_only_direction_cartesian is not None
+    assert result.acc_primitive_spin_only_direction_poscar_spin_frame is not None
     assert result.g0_standard_ssg_seitz_descriptions
     assert result.l0_standard_ssg_seitz_descriptions
     assert result.convention_ssg_seitz_descriptions

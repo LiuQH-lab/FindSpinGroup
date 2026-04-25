@@ -762,14 +762,14 @@ def format_translation_tau(translation: np.ndarray, tol: float = 1e-8) -> str:
     vec = np.mod(np.asarray(translation, dtype=float), 1.0)
     vec[np.isclose(vec, 1.0, atol=tol)] = 0.0
     values = ",".join(_format_float(float(v), tol=tol) for v in vec)
-    return f"tau_{{{values}}}"
+    return values
 
 
 def format_translation_tau_latex(translation: np.ndarray, tol: float = 1e-8) -> str:
     vec = np.mod(np.asarray(translation, dtype=float), 1.0)
     vec[np.isclose(vec, 1.0, atol=tol)] = 0.0
     values = ",".join(_format_float_latex(float(v), tol=tol) for v in vec)
-    return rf"\tau_{{({values})}}"
+    return values
 
 
 def _fold_from_hm_symbol(hm_symbol: str) -> int | None:
