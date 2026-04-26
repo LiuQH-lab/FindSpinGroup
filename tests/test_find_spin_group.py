@@ -69,7 +69,7 @@ from findspingroup.find_spin_group import (
 )
 from findspingroup.io import parse_cif_file, parse_poscar_file, parse_scif_metadata
 from findspingroup.structure import SpinSpaceGroup
-from findspingroup.structure.cell import CrystalCell, standardize_lattice
+from findspingroup.structure.cell import CrystalCell
 from findspingroup.structure.group import (
     SpinSpaceGroupOperation,
     _deduplicate_spin_space_ops,
@@ -251,6 +251,19 @@ def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypa
     assert np.asarray(payload["T_acc_primitive_to_G0std"][1], dtype=float).shape == (3,)
     assert np.asarray(payload["T_acc_primitive_to_L0std"][0], dtype=float).shape == (3, 3)
     assert np.asarray(payload["T_acc_primitive_to_L0std"][1], dtype=float).shape == (3,)
+
+
+def test_find_spin_group_acc_primitive_oriented_seitz_handles_0427_nonorthogonal_spin_frame():
+    payload = find_spin_group_acc_primitive(
+        "tests/testset/mcif_241130_no2186/0.427_Sm2Ti2O7.mcif"
+    )
+
+    assert payload["index"] == "227.2.1.2"
+    assert payload["conf"] == "Noncoplanar"
+    assert len(payload["acc_primitive_ssg_ops_oriented"]) == len(
+        payload["acc_primitive_ssg_seitz_oriented"]
+    )
+    assert any("-4" in symbol for symbol in payload["acc_primitive_ssg_seitz_oriented"])
 
 
 def test_write_ssg_operation_matrices_writes_json(tmp_path):
@@ -2948,17 +2961,32 @@ def test_find_spin_group_exposes_poscar_spin_frame_transform_and_polarizations()
     assert np.allclose(forward @ backward, np.eye(3), atol=1e-8)
     assert np.allclose(backward @ forward, np.eye(3), atol=1e-8)
 
-    expected_forward = standardize_lattice(
-        np.asarray(result.acc_primitive_magnetic_cell_detail["lattice"], dtype=float)
-    )[1]
-    assert np.allclose(forward, expected_forward, atol=1e-8)
+    assert np.allclose(forward, np.eye(3), atol=1e-8)
 
     expected_poscar_spin_polarizations = SpinSpaceGroup(result.acc_primitive_ssg_ops).transform_spin(
         forward
     ).spin_polarizations
     assert result.spin_polarizations == expected_poscar_spin_polarizations
     assert result.spin_polarizations_acc_poscar_spin_frame == expected_poscar_spin_polarizations
-    assert result.spin_polarizations_acc_poscar_spin_frame != result.spin_polarizations_acc_cartesian
+    assert result.spin_polarizations_acc_poscar_spin_frame == result.spin_polarizations_acc_cartesian
+
+
+def test_acc_primitive_poscar_preserves_core_acc_primitive_lattice_and_moments(tmp_path):
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif")
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(result.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
+
+    lattice, _positions, _elements, _occupancies, _labels, moments = parse_poscar_file(poscar_path)
+    expected_lattice = np.asarray(result.acc_primitive_magnetic_cell_detail["lattice"], dtype=float)
+    expected_moments = np.asarray(result.acc_primitive_magnetic_cell_detail["moments"], dtype=float)
+
+    assert np.allclose(lattice, expected_lattice, atol=1e-6)
+    assert sorted(map(tuple, np.round(moments, 8))) == sorted(map(tuple, np.round(expected_moments, 8)))
+    assert np.allclose(
+        np.asarray(result.acc_primitive_real_cartesian_to_poscar_spin_frame, dtype=float),
+        np.eye(3),
+        atol=1e-8,
+    )
 
 
 def test_find_spin_group_exposes_convention_nssg_views():
@@ -3005,7 +3033,7 @@ def test_find_spin_group_exposes_convention_spin_only_direction_cartesian():
 @pytest.mark.parametrize(
     ("path", "expect_identity_rotation", "expect_changed"),
     [
-        ("tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif", False, True),
+        ("tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif", True, False),
         ("examples/0.800_MnTe.mcif", True, False),
         ("tests/testset/mcif_241130_no2186/1.317_La0.25Pr0.75Co2P2.mcif", True, False),
     ],
@@ -3018,12 +3046,8 @@ def test_poscar_spin_frame_projection_behaves_consistently_across_representative
     result = find_spin_group(path)
 
     forward = np.asarray(result.acc_primitive_real_cartesian_to_poscar_spin_frame, dtype=float)
-    expected_forward = standardize_lattice(
-        np.asarray(result.acc_primitive_magnetic_cell_detail["lattice"], dtype=float)
-    )[1]
     projected = SpinSpaceGroup(result.acc_primitive_ssg_ops).transform_spin(forward).spin_polarizations
 
-    assert np.allclose(forward, expected_forward, atol=1e-8)
     assert np.allclose(forward, np.eye(3), atol=1e-8) is expect_identity_rotation
     assert result.spin_polarizations == projected
     assert projected == result.spin_polarizations_acc_poscar_spin_frame
@@ -3361,8 +3385,8 @@ def test_high_order_effective_axis_stays_aligned_with_collinear_axis_for_01073_c
 @pytest.mark.parametrize(
     ("path", "expect_identity_rotation", "expect_changed"),
     [
-        ("tests/testset/mcif_241130_no2186/1.325_PrMn2O5.mcif", False, True),
-        ("tests/testset/mcif_241130_no2186/0.13_Ca3Co2-xMnxO6.mcif", False, False),
+        ("tests/testset/mcif_241130_no2186/1.325_PrMn2O5.mcif", True, False),
+        ("tests/testset/mcif_241130_no2186/0.13_Ca3Co2-xMnxO6.mcif", True, False),
         ("examples/0.800_MnTe.mcif", True, False),
     ],
 )
@@ -3374,27 +3398,9 @@ def test_msg_spin_polarizations_poscar_projection_behaves_consistently_across_re
     result = find_spin_group(path)
 
     forward = np.asarray(result.acc_primitive_real_cartesian_to_poscar_spin_frame, dtype=float)
-    expected_forward = standardize_lattice(
-        np.asarray(result.acc_primitive_magnetic_cell_detail["lattice"], dtype=float)
-    )[1]
-    _, _, expected_msg_poscar = _build_msg_little_group_payload(
-        SpinSpaceGroup(result.acc_primitive_ssg_ops),
-        CrystalCell(
-            lattice=np.asarray(result.acc_primitive_magnetic_cell_detail["lattice"], dtype=float),
-            positions=np.asarray(result.acc_primitive_magnetic_cell_detail["positions"], dtype=float),
-            occupancies=result.acc_primitive_magnetic_cell_detail["occupancies"],
-            elements=result.acc_primitive_magnetic_cell_detail["elements"],
-            moments=np.asarray(result.acc_primitive_magnetic_cell_detail["moments"], dtype=float),
-            spin_setting="cartesian",
-        ),
-        tol=0.01,
-        spin_frame_rotation=forward,
-    )
 
-    assert np.allclose(forward, expected_forward, atol=1e-8)
     assert np.allclose(forward, np.eye(3), atol=1e-8) is expect_identity_rotation
-    assert result.msg_spin_polarizations == expected_msg_poscar
-    assert result.msg_spin_polarizations_acc_poscar_spin_frame == expected_msg_poscar
+    assert result.msg_spin_polarizations == result.msg_spin_polarizations_acc_poscar_spin_frame
     assert (
         result.msg_spin_polarizations_acc_poscar_spin_frame
         != result.msg_spin_polarizations_acc_cartesian
