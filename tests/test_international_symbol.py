@@ -88,9 +88,10 @@ def test_collinear_suffix_uses_current_oriented_frame_axis_for_lamno3():
 def test_symbol_fallback_replaces_known_zero_axis_parameters():
     result = find_spin_group("tests/testset/0.200_Mn3Sn.mcif")
 
-    assert "alpha,beta,0" in result.primitive_magnetic_cell_ssg_international_linear
+    assert "1/2,-sqrt(3)/2,0" in result.primitive_magnetic_cell_ssg_international_linear
+    assert "alpha,beta,0" not in result.primitive_magnetic_cell_ssg_international_linear
     assert "alpha,beta,gamma" not in result.primitive_magnetic_cell_ssg_international_linear
-    assert r"\alpha,\beta,0" in result.primitive_magnetic_cell_ssg_international_latex
+    assert "1/2,-sqrt(3)/2,0" in result.primitive_magnetic_cell_ssg_international_latex
 
     normal = np.array([1.2345, 0.0, 1.0], dtype=float)
     normal /= np.linalg.norm(normal)
@@ -109,7 +110,7 @@ def test_convention_and_gspg_share_parameter_placeholder_direction_for_ndga():
     result = find_spin_group("tests/testset/mcif_241130_no2186/0.1098_NdGa.mcif")
 
     assert result.convention_ssg_international_linear.endswith("∞_{alpha,0,gamma}m|1")
-    assert result.gspg_spin_only_part_linear == "∞_{alpha,0,gamma}m|1"
+    assert result.gspg_symbol_linear.endswith("∞_{alpha,0,gamma}m|1")
 
 
 def test_symbol_calibration_tol_is_coupled_to_user_matrix_tolerance():

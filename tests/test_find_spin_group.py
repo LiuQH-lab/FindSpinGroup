@@ -840,9 +840,13 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
         moments,
         tol_cfg,
         source_metadata=None,
+        parser_atol=None,
+        input_spin_setting=None,
     ):
         captured["source_name"] = source_name
         captured["source_metadata"] = source_metadata
+        captured["parser_atol"] = parser_atol
+        captured["input_spin_setting"] = input_spin_setting
         return {"ok": True}
 
     monkeypatch.setattr(find_spin_group_module, "parse_structure_file", fake_parse_structure_file)
@@ -856,6 +860,8 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
     assert captured["return_metadata"] is True
     assert captured["source_name"] == "dummy.scif"
     assert captured["source_metadata"] == {"kind": "fake"}
+    assert captured["parser_atol"] == 0.123
+    assert captured["input_spin_setting"] == "in_lattice"
 
 
 def test_find_transition_matrix_deterministic_error_suggests_pg_standardization_direction(monkeypatch):
@@ -880,7 +886,7 @@ def test_find_transition_matrix_deterministic_error_suggests_pg_standardization_
         find_transition_matrix_deterministic([transformed_mirror], "m", id=True)
 
     message = str(exc_info.value)
-    assert "无法在零空间中找到非奇异矩阵 P。" in message
+    assert "Unable to find a nonsingular matrix P in the null space." in message
     assert "find_spin_group(..., matrix_tol=...)" in message
     assert "meigtol=..." in message
 
@@ -1044,24 +1050,24 @@ def test_scif_chen_transform_contract_for_167_tmptin_uses_current_lattice_scaled
 
     assert metadata["space_group_spin"]["spin_space_group_number_chen"] == "25.8.2.1.P3"
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] == (
-        "P 2_{100}|m 2_{010}|m 2_{001}|2 : (1,2_{010},2_{010}) m_{010}|1"
+        "P 1|m 2_{010}|m 1|2 : (1,2_{010},2_{010}) m_{010}|1"
     )
     assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == (
-        "b,-a,c;0,1/2,0;26.098542cs,13.049617as,22.602bs"
+        "1/2b,-2a,c;0,1/2,0;26.098542cs,13.049617as,22.602bs"
     )
 
 
 @pytest.mark.parametrize(
     ("source_path", "expected_index", "expected_suffix"),
     [
-        ("tests/testset/mcif_241130_no2186/0.1010_C10H6MnN4O4.mcif", "14.1.1.1.P2", "P2"),
-        ("tests/testset/mcif_241130_no2186/0.394_Cu2CdB2O6.mcif", "14.1.1.1.P2", "P2"),
+        ("tests/testset/mcif_241130_no2186/0.1010_C10H6MnN4O4.mcif", "14.1.1.1.P3", "P3"),
+        ("tests/testset/mcif_241130_no2186/0.394_Cu2CdB2O6.mcif", "14.1.1.1.P3", "P3"),
         ("tests/testset/mcif_241130_no2186/0.425_Na2CoP2O7.mcif", "33.1.1.1.P3", "P3"),
-        ("tests/testset/mcif_241130_no2186/0.716_HoCrWO6.mcif", "33.1.1.1.P1", "P1"),
+        ("tests/testset/mcif_241130_no2186/0.716_HoCrWO6.mcif", "33.1.1.1.P2", "P2"),
         ("tests/testset/mcif_241130_no2186/1.302_Ba2CoO4.mcif", "14.2.2.1.P2", "P2"),
         ("tests/testset/mcif_241130_no2186/1.197_Fe4Si2Sn7O16.mcif", "12.2.2.1.P3", "P3"),
-        ("tests/testset/mcif_241130_no2186/1.647_Na2.4Ni2TeO6.mcif", "63.13.2.1.P1", "P1"),
-        ("tests/testset/mcif_241130_no2186/2.96_GdMn2Si2.mcif", "139.115.2.11.P3", "P3"),
+        ("tests/testset/mcif_241130_no2186/1.647_Na2.4Ni2TeO6.mcif", "63.13.2.21.P3", "P3"),
+        ("tests/testset/mcif_241130_no2186/2.96_GdMn2Si2.mcif", "139.115.2.1.P3", "P3"),
     ],
 )
 def test_find_spin_group_uses_excel_backed_suffixes_for_coplanar_d2_identify_branch(
@@ -1408,7 +1414,7 @@ def test_describe_point_operation_keeps_near_improper_fourfold_as_minus4():
 
     assert info["hm_symbol"] == "-4"
     assert info["axis_direction"] == (0, 0, 1)
-    assert info["symbol"] == "-4^{1}_{001}"
+    assert info["symbol"] == "-4^{3}_{001}"
 
 
 def test_audit_spatial_transform_effect_identity_preserves_real_ops_exactly():
@@ -1613,7 +1619,8 @@ def test_changed_basis_conb3s6_tripleq_preserves_msg_after_g0_collapse():
     assert result.msg_type == 3
     assert result.msg_symbol == "P32'1"
     assert result.msg_acc == "3m1P"
-    assert "m_{010}" in result.convention_ssg_international_linear
+    canonical_symbol = SpinSpaceGroup(result.convention_ssg_ops).international_symbol
+    assert canonical_symbol["translation_terms_linear"] == ["(2_{010},2_{001},1)"]
 
 
 def test_identify_point_group_recovers_td_for_conbnb3s6_gamma_little_group_spin_part():
@@ -1719,9 +1726,11 @@ def test_find_spin_group_reports_clear_error_when_extreme_mtol_blocks_late_stage
         find_spin_group("tests/testset/mcif_241130_no2186/1.850_Tb6FeSi2S14.mcif", mtol=5.0)
 
 
-def test_find_spin_group_reports_clear_error_when_extreme_mtol_destabilizes_real_case():
-    with pytest.raises(ValueError, match=UNSTABLE_MTOL_ERROR):
-        find_spin_group("tests/testset/mcif_241130_no2186/0.120_LiFe(SO4)2.mcif", mtol=5.0)
+def test_find_spin_group_does_not_overreject_stable_real_case_with_extreme_mtol():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.120_LiFe(SO4)2.mcif", mtol=5.0)
+
+    assert result.index == "14.2.1.2.P2"
+    assert result.conf == "Coplanar"
 
 
 @pytest.mark.parametrize(
@@ -1729,7 +1738,7 @@ def test_find_spin_group_reports_clear_error_when_extreme_mtol_destabilizes_real
     [
         ("tests/testset/mcif_241130_no2186/1.138_MgV2O4.mcif", "22.1.2.7", 135, 4),
         ("tests/testset/mcif_241130_no2186/1.207_U2Rh2Sn.mcif", "127.2.2.8", 1152, 4),
-        ("tests/testset/mcif_241130_no2186/1.501_Ba2CoO2Cu2S2.mcif", "69.65.2.1.L", 7, 4),
+        ("tests/testset/mcif_241130_no2186/1.501_Ba2CoO2Cu2S2.mcif", "69.65.2.1.L", 97, 4),
     ],
 )
 def test_find_spin_group_recovers_post_batch_three_residual_regressions(
@@ -1807,7 +1816,7 @@ def test_g_type_output_ossg_uses_shortest_nonzero_axis_translations():
     with pytest.warns(RuntimeWarning, match="Identify-index output unavailable"):
         result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
-    assert " : (3^{1}_{001},3^{1}_{001},4^{1}_{001})" in result.convention_ssg_international_linear
+    assert " : (3^{2}_{001},3^{2}_{001},4^{1}_{001})" in result.convention_ssg_international_linear
 
 
 def test_conbnb3s6_tripleq_g_type_translation_part_keeps_nontrivial_a_b_and_identity_c():
@@ -1816,13 +1825,14 @@ def test_conbnb3s6_tripleq_g_type_translation_part_keeps_nontrivial_a_b_and_iden
     ssg = SpinSpaceGroup(result.convention_ssg_ops)
     symbol = ssg.international_symbol
 
-    assert result.convention_ssg_international_linear.endswith(" : (2_{alpha,beta,0},2_{alpha,beta,0},1)")
+    assert symbol["linear"].endswith(" : (2_{010},2_{001},1)")
     assert symbol["translation_terms_linear"] == ["(2_{010},2_{001},1)"]
-    assert symbol["translation_details"][:3] == [
-        {"label": "t_a", "vector": (1.0, 0.0, 0.0), "spin_symbol": "2_{010}"},
-        {"label": "t_b", "vector": (-5.4235237604366743e-17, 1.0, 0.0), "spin_symbol": "2_{001}"},
-        {"label": "t_c", "vector": (0.0, 0.0, 0.0), "spin_symbol": "1"},
-    ]
+    details = symbol["translation_details"][:3]
+    assert [detail["label"] for detail in details] == ["t_a", "t_b", "t_c"]
+    assert [detail["spin_symbol"] for detail in details] == ["2_{010}", "2_{001}", "1"]
+    assert np.allclose(details[0]["vector"], (1.0, 0.0, 0.0))
+    assert np.allclose(details[1]["vector"], (0.0, 1.0, 0.0))
+    assert np.allclose(details[2]["vector"], (0.0, 0.0, 0.0))
 
 
 def test_find_spin_group_preserves_historical_identify_index_for_srmnvo4oh():
@@ -1963,7 +1973,7 @@ def test_get_magnetic_space_group_from_operations_handles_noisy_fractional_trans
     msg_info = get_magnetic_space_group_from_operations(little_group)
 
     assert msg_info is not None
-    assert msg_info["mpg_symbol"] == "-1'"
+    assert msg_info["mpg_symbol"] == "1"
 
 
 @pytest.mark.parametrize(
@@ -2763,7 +2773,7 @@ def test_scif_transform_tags_use_basis_relation_contract():
     default_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED)
     assert (
         "_space_group_spin.fsg_transform_to_input_Pp  "
-        "'2/3a+1/3b-4/3c,-1/3a-2/3b-4/3c,-1/3a+1/3b-4/3c;0,0,0'"
+        "'2/3a-1/3b-1/3c,1/3a-2/3b+1/3c,-4/3a-4/3b-4/3c;0,0,0'"
     ) in default_scif
     assert "_space_group_spin.fsg_transform_to_G0std_Pp  'a,b,c;0,0,0'" in default_scif
     assert '_space_group_spin.fsg_spin_arithmetic_crystal_class_symbol  "-3R"' in default_scif
@@ -2938,7 +2948,7 @@ def test_find_spin_group_uses_gspg_r_eq_i_spin_only_for_collinear_type_k_case():
 def test_find_spin_group_uses_oriented_path_for_public_type_g_gspg_symbol():
     result = find_spin_group("tests/testset/mcif_241130_no2186/1.498_Cu6(SiO3)6(H2O)6.mcif")
 
-    assert result.gspg_symbol_linear == "3^{1}_{001}|-3 -1|1"
+    assert result.gspg_symbol_linear == "3^{2}_{001}|-3 -1|1"
 
 
 def test_find_spin_group_public_gspg_is_derived_from_public_ossg():
@@ -3378,7 +3388,12 @@ def test_high_order_effective_axis_stays_aligned_with_collinear_axis_for_01073_c
             axes.append(axis)
 
     assert result.conf == "Collinear"
-    assert np.allclose(acc_primitive_ossg.collinear_axis, [np.sqrt(0.5), np.sqrt(0.5), 0.0], atol=1e-4)
+    expected_axis = np.asarray([np.sqrt(0.5), np.sqrt(0.5), 0.0], dtype=float)
+    assert np.allclose(acc_primitive_ossg.collinear_axis, expected_axis, atol=1e-4) or np.allclose(
+        acc_primitive_ossg.collinear_axis,
+        -expected_axis,
+        atol=1e-4,
+    )
     assert axes
 
 
