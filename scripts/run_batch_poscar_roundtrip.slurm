@@ -32,7 +32,11 @@ MTOL="${MTOL:-0.02}"
 MEIGTOL="${MEIGTOL:-0.00002}"
 MATRIX_TOL="${MATRIX_TOL:-0.01}"
 SOURCE_MODE="${SOURCE_MODE:-acc_primitive}"
+COMPARE_MODE="${COMPARE_MODE:-basic}"
 COMPARE_CONF="${COMPARE_CONF:-1}"
+COMPARE_ATOL="${COMPARE_ATOL:-1e-6}"
+COMPARE_RTOL="${COMPARE_RTOL:-1e-8}"
+MAX_DIFFERENCES_PER_CASE="${MAX_DIFFERENCES_PER_CASE:-200}"
 SAVE_POSCAR="${SAVE_POSCAR:-1}"
 QUIET="${QUIET:-1}"
 
@@ -81,6 +85,14 @@ CMD=(
   "$MATRIX_TOL"
   --source-mode
   "$SOURCE_MODE"
+  --compare-mode
+  "$COMPARE_MODE"
+  --compare-atol
+  "$COMPARE_ATOL"
+  --compare-rtol
+  "$COMPARE_RTOL"
+  --max-differences-per-case
+  "$MAX_DIFFERENCES_PER_CASE"
 )
 
 if [[ "$COMPARE_CONF" == "0" ]]; then
@@ -101,7 +113,11 @@ echo "Output root : $OUTPUT_ROOT"
 echo "Run dir     : $OUTPUT_DIR"
 echo "Tolerances  : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRIX_TOL"
 echo "Source mode : $SOURCE_MODE"
+echo "Compare mode: $COMPARE_MODE"
 echo "Compare conf: $COMPARE_CONF"
+echo "Compare atol: $COMPARE_ATOL"
+echo "Compare rtol: $COMPARE_RTOL"
+echo "Max diffs   : $MAX_DIFFERENCES_PER_CASE"
 echo "Save poscar : $SAVE_POSCAR"
 echo "Quiet       : $QUIET"
 echo "Python      : $PYTHON_BIN"

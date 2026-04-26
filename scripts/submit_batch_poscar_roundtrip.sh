@@ -22,7 +22,11 @@ Environment overrides:
   MEIGTOL      current: ${MEIGTOL:-0.00002}
   MATRIX_TOL   current: ${MATRIX_TOL:-0.01}
   SOURCE_MODE  current: ${SOURCE_MODE:-acc_primitive}
+  COMPARE_MODE current: ${COMPARE_MODE:-basic}
   COMPARE_CONF current: ${COMPARE_CONF:-1}
+  COMPARE_ATOL current: ${COMPARE_ATOL:-1e-6}
+  COMPARE_RTOL current: ${COMPARE_RTOL:-1e-8}
+  MAX_DIFFERENCES_PER_CASE current: ${MAX_DIFFERENCES_PER_CASE:-200}
   SAVE_POSCAR  current: ${SAVE_POSCAR:-1}
   QUIET        current: ${QUIET:-1}
   SBATCH_BIN   current: ${SBATCH_BIN:-sbatch}
@@ -43,7 +47,11 @@ MTOL="${MTOL:-0.02}"
 MEIGTOL="${MEIGTOL:-0.00002}"
 MATRIX_TOL="${MATRIX_TOL:-0.01}"
 SOURCE_MODE="${SOURCE_MODE:-acc_primitive}"
+COMPARE_MODE="${COMPARE_MODE:-basic}"
 COMPARE_CONF="${COMPARE_CONF:-1}"
+COMPARE_ATOL="${COMPARE_ATOL:-1e-6}"
+COMPARE_RTOL="${COMPARE_RTOL:-1e-8}"
+MAX_DIFFERENCES_PER_CASE="${MAX_DIFFERENCES_PER_CASE:-200}"
 SAVE_POSCAR="${SAVE_POSCAR:-1}"
 QUIET="${QUIET:-1}"
 
@@ -78,7 +86,11 @@ echo "Input dir     : $INPUT_DIR"
 echo "Output root   : $OUTPUT_ROOT"
 echo "Tolerances    : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRIX_TOL"
 echo "Source mode   : $SOURCE_MODE"
+echo "Compare mode  : $COMPARE_MODE"
 echo "Compare conf  : $COMPARE_CONF"
+echo "Compare atol  : $COMPARE_ATOL"
+echo "Compare rtol  : $COMPARE_RTOL"
+echo "Max diffs/case: $MAX_DIFFERENCES_PER_CASE"
 echo "Save poscar   : $SAVE_POSCAR"
 echo "Quiet         : $QUIET"
 
@@ -98,7 +110,11 @@ MTOL="$MTOL" \
 MEIGTOL="$MEIGTOL" \
 MATRIX_TOL="$MATRIX_TOL" \
 SOURCE_MODE="$SOURCE_MODE" \
+COMPARE_MODE="$COMPARE_MODE" \
 COMPARE_CONF="$COMPARE_CONF" \
+COMPARE_ATOL="$COMPARE_ATOL" \
+COMPARE_RTOL="$COMPARE_RTOL" \
+MAX_DIFFERENCES_PER_CASE="$MAX_DIFFERENCES_PER_CASE" \
 SAVE_POSCAR="$SAVE_POSCAR" \
 QUIET="$QUIET" \
 FSG_REPO_ROOT="$REPO_ROOT" \

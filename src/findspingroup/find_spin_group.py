@@ -33,7 +33,6 @@ from findspingroup.structure.group import integer_points_in_new_cell, op_key
 from findspingroup.structure.cell import (
     CrystalCell,
     calculate_vector_coordinates_from_latticefactors,
-    standardize_lattice,
 )
 from findspingroup.data.PG_SYMBOL import PG_IF_HEX_MAPPING, SG_HALL_MAPPING
 from findspingroup.utils.matrix_utils import rref_with_tolerance, normalize_vector_to_zero
@@ -47,7 +46,11 @@ from findspingroup.utils.space_group_flags import (
     space_group_is_chiral,
     space_group_is_polar,
 )
-from findspingroup.utils.seitz_symbol import canonicalize_group_seitz_descriptions
+from findspingroup.utils.seitz_symbol import (
+    calibrated_symbol_tol,
+    canonicalize_group_seitz_descriptions,
+    describe_spin_space_operation,
+)
 from findspingroup.version import __version__
 
 
@@ -1241,8 +1244,8 @@ def _cartesianize_similarity(matrix: np.ndarray, lattice_col: np.ndarray) -> np.
 
 
 def _poscar_spin_frame_rotation(cell: CrystalCell) -> np.ndarray:
-    _, rotation = standardize_lattice(np.asarray(cell.lattice_matrix, dtype=float))
-    return np.asarray(rotation, dtype=float)
+    # POSCAR export preserves the acc-primitive Cartesian spin frame.
+    return np.eye(3)
 
 
 def _ossg_oriented_spin_frame_ssg(ssg: SpinSpaceGroup, cell: CrystalCell) -> SpinSpaceGroup:
@@ -1432,6 +1435,49 @@ def _serialize_op_list_seitz_symbols(
     return (
         [item["symbol"] for item in canonicalized],
         [item["symbol_latex"] for item in canonicalized],
+    )
+
+
+def _seitz_descriptions_with_cartesian_spin_symbols(
+    ssg: SpinSpaceGroup,
+    *,
+    spin_to_cartesian: np.ndarray,
+    tol: float,
+    max_order: int = 120,
+    max_axis_denom: int = 12,
+) -> list[dict]:
+    """Describe ops whose spin matrices are expressed in a non-orthonormal frame.
+
+    The operation matrices are kept in their original frame for output.  For the
+    spin part of the Seitz symbol, however, finite-order recognition must use the
+    Euclidean Cartesian representation; otherwise a valid non-orthonormal-basis
+    rotation can fail the order probe or get an unstable axis label.
+    """
+    symbol_tol = calibrated_symbol_tol(tol)
+    spin_to_cartesian = np.asarray(spin_to_cartesian, dtype=float)
+    cartesian_to_spin = np.linalg.inv(spin_to_cartesian)
+    descriptions = [
+        describe_spin_space_operation(
+            spin_to_cartesian @ np.asarray(op.spin_rotation, dtype=float) @ cartesian_to_spin,
+            op.rotation,
+            op.translation,
+            tol=symbol_tol,
+            max_order=max_order,
+            max_axis_denom=max_axis_denom,
+        )
+        for op in ssg.ops
+    ]
+    return canonicalize_group_seitz_descriptions(
+        descriptions,
+        tol=symbol_tol,
+        max_axis_denom=max_axis_denom,
+    )
+
+
+def _seitz_symbols_from_descriptions(descriptions: list[dict]) -> tuple[list[str], list[str]]:
+    return (
+        [item["symbol"] for item in descriptions],
+        [item["symbol_latex"] for item in descriptions],
     )
 
 
@@ -3230,6 +3276,15 @@ def _find_spin_group_from_parsed(
         convention_nssg_ops,
         tol=public_ossg_ssg.symbol_calibration_tol,
     )
+    acc_primitive_oriented_seitz_descriptions = _seitz_descriptions_with_cartesian_spin_symbols(
+        acc_primitive_ossg,
+        spin_to_cartesian=_lattice_column_matrix(acc_primitive_output_cell),
+        tol=acc_primitive_ossg.symbol_calibration_tol,
+    )
+    (
+        acc_primitive_oriented_seitz,
+        acc_primitive_oriented_seitz_latex,
+    ) = _seitz_symbols_from_descriptions(acc_primitive_oriented_seitz_descriptions)
 
     scif_export_targets = _build_scif_export_targets(
         input_cell=input_cell,
@@ -3425,8 +3480,8 @@ def _find_spin_group_from_parsed(
                 'acc_primitive_ssg_ops_oriented': _serialize_ssg_operation_matrices(
                     list(acc_primitive_ossg.ops)
                 ),
-                'acc_primitive_ssg_seitz_oriented': acc_primitive_ossg.seitz_symbols,
-                'acc_primitive_ssg_seitz_latex_oriented': acc_primitive_ossg.seitz_symbols_latex,
+                'acc_primitive_ssg_seitz_oriented': acc_primitive_oriented_seitz,
+                'acc_primitive_ssg_seitz_latex_oriented': acc_primitive_oriented_seitz_latex,
                 'acc_primitive_spin_only_direction_cartesian': _format_spin_only_direction(
                     acc_primitive_output_ssg.sog_direction
                 ),
@@ -3911,6 +3966,15 @@ def _find_spin_group_acc_primitive_from_parsed(
         acc_primitive_ssg,
         tol_cfg,
     )
+    acc_primitive_oriented_seitz_descriptions = _seitz_descriptions_with_cartesian_spin_symbols(
+        acc_primitive_ossg,
+        spin_to_cartesian=_lattice_column_matrix(acc_primitive_cell),
+        tol=acc_primitive_ossg.symbol_calibration_tol,
+    )
+    (
+        acc_primitive_oriented_seitz,
+        acc_primitive_oriented_seitz_latex,
+    ) = _seitz_symbols_from_descriptions(acc_primitive_oriented_seitz_descriptions)
 
     return {
         "index": identify_info,
@@ -3932,8 +3996,8 @@ def _find_spin_group_acc_primitive_from_parsed(
         "acc_primitive_ssg_ops_oriented": _serialize_ssg_operation_matrices(
             list(acc_primitive_ossg.ops)
         ),
-        "acc_primitive_ssg_seitz_oriented": acc_primitive_ossg.seitz_symbols,
-        "acc_primitive_ssg_seitz_latex_oriented": acc_primitive_ossg.seitz_symbols_latex,
+        "acc_primitive_ssg_seitz_oriented": acc_primitive_oriented_seitz,
+        "acc_primitive_ssg_seitz_latex_oriented": acc_primitive_oriented_seitz_latex,
         "acc_primitive_poscar_spin_frame_setting": ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING,
         "acc_primitive_poscar_spin_frame_ssg_operation_matrices": _serialize_ssg_operation_matrices(
             list(acc_primitive_ssg_in_poscar_spin_frame.ops)

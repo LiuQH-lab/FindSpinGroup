@@ -852,13 +852,12 @@ class CrystalCell:
 
         information = filename + f'#FINDSPINGROUP(version{__version__})'
         scale = '1'
-        std_lattice , std_rotation = standardize_lattice(cell[0])
-        lattice = '\n'.join(' '.join(map(str, i.round(6))) for i in std_lattice)
+        lattice = '\n'.join(' '.join(map(str, i.round(6))) for i in cell[0])
         species = ' '.join(atom_name[1:])
         atom_number = ' '.join(map(str, count[1:]))
         cartesian = 'direct'
         positions = '\n'.join(' '.join(f'{v:.8f}' for v in i) for i in cell[1])
         magmom = '# MAGMOM=' + ' '.join(
-            ' '.join(f'{x:.8f}' for x in (std_rotation @ i)) for i in cell[3]
+            ' '.join(f'{x:.8f}' for x in i) for i in cell[3]
         )
         return '\n'.join([information, scale, lattice, species, atom_number, cartesian, positions, magmom])
