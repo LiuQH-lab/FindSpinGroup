@@ -966,8 +966,8 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_conbs_tripleq_defau
     result = find_spin_group("examples/CoNb3S6_tripleQ.mcif")
     metadata = parse_scif_metadata(source_text=result.scif)
 
-    assert metadata["atom_site_spin_moment"]["symmform_uvw"] == ["u,-u,-0.612408u"]
-    assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,-0.592417u"]
+    assert metadata["atom_site_spin_moment"]["symmform_uvw"] == ["u,-u,0.612416u"]
+    assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,0.592425u"]
 
 
 def test_generated_scif_transform_to_g0std_maps_current_setting_to_g0std_equivalent_ops():

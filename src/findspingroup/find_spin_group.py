@@ -1769,7 +1769,8 @@ def _build_candidate_transform_chen_pp_abcs_hex_spatial_cubic_spin_from_identify
       ordered/oriented according to the identify-index point-group map
 
     `current_space_to_input_basis` is the row-matrix whose rows are the input
-    cubic basis vectors expressed in the current emitted spatial basis.
+    cubic basis vectors expressed in the current emitted spatial basis. The spin
+    basis construction uses the corresponding column basis.
     `identify_point_group_transformation` is the identify-index 3x3 point-group
     transformation returned for the Chen equivalent-map resolution.
     """
@@ -1778,9 +1779,7 @@ def _build_candidate_transform_chen_pp_abcs_hex_spatial_cubic_spin_from_identify
         identify_point_group_transformation,
         dtype=float,
     )
-    spin_basis_current_to_chen = (
-        identify_point_group_transformation @ np.linalg.inv(current_space_to_input_basis)
-    )
+    spin_basis_current_to_chen = identify_point_group_transformation @ current_space_to_input_basis.T
     space_basis_current_to_chen = np.eye(3)
     origin_current_to_chen = np.zeros(3)
     return {
