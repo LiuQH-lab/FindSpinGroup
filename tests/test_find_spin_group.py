@@ -51,9 +51,9 @@ from findspingroup.core.identify_symmetry_from_ops import (
 from findspingroup.core import Molecule, PointGroupAnalyzer
 from findspingroup.core.pg_analyzer import SymmOp, generate_full_symmops
 from findspingroup.find_spin_group import (
-    SCIF_CELL_MODE_G0STD_ORIENTED,
-    SCIF_CELL_MODE_INPUT,
+    SCIF_CELL_MODE_INPUT_IDENTIFIED,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
+    SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     _canonicalize_input_to_standard_setting,
     audit_spatial_transform_effect,
     _build_candidate_transform_chen_pp_abcs_hex_spatial_cubic_spin_from_identify,
@@ -106,6 +106,23 @@ def _serialize_gspg_pairs(ops):
         ]
         for spin_rotation, space_rotation in ops
     ]
+
+
+def _assert_setting_transform_inverse(forward, backward):
+    forward_matrix = np.asarray(forward[0], dtype=float)
+    forward_shift = np.asarray(forward[1], dtype=float)
+    backward_matrix = np.asarray(backward[0], dtype=float)
+    backward_shift = np.asarray(backward[1], dtype=float)
+
+    assert forward_matrix.shape == (3, 3)
+    assert forward_shift.shape == (3,)
+    assert backward_matrix.shape == (3, 3)
+    assert backward_shift.shape == (3,)
+    assert np.allclose(backward_matrix @ forward_matrix, np.eye(3), atol=1e-8)
+
+    residual_shift = backward_matrix @ forward_shift + backward_shift
+    residual_shift = residual_shift - np.round(residual_shift)
+    assert np.allclose(residual_shift, np.zeros(3), atol=1e-8)
 
 
 def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
@@ -1100,7 +1117,7 @@ def test_build_candidate_transform_chen_pp_abcs_for_324_hex_spatial_cubic_spin()
         ),
     )
 
-    assert candidate["from_spatial_setting"] == "current_scif_g0std_oriented_hex"
+    assert candidate["from_spatial_setting"] == "current_scif_ssg_convention_oriented_hex"
     assert candidate["to_spatial_setting"] == "chen_hex_spatial"
     assert candidate["to_spin_frame"] == "chen_cubic_spin_basis"
     assert candidate["transform_Chen_Pp_abcs"] == (
@@ -2248,6 +2265,113 @@ def test_find_spin_group_exposes_standard_setting_payloads_for_web_app():
     assert np.allclose(acc_to_l0_matrix @ l0_to_acc_shift + acc_to_l0_shift, np.zeros(3), atol=1e-8)
 
 
+def test_find_spin_group_exposes_input_setting_payload_for_magnetic_primitive_poscar(tmp_path):
+    source_result = find_spin_group("examples/0.800_MnTe.mcif")
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(source_result.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
+
+    result = find_spin_group(str(poscar_path))
+
+    assert result.input_cell_detail is not None
+    assert not hasattr(result, "input_cell_detail_oriented")
+    assert result.input_ssg_may_be_incomplete is False
+    assert result.input_setting_warning is None
+    assert result.input_wp_chain is not None
+    assert result.input_ssg_ops_spin_cartesian
+    assert result.input_ssg_seitz_latex_spin_cartesian
+    assert result.input_ssg_ops_spin_oriented
+    assert result.input_ssg_seitz_latex_spin_oriented
+    assert len(result.input_ssg_ops_spin_cartesian) == len(
+        result.input_ssg_seitz_latex_spin_cartesian
+    )
+    assert len(result.input_ssg_ops_spin_oriented) == len(
+        result.input_ssg_seitz_latex_spin_oriented
+    )
+    assert isinstance(result.input_spin_only_direction_spin_cartesian, str)
+    assert isinstance(result.input_spin_only_direction_spin_oriented, str)
+
+    _assert_setting_transform_inverse(result.T_input_to_G0std, result.T_G0std_to_input)
+    _assert_setting_transform_inverse(result.T_input_to_L0std, result.T_L0std_to_input)
+    _assert_setting_transform_inverse(
+        result.T_input_to_acc_primitive,
+        result.T_acc_primitive_to_input,
+    )
+    _assert_setting_transform_inverse(
+        result.T_input_to_convention,
+        result.T_convention_to_input,
+    )
+
+
+def test_find_spin_group_input_setting_payload_allows_nonprimitive_when_ssg_matches_true_setting():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif")
+
+    assert result.input_cell_detail is not None
+    assert result.input_ssg_may_be_incomplete is False
+    assert not hasattr(result, "input_ssg_index")
+    assert result.input_setting_warning is None
+    assert result.input_wp_chain is not None
+    assert result.input_ssg_ops_spin_cartesian
+    assert result.input_ssg_seitz_latex_spin_cartesian
+    assert result.input_ssg_ops_spin_oriented
+    assert result.input_ssg_seitz_latex_spin_oriented
+    assert len(result.input_ssg_ops_spin_cartesian) == len(
+        result.input_ssg_seitz_latex_spin_cartesian
+    )
+    assert len(result.input_ssg_ops_spin_oriented) == len(
+        result.input_ssg_seitz_latex_spin_oriented
+    )
+    _assert_setting_transform_inverse(result.T_input_to_G0std, result.T_G0std_to_input)
+    _assert_setting_transform_inverse(result.T_input_to_L0std, result.T_L0std_to_input)
+    _assert_setting_transform_inverse(
+        result.T_input_to_acc_primitive,
+        result.T_acc_primitive_to_input,
+    )
+    _assert_setting_transform_inverse(
+        result.T_input_to_convention,
+        result.T_convention_to_input,
+    )
+
+
+def test_find_spin_group_input_setting_payload_warns_when_input_ssg_differs_from_true_setting():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.396_MnPtGa.mcif")
+
+    assert result.input_cell_detail is not None
+    assert result.input_ssg_may_be_incomplete is True
+    assert result.input_setting_warning == (
+        "Input-cell SSG differs from the magnetic-primitive SSG transformed "
+        "to the input setting; input_ssg_index=63.12.1.2.P2."
+    )
+    assert result.input_wp_chain is None
+    assert result.input_ssg_ops_spin_cartesian
+    assert result.input_ssg_seitz_latex_spin_cartesian
+    assert result.input_ssg_ops_spin_oriented
+    assert result.input_ssg_seitz_latex_spin_oriented
+
+    input_identified_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_IDENTIFIED)
+    assert '_space_group_spin.number_Chen_Liu  "63.12.1.2.P2"' in input_identified_scif
+    assert (
+        '_space_group_spin.fsg_input_setting_warning  '
+        '"Input-cell SSG differs from the magnetic-primitive SSG transformed '
+        'to the input setting; input_ssg_index=63.12.1.2.P2."'
+    ) in input_identified_scif
+    assert input_identified_scif.index("# repo-local FINDSPINGROUP extensions") < input_identified_scif.index(
+        "_space_group_spin.fsg_input_setting_warning"
+    ) < input_identified_scif.index("_space_group_spin.fsg_oriented_spin_space_group_name_linear")
+    for suppressed_tag in [
+        "_space_group_spin.fsg_G0_number",
+        "_space_group_spin.fsg_L0_number",
+        "_space_group_spin.fsg_it",
+        "_space_group_spin.fsg_ik",
+        "_space_group_spin.fsg_spin_space_point_group_name",
+        "_space_group_spin.fsg_magnetic_phase",
+        "_space_group_spin.fsg_spin_arithmetic_crystal_class_symbol",
+        "_space_group_spin.fsg_magnetic_arithmetic_crystal_class_symbol",
+    ]:
+        assert suppressed_tag not in input_identified_scif
+    with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
+        result.to_scif(cell_mode="input")
+
+
 @pytest.mark.parametrize(
     (
         "path",
@@ -2770,7 +2894,7 @@ def test_find_spin_group_exposes_input_and_public_magnetic_primitive_layers():
 def test_scif_transform_tags_use_basis_relation_contract():
     result = find_spin_group("tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif")
 
-    default_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED)
+    default_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED)
     assert (
         "_space_group_spin.fsg_transform_to_input_Pp  "
         "'2/3a-1/3b-1/3c,1/3a-2/3b+1/3c,-4/3a-4/3b-4/3c;0,0,0'"
@@ -2779,8 +2903,12 @@ def test_scif_transform_tags_use_basis_relation_contract():
     assert '_space_group_spin.fsg_spin_arithmetic_crystal_class_symbol  "-3R"' in default_scif
     assert '_space_group_spin.fsg_magnetic_arithmetic_crystal_class_symbol  "-3R"' in default_scif
 
-    input_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT)
-    assert "_space_group_spin.fsg_transform_to_input_Pp  'a,b,c;0,0,0'" in input_scif
+    with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
+        result.to_scif(cell_mode="input")
+
+    input_identified_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_IDENTIFIED)
+    assert "_space_group_spin.fsg_transform_to_input_Pp  'a,b,c;0,0,0'" in input_identified_scif
+    assert "_space_group_spin.fsg_input_setting_warning" not in input_identified_scif
 
     magnetic_primitive_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE)
     assert (

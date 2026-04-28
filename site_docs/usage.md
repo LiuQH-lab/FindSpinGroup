@@ -43,6 +43,8 @@ Commonly used `MagSymmetryResult` attributes include:
 | `spin_polarizations` | Symmetry-allowed spin-polarization components at sampled k points. |
 | `msg_spin_polarizations` | MSG-derived spin-polarization constraints. |
 | `scif` | Generated `.scif` text. |
+| `scif_outputs` | Generated `.scif` text keyed by cell mode. |
+| `scif_cell_modes` | Available `.scif` output modes. |
 | `tensor_outputs` | Symmetry-constrained tensor-analysis outputs. |
 
 Example:
@@ -60,6 +62,17 @@ print("KPOINTS setting:", result.KPOINTS_setting)
 
 For exploratory scripting, `result.to_dict()` exposes the current attribute
 dictionary.
+
+SCIF output modes:
+
+| Mode | Meaning |
+| --- | --- |
+| `ssg_convention_oriented` | Default public OSSG convention output. |
+| `magnetic_primitive` | Magnetic primitive-cell output. |
+| `input_identified` | Direct input-cell identified output; may include `fsg_input_setting_warning` if input-cell symmetry is incomplete. |
+
+There is no separate `input` SCIF mode. If the input cell is already the same
+setting as the OSSG convention output, use `ssg_convention_oriented`.
 
 ## Lightweight Summary: `find_spin_group_basic`
 
