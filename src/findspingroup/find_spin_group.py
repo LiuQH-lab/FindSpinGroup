@@ -112,9 +112,9 @@ ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING = "acc_primitive_poscar_spin_frame"
 OSSG_ORIENTED_SPIN_FRAME_SETTING = "ossg_oriented_spin_frame"
 G0_STANDARD_SETTING = "G0std"
 L0_STANDARD_SETTING = "L0std"
-SCIF_CELL_MODE_INPUT = "input"
+SCIF_CELL_MODE_INPUT_IDENTIFIED = "input_identified"
 SCIF_CELL_MODE_MAGNETIC_PRIMITIVE = "magnetic_primitive"
-SCIF_CELL_MODE_G0STD_ORIENTED = "g0std_oriented"
+SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED = "ssg_convention_oriented"
 def _should_degrade_identify_index_error(error: Exception) -> bool:
     message = str(error)
     return (
@@ -150,6 +150,41 @@ def _deduplicate_ops_with_exact_translation(
             continue
         unique_ops.append(op)
     return unique_ops
+
+
+def _spin_space_group_operation_sets_match(left_ops, right_ops, *, tol: float) -> bool:
+    left = sorted(list(left_ops), key=op_key)
+    right = sorted(list(right_ops), key=op_key)
+    if len(left) != len(right):
+        return False
+
+    unmatched = list(right)
+    for left_op in left:
+        for index, right_op in enumerate(unmatched):
+            if left_op.is_same_with(right_op, atol=tol):
+                unmatched.pop(index)
+                break
+        else:
+            return False
+    return True
+
+
+def _diagnostic_ssg_index(file_name: str, ssg: SpinSpaceGroup, *, tol: float) -> str:
+    try:
+        return ssg.identify_index(file_name, tol=tol)
+    except ValueError as exc:
+        if not _should_degrade_identify_index_error(exc):
+            raise
+        return ssg.index
+
+
+def _is_identity_setting_transform(transform: tuple[np.ndarray, np.ndarray], *, tol: float) -> bool:
+    matrix = np.asarray(transform[0], dtype=float)
+    shift = np.asarray(transform[1], dtype=float)
+    if not np.allclose(matrix, np.eye(3), atol=tol):
+        return False
+    wrapped_shift = shift - np.round(shift)
+    return bool(np.allclose(wrapped_shift, np.zeros(3), atol=tol))
 
 
 def _deduplicate_translation_vectors_exact(translations, tol: float) -> list[np.ndarray]:
@@ -542,6 +577,7 @@ class MagSymmetryResult:
         self.source_structure_metadata = symmetry.get('source_structure_metadata', None)
         self.source_parent_space_group = symmetry.get('source_parent_space_group', None)
         self.source_cell_parameter_strings = symmetry.get('source_cell_parameter_strings', None)
+        self.input_cell_detail = cell.get('input_cell_detail', None)
 
         self.input_magnetic_primitive_cell = cell.get('input_magnetic_primitive_cell', None)
         self.input_magnetic_primitive_cell_setting = cell.get(
@@ -584,12 +620,12 @@ class MagSymmetryResult:
         self.scif_outputs = cell.get(
             'scif_outputs',
             {
-                SCIF_CELL_MODE_G0STD_ORIENTED: self.scif,
+                SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED: self.scif,
             },
         )
         self.scif_cell_modes = cell.get(
             'scif_cell_modes',
-            [SCIF_CELL_MODE_G0STD_ORIENTED],
+            [SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED],
         )
         self.primitive_magnetic_cell_detail = cell.get(
             'primitive_magnetic_cell_detail',
@@ -844,6 +880,39 @@ class MagSymmetryResult:
             'acc_primitive_spin_only_direction_poscar_spin_frame',
             "",
         )
+        self.input_ssg_ops_spin_cartesian = symmetry.get(
+            'input_ssg_ops_spin_cartesian',
+            None,
+        )
+        self.input_ssg_seitz_latex_spin_cartesian = symmetry.get(
+            'input_ssg_seitz_latex_spin_cartesian',
+            None,
+        )
+        self.input_ssg_ops_spin_oriented = symmetry.get(
+            'input_ssg_ops_spin_oriented',
+            None,
+        )
+        self.input_ssg_seitz_latex_spin_oriented = symmetry.get(
+            'input_ssg_seitz_latex_spin_oriented',
+            None,
+        )
+        self.input_wp_chain = cell.get('input_wp_chain', None)
+        self.input_spin_only_direction_spin_cartesian = symmetry.get(
+            'input_spin_only_direction_spin_cartesian',
+            "",
+        )
+        self.input_spin_only_direction_spin_oriented = symmetry.get(
+            'input_spin_only_direction_spin_oriented',
+            "",
+        )
+        self.input_ssg_may_be_incomplete = symmetry.get(
+            'input_ssg_may_be_incomplete',
+            None,
+        )
+        self.input_setting_warning = symmetry.get(
+            'input_setting_warning',
+            None,
+        )
         self.acc_conventional_ssg_ops = symmetry.get('acc_conventional_ssg_ops', None)
         self.acc_conventional_ssg_setting = symmetry.get('acc_conventional_ssg_setting', None)
         self.acc_conventional_ssg_seitz = symmetry.get('acc_conventional_ssg_seitz', None)
@@ -1026,6 +1095,10 @@ class MagSymmetryResult:
             None,
         )
         self.T_input_to_convention = symmetry.get('T_input_to_convention', None)
+        self.T_G0std_to_input = symmetry.get('T_G0std_to_input', None)
+        self.T_L0std_to_input = symmetry.get('T_L0std_to_input', None)
+        self.T_acc_primitive_to_input = symmetry.get('T_acc_primitive_to_input', None)
+        self.T_convention_to_input = symmetry.get('T_convention_to_input', None)
         self.T_convention_to_acc_primitive = symmetry.get(
             'T_convention_to_acc_primitive',
             None,
@@ -1138,7 +1211,7 @@ class MagSymmetryResult:
     def to_scif(
         self,
         *,
-        cell_mode: str = SCIF_CELL_MODE_G0STD_ORIENTED,
+        cell_mode: str = SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ) -> str:
         try:
             return self.scif_outputs[cell_mode]
@@ -1783,7 +1856,7 @@ def _build_candidate_transform_chen_pp_abcs_hex_spatial_cubic_spin_from_identify
     space_basis_current_to_chen = np.eye(3)
     origin_current_to_chen = np.zeros(3)
     return {
-        "from_spatial_setting": "current_scif_g0std_oriented_hex",
+        "from_spatial_setting": "current_scif_ssg_convention_oriented_hex",
         "from_spin_frame": "current_file_spinframe_(as,bs,cs)",
         "to_spatial_setting": "chen_hex_spatial",
         "to_spin_frame": "chen_cubic_spin_basis",
@@ -1814,31 +1887,19 @@ def _spin_transform_to_oriented_abc(cell: CrystalCell) -> np.ndarray:
 def _build_scif_export_targets(
     *,
     input_cell: CrystalCell,
-    magnetic_primitive_cell: CrystalCell,
-    ssg_primitive: SpinSpaceGroup,
     acc_magnetic_primitive_cell: CrystalCell,
     acc_magnetic_primitive_ssg: SpinSpaceGroup,
     G0std_cell: CrystalCell,
     G0std_ssg: SpinSpaceGroup,
-    L0std_cell: CrystalCell,
-    L0std_ssg: SpinSpaceGroup,
-    transformation_input_to_primitive: tuple[np.ndarray, np.ndarray],
     transformation_input_to_acc_primitive: tuple[np.ndarray, np.ndarray],
     transformation_input_to_G0std: tuple[np.ndarray, np.ndarray],
     transformation_input_to_L0std: tuple[np.ndarray, np.ndarray],
+    input_identified_ssg: SpinSpaceGroup | None = None,
 ):
-    primitive_to_input = _invert_setting_transform(*transformation_input_to_primitive)
-    input_ssg = ssg_primitive.transform(*primitive_to_input)
-
-    primitive_in_lattice = _spin_transform_to_in_lattice(magnetic_primitive_cell)
     acc_primitive_in_lattice = _spin_transform_to_in_lattice(acc_magnetic_primitive_cell)
     g0std_in_lattice = _spin_transform_to_in_lattice(G0std_cell)
-    l0std_in_lattice = _spin_transform_to_in_lattice(L0std_cell)
-    input_in_lattice = _spin_transform_to_in_lattice(input_cell)
-    primitive_true_abc = _spin_transform_to_oriented_abc(magnetic_primitive_cell)
     acc_primitive_true_abc = _spin_transform_to_oriented_abc(acc_magnetic_primitive_cell)
     g0std_true_abc = _spin_transform_to_oriented_abc(G0std_cell)
-    l0std_true_abc = _spin_transform_to_oriented_abc(L0std_cell)
     input_true_abc = _spin_transform_to_oriented_abc(input_cell)
 
     def _basis_tag_transforms_for_export(
@@ -1866,7 +1927,7 @@ def _build_scif_export_targets(
             ),
         }
 
-    return {
+    targets = {
         SCIF_CELL_MODE_MAGNETIC_PRIMITIVE: {
             "export_cell": acc_magnetic_primitive_cell.transform_spin(acc_primitive_in_lattice, "in_lattice"),
             "export_ssg": acc_magnetic_primitive_ssg.transform_spin(acc_primitive_true_abc),
@@ -1876,7 +1937,7 @@ def _build_scif_export_targets(
             ),
             "setting_name": ACC_PRIMITIVE_SETTING,
         },
-        SCIF_CELL_MODE_G0STD_ORIENTED: {
+        SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED: {
             "export_cell": G0std_cell.transform_spin(g0std_in_lattice, "in_lattice"),
             "export_ssg": G0std_ssg.transform_spin(g0std_true_abc),
             "transform_input_to_export": transformation_input_to_G0std,
@@ -1885,16 +1946,18 @@ def _build_scif_export_targets(
             ),
             "setting_name": G0_STANDARD_SETTING,
         },
-        SCIF_CELL_MODE_INPUT: {
+    }
+    if input_identified_ssg is not None:
+        targets[SCIF_CELL_MODE_INPUT_IDENTIFIED] = {
             "export_cell": input_cell,
-            "export_ssg": input_ssg.transform_spin(input_true_abc),
+            "export_ssg": input_identified_ssg.transform_spin(input_true_abc),
             "transform_input_to_export": (np.eye(3), np.zeros(3)),
             "basis_tag_transforms": _basis_tag_transforms_for_export(
                 (np.eye(3), np.zeros(3)),
             ),
-            "setting_name": "input",
-        },
-    }
+            "setting_name": "input_identified",
+        }
+    return targets
 
 
 def _identify_parent_space_group_for_export_cell(
@@ -3127,6 +3190,10 @@ def _find_spin_group_from_parsed(
         transformation_primitive_to_acc_primitive[0],
         transformation_primitive_to_acc_primitive[1],
     )
+    transformation_primitive_to_input = _invert_setting_transform(
+        transformation_input_to_primitive[0],
+        transformation_input_to_primitive[1],
+    )
     transformation_G0std_to_primitive = _compose_setting_transform(
         transformation_input_to_G0std[0],
         transformation_input_to_G0std[1],
@@ -3217,6 +3284,48 @@ def _find_spin_group_from_parsed(
     convention_to_acc_conventional_audit = selected_standard_to_acc_conventional_audit
     convention_to_acc_conventional_label = selected_standard_to_acc_conventional_label
 
+    input_cell_is_convention = _is_identity_setting_transform(
+        transformation_input_to_convention,
+        tol=tol_cfg.m_matrix_tol,
+    )
+    input_setting_warning = None
+    if input_cell_is_convention:
+        input_setting_ssg = convention_ssg
+        input_setting_matches_true_ssg = True
+        input_setting_identify_info = identify_info
+        input_setting_identify_index_details = identify_index_details
+    else:
+        true_input_setting_ssg = ssg_primitive.transform(*transformation_primitive_to_input)
+        input_identify_result = identify_spin_space_group_result(
+            input_cell_cartesian,
+            find_primitive=False,
+            tol=tol_cfg,
+        )
+        input_setting_ssg = input_identify_result.ssg
+        input_setting_matches_true_ssg = _spin_space_group_operation_sets_match(
+            input_setting_ssg.ops,
+            true_input_setting_ssg.ops,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        if input_setting_matches_true_ssg:
+            input_setting_identify_info = identify_info
+            input_setting_identify_index_details = identify_index_details
+        else:
+            input_setting_identify_info = _diagnostic_ssg_index(
+                source_name,
+                input_setting_ssg,
+                tol=tol_cfg.m_matrix_tol,
+            )
+            input_setting_identify_index_details = None
+            input_setting_warning = (
+                "Input-cell SSG differs from the magnetic-primitive SSG transformed "
+                f"to the input setting; input_ssg_index={input_setting_identify_info}."
+            )
+    input_setting_ossg = _ossg_oriented_spin_frame_ssg(
+        input_setting_ssg,
+        input_cell_cartesian,
+    )
+
     public_ossg_ssg = _ossg_oriented_spin_frame_ssg(convention_ssg, convention_cell)
     try:
         msg_acc = SpinSpaceGroup(public_ossg_ssg.msg_ops).acc
@@ -3244,6 +3353,22 @@ def _find_spin_group_from_parsed(
     transformation_acc_primitive_to_L0std = _invert_setting_transform(
         transformation_L0std_to_acc_primitive_output[0],
         transformation_L0std_to_acc_primitive_output[1],
+    )
+    transformation_G0std_to_input = _invert_setting_transform(
+        transformation_input_to_G0std[0],
+        transformation_input_to_G0std[1],
+    )
+    transformation_L0std_to_input = _invert_setting_transform(
+        transformation_input_to_L0std[0],
+        transformation_input_to_L0std[1],
+    )
+    transformation_acc_primitive_to_input = _invert_setting_transform(
+        transformation_input_to_acc_primitive_output[0],
+        transformation_input_to_acc_primitive_output[1],
+    )
+    transformation_convention_to_input = _invert_setting_transform(
+        transformation_input_to_convention[0],
+        transformation_input_to_convention[1],
     )
 
     KPOINTS = acc_primitive_output_ssg.KPOINTS
@@ -3284,21 +3409,36 @@ def _find_spin_group_from_parsed(
         acc_primitive_oriented_seitz,
         acc_primitive_oriented_seitz_latex,
     ) = _seitz_symbols_from_descriptions(acc_primitive_oriented_seitz_descriptions)
+    input_oriented_seitz_descriptions = _seitz_descriptions_with_cartesian_spin_symbols(
+        input_setting_ossg,
+        spin_to_cartesian=_lattice_column_matrix(input_cell_cartesian),
+        tol=input_setting_ossg.symbol_calibration_tol,
+    )
+    (
+        _input_oriented_seitz,
+        input_oriented_seitz_latex,
+    ) = _seitz_symbols_from_descriptions(input_oriented_seitz_descriptions)
 
     scif_export_targets = _build_scif_export_targets(
         input_cell=input_cell,
-        magnetic_primitive_cell=magnetic_primitive_cell,
-        ssg_primitive=ssg_primitive,
         acc_magnetic_primitive_cell=acc_magnetic_primitive_cell,
         acc_magnetic_primitive_ssg=acc_magnetic_primitive_ssg,
         G0std_cell=G0std_cell,
         G0std_ssg=G0std_ssg,
-        L0std_cell=L0std_cell,
-        L0std_ssg=L0std_ssg,
-        transformation_input_to_primitive=transformation_input_to_primitive,
         transformation_input_to_acc_primitive=transformation_input_to_acc_primitive,
         transformation_input_to_G0std=transformation_input_to_G0std,
         transformation_input_to_L0std=transformation_input_to_L0std,
+        input_identified_ssg=input_setting_ssg,
+    )
+    scif_export_targets[SCIF_CELL_MODE_INPUT_IDENTIFIED].update(
+        {
+            "spin_space_group_index": input_setting_identify_info,
+            "spin_space_group_name_linear": input_setting_ossg.international_symbol_linear_current_frame,
+            "spin_space_group_name_latex": input_setting_ossg.international_symbol_latex_current_frame,
+            "identify_index_details": input_setting_identify_index_details,
+            "input_setting_warning": input_setting_warning,
+            "suppress_repo_local_summary": True,
+        }
     )
     wp_chain = _build_wp_chain_payload(G0std_cell, G0std_ssg, tol_cfg)
     acc_primitive_wp_chain = _build_wp_chain_payload(
@@ -3306,11 +3446,30 @@ def _find_spin_group_from_parsed(
         acc_primitive_output_ssg,
         tol_cfg,
     )
+    input_wp_chain = (
+        _build_wp_chain_payload(input_cell_cartesian, input_setting_ssg, tol_cfg)
+        if input_setting_matches_true_ssg
+        else None
+    )
 
     scif_outputs = {}
     for cell_mode, export_target in scif_export_targets.items():
         export_cell = export_target["export_cell"]
         export_ssg = export_target["export_ssg"]
+        is_input_like_scif = cell_mode == SCIF_CELL_MODE_INPUT_IDENTIFIED
+        export_spin_space_group_index = export_target.get("spin_space_group_index", identify_info)
+        export_spin_space_group_name_linear = export_target.get(
+            "spin_space_group_name_linear",
+            public_ossg_ssg.international_symbol_linear_current_frame,
+        )
+        export_spin_space_group_name_latex = export_target.get(
+            "spin_space_group_name_latex",
+            public_ossg_ssg.international_symbol_latex_current_frame,
+        )
+        export_identify_index_details = export_target.get(
+            "identify_index_details",
+            identify_index_details,
+        )
         export_wyckoff = get_spin_wyckoff(export_cell, export_ssg.ops)
         source_parent_space_group = (
             None if source_metadata is None else source_metadata.get("parent_space_group")
@@ -3320,12 +3479,12 @@ def _find_spin_group_from_parsed(
                 export_cell,
                 symprec=tol_cfg.space,
                 source_parent_space_group=source_parent_space_group,
-                reuse_source_transforms=(cell_mode == SCIF_CELL_MODE_INPUT),
+                reuse_source_transforms=is_input_like_scif,
             )
         )
         source_cell_parameter_strings = (
             None
-            if source_metadata is None or cell_mode != SCIF_CELL_MODE_INPUT
+            if source_metadata is None or not is_input_like_scif
             else source_metadata.get("cell_parameter_strings")
         )
         scif_outputs[cell_mode] = generate_scif(
@@ -3335,19 +3494,21 @@ def _find_spin_group_from_parsed(
             export_wyckoff,
             export_target["basis_tag_transforms"],
             ssg_primitive,
-            spin_space_group_index=identify_info,
-            spin_space_group_name=public_ossg_ssg.international_symbol_linear_current_frame,
-            spin_space_group_name_linear=public_ossg_ssg.international_symbol_linear_current_frame,
-            spin_space_group_name_latex=public_ossg_ssg.international_symbol_latex_current_frame,
+            spin_space_group_index=export_spin_space_group_index,
+            spin_space_group_name=export_spin_space_group_name_linear,
+            spin_space_group_name_linear=export_spin_space_group_name_linear,
+            spin_space_group_name_latex=export_spin_space_group_name_latex,
             magnetic_phase=magnetic_phase,
-            identify_index_details=identify_index_details,
+            identify_index_details=export_identify_index_details,
             source_cell_parameter_strings=source_cell_parameter_strings,
             parent_space_group=generated_parent_space_group,
             source_parent_space_group=source_parent_space_group,
             parent_space_group_comparison=parent_space_group_comparison,
+            input_setting_warning=export_target.get("input_setting_warning"),
+            suppress_repo_local_summary=bool(export_target.get("suppress_repo_local_summary", False)),
         )
 
-    scif = scif_outputs[SCIF_CELL_MODE_G0STD_ORIENTED]
+    scif = scif_outputs[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]
 
 
     result = {
@@ -3365,6 +3526,7 @@ def _find_spin_group_from_parsed(
     }
 
     cell = {
+        'input_cell_detail': _serialize_cell_snapshot(input_cell_cartesian),
         'input_magnetic_primitive_cell': magnetic_primitive_cell.to_spglib(mag=True),
         'input_magnetic_primitive_cell_setting': INPUT_MAGNETIC_PRIMITIVE_SETTING,
         'input_magnetic_primitive_cell_poscar': input_magnetic_primitive_poscar,
@@ -3394,6 +3556,7 @@ def _find_spin_group_from_parsed(
         'convention_cell_detail': convention_cell_snapshot,
         'wp_chain': wp_chain,
         'acc_primitive_wp_chain': acc_primitive_wp_chain,
+        'input_wp_chain': input_wp_chain,
         'scif':scif,
     }
     symmetry = {'index':identify_info,
@@ -3487,6 +3650,22 @@ def _find_spin_group_from_parsed(
                 'acc_primitive_spin_only_direction_poscar_spin_frame': _format_spin_only_direction(
                     acc_primitive_output_ssg_in_poscar_spin_frame.sog_direction
                 ),
+                'input_ssg_ops_spin_cartesian': _serialize_ssg_operation_matrices(
+                    list(input_setting_ssg.ops)
+                ),
+                'input_ssg_seitz_latex_spin_cartesian': input_setting_ssg.seitz_symbols_latex,
+                'input_ssg_ops_spin_oriented': _serialize_ssg_operation_matrices(
+                    list(input_setting_ossg.ops)
+                ),
+                'input_ssg_seitz_latex_spin_oriented': input_oriented_seitz_latex,
+                'input_spin_only_direction_spin_cartesian': _format_spin_only_direction(
+                    input_setting_ssg.sog_direction
+                ),
+                'input_spin_only_direction_spin_oriented': _format_spin_only_direction(
+                    input_setting_ossg.sog_direction
+                ),
+                'input_ssg_may_be_incomplete': not input_setting_matches_true_ssg,
+                'input_setting_warning': input_setting_warning,
                 'symbol_calibration_tol': acc_magnetic_primitive_ssg.symbol_calibration_tol,
                 'primitive_magnetic_cell_ssg_type':acc_magnetic_primitive_ssg.international_symbol_type,
                 'full_spin_part_point_group':ssg_primitive.spin_part_point_group_symbol_hm,
@@ -3585,6 +3764,10 @@ def _find_spin_group_from_parsed(
                     np.asarray(transformation_acc_primitive_to_G0std[0], dtype=float).tolist(),
                     np.asarray(transformation_acc_primitive_to_G0std[1], dtype=float).tolist(),
                 ),
+                'T_G0std_to_input': (
+                    np.asarray(transformation_G0std_to_input[0], dtype=float).tolist(),
+                    np.asarray(transformation_G0std_to_input[1], dtype=float).tolist(),
+                ),
                 'T_input_to_L0std': (
                     np.asarray(transformation_input_to_L0std[0], dtype=float).tolist(),
                     np.asarray(transformation_input_to_L0std[1], dtype=float).tolist(),
@@ -3605,9 +3788,17 @@ def _find_spin_group_from_parsed(
                     np.asarray(transformation_acc_primitive_to_L0std[0], dtype=float).tolist(),
                     np.asarray(transformation_acc_primitive_to_L0std[1], dtype=float).tolist(),
                 ),
+                'T_L0std_to_input': (
+                    np.asarray(transformation_L0std_to_input[0], dtype=float).tolist(),
+                    np.asarray(transformation_L0std_to_input[1], dtype=float).tolist(),
+                ),
                 'T_input_to_convention': (
                     np.asarray(transformation_input_to_convention[0], dtype=float).tolist(),
                     np.asarray(transformation_input_to_convention[1], dtype=float).tolist(),
+                ),
+                'T_convention_to_input': (
+                    np.asarray(transformation_convention_to_input[0], dtype=float).tolist(),
+                    np.asarray(transformation_convention_to_input[1], dtype=float).tolist(),
                 ),
                 'T_convention_to_acc_primitive': (
                     np.asarray(transformation_convention_to_primitive[0], dtype=float).tolist(),
@@ -3659,6 +3850,10 @@ def _find_spin_group_from_parsed(
                 'T_input_to_acc_primitive': (
                     np.asarray(transformation_input_to_acc_primitive_output[0], dtype=float).tolist(),
                     np.asarray(transformation_input_to_acc_primitive_output[1], dtype=float).tolist(),
+                ),
+                'T_acc_primitive_to_input': (
+                    np.asarray(transformation_acc_primitive_to_input[0], dtype=float).tolist(),
+                    np.asarray(transformation_acc_primitive_to_input[1], dtype=float).tolist(),
                 ),
                 'msg_num': msg_num,
                 'msg_type': msg_type,

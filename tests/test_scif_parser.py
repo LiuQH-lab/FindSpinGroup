@@ -7,9 +7,9 @@ import pytest
 
 from findspingroup import find_spin_group, find_spin_group_from_data
 from findspingroup.find_spin_group import (
-    SCIF_CELL_MODE_G0STD_ORIENTED,
-    SCIF_CELL_MODE_INPUT,
+    SCIF_CELL_MODE_INPUT_IDENTIFIED,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
+    SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
 )
 from findspingroup.core import Molecule, PointGroupAnalyzer
 from findspingroup.core.identify_spin_space_group import dedup_moments_with_tol
@@ -109,7 +109,7 @@ def _roundtrip_index_with_spin_transform_strategy(
         find_spin_group_module._spin_transform_to_in_lattice = strategy
         original = find_spin_group(source_path)
         roundtrip = _roundtrip_index_from_scif_text(
-            original.to_scif(cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED),
+            original.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
             f"{Path(source_path).stem}_{strategy_name}.scif",
         )
         return original, roundtrip
@@ -168,6 +168,8 @@ def test_find_spin_group_exposes_mainline_scif_output():
     assert "_space_group_spin.name_Chen_Liu" in result.scif
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] is not None
     assert "_space_group_spin.fsg_spin_space_group_name_linear" not in result.scif
+    assert "##############\n# repo-local FINDSPINGROUP extensions" in result.scif
+    assert "_space_group_spin.fsg_input_parent_space_group_IT_number  194\n##############" in result.scif
     assert (
         f'_space_group_spin.fsg_oriented_spin_space_group_name_linear     "{result.convention_ssg_international_linear}"'
         in result.scif
@@ -184,13 +186,15 @@ def test_find_spin_group_exposes_mainline_scif_output():
     )
     assert sorted(result.scif_cell_modes) == sorted(
         [
-            SCIF_CELL_MODE_G0STD_ORIENTED,
-            SCIF_CELL_MODE_INPUT,
+            SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
+            SCIF_CELL_MODE_INPUT_IDENTIFIED,
             SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
         ]
     )
     assert result.to_scif() == result.scif
-    assert result.to_scif(cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED) == result.scif
+    assert result.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED) == result.scif
+    with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
+        result.to_scif(cell_mode="input")
 
 
 def test_scif_atom_type_loop_lists_all_emitted_species_for_324():
@@ -207,9 +211,9 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_mnte(
     original = find_spin_group("examples/0.800_MnTe.mcif")
 
     for cell_mode in [
-        SCIF_CELL_MODE_INPUT,
+        SCIF_CELL_MODE_INPUT_IDENTIFIED,
         SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
-        SCIF_CELL_MODE_G0STD_ORIENTED,
+        SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ]:
         roundtrip = _roundtrip_index_from_scif_text(
             original.to_scif(cell_mode=cell_mode),
@@ -218,14 +222,17 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_mnte(
         assert roundtrip.index == original.index
         assert roundtrip.conf == original.conf
 
+    with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
+        original.to_scif(cell_mode="input")
+
 
 def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_324():
     original = find_spin_group("tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif")
 
     for cell_mode in [
-        SCIF_CELL_MODE_INPUT,
+        SCIF_CELL_MODE_INPUT_IDENTIFIED,
         SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
-        SCIF_CELL_MODE_G0STD_ORIENTED,
+        SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ]:
         roundtrip = _roundtrip_index_from_scif_text(
             original.to_scif(cell_mode=cell_mode),
@@ -235,9 +242,12 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_324()
         assert roundtrip.conf == original.conf
 
 
-def test_input_mode_scif_preserves_source_parent_tags_and_cell_strings_for_324():
+def test_input_identified_scif_preserves_source_parent_tags_and_cell_strings_for_324():
     result = find_spin_group("tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif")
-    input_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT)
+    input_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_IDENTIFIED)
+
+    with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
+        result.to_scif(cell_mode="input")
 
     assert '_parent_space_group.name_H-M_alt  "I m -3"' in input_scif
     assert "_parent_space_group.IT_number  204" in input_scif
@@ -265,7 +275,7 @@ def test_input_mode_scif_preserves_source_parent_tags_and_cell_strings_for_324()
 def test_non_input_scif_uses_six_decimal_computed_cell_constants_for_324():
     result = find_spin_group("tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif")
     g0std_scif = result.to_scif(
-        cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED,
+        cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     )
 
     assert any(
@@ -301,9 +311,8 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_0396(
     original = find_spin_group("tests/testset/mcif_241130_no2186/0.396_MnPtGa.mcif")
 
     for cell_mode in [
-        SCIF_CELL_MODE_INPUT,
         SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
-        SCIF_CELL_MODE_G0STD_ORIENTED,
+        SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ]:
         roundtrip = _roundtrip_index_from_scif_text(
             original.to_scif(cell_mode=cell_mode),
@@ -311,6 +320,18 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_0396(
         )
         assert roundtrip.index == original.index
         assert roundtrip.conf == original.conf
+
+    direct_input_roundtrip = _roundtrip_index_from_scif_text(
+        original.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_IDENTIFIED),
+        "mnptga_0396_input_identified.scif",
+    )
+    assert direct_input_roundtrip.index == original.index
+    input_identified_scif = original.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_IDENTIFIED)
+    assert '_space_group_spin.number_Chen_Liu  "63.12.1.2.P2"' in input_identified_scif
+    assert "input_ssg_index=63.12.1.2.P2" in input_identified_scif
+
+    with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
+        original.to_scif(cell_mode="input")
 
 
 def test_parse_scif_error_message_points_to_find_spin_group_parser_atol():
@@ -376,8 +397,8 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_0506():
     original = find_spin_group("tests/testset/mcif_241130_no2186/0.506_Cs2Cu3SnF12.mcif")
 
     roundtrip = _roundtrip_index_from_scif_text(
-        original.to_scif(cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED),
-        "cs2cu3snf12_0506_g0std_oriented.scif",
+        original.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
+        "cs2cu3snf12_0506_ssg_convention_oriented.scif",
     )
 
     assert roundtrip.index == original.index
@@ -388,8 +409,8 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_0876():
     original = find_spin_group("tests/testset/mcif_241130_no2186/0.876_La2ZnIrO6.mcif")
 
     roundtrip = _roundtrip_index_from_scif_text(
-        original.to_scif(cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED),
-        "la2zniro6_0876_g0std_oriented.scif",
+        original.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
+        "la2zniro6_0876_ssg_convention_oriented.scif",
     )
 
     assert roundtrip.index == original.index
@@ -400,8 +421,8 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_0427():
     original = find_spin_group("tests/testset/mcif_241130_no2186/0.427_Sm2Ti2O7.mcif")
 
     roundtrip = _roundtrip_index_from_scif_text(
-        original.to_scif(cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED),
-        "sm2ti2o7_0427_g0std_oriented.scif",
+        original.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
+        "sm2ti2o7_0427_ssg_convention_oriented.scif",
     )
 
     assert roundtrip.index == original.index
@@ -412,8 +433,8 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_0265():
     original = find_spin_group("tests/testset/mcif_241130_no2186/0.265_Mn3(Co0.61Mn0.39)N.mcif")
 
     roundtrip = _roundtrip_index_from_scif_text(
-        original.to_scif(cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED),
-        "mn3_co061mn039_n_0265_g0std_oriented.scif",
+        original.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
+        "mn3_co061mn039_n_0265_ssg_convention_oriented.scif",
     )
 
     assert roundtrip.index == original.index
@@ -458,7 +479,7 @@ def test_pure_actual_basis_scif_write_and_read_split_is_explicit_for_0427():
         find_spin_group_module._spin_transform_to_in_lattice = _actual_basis_spin_transform
         result = find_spin_group("tests/testset/mcif_241130_no2186/0.427_Sm2Ti2O7.mcif")
         scif_text = result.to_scif(
-            cell_mode=SCIF_CELL_MODE_G0STD_ORIENTED,
+            cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
         )
         lattice_factors, positions, elements, occupancies, labels, moments = parse_scif_text(scif_text)
     finally:

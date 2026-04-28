@@ -91,12 +91,17 @@ print(result.index)
 print(result.acc)
 print(result.convention_ssg_international_linear)
 print(result.magnetic_phase)
+print(result.to_scif(cell_mode="ssg_convention_oriented"))
 ```
 
 `find_spin_group(...)` returns a `MagSymmetryResult` object with the full
 analysis result. See the
 [usage documentation](https://findspingroup.readthedocs.io/en/latest/usage/)
 for the main `MagSymmetryResult` attributes and route-specific outputs.
+
+SCIF export modes are documented at
+[SCIF](https://findspingroup.readthedocs.io/en/latest/scif/). Current modes are
+`ssg_convention_oriented`, `magnetic_primitive`, and `input_identified`.
 
 ### Lightweight Basic Summary
 

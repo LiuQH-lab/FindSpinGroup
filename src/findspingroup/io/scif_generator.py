@@ -53,6 +53,7 @@ def _scif_repo_local_extension_tag_names() -> dict[str, str]:
         "ssg_name_linear": "_space_group_spin.fsg_oriented_spin_space_group_name_linear",
         "ssg_name_latex": "_space_group_spin.fsg_oriented_spin_space_group_name_latex",
         "magnetic_phase": "_space_group_spin.fsg_magnetic_phase",
+        "input_setting_warning": "_space_group_spin.fsg_input_setting_warning",
         "spin_arithmetic_crystal_class_symbol": "_space_group_spin.fsg_spin_arithmetic_crystal_class_symbol",
         "magnetic_arithmetic_crystal_class_symbol": "_space_group_spin.fsg_magnetic_arithmetic_crystal_class_symbol",
         "parent_space_group_status": "_space_group_spin.fsg_parent_space_group_status",
@@ -1088,6 +1089,8 @@ def generate_scif(
     parent_space_group: dict | None = None,
     source_parent_space_group: dict | None = None,
     parent_space_group_comparison: dict | None = None,
+    input_setting_warning: str | None = None,
+    suppress_repo_local_summary: bool = False,
 ):
     """
     input:
@@ -1202,11 +1205,10 @@ def generate_scif(
             else "_space_group_spin.transform_Chen_Liu_Pp_abcs  .",
         ]
     )
-    scif_repo_local_extensions = "\n".join(
-        [
-            "# repo-local FINDSPINGROUP extensions",
-            ssg_name_linear,
-            ssg_name_latex,
+    repo_local_summary_lines = (
+        []
+        if suppress_repo_local_summary
+        else [
             f"{repo_tags['G0_number']}  {int(ssg_primitive.G0_num)}",
             f"{repo_tags['L0_number']}  {int(ssg_primitive.L0_num)}",
             f"{repo_tags['it']}  {int(ssg_primitive.it)}",
@@ -1215,27 +1217,43 @@ def generate_scif(
             magnetic_phase_line,
             spin_acc_line,
             magnetic_acc_line,
-            "",
-            transform_to_input_Pp,
-            transform_to_magnetic_primitive_Pp,
-            transform_to_magnetic_L0_Pp,
-            transform_to_magnetic_G0_Pp,
-            "",
-            (
-                f"{repo_tags['input_parent_space_group_name']}  "
-                f"{_quote_scif_string(parent_space_group_comparison['input_name_H_M_alt'])}"
-                if parent_space_group_comparison is not None
-                and parent_space_group_comparison.get('input_name_H_M_alt') is not None
-                else f"{repo_tags['input_parent_space_group_name']}  ."
-            ),
-            (
-                f"{repo_tags['input_parent_space_group_number']}  "
-                f"{int(round(float(parent_space_group_comparison['input_IT_number'])))}"
-                if parent_space_group_comparison is not None
-                and parent_space_group_comparison.get('input_IT_number') is not None
-                else f"{repo_tags['input_parent_space_group_number']}  ."
-            ),
         ]
+    )
+    scif_repo_local_extension_lines = [
+        "##############",
+        "# repo-local FINDSPINGROUP extensions",
+        (
+            f"{repo_tags['input_setting_warning']}  {_quote_scif_string(input_setting_warning)}"
+            if input_setting_warning
+            else None
+        ),
+        ssg_name_linear,
+        ssg_name_latex,
+        *repo_local_summary_lines,
+        "",
+        transform_to_input_Pp,
+        transform_to_magnetic_primitive_Pp,
+        transform_to_magnetic_L0_Pp,
+        transform_to_magnetic_G0_Pp,
+        "",
+        (
+            f"{repo_tags['input_parent_space_group_name']}  "
+            f"{_quote_scif_string(parent_space_group_comparison['input_name_H_M_alt'])}"
+            if parent_space_group_comparison is not None
+            and parent_space_group_comparison.get('input_name_H_M_alt') is not None
+            else f"{repo_tags['input_parent_space_group_name']}  ."
+        ),
+        (
+            f"{repo_tags['input_parent_space_group_number']}  "
+            f"{int(round(float(parent_space_group_comparison['input_IT_number'])))}"
+            if parent_space_group_comparison is not None
+            and parent_space_group_comparison.get('input_IT_number') is not None
+            else f"{repo_tags['input_parent_space_group_number']}  ."
+        ),
+        "##############",
+    ]
+    scif_repo_local_extensions = "\n".join(
+        line for line in scif_repo_local_extension_lines if line is not None
     )
     parent_space_group_lines = []
     if parent_space_group is not None:
