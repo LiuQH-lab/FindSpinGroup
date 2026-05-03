@@ -3136,7 +3136,15 @@ def test_scif_transform_tags_use_basis_relation_contract():
     default_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED)
     assert (
         "_space_group_spin.fsg_transform_to_input_Pp  "
-        "'2/3a-1/3b-1/3c,1/3a-2/3b+1/3c,-4/3a-4/3b-4/3c;0,0,0'"
+        "'2/3a+1/3b-4/3c,-1/3a-2/3b-4/3c,-1/3a+1/3b-4/3c;0,0,0'"
+    ) in default_scif
+    assert (
+        "_space_group_spin.fsg_transform_to_magnetic_primitive_Pp  "
+        "'-1/3a+1/3b-1/3c,2/3a+1/3b-1/3c,-1/3a-2/3b-1/3c;0,0,0'"
+    ) in default_scif
+    assert (
+        "_space_group_spin.fsg_transform_to_L0std_Pp  "
+        "'-c,-2/3a-1/3b+1/3c,1/3a+2/3b+1/3c;0,0,0'"
     ) in default_scif
     assert "_space_group_spin.fsg_transform_to_G0std_Pp  'a,b,c;0,0,0'" in default_scif
     assert '_space_group_spin.fsg_spin_arithmetic_crystal_class_symbol  "-3R"' in default_scif

@@ -467,15 +467,15 @@ def _source_to_target_basis_pp_string(
     then the basis relation to emit is:
         (a_source, b_source, c_source) = (a_target, b_target, c_target) A
 
-    Since `affine_matrix_to_xyz_expression` formats row-wise linear forms, each
-    row of `A` is emitted directly as one source-basis vector written in the
-    target basis. The translation part is the source origin expressed in target
-    fractional coordinates, i.e. `o`.
+    Since `affine_matrix_to_xyz_expression` formats row-wise linear forms, pass
+    `A.T` so each emitted row corresponds to one source-basis vector written in
+    the target basis. The translation part is the source origin expressed in
+    target fractional coordinates, i.e. `o`.
     """
     matrix = np.asarray(matrix, dtype=float)
     shift = normalize_vector_to_zero(np.asarray(shift, dtype=float), atol=1e-9)
     return affine_matrix_to_xyz_expression(
-        matrix,
+        matrix.T,
         shift,
         symbols,
         separate_translation=True,

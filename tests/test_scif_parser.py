@@ -17,6 +17,7 @@ from findspingroup.io import parse_cif_file, parse_scif_file, parse_scif_metadat
 from findspingroup.io.scif_generator import (
     _parse_solver_component_expression,
     _parse_solver_numeric_token,
+    _source_to_target_basis_pp_string,
 )
 from findspingroup.structure.cell import (
     CrystalCell,
@@ -49,13 +50,13 @@ def _roundtrip_index_from_scif_text(scif_text: str, source_name: str):
 
 def _parse_pp_transform(pp_string: str):
     # The emitted `Pp` string is interpreted as a basis change:
-    #   x_current = P x_target + p
+    #   (a_current, b_current, c_current) = (a_target, b_target, c_target) P
     # Convert it back into the direct transform expected by `.transform(...)`:
     #   x_target = P^{-1} x_current - P^{-1} p
     expr, translation = pp_string.split(";")
     matrices, _ = general_positions_to_matrix([f"{expr},+1"], variables=("a", "b", "c"))
     basis_rows, _ = matrices[0]
-    basis_change = np.asarray(basis_rows, dtype=float)
+    basis_change = np.asarray(basis_rows, dtype=float).T
     origin_current = np.array([float(Fraction(token)) for token in translation.split(",")], dtype=float)
     direct_matrix = np.linalg.inv(basis_change)
     direct_shift = normalize_vector_to_zero(-direct_matrix @ origin_current, atol=1e-10)
@@ -78,6 +79,25 @@ def _invert_setting_transform(transform: np.ndarray, shift: np.ndarray):
     shift_inv[np.isclose(shift_inv, 1.0, atol=1e-8)] = 0.0
     shift_inv[np.isclose(shift_inv, 0.0, atol=1e-8)] = 0.0
     return transform_inv, shift_inv
+
+
+def test_scif_basis_relation_pp_string_writes_source_basis_vectors_as_rows():
+    direct_source_to_target = np.array(
+        [
+            [2.0 / 3.0, -1.0 / 3.0, -1.0 / 3.0],
+            [1.0 / 3.0, -2.0 / 3.0, 1.0 / 3.0],
+            [-4.0 / 3.0, -4.0 / 3.0, -4.0 / 3.0],
+        ],
+        dtype=float,
+    )
+
+    pp_string = _source_to_target_basis_pp_string(
+        direct_source_to_target,
+        np.zeros(3),
+        ("a", "b", "c"),
+    )
+
+    assert pp_string == "2/3a+1/3b-4/3c,-1/3a-2/3b-4/3c,-1/3a+1/3b-4/3c;0,0,0"
 
 
 def _actual_basis_spin_transform(cell: CrystalCell) -> np.ndarray:
@@ -303,7 +323,7 @@ def test_non_input_scif_uses_six_decimal_computed_cell_constants_for_324():
     assert metadata["space_group_spin"]["parent_space_group_status"] is None
     assert metadata["space_group_spin"]["parent_space_group_matches_input"] is None
     assert metadata["space_group_spin"]["transform_to_input_Pp"] == (
-        "2/3a-1/3b-1/3c,1/3a-2/3b+1/3c,-4/3a-4/3b-4/3c;0,0,0"
+        "2/3a+1/3b-4/3c,-1/3a-2/3b-4/3c,-1/3a+1/3b-4/3c;0,0,0"
     )
 
 
