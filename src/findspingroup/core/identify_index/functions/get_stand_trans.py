@@ -64,7 +64,13 @@ def get_stand_trans(
     
     new_name_maps_matrices = map_transformation(name_maps,TTM)
     new_translation_maps_matrices = map_transformation(translation_maps,TTM)
-    stand_map = find_stand_gen_maps(new_name_maps_matrices,new_translation_maps_matrices,ssg_ttm['gen_matrices'], cell_size)
+    stand_map = find_stand_gen_maps(
+        new_name_maps_matrices,
+        new_translation_maps_matrices,
+        ssg_ttm['gen_matrices'],
+        cell_size,
+        tol=tol,
+    )
     map_num = find_map_num(stand_map,iso,tol = tol, use_222_contract=use_222_contract)
     norm = get_norm_matrices(iso, use_222_contract=use_222_contract)
     

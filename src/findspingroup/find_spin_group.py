@@ -14,6 +14,7 @@ from findspingroup.core.identify_symmetry_from_ops import (
     identify_point_group,
 )
 from findspingroup.core.identify_spin_space_group import (
+    _candidate_audit_failure,
     identify_spin_space_group_result,
 )
 from findspingroup.core.identify_index.contract_222 import (
@@ -29,9 +30,10 @@ from findspingroup.io.scif_generator import (
     generate_scif,
 )
 from findspingroup.structure import SpinSpaceGroup,SpinSpaceGroupOperation
-from findspingroup.structure.group import integer_points_in_new_cell, op_key
+from findspingroup.structure.group import integer_points_in_new_cell, op_key, _resolve_point_group_info
 from findspingroup.structure.cell import (
     CrystalCell,
+    SpaceToleranceDegeneracyError,
     calculate_vector_coordinates_from_latticefactors,
 )
 from findspingroup.data.PG_SYMBOL import PG_IF_HEX_MAPPING, SG_HALL_MAPPING
@@ -115,12 +117,62 @@ L0_STANDARD_SETTING = "L0std"
 SCIF_CELL_MODE_INPUT_IDENTIFIED = "input_identified"
 SCIF_CELL_MODE_MAGNETIC_PRIMITIVE = "magnetic_primitive"
 SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED = "ssg_convention_oriented"
-def _should_degrade_identify_index_error(error: Exception) -> bool:
+
+
+def _is_identify_index_database_missing_error(error: Exception) -> bool:
     message = str(error)
-    return (
-        message.startswith("No identify-index reduction record for ")
-        or message.startswith("Cannot identify point-group map number for ")
+    return message.startswith("No identify-index reduction record for ")
+
+
+def _identify_index_database_missing_label(error: Exception) -> str:
+    return f"not in identify-index database: {error}"
+
+
+def _should_degrade_identify_index_error(error: Exception) -> bool:
+    return _is_identify_index_database_missing_error(error)
+
+
+def _handle_missing_identify_index(source_name: str, error: Exception) -> str:
+    label = _identify_index_database_missing_label(error)
+    warnings.warn(
+        f"Identify-index database entry unavailable for {source_name}: {error}. "
+        f"Continuing with index set to {label!r}.",
+        RuntimeWarning,
+        stacklevel=2,
     )
+    return label
+
+
+def _assert_ssg_ops_consistency(
+    label: str,
+    ssg: SpinSpaceGroup,
+    *,
+    tol: Tolerances = DEFAULT_TOL,
+    identify_index_details: dict | None = None,
+) -> None:
+    failure = _candidate_audit_failure(list(ssg.ops), group_tol=tol)
+    if failure is not None:
+        raise ValueError(f"Inconsistent {label} SSG operations: {failure}")
+
+    ssg.validate_nsspg_invariants()
+
+    if identify_index_details is None:
+        return
+
+    expected = {
+        "G0_id": int(ssg.G0_num),
+        "L0_id": int(ssg.L0_num),
+        "t_index": int(ssg.it),
+        "k_index": int(ssg.ik),
+        "configuration": ssg.conf,
+    }
+    for key, expected_value in expected.items():
+        actual_value = identify_index_details.get(key)
+        if actual_value != expected_value:
+            raise ValueError(
+                f"Inconsistent identify-index details for {label}: "
+                f"{key}={actual_value!r} does not match SSG ops value {expected_value!r}."
+            )
 
 
 def _exact_translation_distance(a, b) -> float:
@@ -145,10 +197,32 @@ def _deduplicate_ops_with_exact_translation(
 ) -> list[SpinSpaceGroupOperation]:
     ordered_ops = sorted(ops, key=op_key)
     unique_ops: list[SpinSpaceGroupOperation] = []
+    unique_spin_rotations = np.empty((0, 3, 3), dtype=float)
+    unique_real_rotations = np.empty((0, 3, 3), dtype=float)
+    unique_translations = np.empty((0, 3), dtype=float)
     for op in ordered_ops:
-        if any(_ops_match_with_exact_translation(op, existing, tol) for existing in unique_ops):
-            continue
+        spin_rotation = np.asarray(op[0], dtype=float)
+        real_rotation = np.asarray(op[1], dtype=float)
+        translation = np.asarray(op[2], dtype=float)
+        if unique_ops:
+            spin_close = np.all(np.isclose(spin_rotation, unique_spin_rotations, atol=tol), axis=(1, 2))
+            if np.any(spin_close):
+                spin_indices = np.flatnonzero(spin_close)
+                real_close = np.all(
+                    np.isclose(real_rotation, unique_real_rotations[spin_indices], atol=tol),
+                    axis=(1, 2),
+                )
+                if np.any(real_close):
+                    candidate_indices = spin_indices[real_close]
+                    translation_close = (
+                        np.max(np.abs(translation - unique_translations[candidate_indices]), axis=1) < tol
+                    )
+                    if np.any(translation_close):
+                        continue
         unique_ops.append(op)
+        unique_spin_rotations = np.concatenate((unique_spin_rotations, spin_rotation[None, :, :]), axis=0)
+        unique_real_rotations = np.concatenate((unique_real_rotations, real_rotation[None, :, :]), axis=0)
+        unique_translations = np.concatenate((unique_translations, translation[None, :]), axis=0)
     return unique_ops
 
 
@@ -175,7 +249,7 @@ def _diagnostic_ssg_index(file_name: str, ssg: SpinSpaceGroup, *, tol: float) ->
     except ValueError as exc:
         if not _should_degrade_identify_index_error(exc):
             raise
-        return ssg.index
+        return _identify_index_database_missing_label(exc)
 
 
 def _is_identity_setting_transform(transform: tuple[np.ndarray, np.ndarray], *, tol: float) -> bool:
@@ -1044,6 +1118,10 @@ class MagSymmetryResult:
             'acc_primitive_msg_ops_spin_frame_setting',
             self.primitive_msg_ops_spin_frame_setting,
         )
+        self.ssg_little_group_ops = symmetry.get('ssg_little_group_ops', None)
+        self.ssg_little_group_seitz_latex = symmetry.get('ssg_little_group_seitz_latex', None)
+        self.msg_little_group_ops = symmetry.get('msg_little_group_ops', None)
+        self.msg_little_group_seitz_latex = symmetry.get('msg_little_group_seitz_latex', None)
         self.msg_little_group_symbols = symmetry.get('msg_little_group_symbols', None)
         self.msg_spin_polarizations = symmetry.get('msg_spin_polarizations', None)
         self.msg_spin_polarizations_setting = symmetry.get(
@@ -1443,6 +1521,18 @@ def _serialize_gspg_xyz_uvw_ops(
     return payload
 
 
+def _gspg_public_operation_sets(ssg: SpinSpaceGroup):
+    raw_ops = deduplicate_matrix_pairs([[i[0], i[1]] for i in ssg.ops], tol=ssg.tol)
+    if ssg.conf == "Collinear":
+        presented_ops = deduplicate_matrix_pairs(
+            [[np.asarray(op[0], dtype=float), np.asarray(op[1], dtype=float)] for op in ssg.nssg],
+            tol=ssg.tol,
+        )
+    else:
+        presented_ops = raw_ops
+    return presented_ops, raw_ops
+
+
 def _serialize_ssg_operation_matrices(
     ops: list[SpinSpaceGroupOperation],
 ) -> list[dict]:
@@ -1473,6 +1563,18 @@ def _serialize_msg_operation_matrices(
     ]
 
 
+def _serialize_msg_operation_rows(ops: list[list]) -> list[dict]:
+    return [
+        {
+            "index": idx + 1,
+            "time_reversal": int(time_reversal),
+            "real_rotation": np.asarray(rotation, dtype=float).tolist(),
+            "translation": np.asarray(translation, dtype=float).tolist(),
+        }
+        for idx, (time_reversal, rotation, translation) in enumerate(ops)
+    ]
+
+
 def _serialize_effective_mpg_ops(ops) -> list[list]:
     return [
         [
@@ -1497,7 +1599,11 @@ def _serialize_op_list_seitz_symbols(
     tol: float,
 ) -> tuple[list[str], list[str]]:
     descriptions = [
-        op.seitz_description(tol=tol, max_order=120, max_axis_denom=12)
+        op.seitz_description(
+            tol=tol,
+            max_order=120,
+            max_axis_denom=12,
+        )
         for op in ops
     ]
     canonicalized = canonicalize_group_seitz_descriptions(
@@ -1509,6 +1615,58 @@ def _serialize_op_list_seitz_symbols(
         [item["symbol"] for item in canonicalized],
         [item["symbol_latex"] for item in canonicalized],
     )
+
+
+def _serialize_ssg_little_group_ops(
+    little_groups: list[list[SpinSpaceGroupOperation]],
+) -> list[list[dict]]:
+    return [_serialize_ssg_operation_matrices(list(group)) for group in little_groups]
+
+
+def _serialize_ssg_little_group_seitz_latex(
+    little_groups: list[list[SpinSpaceGroupOperation]],
+    *,
+    tol: float,
+) -> list[list[str]]:
+    return [
+        _serialize_op_list_seitz_symbols(list(group), tol=tol)[1]
+        for group in little_groups
+    ]
+
+
+def _serialize_msg_little_group_ops(little_groups: list[list[list]]) -> list[list[dict]]:
+    return [_serialize_msg_operation_rows(list(group)) for group in little_groups]
+
+
+def _serialize_msg_little_group_seitz_latex(
+    little_groups: list[list[list]],
+    *,
+    tol: float,
+) -> list[list[str]]:
+    output: list[list[str]] = []
+    symbol_tol = calibrated_symbol_tol(tol)
+    for group in little_groups:
+        descriptions = []
+        for time_reversal, rotation, translation in group:
+            description = describe_spin_space_operation(
+                np.eye(3),
+                np.asarray(rotation, dtype=float),
+                np.asarray(translation, dtype=float),
+                tol=symbol_tol,
+                max_order=120,
+                max_axis_denom=12,
+            )
+            if int(time_reversal) < 0:
+                description["spin"]["symbol"] = "1'"
+                description["spin"]["symbol_latex"] = r"1^{\prime}"
+            descriptions.append(description)
+        canonicalized = canonicalize_group_seitz_descriptions(
+            descriptions,
+            tol=symbol_tol,
+            max_axis_denom=12,
+        )
+        output.append([item["symbol_latex"] for item in canonicalized])
+    return output
 
 
 def _seitz_descriptions_with_cartesian_spin_symbols(
@@ -1559,12 +1717,12 @@ def _build_gspg_payload(
     *,
     real_space_setting: str,
     spin_frame_setting: str,
+    spin_analysis_transform: np.ndarray | None = None,
 ) -> dict:
-    presented_ops = ssg.gspg.ops
-    raw_ops = ssg.gspg.raw_ops
+    presented_ops, raw_ops = _gspg_public_operation_sets(ssg)
     output_mode = (
         "reduced_point_part_with_spin_only_annotation"
-        if ssg.gspg.public_ops_are_reduced
+        if len(presented_ops) != len(raw_ops)
         else "explicit_ops"
     )
 
@@ -1572,6 +1730,40 @@ def _build_gspg_payload(
         [np.asarray(rotation, dtype=float), np.eye(3)]
         for rotation in ssg.gspg_spin_only_ops
     ]
+    public_gspg = None
+    try:
+        public_gspg = ssg.gspg
+        spin_only_symbol = ssg.gspg_spin_only_symbol
+        collinear_axis = public_gspg.collinear_axis
+        empg_symbol = public_gspg.empg_symbol
+    except ValueError as exc:
+        if spin_analysis_transform is None or "closure exceeded limit" not in str(exc):
+            raise
+        analysis_transform = np.asarray(spin_analysis_transform, dtype=float)
+        analysis_ssg = ssg.transform_spin(analysis_transform)
+        spin_only_symbol = analysis_ssg.gspg_spin_only_symbol
+        analysis_gspg = analysis_ssg.gspg
+        empg_symbol = analysis_gspg.empg_symbol
+        if analysis_gspg.collinear_axis is None:
+            collinear_axis = None
+        else:
+            analysis_to_public = np.linalg.inv(analysis_transform)
+            collinear_axis = _normalize_spin_only_direction(
+                analysis_to_public @ np.asarray(analysis_gspg.collinear_axis, dtype=float)
+            )
+
+    point_part_linear = ssg.international_symbol.get("point_part_linear", "")
+    point_part_latex = ssg.international_symbol.get("point_part_latex", "")
+    symbol_linear = (
+        f"{point_part_linear} {spin_only_symbol['linear']}".strip()
+        if point_part_linear
+        else spin_only_symbol["linear"]
+    )
+    symbol_latex = (
+        f"{point_part_latex}{spin_only_symbol['latex']}"
+        if point_part_latex
+        else spin_only_symbol["latex"]
+    )
 
     return {
         "gspg_ops": _serialize_gspg_ops(presented_ops),
@@ -1580,11 +1772,11 @@ def _build_gspg_payload(
         "gspg_spin_only_ops": _serialize_gspg_ops(spin_only_ops),
         "gspg_spin_only_ops_xyz_uvw": _serialize_gspg_xyz_uvw_ops(spin_only_ops, tol=ssg.tol),
         "gspg_collinear_axis": (
-            None if ssg.gspg.collinear_axis is None else np.asarray(ssg.gspg.collinear_axis, dtype=float).tolist()
+            None if collinear_axis is None else np.asarray(collinear_axis, dtype=float).tolist()
         ),
-        "gspg_symbol_linear": ssg.gspg.symbol_linear,
-        "gspg_symbol_latex": ssg.gspg.symbol_latex,
-        "gspg_effective_mpg_symbol": ssg.gspg.empg_symbol,
+        "gspg_symbol_linear": symbol_linear,
+        "gspg_symbol_latex": symbol_latex,
+        "gspg_effective_mpg_symbol": empg_symbol,
     }
 
 
@@ -1596,7 +1788,11 @@ def _spin_only_component_symbols(ssg: SpinSpaceGroup) -> tuple[str, str]:
             return "∞/mm", "D∞h"
         raise ValueError("Collinear spin-only symbol identification error")
 
-    info = identify_point_group([np.asarray(op[0], dtype=float) for op in ssg.sog], _id=True)
+    info = _resolve_point_group_info(
+        [np.asarray(op[0], dtype=float) for op in ssg.sog],
+        tol=max(float(ssg.tol), 1e-6),
+        label="spin-only component point group",
+    )
     return info[0], info[4]
 
 
@@ -2096,6 +2292,50 @@ def _get_magnetic_little_group(kpoint, primitive_msg_operations, tol: float) -> 
     return magnetic_little_group
 
 
+def _get_ssg_little_groups(ssg: SpinSpaceGroup, *, tol: float) -> list[list[SpinSpaceGroupOperation]]:
+    kpoints = ssg.kpoints_primitive if ssg.is_primitive else ssg.kpoints_conventional
+    ops = list(ssg.ops)
+    effective_ops = [
+        np.linalg.det(op.spin_rotation) * np.linalg.inv(np.asarray(op.rotation, dtype=float)).T
+        for op in ops
+    ]
+
+    if ssg.cptrans is None or np.allclose(ssg.cptrans, np.eye(3), atol=tol):
+        little_groups = []
+        for kpoint in kpoints:
+            primitive_kpoint = np.asarray(kpoint, dtype=float)
+            little_group = []
+            for op, effective_op in zip(ops, effective_ops):
+                target_kpoint = effective_op @ primitive_kpoint % 1
+                if getNormInf(primitive_kpoint % 1, target_kpoint) < tol:
+                    little_group.append(op)
+            little_groups.append(little_group)
+        return little_groups
+
+    cptrans = np.asarray(ssg.cptrans, dtype=float)
+    cptrans_inv = np.linalg.inv(cptrans)
+    conjugated_effective_ops = [
+        cptrans_inv @ effective_op @ cptrans
+        for effective_op in effective_ops
+    ]
+    little_groups = []
+    for kpoint in kpoints:
+        kpoint_array = np.asarray(kpoint, dtype=float)
+        little_group = []
+        for op, effective_op, conjugated_effective_op in zip(ops, effective_ops, conjugated_effective_ops):
+            if ssg.is_primitive:
+                target_kpoint = effective_op @ kpoint_array % 1
+                if getNormInf(kpoint_array % 1, target_kpoint) < tol:
+                    little_group.append(op)
+            else:
+                primitive_kpoint = cptrans.T @ kpoint_array % 1
+                transformed_primitive = conjugated_effective_op @ primitive_kpoint % 1
+                if getNormInf(primitive_kpoint, transformed_primitive) < tol:
+                    little_group.append(op)
+        little_groups.append(little_group)
+    return little_groups
+
+
 def _get_spin_constraint_for_msg_little_groups(
     little_groups: list[list[list]],
     cell: CrystalCell,
@@ -2123,7 +2363,7 @@ def _build_msg_little_group_payload(
     cell: CrystalCell,
     tol: float,
     spin_frame_rotation: np.ndarray | None = None,
-) -> tuple[list[list], list[str], list[list[str]]]:
+) -> tuple[list[list], list[str | None], list[list[str]]]:
     primitive_msg_ops, little_groups, little_group_symbols = _build_msg_little_group_core(
         ssg,
         tol=tol,
@@ -2141,7 +2381,7 @@ def _build_msg_little_group_core(
     ssg: SpinSpaceGroup,
     *,
     tol: float,
-) -> tuple[list[list], list[list[list]], list[str]]:
+) -> tuple[list[list], list[list[list]], list[str | None]]:
     primitive_msg_ops = _primitive_msg_ops_from_ssg(
         ssg.msg_ops,
         tol=tol,
@@ -2157,7 +2397,10 @@ def _build_msg_little_group_core(
             little_group_symbols.append("1")
             continue
         msg_info = get_magnetic_space_group_from_operations(group)
-        little_group_symbols.append(msg_info["mpg_symbol"] if msg_info else "Unknown")
+        if msg_info is None:
+            little_group_symbols.append(None)
+        else:
+            little_group_symbols.append(msg_info["mpg_symbol"])
     return primitive_msg_ops, little_groups, little_group_symbols
 
 
@@ -2179,14 +2422,10 @@ def _make_wp_chain(wp_sg, wp_ssg, wp_msg, cell, atom_types_dict):
 
 def _build_wp_chain_payload(g0_cell: CrystalCell, g0_ssg: SpinSpaceGroup, tol_cfg: Tolerances):
     sg_dataset = get_symmetry_dataset(g0_cell.to_spglib(), symprec=tol_cfg.space)
-    msg_dataset_magnetic = get_magnetic_symmetry_dataset(
-        g0_cell.to_spglib(mag=True),
-        symprec=tol_cfg.space,
-        mag_symprec=tol_cfg.moment,
-    )
-    if msg_dataset_magnetic is None:
+    oriented_ssg = _ossg_oriented_spin_frame_ssg(g0_ssg, g0_cell)
+    msg_ops = [[op[1], op[2]] for op in oriented_ssg.msg_ops]
+    if not msg_ops:
         return []
-    msg_ops = [list(item) for item in zip(msg_dataset_magnetic.rotations, msg_dataset_magnetic.translations)]
     msg_dataset = get_G0_dataset_for_cell(msg_ops, g0_cell.to_spglib(mag=True), tol_cfg.space)
     ssg_dataset = get_G0_dataset_for_cell(g0_ssg.G0_ops, g0_cell.to_spglib(mag=True), tol_cfg.space)
     wp_extended_sg = get_wp_from_dataset(sg_dataset, max=False)
@@ -2831,7 +3070,14 @@ def _identify_ssg_index_details(file_name,ssg_primitive:SpinSpaceGroup,tol = 0.0
             f"G0={G0_num}, L0={L0_num}."
         )
     coplanar_suffix = _resolve_order_two_coplanar_suffix(identify_nofrac_group)
-    pg = PG_SCH_TO_ID_INDEX[ssg_primitive.n_spin_part_point_group_symbol_s] # map to identify-pg list
+    n_spin_part_pg_symbol = ssg_primitive.n_spin_part_point_group_symbol_s
+    if n_spin_part_pg_symbol not in PG_SCH_TO_ID_INDEX:
+        raise ValueError(
+            "Cannot identify point-group map number for "
+            f"{file_name}: n-spin part point group {n_spin_part_pg_symbol!r} "
+            "is not in the identify-index table."
+        )
+    pg = PG_SCH_TO_ID_INDEX[n_spin_part_pg_symbol] # map to identify-pg list
     name_generators = _match_name_generators(
         G0_num,
         identify_generator_source_ops,
@@ -2868,19 +3114,43 @@ def _identify_ssg_index_details(file_name,ssg_primitive:SpinSpaceGroup,tol = 0.0
         last_index = f'.{coplanar_suffix}' if coplanar_suffix is not None else '.P'
     else:
         last_index = ''
-    map_result = get_stand_trans(
-        L0_id,
-        G0_id,
-        it,
-        ik,
-        iso,
-        T,
-        name_maps,
-        translation_maps,
-        tol=tol,
-        use_222_contract=use_222_contract,
-        return_map_info=use_222_contract,
-    )
+    try:
+        map_result = get_stand_trans(
+            L0_id,
+            G0_id,
+            it,
+            ik,
+            iso,
+            T,
+            name_maps,
+            translation_maps,
+            tol=tol,
+            use_222_contract=use_222_contract,
+            return_map_info=use_222_contract,
+        )
+    except IndexError as exc:
+        context = {
+            "file_name": file_name,
+            "L0_id": L0_id,
+            "G0_id": G0_id,
+            "t_index": it,
+            "k_index": ik,
+            "point_group_id": iso,
+            "configuration": ssg_primitive.conf,
+            "n_spin_part_point_group_symbol_s": n_spin_part_pg_symbol,
+            "nsspg_order": nsspg_order,
+            "use_222_contract": use_222_contract,
+            "transformation_matrix": T,
+            "name_maps": name_maps,
+            "translation_maps": translation_maps,
+        }
+        raise ValueError(
+            "Identify-index adapter call failed with an internal IndexError "
+            "before returning a standard-generator map. This is an exposed "
+            "adapter/input consistency error; audit the context before "
+            "modifying identify-index internals. context="
+            f"{json.dumps(context, cls=NumpyEncoder, sort_keys=True)}"
+        ) from exc
     if use_222_contract:
         map_num, trans1, trans2, identify_map_info = map_result
         lookup_entry = get_coplanar_222_lookup_entry(
@@ -2982,8 +3252,19 @@ def get_G0_dataset_for_cell(space_group_operations, cell, symprec):
             typesForGerator.append(max(defaulttypes) + 1)
     cells = (cell[0], defaultpos + generatePosition, defaulttypes + typesForGerator)
     space_group_dataset =get_symmetry_dataset(cells, symprec=symprec)
+    if space_group_dataset is None:
+        raise SpaceToleranceDegeneracyError(
+            "spglib could not identify the G0 dataset from accepted operations "
+            "under the current space_tol; the spatial tolerance has made the "
+            "operation orbit inconsistent with the decorated magnetic cell."
+        )
     if space_group_dataset.number in SG_HALL_MAPPING:
         space_group_dataset =get_symmetry_dataset(cells, symprec=symprec, hall_number=SG_HALL_MAPPING[space_group_dataset.number])
+        if space_group_dataset is None:
+            raise SpaceToleranceDegeneracyError(
+                "spglib could not identify the mapped G0 dataset from accepted "
+                "operations under the current space_tol."
+            )
 
     return space_group_dataset
 
@@ -3072,6 +3353,11 @@ def _find_spin_group_from_parsed(
         tol=tol_cfg,
     )
     ssg_primitive: SpinSpaceGroup = identify_result.ssg
+    _assert_ssg_ops_consistency(
+        "input magnetic primitive",
+        ssg_primitive,
+        tol=tol_cfg,
+    )
     input_space_group = identify_result.input_space_group
     input_space_group_number = None if input_space_group is None else input_space_group.number
     input_space_group_symbol = None if input_space_group is None else input_space_group.symbol
@@ -3079,25 +3365,17 @@ def _find_spin_group_from_parsed(
         None if input_space_group is None else input_space_group.basis_or_setting
     )
 
-    try:
-        msg_dataset_primitive = get_magnetic_symmetry_dataset(
-            magnetic_primitive_cell.to_spglib(mag=True),
-            symprec=tol_cfg.space,
-            mag_symprec=tol_cfg.moment,
-        )
-        spglib_msg_num = msg_dataset_primitive.uni_number
-        mpg_symbol = MSGMPG_DB.OG_NUM_TO_MPG[
-            MSGMPG_DB.BNS_TO_OG_NUM[MSGMPG_DB.MSG_INT_TO_BNS[spglib_msg_num][0]]
-        ]["pointgroup_no"]
-    except Exception:
-        mpg_symbol = None
+    primitive_ossg_for_phase = _ossg_oriented_spin_frame_ssg(
+        ssg_primitive,
+        magnetic_primitive_cell,
+    )
 
     magnetic_phase_payload = classify_magnetic_phase(
         conf=ssg_primitive.conf,
         full_spin_part_point_group_hm=ssg_primitive.spin_part_point_group_symbol_hm,
         full_spin_part_point_group_s=ssg_primitive.spin_part_point_group_symbol_s,
         net_moment=magnetic_primitive_cell.net_moment,
-        mpg_identifier=mpg_symbol,
+        mpg_identifier=primitive_ossg_for_phase.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
     )
     magnetic_phase = magnetic_phase_payload['phase']
@@ -3105,7 +3383,7 @@ def _find_spin_group_from_parsed(
     magnetic_phase_modifier = magnetic_phase_payload['modifier']
     magnetic_phase_details = magnetic_phase_payload['details']
     ss_w_soc = spin_splitting_w_soc(ssg_primitive)
-    ahc_w_soc = is_ahc(mpg_symbol)
+    ahc_w_soc = is_ahc(primitive_ossg_for_phase.mpg_num)
     ss_wo_soc = magnetic_phase_payload['spin_splitting_without_soc']
     ahc_wo_soc = is_ahc(ssg_primitive.gspg.empg_symbol)
     alter = magnetic_phase_payload['is_alter']
@@ -3122,18 +3400,19 @@ def _find_spin_group_from_parsed(
         identify_index_details = _identify_ssg_index_details(
             source_name,
             ssg_primitive,
-            tol=tol_cfg.m_matrix_tol,
+            tol=tol_cfg.space,
         )
         identify_info = identify_index_details['index']
+        _assert_ssg_ops_consistency(
+            "input magnetic primitive",
+            ssg_primitive,
+            tol=tol_cfg,
+            identify_index_details=identify_index_details,
+        )
     except ValueError as exc:
         if not _should_degrade_identify_index_error(exc):
             raise
-        warnings.warn(
-            f"Identify-index output unavailable for {source_name}: {exc}. "
-            "Continuing with identify-index-derived outputs set to None.",
-            RuntimeWarning,
-            stacklevel=2,
-        )
+        identify_info = _handle_missing_identify_index(source_name, exc)
     input_magnetic_primitive_poscar = magnetic_primitive_cell.to_poscar(source_name)
     raw_transformation_primitive_to_G0std = (
         np.asarray(ssg_primitive.transformation_to_G0std, dtype=float),
@@ -3335,6 +3614,7 @@ def _find_spin_group_from_parsed(
         public_ossg_ssg,
         real_space_setting=convention_setting,
         spin_frame_setting=OSSG_ORIENTED_SPIN_FRAME_SETTING,
+        spin_analysis_transform=_lattice_column_matrix(convention_cell),
     )
     msg_parent_info = msg_parent_space_group_info(msg_num)
     ossg_space_group_number = None if identify_index_details is None else identify_index_details.get("G0_id")
@@ -3374,6 +3654,10 @@ def _find_spin_group_from_parsed(
     KPOINTS = acc_primitive_output_ssg.KPOINTS
     SS =  acc_primitive_output_ssg.spin_polarizations
     SS_poscar = acc_primitive_output_ssg_in_poscar_spin_frame.spin_polarizations
+    ssg_little_groups = _get_ssg_little_groups(
+        acc_primitive_output_ssg,
+        tol=tol_cfg.m_matrix_tol,
+    )
     primitive_msg_ops, msg_little_groups, msg_little_group_symbols = _build_msg_little_group_core(
         acc_primitive_ossg,
         tol=tol_cfg.m_matrix_tol,
@@ -3512,7 +3796,7 @@ def _find_spin_group_from_parsed(
 
 
     result = {
-        'index':ssg_primitive.index,
+        'index':identify_info,
         'spin_part_pg':ssg_primitive.spin_part_point_group_symbol_hm,
         'conf':ssg_primitive.conf,
         'id_index_info':identify_info,
@@ -3735,6 +4019,16 @@ def _find_spin_group_from_parsed(
                 ],
                 'acc_primitive_msg_ops_setting': ACC_PRIMITIVE_SETTING,
                 'acc_primitive_msg_ops_spin_frame_setting': OSSG_ORIENTED_SPIN_FRAME_SETTING,
+                'ssg_little_group_ops': _serialize_ssg_little_group_ops(ssg_little_groups),
+                'ssg_little_group_seitz_latex': _serialize_ssg_little_group_seitz_latex(
+                    ssg_little_groups,
+                    tol=acc_primitive_output_ssg.symbol_calibration_tol,
+                ),
+                'msg_little_group_ops': _serialize_msg_little_group_ops(msg_little_groups),
+                'msg_little_group_seitz_latex': _serialize_msg_little_group_seitz_latex(
+                    msg_little_groups,
+                    tol=tol_cfg.m_matrix_tol,
+                ),
                 'msg_little_group_symbols': msg_little_group_symbols,
                 'msg_spin_polarizations': msg_spin_polarizations_poscar,
                 'msg_spin_polarizations_setting': ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING,
@@ -3935,6 +4229,11 @@ def _find_spin_group_basic_from_parsed(
         tol=tol_cfg,
     )
     ssg_primitive: SpinSpaceGroup = identify_result.ssg
+    _assert_ssg_ops_consistency(
+        "basic magnetic primitive",
+        ssg_primitive,
+        tol=tol_cfg,
+    )
     input_space_group = identify_result.input_space_group
     input_space_group_number = None if input_space_group is None else input_space_group.number
     input_space_group_symbol = None if input_space_group is None else input_space_group.symbol
@@ -3945,38 +4244,31 @@ def _find_spin_group_basic_from_parsed(
         identify_index_details = _identify_ssg_index_details(
             source_name,
             ssg_primitive,
-            tol=tol_cfg.m_matrix_tol,
+            tol=tol_cfg.space,
         )
         identify_info = identify_index_details["index"]
+        _assert_ssg_ops_consistency(
+            "basic magnetic primitive",
+            ssg_primitive,
+            tol=tol_cfg,
+            identify_index_details=identify_index_details,
+        )
     except ValueError as exc:
         if not _should_degrade_identify_index_error(exc):
             raise
-        warnings.warn(
-            f"Identify-index output unavailable for {source_name}: {exc}. "
-            "Continuing with identify-index-derived outputs set to None.",
-            RuntimeWarning,
-            stacklevel=2,
-        )
+        identify_info = _handle_missing_identify_index(source_name, exc)
 
-    try:
-        msg_dataset_primitive = get_magnetic_symmetry_dataset(
-            magnetic_primitive_cell.to_spglib(mag=True),
-            symprec=tol_cfg.space,
-            mag_symprec=tol_cfg.moment,
-        )
-        spglib_msg_num = msg_dataset_primitive.uni_number
-        mpg_symbol = MSGMPG_DB.OG_NUM_TO_MPG[
-            MSGMPG_DB.BNS_TO_OG_NUM[MSGMPG_DB.MSG_INT_TO_BNS[spglib_msg_num][0]]
-        ]["pointgroup_no"]
-    except Exception:
-        mpg_symbol = None
+    primitive_ossg_for_phase = _ossg_oriented_spin_frame_ssg(
+        ssg_primitive,
+        magnetic_primitive_cell,
+    )
 
     magnetic_phase_payload = classify_magnetic_phase(
         conf=ssg_primitive.conf,
         full_spin_part_point_group_hm=ssg_primitive.spin_part_point_group_symbol_hm,
         full_spin_part_point_group_s=ssg_primitive.spin_part_point_group_symbol_s,
         net_moment=magnetic_primitive_cell.net_moment,
-        mpg_identifier=mpg_symbol,
+        mpg_identifier=primitive_ossg_for_phase.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
     )
 
@@ -4059,24 +4351,30 @@ def _find_spin_group_acc_primitive_from_parsed(
         tol=tol_cfg,
     )
     ssg_primitive: SpinSpaceGroup = identify_result.ssg
+    _assert_ssg_ops_consistency(
+        "ACC primitive magnetic primitive",
+        ssg_primitive,
+        tol=tol_cfg,
+    )
 
     identify_index_details = None
     identify_info = None
     try:
         identify_index_details = ssg_primitive.identify_index_details(
             source_name,
-            tol=tol_cfg.m_matrix_tol,
+            tol=tol_cfg.space,
         )
         identify_info = identify_index_details["index"]
+        _assert_ssg_ops_consistency(
+            "ACC primitive magnetic primitive",
+            ssg_primitive,
+            tol=tol_cfg,
+            identify_index_details=identify_index_details,
+        )
     except ValueError as exc:
         if not _should_degrade_identify_index_error(exc):
             raise
-        warnings.warn(
-            f"Identify-index output unavailable for {source_name}: {exc}. "
-            "Continuing with identify-index-derived outputs set to None.",
-            RuntimeWarning,
-            stacklevel=2,
-        )
+        identify_info = _handle_missing_identify_index(source_name, exc)
 
     transformation_primitive_to_acc_primitive = (
         np.asarray(ssg_primitive.acc_primitive_trans, dtype=float),
@@ -4363,24 +4661,22 @@ def _find_spin_group_input_ssg_from_parsed(
         tol=tol_cfg,
     )
     primitive_ssg: SpinSpaceGroup = primitive_identify_result.ssg
+    _assert_ssg_ops_consistency(
+        "input route primitive SSG",
+        primitive_ssg,
+        tol=tol_cfg,
+    )
 
     primitive_identify_info = None
     try:
         primitive_identify_info = primitive_ssg.identify_index(
             source_name,
-            tol=tol_cfg.m_matrix_tol,
+            tol=tol_cfg.space,
         )
     except ValueError as exc:
         if not _should_degrade_identify_index_error(exc):
             raise
-        warnings.warn(
-            f"Primitive identify-index output unavailable for {source_name}: {exc}. "
-            "Continuing with primitive identify-index-derived outputs set to None.",
-            RuntimeWarning,
-            stacklevel=2,
-        )
-        primitive_identify_info = primitive_ssg.index
-    primitive_identify_info = primitive_identify_info or primitive_ssg.index
+        primitive_identify_info = _handle_missing_identify_index(source_name, exc)
 
     primitive_ossg = _ossg_oriented_spin_frame_ssg(primitive_ssg, input_magnetic_primitive_cell)
 
@@ -4390,6 +4686,11 @@ def _find_spin_group_input_ssg_from_parsed(
             np.zeros(3),
         )
         input_ssg = primitive_ssg.transform(*primitive_to_input)
+        _assert_ssg_ops_consistency(
+            "input route input SSG",
+            input_ssg,
+            tol=tol_cfg,
+        )
         identify_info = primitive_identify_info
     else:
         input_identify_result = identify_spin_space_group_result(
@@ -4398,22 +4699,21 @@ def _find_spin_group_input_ssg_from_parsed(
             tol=tol_cfg,
         )
         input_ssg = input_identify_result.ssg
+        _assert_ssg_ops_consistency(
+            "input route input SSG",
+            input_ssg,
+            tol=tol_cfg,
+        )
         identify_info = None
         try:
             identify_info = input_ssg.identify_index(
                 source_name,
-                tol=tol_cfg.m_matrix_tol,
+                tol=tol_cfg.space,
             )
         except ValueError as exc:
             if not _should_degrade_identify_index_error(exc):
                 raise
-            warnings.warn(
-                f"Identify-index output unavailable for {source_name}: {exc}. "
-                "Continuing with identify-index-derived outputs set to None.",
-                RuntimeWarning,
-                stacklevel=2,
-            )
-        identify_info = identify_info or input_ssg.index
+            identify_info = _handle_missing_identify_index(source_name, exc)
 
     input_ossg = _ossg_oriented_spin_frame_ssg(input_ssg, identify_cell)
     magnetic_phase_payload = classify_magnetic_phase(
@@ -4447,7 +4747,7 @@ def _find_spin_group_input_ssg_from_parsed(
 
     return {
         "summary": {
-            "input_ssg_index": identify_info or input_ssg.index,
+            "input_ssg_index": identify_info,
             "primitive_ssg_index": primitive_identify_info,
             "input_conf": input_ssg.conf,
             "input_spin_only_direction": _format_spin_only_direction(input_ossg.sog_direction),

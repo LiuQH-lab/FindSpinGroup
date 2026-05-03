@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-DEFAULT_SERVER_REPO_ROOT="/share/home/yuyt/project/fsg-2026/FindSpinGroup"
+DEFAULT_SERVER_REPO_ROOT="${FSG_REMOTE_REPO_ROOT:-}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ -n "${FSG_REPO_ROOT:-}" ]]; then
@@ -13,10 +13,16 @@ else
   REPO_ROOT="$DEFAULT_SERVER_REPO_ROOT"
 fi
 
-INPUT_DIR="$REPO_ROOT/tests/testset/mcif_241130_no2186"
-OUTPUT_ROOT="$REPO_ROOT/output/mcif_241130_no2186_run"
+if [[ -n "$REPO_ROOT" ]]; then
+  INPUT_DIR="$REPO_ROOT/tests/testset/mcif_241130_no2186"
+  OUTPUT_ROOT="$REPO_ROOT/output/mcif_241130_no2186_run"
+  BASELINE_ROOT="$REPO_ROOT/batch_baselines"
+else
+  INPUT_DIR=""
+  OUTPUT_ROOT=""
+  BASELINE_ROOT=""
+fi
 BASELINE_SUITE="mcif_241130_no2186"
-BASELINE_ROOT="$REPO_ROOT/batch_baselines"
 EXPORT_TXT="selected.txt"
 EXPORT_FIELDS="index,phase,properties.ss_w_soc"
 SPACE_TOL="0.02"
@@ -31,7 +37,7 @@ Usage: tfsg [options]
 
 Default behavior:
   submit the standard mcif batch test under:
-    $INPUT_DIR
+    <repo>/tests/testset/mcif_241130_no2186
 
 Options:
   --repo-root PATH         Override repository root.
@@ -51,8 +57,9 @@ Options:
 Examples:
   tfsg
   tfsg --space-tol 0.01 --mtol 0.01 --matrix-tol 0.005
-  tfsg --input-dir /share/home/yuyt/project/fsg-2026/FindSpinGroup/testset/error_set \\
-       --output-root /share/home/yuyt/project/fsg-2026/FindSpinGroup/output/error_set_run \\
+  tfsg --repo-root /path/to/FindSpinGroup
+  tfsg --input-dir /path/to/FindSpinGroup/testset/error_set \\
+       --output-root /path/to/FindSpinGroup/output/error_set_run \\
        --baseline-suite error_set
 EOF
 }
@@ -119,6 +126,21 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$REPO_ROOT" ]]; then
+  echo "Cannot determine repository root. Set FSG_REPO_ROOT, FSG_REMOTE_REPO_ROOT, or pass --repo-root PATH." >&2
+  exit 2
+fi
+
+if [[ -z "$INPUT_DIR" ]]; then
+  INPUT_DIR="$REPO_ROOT/tests/testset/mcif_241130_no2186"
+fi
+if [[ -z "$OUTPUT_ROOT" ]]; then
+  OUTPUT_ROOT="$REPO_ROOT/output/mcif_241130_no2186_run"
+fi
+if [[ -z "$BASELINE_ROOT" ]]; then
+  BASELINE_ROOT="$REPO_ROOT/batch_baselines"
+fi
 
 SUBMIT_SCRIPT="$REPO_ROOT/scripts/submit_batch_mcif.sh"
 

@@ -14,8 +14,19 @@ from findspingroup.utils.matrix_utils import normalize_vector_to_zero
 MAGNETIC_PRESENCE_TOL = 1e-5
 
 
+class SpaceToleranceDegeneracyError(ValueError):
+    """Raised when space_tol makes atomic-site equivalence magnetically inconsistent."""
+
+
 def _moment_distance(moment_a, moment_b):
     return float(np.linalg.norm(np.asarray(moment_a, dtype=float) - np.asarray(moment_b, dtype=float)))
+
+
+def _within_closed_tolerance(distance, tolerance):
+    distance = float(distance)
+    tolerance = float(tolerance)
+    slack = 64.0 * np.finfo(float).eps * max(1.0, abs(distance), abs(tolerance))
+    return distance <= tolerance + slack
 
 
 def standardize_lattice(lattice):
@@ -323,7 +334,8 @@ def find_cell_border(a, b, c):
         'z': (min(vz_values), max(vz_values))
     }
 
-def change_cell_settings(old_cell, transformation_matrix, origin_shift,eps=0.0001):
+def change_cell_settings(old_cell, transformation_matrix, origin_shift, eps=0.0001, moment_eps=None):
+    moment_eps = eps if moment_eps is None else float(moment_eps)
     """
     given the old cell and the transformation matrix and origin shift
     return the transformed cell
@@ -407,7 +419,11 @@ def change_cell_settings(old_cell, transformation_matrix, origin_shift,eps=0.000
         position_buckets.setdefault((atom_type, bucket_key), []).append(len(new_cell_positions) - 1)
     # print(len(new_cell_positions),len(old_cell[1]),abs(np.linalg.det(transformation_matrix)))
     if len(new_cell_positions) != round(len(old_cell[1])*abs(np.linalg.det(transformation_matrix))):
-        raise ValueError("The number of new cell positions does not match the number of old cell positions, please change tolerance. Or the transformation matrix is not valid.")
+        raise SpaceToleranceDegeneracyError(
+            "space_tol makes transformed atomic positions non-bijective for the "
+            "current cell transformation; distinct sites collapse or the "
+            "transformation is not valid under this tolerance."
+        )
 
     mul_num_list = [0]*len(new_cell_positions)
     for i,p1 in enumerate(temp_new_cell_positions):
@@ -418,8 +434,13 @@ def change_cell_settings(old_cell, transformation_matrix, origin_shift,eps=0.000
                 p2 = new_cell_positions[j]
                 if getNormInf(p1 % 1, p2) < eps:
                     # print(p1,p2)
-                    if sum(abs(temp_cell_moments[i]- new_cell_moments[j]))>eps:
-                        raise ValueError(f"Atom moments mismatch after transformation, p:{temp_new_cell_positions[i]}moments:{temp_cell_moments[i]} and p:{new_cell_positions[j]}moments:{new_cell_moments[j]},please change tolerance. Or it's not a valid transformation matrix.")
+                    if _moment_distance(temp_cell_moments[i], new_cell_moments[j]) > moment_eps:
+                        raise SpaceToleranceDegeneracyError(
+                            "space_tol makes two transformed atomic sites position-equivalent "
+                            "while their magnetic moments differ beyond mtol; "
+                            f"p:{temp_new_cell_positions[i]} moments:{temp_cell_moments[i]} "
+                            f"and p:{new_cell_positions[j]} moments:{new_cell_moments[j]}."
+                        )
                     mul_num_list[j] +=1
                     break
             else:
@@ -488,9 +509,12 @@ class AtomicSite:
         """Check if two AtomicSite instances are equivalent within a tolerance."""
         if not isinstance(other, AtomicSite):
             return False
-        pos_equal = getNormInf(self.position, other.position) < tol.space
-        mom_equal = _moment_distance(self.magnetic_moment, other.magnetic_moment) <= tol.moment
-        occ_equal = abs(self.occupancy - other.occupancy) < tol.occupancy
+        pos_equal = _within_closed_tolerance(getNormInf(self.position, other.position), tol.space)
+        mom_equal = _within_closed_tolerance(
+            _moment_distance(self.magnetic_moment, other.magnetic_moment),
+            tol.moment,
+        )
+        occ_equal = _within_closed_tolerance(abs(self.occupancy - other.occupancy), tol.occupancy)
         elem_equal = self.element_symbol == other.element_symbol
         return pos_equal and mom_equal and occ_equal and elem_equal
 
@@ -742,11 +766,23 @@ class CrystalCell:
         L0_nonmagnetic_cell = tuple([self.lattice_matrix,self.positions,L0_nonmagnetic_atom_types])
 
         try:
-            prim_lat, prim_pos, prim_types = sc(
-            L0_nonmagnetic_cell, symprec=self.tol.space, to_primitive=True, no_idealize=True
-        )
-        except:
-            raise ValueError("Spglib failed to find the primitive cell. Maybe the tolerance is too small or the structure is not valid.")
+            primitive_result = sc(
+                L0_nonmagnetic_cell,
+                symprec=self.tol.space,
+                to_primitive=True,
+                no_idealize=True,
+            )
+        except Exception as exc:
+            raise SpaceToleranceDegeneracyError(
+                "spglib failed to find the magnetic primitive cell under the "
+                "current space_tol after magnetic sites were split by mtol."
+            ) from exc
+        if primitive_result is None:
+            raise SpaceToleranceDegeneracyError(
+                "spglib failed to find the magnetic primitive cell under the "
+                "current space_tol after magnetic sites were split by mtol."
+            )
+        prim_lat, prim_pos, prim_types = primitive_result
 
         prim_occ = [L0_nonmagnetic_atom_types_to_occupancies[t] for t in prim_types]
         prim_elem = [L0_nonmagnetic_atom_types_to_symbol[t] for t in prim_types]
@@ -781,7 +817,12 @@ class CrystalCell:
         if self.moments is None:
             new_cell = change_cell_settings(self.to_spglib(mag=False), matrix, shift)
         else:
-            new_cell = change_cell_settings(self.to_spglib(mag=True), matrix, shift)
+            new_cell = change_cell_settings(
+                self.to_spglib(mag=True),
+                matrix,
+                shift,
+                moment_eps=self.tol.moment,
+            )
 
         new_lattice, new_positions, new_types, new_moments = new_cell
 

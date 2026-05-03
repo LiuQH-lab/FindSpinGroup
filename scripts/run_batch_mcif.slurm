@@ -11,7 +11,9 @@ ulimit -s unlimited
 ulimit -l unlimited
 
 module load anaconda
+set +u
 source activate base
+set -u
 
 export OMP_NUM_THREADS=1
 export OPENBLAS_NUM_THREADS=1
@@ -39,6 +41,9 @@ EXPORT_RUNTIME_ROWS="${EXPORT_RUNTIME_ROWS:-1}"
 EXPORT_ROWS_JSONL_NAME="${EXPORT_ROWS_JSONL_NAME:-export_rows.jsonl}"
 EXPORT_ROWS_XLSX_NAME="${EXPORT_ROWS_XLSX_NAME:-export_rows.xlsx}"
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}"
+SHARD_INDEX="${SHARD_INDEX:-0}"
+SHARD_COUNT="${SHARD_COUNT:-1}"
+LIMIT="${LIMIT:-}"
 
 if [[ ! -d "$INPUT_DIR" ]]; then
   echo "Input directory does not exist: $INPUT_DIR" >&2
@@ -88,7 +93,18 @@ CMD=(
   "$MATRIX_TOL"
   --route
   "$BATCH_ROUTE"
+  --shard-index
+  "$SHARD_INDEX"
+  --shard-count
+  "$SHARD_COUNT"
 )
+
+if [[ -n "$LIMIT" ]]; then
+  CMD+=(
+    --limit
+    "$LIMIT"
+  )
+fi
 
 if [[ -n "$BASELINE_SUITE" ]]; then
   CMD+=(
@@ -136,6 +152,12 @@ else
 fi
 echo "Tolerances  : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRIX_TOL"
 echo "Batch route : $BATCH_ROUTE"
+echo "Shard       : $SHARD_INDEX / $SHARD_COUNT"
+if [[ -n "$LIMIT" ]]; then
+  echo "Limit       : $LIMIT"
+else
+  echo "Limit       : <none>"
+fi
 if [[ -n "$EXPORT_TXT" ]]; then
   echo "Export txt  : $EXPORT_TXT"
 else

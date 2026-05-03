@@ -26,6 +26,9 @@ Environment overrides:
   EXPORT_TXT     current: ${EXPORT_TXT:-selected.txt}
   EXPORT_FIELDS  current: ${EXPORT_FIELDS:-index,phase,properties.ss_w_soc}
   INCLUDE_G0_SELF_AUDIT current: ${INCLUDE_G0_SELF_AUDIT:-0}
+  SHARD_INDEX    current: ${SHARD_INDEX:-0}
+  SHARD_COUNT    current: ${SHARD_COUNT:-1}
+  LIMIT          current: ${LIMIT:-<none>}
   SBATCH_BIN     current: ${SBATCH_BIN:-sbatch}
 
 Examples:
@@ -48,6 +51,9 @@ MTOL="${MTOL:-0.02}"
 MEIGTOL="${MEIGTOL:-0.00002}"
 MATRIX_TOL="${MATRIX_TOL:-0.01}"
 BATCH_ROUTE="${BATCH_ROUTE:-full}"
+SHARD_INDEX="${SHARD_INDEX:-0}"
+SHARD_COUNT="${SHARD_COUNT:-1}"
+LIMIT="${LIMIT:-}"
 
 EXPORT_TXT="${EXPORT_TXT:-selected.txt}"
 if [[ -n "${EXPORT_FIELDS+x}" ]]; then
@@ -102,6 +108,8 @@ echo "Batch route    : $BATCH_ROUTE"
 echo "Export txt     : ${EXPORT_TXT:-<none>}"
 echo "Export fields  : ${EXPORT_FIELDS:-<none>}"
 echo "G0 self audit  : ${INCLUDE_G0_SELF_AUDIT:-0}"
+echo "Shard          : $SHARD_INDEX / $SHARD_COUNT"
+echo "Limit          : ${LIMIT:-<none>}"
 
 CMD=(
   "$SBATCH_BIN"
@@ -124,5 +132,8 @@ BATCH_ROUTE="$BATCH_ROUTE" \
 EXPORT_TXT="$EXPORT_TXT" \
 EXPORT_FIELDS="$EXPORT_FIELDS" \
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}" \
+SHARD_INDEX="$SHARD_INDEX" \
+SHARD_COUNT="$SHARD_COUNT" \
+LIMIT="$LIMIT" \
 FSG_REPO_ROOT="$REPO_ROOT" \
 "${CMD[@]}"

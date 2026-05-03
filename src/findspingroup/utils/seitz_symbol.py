@@ -42,74 +42,6 @@ def _matrix_order(matrix: np.ndarray, max_order: int = 120, tol: float = 1e-6) -
     raise ValueError(f"Cannot determine matrix order <= {max_order}.")
 
 
-def _fallback_low_order(matrix: np.ndarray, tol: float = 1e-6) -> int | None:
-    matrix = np.asarray(matrix, dtype=float)
-    if np.allclose(matrix, np.eye(3), atol=max(1e-4, 100 * tol), rtol=0):
-        return 1
-    if np.allclose(matrix @ matrix, np.eye(3), atol=max(1e-3, 20 * tol), rtol=0):
-        return 2
-
-    det = float(np.linalg.det(matrix))
-    eigenvalues = np.linalg.eigvals(matrix)
-    if det < 0:
-        unit_eigenvalues = [value / abs(value) for value in eigenvalues if abs(value) > tol]
-        minus_one_hits = [
-            value for value in unit_eigenvalues
-            if abs(value.imag) < max(1e-3, 1000 * tol) and abs(value.real + 1.0) < max(1e-2, 10000 * tol)
-        ]
-        if minus_one_hits:
-            residual_angles = []
-            for value in unit_eigenvalues:
-                if any(np.allclose(value, hit, atol=max(1e-3, 1000 * tol), rtol=0) for hit in minus_one_hits):
-                    continue
-                angle = abs(float(np.angle(value)))
-                residual_angles.append(min(angle, abs(2.0 * math.pi - angle)))
-            if residual_angles and max(residual_angles) < 5e-2:
-                return 2
-    return None
-
-
-def _nearest_known_point_operation(
-    matrix: np.ndarray,
-    *,
-    tol: float = 1e-6,
-) -> np.ndarray | None:
-    """Return the nearest standard point-operation matrix when the match is clear."""
-    matrix = np.asarray(matrix, dtype=float)
-    comparison_bases = [matrix, _orthogonalize_matrix(matrix)]
-    unique_candidates: list[np.ndarray] = []
-    for op_set in (operations, operations_hex):
-        for raw_matrix, _, _ in op_set:
-            candidate = np.asarray(raw_matrix, dtype=float)
-            if any(np.allclose(candidate, existing, atol=1e-12, rtol=0) for existing in unique_candidates):
-                continue
-            unique_candidates.append(candidate)
-
-    candidates: list[tuple[float, np.ndarray]] = []
-    for candidate in unique_candidates:
-        best_dist = min(float(np.linalg.norm(basis_matrix - candidate)) for basis_matrix in comparison_bases)
-        candidates.append((best_dist, candidate))
-
-    if not candidates:
-        return None
-
-    candidates.sort(key=lambda item: item[0])
-    best_dist, best_matrix = candidates[0]
-    second_dist = candidates[1][0] if len(candidates) > 1 else math.inf
-
-    # This branch only runs after direct order probing and spectral fallback
-    # both fail. A wider fixed gate is acceptable here for noisy but clearly
-    # standard finite-order operations such as the 0.427 near-`-4` case.
-    max_match_dist = max(1e-2, 4 * tol)
-    min_gap = max(1e-4, 2 * tol)
-
-    if best_dist > max_match_dist:
-        return None
-    if second_dist - best_dist < min_gap:
-        return None
-    return np.asarray(best_matrix, dtype=float)
-
-
 def _parse_direction_subscript_token(token: str) -> tuple[int, int, int]:
     if "," in token:
         parts = [part.strip() for part in token.split(",")]
@@ -191,33 +123,13 @@ def _nearest_known_point_operation_token(
     best_dist, best_info = candidates[0]
     second_dist = candidates[1][0] if len(candidates) > 1 else math.inf
 
-    max_match_dist = max(1e-2, 4 * tol)
+    max_match_dist = max(5 * tol, 1e-8)
     min_gap = max(1e-4, 2 * tol)
     if best_dist > max_match_dist:
         return None
     if second_dist - best_dist < min_gap:
         return None
     return copy.deepcopy(best_info)
-
-
-def _spectral_order_hint(
-    matrix: np.ndarray,
-    *,
-    max_order: int = 120,
-    tol: float = 1e-6,
-) -> int | None:
-    """Infer a plausible finite order from eigenvalue phases when power probing misses narrowly."""
-    matrix = np.asarray(matrix, dtype=float)
-    _, fold = _rotation_fraction_from_eigenvalues(matrix, max_fold=max_order, tol=max(tol, 1e-6))
-    if fold <= 1 or fold > max_order:
-        return None
-
-    power = np.eye(3)
-    for _ in range(fold):
-        power = power @ matrix
-    if np.max(np.abs(power - np.eye(3))) > max(2e-4, 4 * tol):
-        return None
-    return int(fold)
 
 
 def _canonicalize_axis(axis: np.ndarray, tol: float = 1e-9) -> np.ndarray:
@@ -310,7 +222,7 @@ def _rotation_fraction_from_eigenvalues(
     return int(frac.numerator), int(frac.denominator)
 
 
-def _hm_improper_fold(matrix: np.ndarray, fallback_fold: int, tol: float = 1e-6) -> int:
+def _hm_improper_fold(matrix: np.ndarray, order_hint: int, tol: float = 1e-6) -> int:
     """
     Return the crystallographic HM fold for an improper point operation.
 
@@ -318,10 +230,7 @@ def _hm_improper_fold(matrix: np.ndarray, fallback_fold: int, tol: float = 1e-6)
     still `-3`. The HM fold comes from the proper rotation part `-R`.
     """
     candidate = -np.asarray(matrix, dtype=float)
-    try:
-        return _matrix_order(candidate, max_order=max(12, fallback_fold * 2), tol=tol)
-    except Exception:
-        return int(fallback_fold)
+    return _matrix_order(candidate, max_order=max(12, int(order_hint) * 2), tol=tol)
 
 
 def _vector_to_integer_direction(
@@ -582,30 +491,7 @@ def _describe_point_operation_impl(
     det_sign = 1 if det >= 0 else -1
 
     order = None
-    try:
-        order = _matrix_order(matrix, max_order=max_order, tol=tol)
-    except ValueError:
-        # In some transformed (non-Euclidean) bases, finite-order matrices can
-        # be numerically noisy; use orthogonalized fallback for order probing.
-        try:
-            order = _matrix_order(ortho_matrix, max_order=max_order, tol=tol)
-        except ValueError:
-            spectral_order = _spectral_order_hint(matrix, max_order=max_order, tol=tol)
-            if spectral_order is not None:
-                order = spectral_order
-            else:
-                nearest_match = _nearest_known_point_operation(matrix, tol=tol)
-                if nearest_match is not None:
-                    return describe_point_operation(
-                        nearest_match,
-                        tol=min(float(tol), 1e-6),
-                        max_order=max_order,
-                        max_axis_denom=max_axis_denom,
-                    )
-                fallback_order = _fallback_low_order(ortho_matrix, tol=tol)
-                if fallback_order is None:
-                    raise
-                order = fallback_order
+    order = _matrix_order(matrix, max_order=max_order, tol=tol)
 
     is_euclidean_orthogonal = np.allclose(matrix.T @ matrix, np.eye(3), atol=1e-3, rtol=0)
 
@@ -756,6 +642,49 @@ def describe_point_operation(
             int(max_axis_denom),
         )
     )
+
+
+def _unresolved_point_operation_description(matrix: np.ndarray, reason: str) -> dict:
+    matrix = np.asarray(matrix, dtype=float)
+    return {
+        "hm_symbol": "?",
+        "order": None,
+        "rotation_power": None,
+        "axis_kind": None,
+        "axis_vector": None,
+        "axis_direction": None,
+        "axis_euler_deg": None,
+        "axis_parameter_values": None,
+        "axis_subscript_linear": None,
+        "axis_subscript_latex": None,
+        "symbol": "?",
+        "symbol_latex": "?",
+        "unresolved": True,
+        "unresolved_reason": reason,
+        "matrix": tuple(tuple(float(value) for value in row) for row in matrix),
+    }
+
+
+def describe_point_operation_or_unresolved(
+    matrix: np.ndarray,
+    *,
+    tol: float = 1e-6,
+    max_order: int = 120,
+    max_axis_denom: int = 12,
+    component: str = "point operation",
+) -> dict:
+    try:
+        return describe_point_operation(
+            matrix,
+            tol=tol,
+            max_order=max_order,
+            max_axis_denom=max_axis_denom,
+        )
+    except Exception as exc:
+        return _unresolved_point_operation_description(
+            matrix,
+            f"{component}: {type(exc).__name__}: {exc}",
+        )
 
 
 def format_translation_tau(translation: np.ndarray, tol: float = 1e-8) -> str:
@@ -912,12 +841,22 @@ def describe_spin_space_operation(
     tol: float = 1e-6,
     max_order: int = 120,
     max_axis_denom: int = 12,
+    allow_unresolved: bool = False,
 ) -> dict:
-    spin_info = describe_point_operation(
-        spin_rotation, tol=tol, max_order=max_order, max_axis_denom=max_axis_denom
+    describe_point = describe_point_operation_or_unresolved if allow_unresolved else describe_point_operation
+    spin_info = describe_point(
+        spin_rotation,
+        tol=tol,
+        max_order=max_order,
+        max_axis_denom=max_axis_denom,
+        **({"component": "spin rotation"} if allow_unresolved else {}),
     )
-    real_info = describe_point_operation(
-        real_rotation, tol=tol, max_order=max_order, max_axis_denom=max_axis_denom
+    real_info = describe_point(
+        real_rotation,
+        tol=tol,
+        max_order=max_order,
+        max_axis_denom=max_axis_denom,
+        **({"component": "real rotation"} if allow_unresolved else {}),
     )
     tau = format_translation_tau(translation, tol=tol)
     tau_latex = format_translation_tau_latex(translation, tol=tol)

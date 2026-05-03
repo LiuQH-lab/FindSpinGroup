@@ -45,11 +45,11 @@ def adjust_space_matrix(A, m, tol = 0.001):
     return B
 
 # Normalize both the point and space parts of a map pair.
-def adjust_map(pair, m):
+def adjust_map(pair, m, tol=0.001):
     A = pair[0].copy()
     B = pair[1].copy()
     A_adj = adjust_point_matrix(A)
-    B_adj = adjust_space_matrix(B, m)
+    B_adj = adjust_space_matrix(B, m, tol=tol)
 
     return [A_adj, B_adj]
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import math
 import shutil
@@ -85,18 +86,26 @@ def _normalize_case_id(path: Path) -> str:
         return resolved.as_posix()
 
 
-def _tagged_artifact_name(file_name: str, run_tag: str) -> str:
+def _tagged_artifact_name(file_name: str, run_tag: str, case_id: str | None = None) -> str:
     path = Path(file_name)
-    return f"{path.stem}__{run_tag}{path.suffix}"
+    digest_part = ""
+    if case_id is not None:
+        digest = hashlib.sha1(case_id.encode("utf-8")).hexdigest()[:12]
+        digest_part = f"__{digest}"
+    tail = f"{digest_part}__{run_tag}{path.suffix}"
+    max_component_length = 240
+    stem_limit = max(16, max_component_length - len(tail))
+    stem = path.stem[:stem_limit]
+    return f"{stem}{tail}"
 
 
-def _error_json_path(root: Path, file_name: str, run_tag: str) -> Path:
-    tagged_name = _tagged_artifact_name(file_name, run_tag)
+def _error_json_path(root: Path, file_name: str, run_tag: str, case_id: str | None = None) -> Path:
+    tagged_name = _tagged_artifact_name(file_name, run_tag, case_id=case_id)
     return root / "error_json" / f"{tagged_name}.json"
 
 
-def _error_set_path(root: Path, file_name: str, run_tag: str) -> Path:
-    return root / "error_set" / _tagged_artifact_name(file_name, run_tag)
+def _error_set_path(root: Path, file_name: str, run_tag: str, case_id: str | None = None) -> Path:
+    return root / "error_set" / _tagged_artifact_name(file_name, run_tag, case_id=case_id)
 
 
 def _read_manifest(manifest_path: Path) -> list[Path]:
@@ -846,8 +855,8 @@ def run_mcif_batch(
         _append_jsonl(records_path, runtime_record)
         _append_jsonl(full_results_path, full_runtime_record)
         if runtime_record["status"] == "error":
-            _write_json(_error_json_path(output_dir, file_path.name, run_tag), runtime_record)
-            error_set_path = _error_set_path(output_dir, file_path.name, run_tag)
+            _write_json(_error_json_path(output_dir, file_path.name, run_tag, case_id=case_id), runtime_record)
+            error_set_path = _error_set_path(output_dir, file_path.name, run_tag, case_id=case_id)
             error_set_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(file_path, error_set_path)
 

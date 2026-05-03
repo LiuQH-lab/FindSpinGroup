@@ -11,7 +11,7 @@ sys.path.insert(0, parent_path)
 from databases import find_ssg_reduce,get_space_group
 from functions import *
 
-def find_ssg_transformation(L0_id, G0_id, it, ik, iso,TM):
+def find_ssg_transformation(L0_id, G0_id, it, ik, iso,TM,tol=0.001):
     result = {}
     results = find_ssg_reduce(L0_id, G0_id, it, ik, iso)
     L0 = get_space_group(L0_id)
@@ -39,8 +39,8 @@ def find_ssg_transformation(L0_id, G0_id, it, ik, iso,TM):
             newTM = np.matrix.getI(make_4d_matrix(ttm[0]))*(TM)
             newgen = []
             for gen in Gen:
-                newgen.append(adjust_space_matrix(newTM*gen*np.matrix.getI(newTM),1))
-            if is_matrices_in(newgen,All):
+                newgen.append(adjust_space_matrix(newTM*gen*np.matrix.getI(newTM),1,tol=tol))
+            if is_matrices_in(newgen,All,tol=tol):
                 result = {"indices": [L0_id,G0_id,it,ik],
                 "cell_size": item['cell_size'],
                 "gen_matrices": item['gen_matrix'],
