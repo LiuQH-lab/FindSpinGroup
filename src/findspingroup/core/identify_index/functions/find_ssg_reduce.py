@@ -40,7 +40,7 @@ def find_ssg_transformation(L0_id, G0_id, it, ik, iso,TM,tol = 0.001, use_222_co
             newTM = np.linalg.inv(make_4d_matrix(ttm[0])) @ TM
             newgen = []
             for gen in Gen:
-                newgen.append(adjust_space_matrix(newTM @ gen @ np.linalg.inv(newTM),1))
+                newgen.append(adjust_space_matrix(newTM @ gen @ np.linalg.inv(newTM), 1, tol=tol))
 
             if is_matrices_in(newgen,All,tol=tol):
                 result = {"indices": [L0_id,G0_id,it,ik],

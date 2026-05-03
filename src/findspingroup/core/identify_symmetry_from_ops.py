@@ -3,7 +3,6 @@ import itertools
 import math
 import re
 from fractions import Fraction
-from seekpath import get_path
 
 import numpy as np
 
@@ -68,7 +67,7 @@ def times_of_rotation(rotation_angle, order_hint=None):
     return m, n
 
 
-def _hm_improper_display_order(op: np.ndarray, fallback_order: int) -> int:
+def _hm_improper_display_order(op: np.ndarray) -> int:
     """
     Return the HM display order for an improper operation.
 
@@ -77,10 +76,7 @@ def _hm_improper_display_order(op: np.ndarray, fallback_order: int) -> int:
     but its HM token must still be `-3`. The HM order is determined by the
     proper rotation obtained after multiplying by inversion.
     """
-    try:
-        return int(get_element_order(-np.asarray(op, dtype=float)))
-    except Exception:
-        return int(fallback_order)
+    return int(get_element_order(-np.asarray(op, dtype=float)))
 
 
 def costheta(v1, v2):
@@ -321,7 +317,7 @@ def classify_point_group_operations(point_group_matrices, tol=1e-2):
                         axis = eigvecs[i].real
                         angle = rotation_angle(-op, axis, -eigvals)
                         m, n = times_of_rotation(angle, order_hint=order)
-                        display_n = _hm_improper_display_order(op, n)
+                        display_n = _hm_improper_display_order(op)
                         op_order_type_direction_addition_det.append(
                             [op, order, str(-display_n), axis, [m, n], -1]
                         )
@@ -1378,6 +1374,11 @@ def identify_point_group(point_group_matrices,_id= False,tol=1e-2):
     # print(group_symbol)
     # print(generators_index)
 
+    if "generators" not in locals() or "generators_index" not in locals():
+        raise ValueError(
+            f"Cannot identify canonical generators for point group with {order_group} operations."
+        )
+
     P2 = find_transition_matrix_deterministic(generators, group_symbol,id = _id)
     transformation = P1 @ P2
 
@@ -1703,7 +1704,16 @@ def compute_invariant_metric(point_group_rotations):
 def get_space_group_from_operations(space_group_operations,symprec = 0.02,bz = False)->SpglibDataset:
 
 
-    weird_sites = [np.array([0.1715870, 0.27754210, 0.737388700]),np.array([0,0,0])]
+    # Use typed generic probe sites to recover the space group from operations.
+    # A probe at the origin is a special position and is not stable under small
+    # origin shifts in relaxed structures; a single generic site can still admit
+    # extra origin-compensating rotations. Two distinct generic typed orbits keep
+    # the affine translation information without introducing special-position
+    # near-duplicates.
+    weird_sites = [
+        np.array([0.1715870, 0.27754210, 0.737388700]),
+        np.array([0.3193410, 0.43190700, 0.619283000]),
+    ]
 
     # get point group rotations
     point_group_rotations = deduplicate_matrix_pairs([i[0] for i in space_group_operations])
@@ -1741,6 +1751,8 @@ def get_space_group_from_operations(space_group_operations,symprec = 0.02,bz = F
         space_group_dataset =get_symmetry_dataset(cell, symprec=symprec, hall_number=SG_HALL_MAPPING[space_group_dataset.number])
 
     if bz :
+        from seekpath import get_path
+
         path_info = get_path(cell,with_time_reversal=False,symprec=symprec)
         return  space_group_dataset, path_info
     else:

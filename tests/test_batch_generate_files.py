@@ -992,7 +992,12 @@ def test_run_mcif_batch_writes_flat_error_artifacts(monkeypatch, tmp_path):
 
     summary = run_mcif_batch([source_file], tmp_path, quiet=True)
 
-    tagged_name = batch_mcif._tagged_artifact_name(source_file.name, summary["run_tag"])
+    case_id = batch_mcif._normalize_case_id(source_file)
+    tagged_name = batch_mcif._tagged_artifact_name(
+        source_file.name,
+        summary["run_tag"],
+        case_id=case_id,
+    )
     error_json = tmp_path / "error_json" / f"{tagged_name}.json"
     error_copy = tmp_path / "error_set" / tagged_name
 
@@ -1002,3 +1007,29 @@ def test_run_mcif_batch_writes_flat_error_artifacts(monkeypatch, tmp_path):
     assert error_copy.exists()
     assert not (tmp_path / "ok").exists()
     assert not (tmp_path / "error").exists()
+
+
+def test_run_mcif_batch_keeps_error_artifacts_for_duplicate_basenames(monkeypatch, tmp_path):
+    source_a = tmp_path / "material_a" / "same.mcif"
+    source_b = tmp_path / "material_b" / "same.mcif"
+    source_a.parent.mkdir()
+    source_b.parent.mkdir()
+    source_a.write_text("invalid-a\n", encoding="utf-8")
+    source_b.write_text("invalid-b\n", encoding="utf-8")
+
+    def raise_error(path, *args, **kwargs):
+        raise RuntimeError(f"synthetic failure for {Path(path).parent.name}")
+
+    monkeypatch.setattr(batch_mcif, "find_spin_group", raise_error)
+
+    output_dir = tmp_path / "batch"
+    summary = run_mcif_batch([source_a, source_b], output_dir, quiet=True)
+
+    error_json_files = sorted((output_dir / "error_json").glob("*.json"))
+    error_set_files = sorted((output_dir / "error_set").glob("*.mcif"))
+
+    assert summary["error_count"] == 2
+    assert len(error_json_files) == 2
+    assert len(error_set_files) == 2
+    assert len({path.name for path in error_json_files}) == 2
+    assert len({path.name for path in error_set_files}) == 2

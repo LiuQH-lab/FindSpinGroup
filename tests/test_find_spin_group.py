@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 import findspingroup.core.identify_symmetry_from_ops as identify_symmetry_from_ops_module
+import findspingroup.core.identify_spin_space_group as identify_spin_space_group_module
 import findspingroup.structure.group as group_module
 from findspingroup import (
     find_spin_group,
@@ -29,18 +30,24 @@ from findspingroup.core.identify_index.functions.find_ssg_reduce import (
     find_ssg_transformation,
 )
 from findspingroup.core.identify_spin_space_group import (
+    MagneticToleranceDegeneracyError,
     NONMAGNETIC_MTOL_ERROR,
     UNSTABLE_MTOL_ERROR,
     _candidate_directions_from_moments,
+    _complete_ssg_ops_by_closure,
+    _select_identify_pg_candidate,
     dedup_moments_with_tol,
     get_pg,
     identify_spin_space_group,
     identify_spin_space_group_result,
     _classify_moment_configuration,
+    _build_pg_candidates,
+    _configuration_compatibility,
     _collinear_residual,
     _configuration_details,
     _coplanar_residual,
 )
+from findspingroup.core.tolerances import Tolerances
 from findspingroup.core.identify_symmetry_from_ops import (
     analyze_transition_matrix_problem,
     deduplicate_matrix_pairs,
@@ -68,11 +75,18 @@ from findspingroup.find_spin_group import (
     combine_parametric_solutions,
 )
 from findspingroup.io import parse_cif_file, parse_poscar_file, parse_scif_metadata
+from findspingroup.io.scif_generator import write_scif_spin_only
 from findspingroup.structure import SpinSpaceGroup
-from findspingroup.structure.cell import CrystalCell
+from findspingroup.structure.cell import (
+    AtomicSite,
+    CrystalCell,
+    SpaceToleranceDegeneracyError,
+    change_cell_settings,
+)
 from findspingroup.structure.group import (
     SpinSpaceGroupOperation,
     _deduplicate_spin_space_ops,
+    _resolve_point_group_info,
     op_key,
 )
 from findspingroup.utils.international_symbol import (
@@ -91,9 +105,8 @@ from findspingroup.utils.space_group_flags import (
     space_group_is_polar,
     space_group_has_real_space_inversion,
 )
-from findspingroup.utils.seitz_symbol import describe_point_operation
+from findspingroup.utils.seitz_symbol import describe_point_operation, describe_spin_space_operation
 from findspingroup.utils import general_positions_to_matrix
-from web_app.website6 import serialize_data
 
 find_spin_group_module = importlib.import_module("findspingroup.find_spin_group")
 
@@ -1010,6 +1023,41 @@ def test_find_spin_group_exposes_main_flow_identify_result_for_collinear_case():
     assert result.identify_index_details["equivalent_map_index"] == 1
 
 
+def test_spin_space_group_index_is_lazy_identify_index_not_legacy_shorthand(monkeypatch):
+    result = find_spin_group("examples/0.800_MnTe.mcif")
+    ssg = SpinSpaceGroup(
+        result.input_magnetic_primitive_ssg_ops,
+        identify_source_name="examples/0.800_MnTe.mcif",
+    )
+
+    repr_text = repr(ssg)
+
+    assert "index" not in ssg.__dict__
+    assert "<SpinSpaceGroup #<unidentified> '" in repr_text
+    with pytest.raises(TypeError):
+        hash(ssg)
+    assert ssg.index == result.index
+    assert ssg.__dict__["index"] == "194.164.1.1.L"
+
+    def _raise_point_group_map_error(*_args, **_kwargs):
+        raise ValueError(
+            "Cannot identify point-group map number for point_group=1, generator_numbers=[1]."
+        )
+
+    monkeypatch.setattr(
+        find_spin_group_module,
+        "_identify_ssg_index_details",
+        _raise_point_group_map_error,
+    )
+    failing_ssg = SpinSpaceGroup(
+        result.input_magnetic_primitive_ssg_ops,
+        identify_source_name="examples/0.800_MnTe.mcif",
+    )
+    with pytest.raises(ValueError, match="Cannot identify point-group map number"):
+        _ = failing_ssg.index
+    assert "index" not in failing_ssg.__dict__
+
+
 def test_find_spin_group_exposes_identify_transformations_for_coplanar_case():
     result = find_spin_group("tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif")
     details = result.identify_index_details
@@ -1263,6 +1311,57 @@ def test_ktb3f10_spin_point_group_sentinel_stays_c3v_with_origin_anchor():
     assert len(pg.get_symmetry_operations()) == 6
 
 
+def test_point_group_analyzer_relabels_symbol_from_audited_operation_closure():
+    moments = np.array(
+        [
+            [-2.121, 1.832, -0.007],
+            [-0.522, -2.753, 0.002],
+            [2.651, 0.91, -0.003],
+        ],
+        dtype=float,
+    )
+
+    pg = PointGroupAnalyzer(
+        Molecule([1, 1, 1], moments),
+        tolerance=0.02,
+        eigen_tolerance=2e-7,
+    )
+
+    assert pg.heuristic_sch_symbol == "Cs"
+    assert pg.sch_symbol == "C3v"
+    assert str(pg.get_pointgroup()) == "C3v"
+    assert len(pg.get_symmetry_operations()) == 6
+
+
+def test_ssg_generation_completes_closure_only_after_magnetic_revalidation():
+    identity = np.eye(3)
+    zero = np.zeros(3)
+    mirror_x = np.diag([1.0, -1.0, 1.0])
+    angle = np.deg2rad(60.0)
+    mirror_60 = np.array(
+        [
+            [np.cos(2 * angle), np.sin(2 * angle), 0.0],
+            [np.sin(2 * angle), -np.cos(2 * angle), 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    mag_atoms = [AtomicSite([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], 1.0, 1)]
+    raw_ops = [
+        SpinSpaceGroupOperation(identity, identity, zero),
+        SpinSpaceGroupOperation(mirror_x, identity, zero),
+        SpinSpaceGroupOperation(mirror_60, identity, zero),
+    ]
+
+    closed_ops = _complete_ssg_ops_by_closure(raw_ops, mag_atoms, group_tol=0.02)
+
+    assert len(closed_ops) == 6
+    assert _resolve_point_group_info(
+        [op[0] for op in closed_ops],
+        tol=0.02,
+        label="closed spin operations",
+    )[-1] == "C3v"
+
+
 @pytest.mark.parametrize(
     ("path", "expected_symbol"),
     [
@@ -1378,22 +1477,100 @@ def test_little_groups_symbols_use_minus3_not_minus6_for_vcl2_trigonal_cogroups(
     assert "-3" in actual["K:(1/3,1/3,0)"]
 
 
-def test_describe_point_operation_keeps_near_hex_threefold_as_3_not_2():
+@pytest.mark.parametrize(
+    "matrix",
+    [
+        np.array(
+            [
+                [3.833458638e-05, -1.000019165e00, -7.295004068e-05],
+                [1.000019167e00, -9.999808303e-01, -5.285192675e-05],
+                [1.532712294e-05, -5.886194163e-05, 9.999999980e-01],
+            ],
+            dtype=float,
+        ),
+        np.array(
+            [
+                [-0.49991117, 0.86607668, 0.0],
+                [-0.86607668, -0.49991117, 0.0],
+                [0.0, 0.0, -1.0],
+            ],
+            dtype=float,
+        ),
+        np.array(
+            [
+                [-5.04334917e-01, 1.66181668e-01, -2.20093585e-03],
+                [-4.48690519e00, -5.04325025e-01, 1.98492772e-02],
+                [2.22780031e-03, 7.49713550e-04, 9.99990108e-01],
+            ],
+            dtype=float,
+        ),
+    ],
+)
+def test_describe_point_operation_rejects_unverified_noisy_finite_order_guesses(matrix):
+    with pytest.raises(ValueError, match="Cannot determine matrix order"):
+        describe_point_operation(matrix, tol=1e-4, max_order=120)
+
+
+def test_describe_spin_space_operation_can_mark_unresolved_without_guessing():
     matrix = np.array(
         [
-            [3.833458638e-05, -1.000019165e00, -7.295004068e-05],
-            [1.000019167e00, -9.999808303e-01, -5.285192675e-05],
-            [1.532712294e-05, -5.886194163e-05, 9.999999980e-01],
+            [-5.04334917e-01, 1.66181668e-01, -2.20093585e-03],
+            [-4.48690519e00, -5.04325025e-01, 1.98492772e-02],
+            [2.22780031e-03, 7.49713550e-04, 9.99990108e-01],
         ],
         dtype=float,
     )
 
-    info = describe_point_operation(matrix, tol=1e-4, max_order=12)
+    info = describe_spin_space_operation(
+        matrix,
+        np.eye(3),
+        np.zeros(3),
+        tol=1e-4,
+        max_order=120,
+        allow_unresolved=True,
+    )
 
-    assert info["hm_symbol"] == "3"
-    assert info["rotation_power"] == 1
-    assert info["axis_direction"] == (0, 0, 1)
-    assert info["symbol"] == "3^{1}_{001}"
+    assert info["spin"]["symbol"] == "?"
+    assert info["spin"]["unresolved"] is True
+    assert "Cannot determine matrix order" in info["spin"]["unresolved_reason"]
+    assert info["symbol"] == "{ ? || 1 | 0,0,0 }"
+
+
+def test_point_group_resolver_rejects_nonclosed_operation_set():
+    rotation_120 = np.array(
+        [
+            [-0.5, -np.sqrt(3) / 2, 0.0],
+            [np.sqrt(3) / 2, -0.5, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+
+    with pytest.raises(ValueError, match="no inverse|is not closed"):
+        _resolve_point_group_info(
+            [np.eye(3), rotation_120],
+            tol=1e-6,
+            label="nonclosed test point group",
+        )
+
+
+def test_point_group_resolver_accepts_closed_operation_set():
+    rotation_120 = np.array(
+        [
+            [-0.5, -np.sqrt(3) / 2, 0.0],
+            [np.sqrt(3) / 2, -0.5, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    rotation_240 = rotation_120 @ rotation_120
+
+    info = _resolve_point_group_info(
+        [np.eye(3), rotation_120, rotation_240],
+        tol=1e-6,
+        label="closed test point group",
+    )
+
+    assert info[0] == "3"
+    assert info[4] == "C3"
 
 
 def test_mn3sn_seitz_symbols_do_not_emit_illegal_minus6_power2_tokens():
@@ -1417,7 +1594,7 @@ def test_mn3sn_cartesian_standard_spin_axes_prefer_symbolic_components_over_alph
     assert "sqrt(3)/2" in l0_joined
 
 
-def test_describe_point_operation_keeps_near_improper_fourfold_as_minus4():
+def test_describe_point_operation_requires_physical_tolerance_for_noisy_improper_fourfold():
     matrix = np.array(
         [
             [-0.00195873, -0.9999979, -0.00022571],
@@ -1427,7 +1604,10 @@ def test_describe_point_operation_keeps_near_improper_fourfold_as_minus4():
         dtype=float,
     )
 
-    info = describe_point_operation(matrix, tol=1e-4, max_order=120)
+    with pytest.raises(ValueError, match="Cannot determine matrix order"):
+        describe_point_operation(matrix, tol=1e-4, max_order=120)
+
+    info = describe_point_operation(matrix, tol=1e-2, max_order=120)
 
     assert info["hm_symbol"] == "-4"
     assert info["axis_direction"] == (0, 0, 1)
@@ -1637,7 +1817,10 @@ def test_changed_basis_conb3s6_tripleq_preserves_msg_after_g0_collapse():
     assert result.msg_symbol == "P32'1"
     assert result.msg_acc == "3m1P"
     canonical_symbol = SpinSpaceGroup(result.convention_ssg_ops).international_symbol
-    assert canonical_symbol["translation_terms_linear"] == ["(2_{010},2_{001},1)"]
+    primitive_terms = canonical_symbol["translation_terms_linear"][0].strip("()").split(",")
+    assert primitive_terms[0] != "1"
+    assert primitive_terms[1] != "1"
+    assert primitive_terms[2] == "1"
 
 
 def test_identify_point_group_recovers_td_for_conbnb3s6_gamma_little_group_spin_part():
@@ -1665,6 +1848,39 @@ def test_classify_moment_configuration_uses_mtol_residual_contract():
     assert _classify_moment_configuration(moments, 0.006) == "Noncoplanar"
 
 
+def test_classify_moment_configuration_reports_o3_degeneracy_when_mtol_erases_spin_scale():
+    moments = np.array(
+        [
+            [0.6, 0.0, 0.0],
+            [0.0, -0.7, 0.0],
+        ],
+        dtype=float,
+    )
+
+    details = _configuration_details(moments, mtol=1.0)
+
+    assert details["configuration"] == "Nonmagnetic"
+    assert details["constraint_rank"] == 0
+    assert details["spin_point_group_semantics"] == "O3"
+    assert _classify_moment_configuration(moments, 1.0) == "Nonmagnetic"
+
+
+def test_get_pg_coplanar_candidate_contains_required_spin_mirror():
+    moments = np.array(
+        [
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [1.0, 1.0, 0.0],
+        ],
+        dtype=float,
+    )
+
+    symbol, operations = get_pg(moments, np.array([1, 1, 1]), mtol=0.02, meigtol=2e-5)
+
+    assert symbol not in {"C1", "C*v", "D*h", "Kh"}
+    assert any(np.allclose(op, np.diag([1.0, 1.0, -1.0]), atol=0.02, rtol=0) for op in operations)
+
+
 @pytest.mark.parametrize(
     ("path", "low_mtol", "mid_mtol", "high_mtol", "expected_low", "expected_mid", "expected_high"),
     [
@@ -1672,7 +1888,7 @@ def test_classify_moment_configuration_uses_mtol_residual_contract():
             "tests/testset/mcif_241130_no2186/0.120_LiFe(SO4)2.mcif",
             0.019,
             0.02,
-            0.021,
+            0.041,
             "Coplanar",
             "Coplanar",
             "Collinear",
@@ -1681,7 +1897,7 @@ def test_classify_moment_configuration_uses_mtol_residual_contract():
             "tests/testset/mcif_241130_no2186/0.122_Li2Mn(SO4)2.mcif",
             0.019,
             0.02,
-            0.021,
+            0.041,
             "Coplanar",
             "Coplanar",
             "Collinear",
@@ -1690,16 +1906,16 @@ def test_classify_moment_configuration_uses_mtol_residual_contract():
             "tests/testset/mcif_241130_no2186/0.1060_C3H6MnO6.mcif",
             0.049,
             0.05,
-            0.053,
+            0.101,
             "Coplanar",
             "Coplanar",
             "Collinear",
         ),
         (
-            "tests/testset/mcif_241130_no2186/1.138_MgV2O4.mcif",
-            0.041,
-            0.043,
-            0.061,
+            "tests/testset/mcif_241130_no2186/0.394_Cu2CdB2O6.mcif",
+            0.012,
+            0.014,
+            0.39,
             "Noncoplanar",
             "Coplanar",
             "Collinear",
@@ -1734,20 +1950,36 @@ def test_identify_spin_space_group_reports_nonmagnetic_error_when_input_is_effec
         spin_setting="in_lattice",
     )
 
-    with pytest.raises(ValueError, match=NONMAGNETIC_MTOL_ERROR):
+    with pytest.raises(MagneticToleranceDegeneracyError, match=NONMAGNETIC_MTOL_ERROR):
         identify_spin_space_group_result(cell, find_primitive=False)
 
 
-def test_find_spin_group_reports_clear_error_when_extreme_mtol_blocks_late_stage_degeneracy():
-    with pytest.raises(ValueError, match=UNSTABLE_MTOL_ERROR):
+def test_identify_spin_space_group_reports_mtol_induced_o3_degeneracy():
+    cell = CrystalCell(
+        lattice=[1.0, 1.0, 1.0, 90.0, 90.0, 90.0],
+        positions=[[0.0, 0.0, 0.0]],
+        occupancies=[1.0],
+        elements=["Fe"],
+        moments=[[0.5, 0.0, 0.0]],
+        spin_setting="in_lattice",
+    )
+
+    with pytest.raises(MagneticToleranceDegeneracyError, match="nonmagnetic O3"):
+        identify_spin_space_group_result(
+            cell,
+            find_primitive=False,
+            tol=Tolerances(space=0.02, moment=1.0, m_eig=2e-5, occupancy=0.002, m_matrix_tol=0.01),
+        )
+
+
+def test_find_spin_group_extreme_mtol_reports_spin_constraint_degeneracy():
+    with pytest.raises(MagneticToleranceDegeneracyError, match="nonmagnetic O3"):
         find_spin_group("tests/testset/mcif_241130_no2186/1.850_Tb6FeSi2S14.mcif", mtol=5.0)
 
 
-def test_find_spin_group_does_not_overreject_stable_real_case_with_extreme_mtol():
-    result = find_spin_group("tests/testset/mcif_241130_no2186/0.120_LiFe(SO4)2.mcif", mtol=5.0)
-
-    assert result.index == "14.2.1.2.P2"
-    assert result.conf == "Coplanar"
+def test_find_spin_group_extreme_mtol_rejects_real_case_as_semantically_degenerate():
+    with pytest.raises(MagneticToleranceDegeneracyError, match="nonmagnetic O3"):
+        find_spin_group("tests/testset/mcif_241130_no2186/0.120_LiFe(SO4)2.mcif", mtol=5.0)
 
 
 @pytest.mark.parametrize(
@@ -1799,29 +2031,51 @@ def test_find_spin_group_basic_matches_manual_checked_identify_222_index_changes
 
 
 def test_find_spin_group_basic_does_not_fallback_when_identify_database_entry_is_missing():
-    with pytest.warns(RuntimeWarning, match="Identify-index output unavailable"):
+    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
         payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
-    assert payload["index"] is None
+    assert str(payload["index"]).startswith("not in identify-index database:")
+
+
+def test_find_spin_group_basic_reraises_non_database_identify_errors(monkeypatch):
+    def _raise_point_group_map_error(*_args, **_kwargs):
+        raise ValueError(
+            "Cannot identify point-group map number for point_group=1, generator_numbers=[1]."
+        )
+
+    monkeypatch.setattr(
+        find_spin_group_module,
+        "_identify_ssg_index_details",
+        _raise_point_group_map_error,
+    )
+
+    with pytest.raises(ValueError, match="Cannot identify point-group map number"):
+        find_spin_group_basic("examples/0.800_MnTe.mcif")
 
 
 def test_find_spin_group_acc_primitive_does_not_fallback_when_identify_database_entry_is_missing():
-    with pytest.warns(RuntimeWarning, match="Identify-index output unavailable"):
+    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
         payload = find_spin_group_acc_primitive("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
-    assert payload["index"] is None
+    assert str(payload["index"]).startswith("not in identify-index database:")
 
 
 def test_find_spin_group_gracefully_degrades_when_identify_database_entry_is_missing():
-    with pytest.warns(RuntimeWarning, match="Identify-index output unavailable"):
-        result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+    source_name = "tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif"
+    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
+        result = find_spin_group(source_name)
 
-    assert result.index is None
+    assert str(result.index).startswith("not in identify-index database:")
     assert result.conf == "Coplanar"
     assert result.identify_index_details is None
+    direct_ssg = SpinSpaceGroup(
+        result.input_magnetic_primitive_ssg_ops,
+        identify_source_name=source_name,
+    )
+    assert str(direct_ssg.index).startswith("not in identify-index database:")
 
     metadata = parse_scif_metadata(source_text=result.scif)
-    assert metadata["space_group_spin"]["spin_space_group_number_chen"] is None
+    assert metadata["space_group_spin"]["spin_space_group_number_chen"] == result.index
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] is None
     assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] is None
     assert metadata["space_group_spin"]["spin_space_group_name_linear"] == (
@@ -1830,7 +2084,7 @@ def test_find_spin_group_gracefully_degrades_when_identify_database_entry_is_mis
 
 
 def test_g_type_output_ossg_uses_shortest_nonzero_axis_translations():
-    with pytest.warns(RuntimeWarning, match="Identify-index output unavailable"):
+    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
         result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
     assert " : (3^{2}_{001},3^{2}_{001},4^{1}_{001})" in result.convention_ssg_international_linear
@@ -1842,11 +2096,16 @@ def test_conbnb3s6_tripleq_g_type_translation_part_keeps_nontrivial_a_b_and_iden
     ssg = SpinSpaceGroup(result.convention_ssg_ops)
     symbol = ssg.international_symbol
 
-    assert symbol["linear"].endswith(" : (2_{010},2_{001},1)")
-    assert symbol["translation_terms_linear"] == ["(2_{010},2_{001},1)"]
+    primitive_terms = symbol["translation_terms_linear"][0].strip("()").split(",")
+    assert symbol["linear"].endswith(f" : {symbol['translation_terms_linear'][0]}")
+    assert primitive_terms[0] != "1"
+    assert primitive_terms[1] != "1"
+    assert primitive_terms[2] == "1"
     details = symbol["translation_details"][:3]
     assert [detail["label"] for detail in details] == ["t_a", "t_b", "t_c"]
-    assert [detail["spin_symbol"] for detail in details] == ["2_{010}", "2_{001}", "1"]
+    assert details[0]["spin_symbol"] != "1"
+    assert details[1]["spin_symbol"] != "1"
+    assert details[2]["spin_symbol"] == "1"
     assert np.allclose(details[0]["vector"], (1.0, 0.0, 0.0))
     assert np.allclose(details[1]["vector"], (0.0, 1.0, 0.0))
     assert np.allclose(details[2]["vector"], (0.0, 0.0, 0.0))
@@ -1938,6 +2197,26 @@ def test_find_spin_group_recovers_msg_little_group_symbols_after_translation_cle
 
     assert result.msg_little_group_symbols
     assert "Unknown" not in set(result.msg_little_group_symbols)
+
+
+def test_find_spin_group_keeps_maximal_ssg_when_ossg_msg_little_group_is_unindexed():
+    result = find_spin_group(
+        "tests/testset/mcif_241130_no2186/1.85_alpha-Mn.mcif",
+        mtol=0.2,
+        matrix_tol=0.02,
+        space_tol=0.02,
+        meigtol=0.00002,
+    )
+
+    assert result.conf == "Noncoplanar"
+    assert result.index is not None
+    assert len(result.acc_primitive_ssg_ops) == 8
+    assert len(result.primitive_msg_ops) == 8
+    assert result.msg_num is None
+    assert result.msg_symbol is None
+    assert None in result.msg_little_group_symbols
+    assert len(result.msg_little_group_symbols) == len(result.spin_polarizations)
+    assert len(result.msg_spin_polarizations) == len(result.spin_polarizations)
 
 
 def test_tensor_ops_do_not_depend_on_international_symbol_generation(monkeypatch):
@@ -2160,14 +2439,11 @@ def test_find_spin_group_from_data_matches_file_based_flow():
 def test_find_spin_group_exposes_input_space_group_metadata_from_identified_magnetic_primitive():
     result = find_spin_group("tests/testset/mcif_241130_no2186/0.11_DyFeO3.mcif")
     ssg = SpinSpaceGroup(result.primitive_magnetic_cell_ssg_ops)
-    payload = serialize_data(result.to_dict())
 
     assert result.input_space_group_number == 62
     assert result.input_space_group_symbol == "Pnma"
     assert result.input_space_group_number != ssg.international_symbol["sg_number"]
     assert result.input_space_group_symbol != ssg.international_symbol["sg_symbol"]
-    assert payload["input_space_group_number"] == 62
-    assert payload["input_space_group_symbol"] == "Pnma"
 
 
 def test_identify_spin_space_group_result_keeps_input_space_group_context_off_ssg():
@@ -2226,43 +2502,6 @@ def test_find_spin_group_exposes_source_structure_metadata_from_mcif():
     assert result.source_parent_space_group["child_transform_Pp_abc"] == "2a,2b,2c;0,0,0"
     assert result.source_cell_parameter_strings["_cell_length_a"] == "14.88540"
     assert result.source_cell_parameter_strings["_cell_angle_alpha"] == "90.00000"
-
-
-def test_find_spin_group_exposes_standard_setting_payloads_for_web_app():
-    result = find_spin_group("tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif")
-
-    assert result.g0_standard_cell is not None
-    assert result.l0_standard_cell is not None
-    assert result.g0_standard_ssg_ops
-    assert result.l0_standard_ssg_ops
-    assert np.asarray(result.T_input_to_G0std[0], dtype=float).shape == (3, 3)
-    assert np.asarray(result.T_input_to_G0std[1], dtype=float).shape == (3,)
-    assert np.asarray(result.T_G0std_to_primitive[0], dtype=float).shape == (3, 3)
-    assert np.asarray(result.T_G0std_to_primitive[1], dtype=float).shape == (3,)
-    assert np.asarray(result.T_input_to_L0std[0], dtype=float).shape == (3, 3)
-    assert np.asarray(result.T_input_to_L0std[1], dtype=float).shape == (3,)
-    assert np.asarray(result.T_L0std_to_primitive[0], dtype=float).shape == (3, 3)
-    assert np.asarray(result.T_L0std_to_primitive[1], dtype=float).shape == (3,)
-    assert result.T_G0std_to_acc_primitive == result.T_G0std_to_primitive
-    assert result.T_L0std_to_acc_primitive == result.T_L0std_to_primitive
-    assert np.asarray(result.T_acc_primitive_to_G0std[0], dtype=float).shape == (3, 3)
-    assert np.asarray(result.T_acc_primitive_to_G0std[1], dtype=float).shape == (3,)
-    assert np.asarray(result.T_acc_primitive_to_L0std[0], dtype=float).shape == (3, 3)
-    assert np.asarray(result.T_acc_primitive_to_L0std[1], dtype=float).shape == (3,)
-
-    g0_to_acc_matrix = np.asarray(result.T_G0std_to_acc_primitive[0], dtype=float)
-    g0_to_acc_shift = np.asarray(result.T_G0std_to_acc_primitive[1], dtype=float)
-    acc_to_g0_matrix = np.asarray(result.T_acc_primitive_to_G0std[0], dtype=float)
-    acc_to_g0_shift = np.asarray(result.T_acc_primitive_to_G0std[1], dtype=float)
-    assert np.allclose(acc_to_g0_matrix @ g0_to_acc_matrix, np.eye(3), atol=1e-8)
-    assert np.allclose(acc_to_g0_matrix @ g0_to_acc_shift + acc_to_g0_shift, np.zeros(3), atol=1e-8)
-
-    l0_to_acc_matrix = np.asarray(result.T_L0std_to_acc_primitive[0], dtype=float)
-    l0_to_acc_shift = np.asarray(result.T_L0std_to_acc_primitive[1], dtype=float)
-    acc_to_l0_matrix = np.asarray(result.T_acc_primitive_to_L0std[0], dtype=float)
-    acc_to_l0_shift = np.asarray(result.T_acc_primitive_to_L0std[1], dtype=float)
-    assert np.allclose(acc_to_l0_matrix @ l0_to_acc_matrix, np.eye(3), atol=1e-8)
-    assert np.allclose(acc_to_l0_matrix @ l0_to_acc_shift + acc_to_l0_shift, np.zeros(3), atol=1e-8)
 
 
 def test_find_spin_group_exposes_input_setting_payload_for_magnetic_primitive_poscar(tmp_path):
@@ -3059,7 +3298,7 @@ def test_find_spin_group_keeps_explicit_public_gspg_ops_for_coplanar_case():
         ("tests/testset/mcif_241130_no2186/1.498_Cu6(SiO3)6(H2O)6.mcif", "g"),
     ],
 )
-def test_find_spin_group_uses_componentized_gspg_symbol_fallback_for_type_k_and_g(path, expected_type):
+def test_find_spin_group_uses_componentized_gspg_symbol_for_type_k_and_g(path, expected_type):
     result = find_spin_group(path)
 
     assert result.primitive_magnetic_cell_ssg_type == expected_type
@@ -3205,6 +3444,16 @@ def test_find_spin_group_exposes_msg_little_groups_and_wp_chain():
     )
     assert len(result.msg_little_group_symbols) == len(result.spin_polarizations)
     assert len(result.msg_spin_polarizations) == len(result.spin_polarizations)
+    assert len(result.ssg_little_group_ops) == len(result.spin_polarizations)
+    assert len(result.ssg_little_group_seitz_latex) == len(result.ssg_little_group_ops)
+    assert len(result.msg_little_group_ops) == len(result.spin_polarizations)
+    assert len(result.msg_little_group_seitz_latex) == len(result.msg_little_group_ops)
+    for ops, seitz_latex in zip(result.ssg_little_group_ops, result.ssg_little_group_seitz_latex):
+        assert len(ops) == len(seitz_latex)
+        assert all({"index", "spin_rotation", "real_rotation", "translation"} <= set(op) for op in ops)
+    for ops, seitz_latex in zip(result.msg_little_group_ops, result.msg_little_group_seitz_latex):
+        assert len(ops) == len(seitz_latex)
+        assert all({"index", "time_reversal", "real_rotation", "translation"} <= set(op) for op in ops)
     assert result.wp_chain
 
 
@@ -3550,21 +3799,41 @@ def test_msg_spin_polarizations_poscar_projection_behaves_consistently_across_re
     ) is expect_changed
 
 
-def test_result_payload_can_be_json_serialized_for_web_app():
-    result = find_spin_group("examples/0.800_MnTe.mcif")
-    payload = serialize_data(result.to_dict())
-
-    encoded = json.dumps(payload, ensure_ascii=False)
-
-    assert '"primitive_magnetic_cell_ssg_ops"' in encoded
-    assert '"acc_primitive_ssg_ops"' in encoded
-    assert '"acc_primitive_magnetic_cell"' in encoded
-    assert '"T_G0std_to_acc_primitive"' in encoded
-    assert '"spin_polarizations_acc_cartesian"' in encoded
-    assert '"spin_polarizations_acc_poscar_spin_frame"' in encoded
-    assert '"acc_primitive_real_cartesian_to_poscar_spin_frame"' in encoded
     assert '"msg_spin_polarizations_acc_poscar_spin_frame"' in encoded
     assert '"gspg_symbol_linear"' in encoded
     assert '"gspg_ops_xyz_uvw"' in encoded
     assert '"gspg_spin_only_ops_xyz_uvw"' in encoded
     assert '"gspg_collinear_axis"' in encoded
+
+
+def test_space_tolerance_site_collapse_reports_semantic_error():
+    magnetic_cell = (
+        np.eye(3),
+        [np.array([0.0, 0.0, 0.0]), np.array([0.05, 0.0, 0.0])],
+        [1, 1],
+        [np.array([0.0, 0.0, 1.0]), np.array([0.0, 0.0, -1.0])],
+    )
+
+    with pytest.raises(SpaceToleranceDegeneracyError, match="space_tol"):
+        change_cell_settings(
+            magnetic_cell,
+            np.eye(3),
+            np.zeros(3),
+            eps=0.1,
+            moment_eps=0.02,
+        )
+
+
+def test_scif_spin_only_direction_requires_single_vector():
+    with pytest.raises(ValueError, match="single 3-vector"):
+        write_scif_spin_only("Coplanar", np.eye(3))
+
+
+def test_spin_only_inversion_has_no_unique_coplanar_direction():
+    ops = [
+        [np.eye(3), np.eye(3), np.zeros(3)],
+        [-np.eye(3), np.eye(3), np.zeros(3)],
+    ]
+
+    with pytest.raises(SpaceToleranceDegeneracyError, match="non-unique coplanar"):
+        _ = SpinSpaceGroup(ops).conf

@@ -35,6 +35,26 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def _rotation_matrix_sets_match(left, right, tol: float) -> bool:
+    if len(left) != len(right):
+        return False
+    unmatched = [np.asarray(op, dtype=float) for op in right]
+    for left_op in left:
+        left_matrix = np.asarray(left_op, dtype=float)
+        match_index = next(
+            (
+                index
+                for index, right_op in enumerate(unmatched)
+                if np.allclose(left_matrix, right_op, atol=tol, rtol=0)
+            ),
+            None,
+        )
+        if match_index is None:
+            return False
+        unmatched.pop(match_index)
+    return True
+
+
 def _point_group_site_weight(site) -> float:
     """Weight used when deriving inertia-based axis guesses for spin-point sets.
 
@@ -1010,6 +1030,8 @@ class PointGroupAnalyzer:
         self.eig_tol = eigen_tolerance
         self.mat_tol = matrix_tolerance
         self._analyze()
+        self.heuristic_sch_symbol = self.sch_symbol
+        self._finalize_point_group_output()
         if self.sch_symbol in {"C1v", "C1h"}:
             self.sch_symbol: str = "Cs"
 
@@ -1363,9 +1385,196 @@ class PointGroupAnalyzer:
             if rot_present[2] and rot_present[3] and (rot_present[4] or rot_present[5]):
                 break
 
+    def _finalize_point_group_output(self) -> None:
+        """Make the public point-group symbol and operations come from one audited set."""
+        self.full_generator_closure_failure = None
+        try:
+            candidate_operation_sets = [self._generate_audited_full_symmops()]
+        except ValueError as exc:
+            self.full_generator_closure_failure = str(exc)
+            candidate_operation_sets = self._generate_maximal_audited_subgroup_symmops()
+            if not candidate_operation_sets:
+                raise
+
+        if self.sch_symbol in {"C*v", "D*h", "Kh"}:
+            self._audited_operation_sets = candidate_operation_sets
+            self._symmetry_operations = candidate_operation_sets[0]
+            return
+
+        resolved_sets = []
+        for generated_ops in candidate_operation_sets:
+            rotations = [np.asarray(op.rotation_matrix, dtype=float) for op in generated_ops]
+            try:
+                info = self._identify_closed_point_group(rotations, tol=self._operation_audit_tol)
+            except Exception as exc:
+                raise ValueError(
+                    "Cannot identify finite point-group symbol from the generated operation closure. "
+                    f"Heuristic symbol was {self.sch_symbol!r} with {len(generated_ops)} operations."
+                ) from exc
+            resolved_symbol = info[-1]
+            if resolved_symbol in {"C1v", "C1h"}:
+                resolved_symbol = "Cs"
+            resolved_sets.append((resolved_symbol, generated_ops))
+
+        resolved_sets.sort(
+            key=lambda item: (
+                -len(item[1]),
+                item[0],
+                self._operation_set_sort_key(item[1]),
+            )
+        )
+        self._audited_operation_sets = [ops for _symbol, ops in resolved_sets]
+        self.sch_symbol, generated_ops = resolved_sets[0]
+        self.symmops = generated_ops
+        self._symmetry_operations = generated_ops
+
+    @property
+    def _operation_audit_tol(self) -> float:
+        return min(float(self.tol), float(self.mat_tol))
+
+    def _operation_set_sort_key(self, ops: list[SymmOp]):
+        return tuple(
+            sorted(
+                tuple(np.round(np.asarray(op.affine_matrix, dtype=float).reshape(-1), 12))
+                for op in ops
+            )
+        )
+
+    def _find_operation_match(self, ops: list[SymmOp], op: SymmOp):
+        return next(
+            (
+                index
+                for index, existing in enumerate(ops)
+                if np.allclose(
+                    existing.affine_matrix,
+                    op.affine_matrix,
+                    atol=self._operation_audit_tol,
+                    rtol=0,
+                )
+            ),
+            None,
+        )
+
+    def _operation_sets_same(self, left: list[SymmOp], right: list[SymmOp]) -> bool:
+        if len(left) != len(right):
+            return False
+        unmatched = list(right)
+        for left_op in left:
+            match_index = self._find_operation_match(unmatched, left_op)
+            if match_index is None:
+                return False
+            unmatched.pop(match_index)
+        return True
+
+    def _add_audited_seed(self, ops: list[SymmOp], op: SymmOp) -> None:
+        if not self.is_valid_op(op):
+            raise ValueError("Point-group generator does not preserve the input point set")
+        match_index = self._find_operation_match(ops, op)
+        if match_index is None:
+            ops.append(op)
+        else:
+            ops[match_index] = op
+
+    def _audited_closure_from_generators(self, generators: list[SymmOp]) -> list[SymmOp]:
+        identity = SymmOp(np.eye(4))
+        full: list[SymmOp] = []
+        self._add_audited_seed(full, identity)
+        for op in generators:
+            self._add_audited_seed(full, op)
+
+        active_generators = [
+            op
+            for op in full
+            if not np.allclose(
+                op.affine_matrix,
+                identity.affine_matrix,
+                atol=self._operation_audit_tol,
+                rtol=0,
+            )
+        ]
+        if not active_generators:
+            return [identity]
+
+        index = 0
+        max_generated_ops = 240
+        while index < len(full):
+            left = full[index]
+            index += 1
+            for generator in active_generators:
+                product = SymmOp(left.affine_matrix @ generator.affine_matrix)
+                match_index = self._find_operation_match(full, product)
+                product_is_valid = self.is_valid_op(product)
+                if match_index is not None:
+                    if product_is_valid and not self.is_valid_op(full[match_index]):
+                        full[match_index] = product
+                    continue
+                if not product_is_valid:
+                    raise ValueError(
+                        "Point-group closure product does not preserve the input point set"
+                    )
+                full.append(product)
+                if len(full) > max_generated_ops:
+                    raise ValueError(
+                        "Point-group closure exceeded the maximum generated operation count "
+                        f"({max_generated_ops}). The current tolerance likely accepts a non-group "
+                        "generator set."
+                    )
+
+        return full
+
+    def _generate_maximal_audited_subgroup_symmops(self) -> list[list[SymmOp]]:
+        identity = SymmOp(np.eye(4))
+        seed_generators = []
+        for op in self.symmops:
+            if np.allclose(op.affine_matrix, identity.affine_matrix, atol=self._operation_audit_tol, rtol=0):
+                continue
+            if not self.is_valid_op(op):
+                continue
+            if self._find_operation_match(seed_generators, op) is None:
+                seed_generators.append(op)
+
+        candidates = [[identity]]
+        # The analyzer's heuristic stage emits a small generator set. If that
+        # changes, exposing the new case is safer than silently enumerating an
+        # unexpectedly large power set.
+        if len(seed_generators) > 8:
+            raise ValueError(
+                "Point-group generator audit cannot enumerate more than 8 non-identity seeds"
+            )
+
+        for subset_size in range(1, len(seed_generators) + 1):
+            for subset in itertools.combinations(seed_generators, subset_size):
+                try:
+                    closure = self._audited_closure_from_generators(list(subset))
+                except ValueError:
+                    continue
+                if any(self._operation_sets_same(closure, existing) for existing in candidates):
+                    continue
+                candidates.append(closure)
+
+        candidates.sort(key=lambda ops: (-len(ops), self._operation_set_sort_key(ops)))
+        max_size = len(candidates[0])
+        return [ops for ops in candidates if len(ops) == max_size]
+
+    def _generate_audited_full_symmops(self) -> list[SymmOp]:
+        return self._audited_closure_from_generators(list(self.symmops))
+
+    @staticmethod
+    def _identify_closed_point_group(rotations, *, tol: float):
+        from findspingroup.core.identify_symmetry_from_ops import identify_point_group
+
+        info = identify_point_group(rotations, _id=True, tol=tol)
+        if not isinstance(info, tuple) or len(info) < 5:
+            raise ValueError("identify_point_group returned an invalid result shape")
+
+        identified_rotations = [np.asarray(row[0], dtype=float) for row in info[1]]
+        if not _rotation_matrix_sets_match(identified_rotations, rotations, tol=tol):
+            raise ValueError("identify_point_group returned operations that do not match the closure")
+        return info
+
     def get_pointgroup(self) -> PointGroupOperations:
         """Get a PointGroup object for the molecule."""
-        return PointGroupOperations(self.sch_symbol, self.symmops, self.mat_tol)
+        return PointGroupOperations(self.sch_symbol, self._symmetry_operations, self.mat_tol)
 
     def get_symmetry_operations(self) -> Sequence[SymmOp]:
         """Get symmetry operations.
@@ -1373,10 +1582,7 @@ class PointGroupAnalyzer:
         Returns:
             list[SymmOp]: symmetry operations in Cartesian coord.
         """
-        # Use the same closure tolerance as point-group identification so the
-        # returned operation set matches the detected finite group instead of
-        # over-expanding near-symmetric generators.
-        return generate_full_symmops(self.symmops, self.mat_tol)
+        return list(self._symmetry_operations)
 
 
     def is_valid_op(self, symm_op: SymmOp) -> bool:

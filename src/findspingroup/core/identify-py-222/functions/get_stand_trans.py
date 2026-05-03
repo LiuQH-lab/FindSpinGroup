@@ -2,16 +2,16 @@ import numpy as np
 from functions import *
 from databases import *
 
-def get_stand_trans(L0_id, G0_id, it, ik, iso,T,name_maps,translation_maps):
+def get_stand_trans(L0_id, G0_id, it, ik, iso,T,name_maps,translation_maps,tol=0.001):
     TM = make_4d_matrix(T)
-    ssg_ttm = find_ssg_transformation(L0_id, G0_id, it, ik, iso, TM)
+    ssg_ttm = find_ssg_transformation(L0_id, G0_id, it, ik, iso, TM, tol=tol)
     transformation_matrix = make_4d_matrix(ssg_ttm['transformation_matrix'])
     ssg_map_list = find_ssg_map(L0_id, G0_id, it, ik, iso)
     
     number = 1
     while number <= len(ssg_map_list):
         map = ssg_map_list[number-1]
-        if not is_matrix_equal(transformation_matrix, make_4d_matrix(map['transformation_matrix']), tol=0.001):
+        if not is_matrix_equal(transformation_matrix, make_4d_matrix(map['transformation_matrix']), tol=tol):
             ssg_map_list.remove(map)
         else:
             number += 1
@@ -21,8 +21,8 @@ def get_stand_trans(L0_id, G0_id, it, ik, iso,T,name_maps,translation_maps):
     
     new_name_maps_matrices = map_transformation(name_maps,TTM)
     new_translation_maps_matrices = map_transformation(translation_maps,TTM)
-    stand_map = find_stand_gen_maps(new_name_maps_matrices,new_translation_maps_matrices,ssg_ttm['gen_matrices'], cell_size)
-    map_num = find_map_num(stand_map,iso)
+    stand_map = find_stand_gen_maps(new_name_maps_matrices,new_translation_maps_matrices,ssg_ttm['gen_matrices'], cell_size,tol=tol)
+    map_num = find_map_num(stand_map,iso,tol=tol)
     norm = get_norm_matrices(iso)
     
     has_found = False

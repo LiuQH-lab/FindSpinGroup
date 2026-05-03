@@ -6,11 +6,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_SCRIPT="${BUILD_SCRIPT:-$REPO_ROOT/scripts/build_batch_snapshot.sh}"
 
-SERVER_ALIAS="${SERVER_ALIAS:-yuyt-26-130}"
-REMOTE_BASE="${REMOTE_BASE:-/share/home/yuyt/project/fsg-2026}"
-REMOTE_SHARED_REPO="${REMOTE_SHARED_REPO:-$REMOTE_BASE/FindSpinGroup}"
-REMOTE_SNAPSHOT_ROOT="${REMOTE_SNAPSHOT_ROOT:-$REMOTE_BASE/findspingroup_snapshots/batch_mcif}"
-REMOTE_OUTPUT_ROOT="${REMOTE_OUTPUT_ROOT:-$REMOTE_BASE/output/mcif_241130_no2186_run}"
+SERVER_ALIAS="${SERVER_ALIAS:-}"
+REMOTE_BASE="${REMOTE_BASE:-}"
+if [[ -n "$REMOTE_BASE" ]]; then
+  REMOTE_SHARED_REPO="${REMOTE_SHARED_REPO:-$REMOTE_BASE/FindSpinGroup}"
+  REMOTE_SNAPSHOT_ROOT="${REMOTE_SNAPSHOT_ROOT:-$REMOTE_BASE/findspingroup_snapshots/batch_mcif}"
+  REMOTE_OUTPUT_ROOT="${REMOTE_OUTPUT_ROOT:-$REMOTE_BASE/output/mcif_241130_no2186_run}"
+else
+  REMOTE_SHARED_REPO="${REMOTE_SHARED_REPO:-}"
+  REMOTE_SNAPSHOT_ROOT="${REMOTE_SNAPSHOT_ROOT:-}"
+  REMOTE_OUTPUT_ROOT="${REMOTE_OUTPUT_ROOT:-}"
+fi
 INPUT_SUBDIR="${INPUT_SUBDIR:-tests/testset/mcif_241130_no2186}"
 BASELINE_SUITE="${BASELINE_SUITE:-mcif_241130_no2186}"
 
@@ -32,11 +38,11 @@ Build a local batch snapshot, upload it, unpack it on the server, relink the
 shared runtime dependencies, and submit the standard .mcif Slurm batch.
 
 Defaults:
-  SERVER_ALIAS         $SERVER_ALIAS
-  REMOTE_BASE          $REMOTE_BASE
-  REMOTE_SHARED_REPO   $REMOTE_SHARED_REPO
-  REMOTE_SNAPSHOT_ROOT $REMOTE_SNAPSHOT_ROOT
-  REMOTE_OUTPUT_ROOT   $REMOTE_OUTPUT_ROOT
+  SERVER_ALIAS         ${SERVER_ALIAS:-<required>}
+  REMOTE_BASE          ${REMOTE_BASE:-<optional when remote paths are explicit>}
+  REMOTE_SHARED_REPO   ${REMOTE_SHARED_REPO:-<required>}
+  REMOTE_SNAPSHOT_ROOT ${REMOTE_SNAPSHOT_ROOT:-<required>}
+  REMOTE_OUTPUT_ROOT   ${REMOTE_OUTPUT_ROOT:-<required>}
   INPUT_SUBDIR         $INPUT_SUBDIR
   BASELINE_SUITE       $BASELINE_SUITE
 EOF
@@ -45,6 +51,16 @@ EOF
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
   usage
   exit 0
+fi
+
+if [[ -z "$SERVER_ALIAS" ]]; then
+  echo "SERVER_ALIAS is required." >&2
+  exit 2
+fi
+
+if [[ -z "$REMOTE_SHARED_REPO" || -z "$REMOTE_SNAPSHOT_ROOT" || -z "$REMOTE_OUTPUT_ROOT" ]]; then
+  echo "Set REMOTE_BASE, or set REMOTE_SHARED_REPO, REMOTE_SNAPSHOT_ROOT, and REMOTE_OUTPUT_ROOT explicitly." >&2
+  exit 2
 fi
 
 if [[ ! -x "$BUILD_SCRIPT" ]]; then

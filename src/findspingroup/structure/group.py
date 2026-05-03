@@ -6,7 +6,7 @@ import numpy as np
 from functools import cached_property, lru_cache
 
 from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
-from findspingroup.structure.cell import AtomicSite
+from findspingroup.structure.cell import AtomicSite, SpaceToleranceDegeneracyError
 from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs, get_space_group_from_operations, \
     get_arithmetic_crystal_class_from_ops, identify_point_group, get_magnetic_space_group_from_operations
 from findspingroup.utils.matrix_utils import getNormInf, integerize_matrix, rref_with_tolerance, in_space_group, \
@@ -146,7 +146,11 @@ def _gspg_spin_only_symbol_from_rotations(rotations, conf: str, tol: float) -> d
             "latex": latex,
         }
 
-    info = identify_point_group(unique_rotations, _id=True)
+    info = _resolve_point_group_info(
+        unique_rotations,
+        tol=max(float(tol), 1e-6),
+        label="GSPG spin-only point group",
+    )
     hm_symbol = info[0]
     s_symbol = info[4]
 
@@ -306,6 +310,73 @@ def _matrix_sets_match(left, right, *, tol: float) -> bool:
     if len(left) != len(right):
         return False
     return all(any(np.allclose(a, b, atol=tol) for b in right) for a in left)
+
+
+def _point_operation_group_audit_failure(rotations, *, tol: float, label: str) -> str | None:
+    rotations = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in rotations], tol=tol)
+    if not rotations:
+        return f"{label} has no operations"
+    if not any(np.allclose(np.eye(3), op, atol=tol, rtol=0) for op in rotations):
+        return f"{label} has no identity operation"
+    for index, op in enumerate(rotations):
+        inverse = np.linalg.inv(op)
+        if not any(np.allclose(inverse, candidate, atol=tol, rtol=0) for candidate in rotations):
+            return f"{label} operation {index} has no inverse"
+    try:
+        closure = _matrix_group_closure(
+            rotations,
+            tol=tol,
+            limit=max(256, len(rotations) * len(rotations) + len(rotations) + 1),
+        )
+    except RuntimeError as exc:
+        return f"{label} closure exceeded limit: {exc}"
+    if not _matrix_sets_match(closure, rotations, tol=tol):
+        return f"{label} is not closed"
+    return None
+
+
+def _resolve_point_group_info(rotations, *, tol: float, label: str):
+    rotations = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in rotations], tol=tol)
+    audit_failure = _point_operation_group_audit_failure(rotations, tol=tol, label=label)
+    if audit_failure is not None:
+        raise ValueError(audit_failure)
+
+    try:
+        info = identify_point_group(rotations, _id=True)
+    except Exception as exc:
+        raise ValueError(f"{label}: {type(exc).__name__}: {exc}") from exc
+
+    if not isinstance(info, tuple) or len(info) < 5:
+        raise ValueError(f"{label}: invalid identify_point_group return shape")
+
+    identified_ops = [np.asarray(row[0], dtype=float) for row in info[1]]
+    if not _matrix_sets_match(identified_ops, rotations, tol=tol):
+        raise ValueError(
+            f"{label}: identify_point_group operations do not match audited operations"
+        )
+
+    transformation = np.asarray(info[2], dtype=float)
+    if transformation.shape != (3, 3) or abs(float(np.linalg.det(transformation))) < 1e-10:
+        raise ValueError(f"{label}: invalid point-group transformation matrix")
+
+    generator_indices = [int(index) for index in info[3]]
+    if any(index < 0 or index >= len(identified_ops) for index in generator_indices):
+        raise ValueError(f"{label}: generator index outside identified operation list")
+    generator_ops = [identified_ops[index] for index in generator_indices]
+    try:
+        generated_ops = _matrix_group_closure(
+            generator_ops,
+            tol=tol,
+            limit=max(256, len(rotations) * len(rotations) + len(rotations) + 1),
+        )
+    except RuntimeError as exc:
+        raise ValueError(f"{label}: generator closure exceeded limit: {exc}") from exc
+    if not _matrix_sets_match(generated_ops, rotations, tol=tol):
+        raise ValueError(
+            f"{label}: identify_point_group generators do not generate audited operations"
+        )
+
+    return info
 
 
 def _effective_proper_rotation(rotation, *, tol: float) -> np.ndarray | None:
@@ -519,11 +590,7 @@ def write_kpoints(seekpath_out, matcher: BrillouinZoneMatcher, num_points=40, ex
         Return `(matched_label, is_splitting)` for a k-point coordinate.
         """
         result = matcher.check(u, v, w)
-        if result:
-            return result['matched_label'], result['has_splitting']
-        else:
-            # Use a conservative fallback if no match is found.
-            return "Unknown", True
+        return result['matched_label'], result['has_splitting']
 
     # Helper: format the display tag.
     def make_tag(label, is_splitting, is_path=False):
@@ -806,7 +873,7 @@ class SpinSpaceGroupOperation:
     def tolist(self):
         return [self.spin_rotation.round(6).tolist(), self.rotation.round(6).tolist(), self.translation.round(6).tolist()]
 
-    def seitz_description(self, tol=1e-6, max_order=120, max_axis_denom=12):
+    def seitz_description(self, tol=1e-6, max_order=120, max_axis_denom=12, allow_unresolved=False):
         """
         Return a structured Seitz description for this operation.
 
@@ -823,6 +890,7 @@ class SpinSpaceGroupOperation:
             tol=tol,
             max_order=max_order,
             max_axis_denom=max_axis_denom,
+            allow_unresolved=allow_unresolved,
         )
 
     def to_seitz_symbol(self, tol=1e-6, max_order=120, max_axis_denom=12):
@@ -987,6 +1055,8 @@ class SpinSpaceGroup:
         tol: float | Tolerances = DEFAULT_TOL,
         *,
         real_space_metric=None,
+        identify_source_name: str | None = None,
+        identify_tol: float | None = None,
     ):
         """
         Initializes a SpinSpaceGroup instance.
@@ -995,6 +1065,9 @@ class SpinSpaceGroup:
         self.real_space_metric = _normalize_metric(real_space_metric)
         self._input_index = None
         self._input_ops = []
+        self.identify_source_name = identify_source_name
+        self.identify_tol = identify_tol
+        self._identify_index_details_cache = {}
 
         if isinstance(input_data, str):
             try:
@@ -1318,7 +1391,19 @@ class SpinSpaceGroup:
     def index(self):
         if self._input_index:
             return self._input_index
-        return self._get_ssg_index_from_ops()
+        source_name = self.identify_source_name or "<operations>"
+        tol = self.identify_tol if self.identify_tol is not None else 0.001
+        try:
+            return self.identify_index(source_name, tol=tol)
+        except ValueError as exc:
+            from findspingroup.find_spin_group import (
+                _identify_index_database_missing_label,
+                _is_identify_index_database_missing_error,
+            )
+
+            if _is_identify_index_database_missing_error(exc):
+                return _identify_index_database_missing_label(exc)
+            raise
 
     # --- Transformations ---
     @cached_property
@@ -1339,7 +1424,11 @@ class SpinSpaceGroup:
 
     @cached_property
     def _n_spin_part_pg_info(self):
-        return identify_point_group(self.n_spin_part_point_ops, _id = True)
+        return _resolve_point_group_info(
+            self.n_spin_part_point_ops,
+            tol=max(float(self.tol), 0.03),
+            label="n-spin part point group",
+        )
 
     @property
     def n_spin_part_point_group_symbol_hm(self):
@@ -1356,7 +1445,11 @@ class SpinSpaceGroup:
     @cached_property
     def _spin_part_pg_info(self):
         if self.conf != 'Collinear':
-            return identify_point_group(self.spin_part_point_ops, _id = True)
+            return _resolve_point_group_info(
+                self.spin_part_point_ops,
+                tol=max(float(self.tol), 0.03),
+                label="spin part point group",
+            )
         elif self.conf == 'Collinear':
             # Return a dummy record with the same shape as identify_point_group.
             spin_part_order = len(self.spin_part_point_ops)
@@ -1596,12 +1689,20 @@ class SpinSpaceGroup:
     def international_symbol_type(self):
         return self.international_symbol["type"]
 
-    def identify_index_details(self, file_name: str, *, tol: float = 0.001):
+    def identify_index_details(self, file_name: str | None = None, *, tol: float = 0.001):
         from findspingroup.find_spin_group import _identify_ssg_index_details
 
-        return _identify_ssg_index_details(file_name, self, tol=tol)
+        source_name = file_name or self.identify_source_name or "<operations>"
+        cache_key = (source_name, float(tol))
+        if cache_key not in self._identify_index_details_cache:
+            self._identify_index_details_cache[cache_key] = _identify_ssg_index_details(
+                source_name,
+                self,
+                tol=tol,
+            )
+        return self._identify_index_details_cache[cache_key]
 
-    def identify_index(self, file_name: str, *, tol: float = 0.001):
+    def identify_index(self, file_name: str | None = None, *, tol: float = 0.001):
         return self.identify_index_details(file_name, tol=tol)["index"]
 
     @cached_property
@@ -1637,7 +1738,11 @@ class SpinSpaceGroup:
     def get_seitz_descriptions(self, tol=1e-6, max_order=120, max_axis_denom=12):
         symbol_tol = calibrated_symbol_tol(tol)
         descriptions = [
-            op.seitz_description(tol=symbol_tol, max_order=max_order, max_axis_denom=max_axis_denom)
+            op.seitz_description(
+                tol=symbol_tol,
+                max_order=max_order,
+                max_axis_denom=max_axis_denom,
+            )
             for op in self.ops
         ]
         return canonicalize_group_seitz_descriptions(
@@ -1662,72 +1767,77 @@ class SpinSpaceGroup:
     def get_little_groups_symbols(self):
         latex_symbols = []
         for index, little_group in enumerate(self.little_groups):
-            try:
-                spin_part = deduplicate_matrix_pairs([np.array(op[0]) for op in little_group])
-                real_part = deduplicate_matrix_pairs([np.array(op[1]) for op in little_group])
-                spin_info = identify_point_group(spin_part)
-                real_info = identify_point_group(real_part)
-
-                if self.conf == 'Collinear':
-                    t_count = 0
-                    for op in little_group:
-                        if np.allclose(np.array(op[1]), np.eye(3), self.tol):
-                            t_count += 1
-                    if t_count == 2:
-                        spin_only_symbol = '^{\\infty }1'
-                    elif t_count == 4:
-                        spin_only_symbol = '^{\\infty m}1'
-                    elif t_count == 8:
-                        spin_only_symbol = '^{\\infty /mm}1'
-                    else:
-                        raise ValueError(
-                            f'Wrong spin translation group of k little group {self.kpoints_symbol_primitive[index]}')  # Fixed symbol reference
+            spin_part = deduplicate_matrix_pairs([np.array(op[0]) for op in little_group])
+            real_part = deduplicate_matrix_pairs([np.array(op[1]) for op in little_group])
+            spin_info = _resolve_point_group_info(
+                spin_part,
+                tol=max(float(self.tol), 1e-6),
+                label=f"spin little group {self.kpoints_symbol_primitive[index]}",
+            )
+            real_info = _resolve_point_group_info(
+                real_part,
+                tol=max(float(self.tol), 1e-6),
+                label=f"real little group {self.kpoints_symbol_primitive[index]}",
+            )
+            if self.conf == 'Collinear':
+                t_count = 0
+                for op in little_group:
+                    if np.allclose(np.array(op[1]), np.eye(3), self.tol):
+                        t_count += 1
+                if t_count == 2:
+                    spin_only_symbol = '^{\\infty }1'
+                elif t_count == 4:
+                    spin_only_symbol = '^{\\infty m}1'
+                elif t_count == 8:
+                    spin_only_symbol = '^{\\infty /mm}1'
                 else:
-                    general_spin_only = []
-                    for op in little_group:
-                        if np.allclose(np.array(op[1]), np.eye(3), self.tol):
-                            general_spin_only.append(np.array(op[0]))
-                    pg_symbol = identify_point_group(general_spin_only)[0]
-                    if pg_symbol != '1':
-                        spin_only_symbol = f"^{{{pg_symbol}}}1"
-                    else:
-                        spin_only_symbol = ''
-
-                # match spin op
-                spin_generators = []
-                for index_g in real_info[3]:  # fixed loop variable name clash
-                    for op in little_group:
-                        if np.allclose(np.array(op[1]), real_info[1][index_g][0], self.tol):
-                            spin_generators.append(op[0])
-                            break
-
-                spin_generators_symbols = []
-                for spin_op in spin_generators:
-                    for op in spin_info[1]:
-                        if np.allclose(np.array(op[0]), spin_op, self.tol):
-                            spin_generators_symbols.append(op[2])
-
-                latex = ''
-                if bool(re.search(r'/', real_info[0])):
-                    count = 0
-                    for i, index_g in enumerate(real_info[3]):
-                        if count == 1:
-                            latex = latex + '/' + '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
-                        else:
-                            latex = latex + '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
-                        count += 1
-                    latex = latex + spin_only_symbol
+                    raise ValueError(
+                        f'Wrong spin translation group of k little group {self.kpoints_symbol_primitive[index]}')  # Fixed symbol reference
+            else:
+                general_spin_only = []
+                for op in little_group:
+                    if np.allclose(np.array(op[1]), np.eye(3), self.tol):
+                        general_spin_only.append(np.array(op[0]))
+                pg_info = _resolve_point_group_info(
+                    general_spin_only,
+                    tol=max(float(self.tol), 1e-6),
+                    label=f"spin-only little group {self.kpoints_symbol_primitive[index]}",
+                )
+                pg_symbol = pg_info[0]
+                if pg_symbol != '1':
+                    spin_only_symbol = f"^{{{pg_symbol}}}1"
                 else:
-                    for i, index_g in enumerate(real_info[3]):
+                    spin_only_symbol = ''
+
+            # match spin op
+            spin_generators = []
+            for index_g in real_info[3]:  # fixed loop variable name clash
+                for op in little_group:
+                    if np.allclose(np.array(op[1]), real_info[1][index_g][0], self.tol):
+                        spin_generators.append(op[0])
+                        break
+
+            spin_generators_symbols = []
+            for spin_op in spin_generators:
+                for op in spin_info[1]:
+                    if np.allclose(np.array(op[0]), spin_op, self.tol):
+                        spin_generators_symbols.append(op[2])
+
+            latex = ''
+            if bool(re.search(r'/', real_info[0])):
+                count = 0
+                for i, index_g in enumerate(real_info[3]):
+                    if count == 1:
+                        latex = latex + '/' + '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
+                    else:
                         latex = latex + '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
-                    latex = latex + spin_only_symbol
-
-                latex_symbols.append(latex)
-            except ValueError:
-                # Little-group symbol generation is display metadata. If PG
-                # standardization fails on one little group, degrade to a
-                # placeholder instead of failing the whole result/UI payload.
-                latex_symbols.append('?')
+                    count += 1
+                latex = latex + spin_only_symbol
+            else:
+                for i, index_g in enumerate(real_info[3]):
+                    latex = latex + '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
+                latex = latex + spin_only_symbol
+            latex_symbols.append(latex)
         return latex_symbols
 
     def get_little_groups(self):
@@ -1881,12 +1991,24 @@ class SpinSpaceGroup:
                 if not np.allclose(operations[0], np.eye(3), atol=0.1) and abs(np.linalg.det(operations[0]) - 1) < 1e-2:
                     eigvals, eigvecs = np.linalg.eig(operations[0])
                     direction = eigvecs[:, np.isclose(eigvals, 1.0, atol=0.1)].real
+                    if direction.shape[1] != 1:
+                        raise SpaceToleranceDegeneracyError(
+                            "space_tol produces a non-unique collinear spin-only "
+                            "axis; the accepted spin-only operation does not define "
+                            "a single magnetic direction."
+                        )
                     return 'Collinear', direction
         if len(self.sog) == 2:
             for operations in self.sog:
                 if not np.allclose(operations[0], np.eye(3), atol=0.1):
                     eigvals, eigvecs = np.linalg.eig(operations[0])
                     direction = eigvecs[:, np.isclose(eigvals, -1.0, atol=0.1)].real
+                    if direction.shape[1] != 1:
+                        raise SpaceToleranceDegeneracyError(
+                            "space_tol produces a non-unique coplanar spin-only "
+                            "normal; the accepted spin-only operation does not "
+                            "define a single spin plane."
+                        )
                     return 'Coplanar', direction
         if len(self.sog) == 1:
             return 'Noncoplanar', None
@@ -1972,13 +2094,15 @@ class SpinSpaceGroup:
         if not rotations_with_order:
             return reduced_spin_only
 
-        highest_order = max(order for order, _ in rotations_with_order)
-        highest_order_generators = [rotation for order, rotation in rotations_with_order if order == highest_order]
-
-        return _matrix_group_closure(
-            list(reduced_spin_only) + highest_order_generators[:1],
-            tol=self.tol,
-        )
+        for _order, generator in sorted(rotations_with_order, key=lambda item: -item[0]):
+            try:
+                return _matrix_group_closure(
+                    list(reduced_spin_only) + [generator],
+                    tol=self.tol,
+                )
+            except RuntimeError:
+                continue
+        return reduced_spin_only
 
     def _build_collinear_perpendicular_direct_candidates(self):
         axis = self.collinear_axis
@@ -2089,14 +2213,14 @@ class SpinSpaceGroup:
     def get_index(self):
         return self.index
 
-    def __hash__(self):
-        return hash(self.index)
+    __hash__ = None
 
     def __len__(self):
         return len(self.ops)
 
     def __repr__(self):
-        lines = [f"<SpinSpaceGroup #{self.index} '>"]
+        display_index = self.__dict__.get("index") or self._input_index or "<unidentified>"
+        lines = [f"<SpinSpaceGroup #{display_index} '>"]
         for i, group in enumerate(self.ops):
             lines.append(f"Group {i+1}:")
             mats = [np.atleast_2d(np.array(m)).reshape(3, -1) for m in group]
@@ -2152,7 +2276,13 @@ class SpinSpaceGroup:
             transformation_matrix = np.asarray(transformation_matrix, dtype=float)
             transformation_matrix_inv = np.linalg.inv(transformation_matrix)
             new_metric = transformation_matrix_inv.T @ new_metric @ transformation_matrix_inv
-        return SpinSpaceGroup(new_ops, tol=self.tol, real_space_metric=new_metric)
+        return SpinSpaceGroup(
+            new_ops,
+            tol=self.tol,
+            real_space_metric=new_metric,
+            identify_source_name=self.identify_source_name,
+            identify_tol=self.identify_tol,
+        )
 
     def transform_spin(self, spin_transformation_matrix):
         spin_transformation_matrix_inv = np.linalg.inv(spin_transformation_matrix)
@@ -2161,7 +2291,13 @@ class SpinSpaceGroup:
             new_spin_rotation = spin_transformation_matrix @ op[0] @ spin_transformation_matrix_inv
             new_op = SpinSpaceGroupOperation(new_spin_rotation, op[1], op[2])
             new_ops.append(new_op)
-        return SpinSpaceGroup(new_ops, tol=self.tol, real_space_metric=self.real_space_metric)
+        return SpinSpaceGroup(
+            new_ops,
+            tol=self.tol,
+            real_space_metric=self.real_space_metric,
+            identify_source_name=self.identify_source_name,
+            identify_tol=self.identify_tol,
+        )
 
     def get_attributes_from_database(self):
         attributes = {

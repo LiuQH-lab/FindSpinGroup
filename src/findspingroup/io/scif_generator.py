@@ -115,12 +115,13 @@ def _format_scif_symbolic_scalar(
 
 def write_scif_spin_only(conf, spin_only_direction):
     if spin_only_direction is not None:
-        direction = []
-        for i in spin_only_direction:
-            if abs(i) < 1e-4:
-                direction.append(0)
-            else:
-                direction.append(i)
+        direction_array = np.asarray(spin_only_direction, dtype=float).reshape(-1)
+        if direction_array.size != 3:
+            raise ValueError(
+                "SCIF spin-only direction must be a single 3-vector; "
+                f"got shape {np.asarray(spin_only_direction).shape}."
+            )
+        direction = [0 if abs(i) < 1e-4 else float(i) for i in direction_array]
     def _format_collinear_direction_for_scif(direction_values):
         numeric = np.asarray(
             [

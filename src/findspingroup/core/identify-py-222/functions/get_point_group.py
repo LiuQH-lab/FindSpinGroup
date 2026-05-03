@@ -18,10 +18,10 @@ def get_norm_matrices(point_group_num):
     point_group_normal_matrices = [np.matrix(point_group['all_norm_matrices'][i]) for i in range(len(point_group['all_norm_matrices']))]
     return point_group_normal_matrices
 
-def find_map_num(map_list,point_group_num):
+def find_map_num(map_list,point_group_num,tol=0.001):
     def find_ind(A,list):
         for i in range(len(list)):
-            if is_matrix_equal(A,list[i],tol = 0.001):
+            if is_matrix_equal(A,list[i],tol=tol):
                 return i
                 break
     point_group = get_point_group(point_group_num)
@@ -80,5 +80,4 @@ if __name__ == "__main__":
 
     except Exception as ex:
         print(f"Error: {str(ex)}")
-
 

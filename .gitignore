@@ -218,4 +218,17 @@ output_files
 ~$*.xlsx
 
 draft.py
+
+# Local/private working artifacts
+tmp/
+docs/nsr_cover_letter_*.md
+docs/software-copyright/
+docs/fsg-tolerance-sweep-audit-log.md
+docs/*cluster*.md
+docs/*runbook*.md
+docs/3d-default-*.md
+docs/3d-default-*.csv
+docs/3d-rootfix-v4-*.md
+docs/3d-rootfix-v4-*.csv
+scripts/run_batch_mcif_tolerance_sweep.slurm
 fsg_rewrite.py

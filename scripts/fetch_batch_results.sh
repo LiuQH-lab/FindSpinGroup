@@ -5,9 +5,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-DEFAULT_SERVER="yuyt@10.20.26.130"
-DEFAULT_REMOTE_REPO_ROOT="/share/home/yuyt/project/fsg-2026/FindSpinGroup"
-DEFAULT_REMOTE_OUTPUT_ROOT="$DEFAULT_REMOTE_REPO_ROOT/output/mcif_241130_no2186_run"
+DEFAULT_SERVER="${FSG_BATCH_SERVER:-}"
+DEFAULT_REMOTE_OUTPUT_ROOT="${FSG_REMOTE_OUTPUT_ROOT:-}"
 DEFAULT_LOCAL_DEST="$REPO_ROOT/tests/error_info"
 
 SERVER="$DEFAULT_SERVER"
@@ -25,9 +24,9 @@ Usage: $(basename "$0") [options]
 Download a batch-test run directory from the server to the local workspace.
 
 Defaults:
-  server            $DEFAULT_SERVER
-  remote output     $DEFAULT_REMOTE_OUTPUT_ROOT
-  local destination $DEFAULT_LOCAL_DEST
+  server            ${DEFAULT_SERVER:-<required>}
+  remote output     ${DEFAULT_REMOTE_OUTPUT_ROOT:-<required>}
+  local destination <repo>/tests/error_info
 
 Options:
   --server USER@HOST         Remote login target
@@ -38,7 +37,7 @@ Options:
   -h, --help                 Show this help
 
 Examples:
-  bash scripts/fetch_batch_results.sh
+  bash scripts/fetch_batch_results.sh --server user@host --remote-output-root /remote/path/to/output
   bash scripts/fetch_batch_results.sh --run-dir run_v0.13.1_20260312_153000
   bash scripts/fetch_batch_results.sh --local-dest /tmp/fsg_runs
 EOF
@@ -77,6 +76,16 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$SERVER" ]]; then
+  echo "Remote server is required. Set FSG_BATCH_SERVER or pass --server USER@HOST." >&2
+  exit 2
+fi
+
+if [[ -z "$REMOTE_OUTPUT_ROOT" ]]; then
+  echo "Remote output root is required. Set FSG_REMOTE_OUTPUT_ROOT or pass --remote-output-root PATH." >&2
+  exit 2
+fi
 
 if [[ -n "$RUN_DIR" ]]; then
   if [[ "$RUN_DIR" == /* ]]; then

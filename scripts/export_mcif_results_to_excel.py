@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -33,7 +34,7 @@ def _compact_wp_chain(wp_chain: Any, *, limit: int = 24) -> str | None:
     return " | ".join(items)
 
 
-def _row_from_result(file_path: Path, result) -> dict[str, Any]:
+def _row_from_result(file_path: Path, result, *, duration_seconds: float | None = None) -> dict[str, Any]:
     identify = result.identify_index_details or {}
     primitive_ssg = SpinSpaceGroup(result.primitive_magnetic_cell_ssg_ops)
 
@@ -41,6 +42,7 @@ def _row_from_result(file_path: Path, result) -> dict[str, Any]:
         "case_id": batch_mcif._normalize_case_id(file_path),
         "file_name": file_path.name,
         "status": "ok",
+        "duration_seconds": duration_seconds,
         "index": result.index,
         "conf": result.conf,
         "phase": result.magnetic_phase,
@@ -90,6 +92,7 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "case_id": record.get("case_id"),
         "file_name": record.get("file_name"),
         "status": record.get("status", "ok"),
+        "duration_seconds": record.get("duration_seconds"),
         "index": payload.get("index"),
         "conf": payload.get("conf"),
         "phase": payload.get("phase"),
@@ -135,11 +138,17 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
     }
 
 
-def _row_from_error(file_path: Path, exc: Exception) -> dict[str, Any]:
+def _row_from_error(
+    file_path: Path,
+    exc: Exception,
+    *,
+    duration_seconds: float | None = None,
+) -> dict[str, Any]:
     return {
         "case_id": batch_mcif._normalize_case_id(file_path),
         "file_name": file_path.name,
         "status": "error",
+        "duration_seconds": duration_seconds,
         "index": None,
         "conf": None,
         "phase": None,
@@ -185,6 +194,7 @@ COLUMNS = [
     "case_id",
     "file_name",
     "status",
+    "duration_seconds",
     "index",
     "conf",
     "phase",
@@ -280,16 +290,14 @@ def main() -> None:
         raise ValueError("Provide at least one of --output-xlsx or --output-jsonl.")
     rows: list[dict[str, Any]] = []
     if args.runtime_jsonl is not None:
-        records = [
-            json.loads(line)
-            for line in args.runtime_jsonl.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
-        if args.limit is not None:
-            records = records[: args.limit]
-        for index, record in enumerate(records, start=1):
-            rows.append(_row_from_serialized_result_record(record))
-            print(f"[{index}/{len(records)}] {record.get('status', 'ok').upper():5} {record.get('file_name')}")
+        with args.runtime_jsonl.open(encoding="utf-8") as handle:
+            records_iter = (json.loads(line) for line in handle if line.strip())
+            if args.limit is not None:
+                records_iter = (record for index, record in enumerate(records_iter) if index < args.limit)
+            total = args.limit if args.limit is not None else "?"
+            for index, record in enumerate(records_iter, start=1):
+                rows.append(_row_from_serialized_result_record(record))
+                print(f"[{index}/{total}] {record.get('status', 'ok').upper():5} {record.get('file_name')}")
     else:
         if not args.inputs:
             raise ValueError("Provide input files/directories unless --runtime-jsonl is used.")
@@ -299,6 +307,7 @@ def main() -> None:
             files = files[: args.limit]
 
         for index, file_path in enumerate(files, start=1):
+            case_start = time.perf_counter()
             try:
                 result = find_spin_group(
                     str(file_path),
@@ -307,11 +316,16 @@ def main() -> None:
                     meigtol=args.meigtol,
                     matrix_tol=args.matrix_tol,
                 )
-                rows.append(_row_from_result(file_path, result))
-                print(f"[{index}/{len(files)}] OK    {file_path.name} -> {result.index}")
+                duration = round(time.perf_counter() - case_start, 6)
+                rows.append(_row_from_result(file_path, result, duration_seconds=duration))
+                print(f"[{index}/{len(files)}] OK    {file_path.name} -> {result.index} ({duration:.3f}s)")
             except Exception as exc:
-                rows.append(_row_from_error(file_path, exc))
-                print(f"[{index}/{len(files)}] ERROR {file_path.name} -> {type(exc).__name__}: {exc}")
+                duration = round(time.perf_counter() - case_start, 6)
+                rows.append(_row_from_error(file_path, exc, duration_seconds=duration))
+                print(
+                    f"[{index}/{len(files)}] ERROR {file_path.name} -> "
+                    f"{type(exc).__name__}: {exc} ({duration:.3f}s)"
+                )
 
     if args.output_jsonl is not None:
         _write_jsonl(rows, args.output_jsonl)

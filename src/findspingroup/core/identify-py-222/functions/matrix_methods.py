@@ -41,36 +41,36 @@ def adjust_point_matrix(A):
     return np.matrix(A)
     
 # Reduce space-group translations modulo m.
-def adjust_space_matrix(A, m):
+def adjust_space_matrix(A, m, tol=0.001):
     B = A.copy()
     for i in range(1, 4):
         B[i,0] = B[i,0] % m
-        if abs(B[i,0]) < 1e-4 or abs(B[i,0] - m)< 1e-4:
+        if abs(B[i,0]) < tol or abs(B[i,0] - m)< tol:
             B[i,0] = 0.0
     return B
 
 # Normalize both point and space parts of a map pair.
-def adjust_map(pair, m):
+def adjust_map(pair, m, tol=0.001):
     A = pair[0].copy()
     B = pair[1].copy()
     A_adj = adjust_point_matrix(A)
-    B_adj = adjust_space_matrix(B, m)
+    B_adj = adjust_space_matrix(B, m, tol=tol)
     
     return [A_adj, B_adj]
 
 
-def is_matrix_in(M,L):
+def is_matrix_in(M,L,tol=0.001):
     is_in = False 
     for B in L:
-        if is_matrix_equal(M, B, tol=0.001):
+        if is_matrix_equal(M, B, tol=tol):
             is_in = True
             break
     return is_in
     
-def is_matrices_in(Gen,L):
+def is_matrices_in(Gen,L,tol=0.001):
     is_in = True
     for A in Gen:
-        if not is_matrix_in(A,L):
+        if not is_matrix_in(A,L,tol=tol):
             is_in = False
             break
     return is_in
