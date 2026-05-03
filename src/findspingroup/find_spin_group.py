@@ -243,6 +243,150 @@ def _spin_space_group_operation_sets_match(left_ops, right_ops, *, tol: float) -
     return True
 
 
+def _cell_position_bucket_params(tol: float) -> tuple[int, int]:
+    bins = max(1, int(np.ceil(1.0 / max(float(tol), 1e-12))))
+    bucket_width = 1.0 / bins
+    neighbor_radius = max(1, int(np.ceil(float(tol) / bucket_width)))
+    return bins, neighbor_radius
+
+
+def _cell_position_bucket_key(position, bins: int) -> tuple[int, int, int]:
+    wrapped = np.mod(np.asarray(position, dtype=float), 1.0)
+    indices = np.floor(wrapped * bins).astype(int) % bins
+    return tuple(int(value) for value in indices)
+
+
+def _cell_position_neighbor_keys(
+    bucket_key: tuple[int, int, int],
+    bins: int,
+    neighbor_radius: int,
+):
+    for dx in range(-neighbor_radius, neighbor_radius + 1):
+        for dy in range(-neighbor_radius, neighbor_radius + 1):
+            for dz in range(-neighbor_radius, neighbor_radius + 1):
+                yield (
+                    (bucket_key[0] + dx) % bins,
+                    (bucket_key[1] + dy) % bins,
+                    (bucket_key[2] + dz) % bins,
+                )
+
+
+def _build_cell_preservation_checker(
+    cell: CrystalCell,
+    *,
+    tol: Tolerances,
+):
+    positions = np.asarray(cell.positions, dtype=float)
+    moments = np.asarray(cell.moments, dtype=float)
+    elements = list(cell.elements)
+    occupancies = [float(value) for value in cell.occupancies]
+    bins, neighbor_radius = _cell_position_bucket_params(tol.space)
+    buckets: dict[tuple[str, int, int, int], list[int]] = {}
+    for index, position in enumerate(positions):
+        key = (elements[index], *_cell_position_bucket_key(position, bins))
+        buckets.setdefault(key, []).append(index)
+
+    def op_preserves_cell(op: SpinSpaceGroupOperation) -> bool:
+        real_rotation = np.asarray(op.rotation, dtype=float)
+        spin_rotation = np.asarray(op.spin_rotation, dtype=float)
+        translation = np.asarray(op.translation, dtype=float)
+        for atom_index, position in enumerate(positions):
+            transformed_position = normalize_vector_to_zero(
+                real_rotation @ position + translation,
+                atol=1e-8,
+            )
+            transformed_moment = spin_rotation @ moments[atom_index]
+            bucket_key = _cell_position_bucket_key(transformed_position, bins)
+            matched = False
+            for neighbor_key in _cell_position_neighbor_keys(bucket_key, bins, neighbor_radius):
+                for candidate_index in buckets.get((elements[atom_index], *neighbor_key), ()):
+                    if abs(occupancies[atom_index] - occupancies[candidate_index]) >= tol.occupancy:
+                        continue
+                    if getNormInf(transformed_position, positions[candidate_index]) >= tol.space:
+                        continue
+                    if np.linalg.norm(transformed_moment - moments[candidate_index]) >= tol.moment:
+                        continue
+                    matched = True
+                    break
+                if matched:
+                    break
+            if not matched:
+                return False
+        return True
+
+    return op_preserves_cell
+
+
+def _ssg_ops_preserve_cell(
+    cell: CrystalCell,
+    ssg: SpinSpaceGroup,
+    *,
+    tol: Tolerances,
+) -> bool:
+    if cell.moments is None:
+        return False
+
+    op_preserves_cell = _build_cell_preservation_checker(cell, tol=tol)
+    for op in ssg.ops:
+        if not op_preserves_cell(op):
+            return False
+    return True
+
+
+def _ssg_real_op_is_lattice_compatible(op: SpinSpaceGroupOperation, *, tol: float) -> bool:
+    rotation = np.asarray(op.rotation, dtype=float)
+    return bool(
+        np.allclose(rotation, np.rint(rotation), atol=tol)
+        and np.isclose(abs(np.linalg.det(rotation)), 1.0, atol=tol)
+    )
+
+
+def _input_compatible_ssg_from_transformed_primitive(
+    input_cell: CrystalCell,
+    transformed_ssg: SpinSpaceGroup,
+    *,
+    tol: Tolerances,
+) -> SpinSpaceGroup | None:
+    if input_cell.moments is None:
+        return None
+
+    op_preserves_cell = _build_cell_preservation_checker(input_cell, tol=tol)
+    compatible_ops = [
+        op
+        for op in transformed_ssg.ops
+        if _ssg_real_op_is_lattice_compatible(op, tol=tol.m_matrix_tol)
+        and op_preserves_cell(op)
+    ]
+    if not compatible_ops:
+        return None
+    if _candidate_audit_failure(compatible_ops, group_tol=tol) is not None:
+        return None
+    return SpinSpaceGroup(
+        compatible_ops,
+        tol=transformed_ssg.tol,
+        real_space_metric=transformed_ssg.real_space_metric,
+        identify_source_name=transformed_ssg.identify_source_name,
+        identify_tol=transformed_ssg.identify_tol,
+    )
+
+
+def _can_reuse_transformed_input_ssg(
+    input_cell: CrystalCell,
+    transformed_ssg: SpinSpaceGroup,
+    *,
+    tol: Tolerances,
+) -> bool:
+    input_compatible_ssg = _input_compatible_ssg_from_transformed_primitive(
+        input_cell,
+        transformed_ssg,
+        tol=tol,
+    )
+    return bool(
+        input_compatible_ssg is not None
+        and len(input_compatible_ssg.ops) == len(transformed_ssg.ops)
+    )
+
+
 def _diagnostic_ssg_index(file_name: str, ssg: SpinSpaceGroup, *, tol: float) -> str:
     try:
         return ssg.identify_index(file_name, tol=tol)
@@ -1679,16 +1823,17 @@ def _seitz_descriptions_with_cartesian_spin_symbols(
 ) -> list[dict]:
     """Describe ops whose spin matrices are expressed in a non-orthonormal frame.
 
-    The operation matrices are kept in their original frame for output.  For the
-    spin part of the Seitz symbol, however, finite-order recognition must use the
-    Euclidean Cartesian representation; otherwise a valid non-orthonormal-basis
-    rotation can fail the order probe or get an unstable axis label.
+    Operation matrices are kept in their original frame for output.  For the
+    spin part of the Seitz symbol, finite-order recognition uses the Euclidean
+    Cartesian representation; the recognized spin axis is then converted back to
+    the original spin frame before canonicalization and formatting.
     """
     symbol_tol = calibrated_symbol_tol(tol)
     spin_to_cartesian = np.asarray(spin_to_cartesian, dtype=float)
     cartesian_to_spin = np.linalg.inv(spin_to_cartesian)
-    descriptions = [
-        describe_spin_space_operation(
+    descriptions = []
+    for op in ssg.ops:
+        description = describe_spin_space_operation(
             spin_to_cartesian @ np.asarray(op.spin_rotation, dtype=float) @ cartesian_to_spin,
             op.rotation,
             op.translation,
@@ -1696,8 +1841,11 @@ def _seitz_descriptions_with_cartesian_spin_symbols(
             max_order=max_order,
             max_axis_denom=max_axis_denom,
         )
-        for op in ssg.ops
-    ]
+        spin_axis = description["spin"].get("axis_vector")
+        if spin_axis is not None:
+            spin_axis_in_frame = cartesian_to_spin @ np.asarray(spin_axis, dtype=float)
+            description["spin"]["axis_vector"] = tuple(float(value) for value in spin_axis_in_frame)
+        descriptions.append(description)
     return canonicalize_group_seitz_descriptions(
         descriptions,
         tol=symbol_tol,
@@ -3575,21 +3723,22 @@ def _find_spin_group_from_parsed(
         input_setting_identify_index_details = identify_index_details
     else:
         true_input_setting_ssg = ssg_primitive.transform(*transformation_primitive_to_input)
-        input_identify_result = identify_spin_space_group_result(
+        input_compatible_ssg = _input_compatible_ssg_from_transformed_primitive(
             input_cell_cartesian,
-            find_primitive=False,
+            true_input_setting_ssg,
             tol=tol_cfg,
         )
-        input_setting_ssg = input_identify_result.ssg
-        input_setting_matches_true_ssg = _spin_space_group_operation_sets_match(
-            input_setting_ssg.ops,
-            true_input_setting_ssg.ops,
-            tol=tol_cfg.m_matrix_tol,
-        )
-        if input_setting_matches_true_ssg:
+        if (
+            input_compatible_ssg is not None
+            and len(input_compatible_ssg.ops) == len(true_input_setting_ssg.ops)
+        ):
+            input_setting_ssg = true_input_setting_ssg
+            input_setting_matches_true_ssg = True
             input_setting_identify_info = identify_info
             input_setting_identify_index_details = identify_index_details
-        else:
+        elif input_compatible_ssg is not None:
+            input_setting_ssg = input_compatible_ssg
+            input_setting_matches_true_ssg = False
             input_setting_identify_info = _diagnostic_ssg_index(
                 source_name,
                 input_setting_ssg,
@@ -3600,6 +3749,32 @@ def _find_spin_group_from_parsed(
                 "Input-cell SSG differs from the magnetic-primitive SSG transformed "
                 f"to the input setting; input_ssg_index={input_setting_identify_info}."
             )
+        else:
+            input_identify_result = identify_spin_space_group_result(
+                input_cell_cartesian,
+                find_primitive=False,
+                tol=tol_cfg,
+            )
+            input_setting_ssg = input_identify_result.ssg
+            input_setting_matches_true_ssg = _spin_space_group_operation_sets_match(
+                input_setting_ssg.ops,
+                true_input_setting_ssg.ops,
+                tol=tol_cfg.m_matrix_tol,
+            )
+            if input_setting_matches_true_ssg:
+                input_setting_identify_info = identify_info
+                input_setting_identify_index_details = identify_index_details
+            else:
+                input_setting_identify_info = _diagnostic_ssg_index(
+                    source_name,
+                    input_setting_ssg,
+                    tol=tol_cfg.m_matrix_tol,
+                )
+                input_setting_identify_index_details = None
+                input_setting_warning = (
+                    "Input-cell SSG differs from the magnetic-primitive SSG transformed "
+                    f"to the input setting; input_ssg_index={input_setting_identify_info}."
+                )
     input_setting_ossg = _ossg_oriented_spin_frame_ssg(
         input_setting_ssg,
         input_cell_cartesian,

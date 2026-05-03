@@ -296,6 +296,27 @@ def test_find_spin_group_acc_primitive_oriented_seitz_handles_0427_nonorthogonal
     assert any("-4" in symbol for symbol in payload["acc_primitive_ssg_seitz_oriented"])
 
 
+def test_acc_primitive_oriented_seitz_uses_same_spin_frame_as_oriented_ops_for_324():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif")
+
+    assert len(result.acc_primitive_ssg_ops_oriented) == len(
+        result.acc_primitive_ssg_seitz_latex_oriented
+    )
+    assert r"2_{211}" in result.acc_primitive_ssg_seitz_latex_oriented[1]
+    assert r"2_{001}" not in result.acc_primitive_ssg_seitz_latex_oriented[1]
+    assert r"3^{2}_{110}" in result.acc_primitive_ssg_seitz_latex_oriented[10]
+    assert r"3^{1}_{110}" not in result.acc_primitive_ssg_seitz_latex_oriented[10]
+
+
+def test_find_spin_group_acc_primitive_oriented_seitz_uses_acc_lattice_frame_for_324():
+    payload = find_spin_group_acc_primitive(
+        "tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif"
+    )
+
+    assert r"2_{211}" in payload["acc_primitive_ssg_seitz_latex_oriented"][1]
+    assert r"2_{001}" not in payload["acc_primitive_ssg_seitz_latex_oriented"][1]
+
+
 def test_write_ssg_operation_matrices_writes_json(tmp_path):
     payload = find_spin_group_acc_primitive("examples/0.800_MnTe.mcif")
     output_path = tmp_path / "acc_primitive_ops.json"
@@ -2571,9 +2592,47 @@ def test_find_spin_group_input_setting_payload_allows_nonprimitive_when_ssg_matc
     )
 
 
-def test_find_spin_group_input_setting_payload_warns_when_input_ssg_differs_from_true_setting():
+def test_find_spin_group_reuses_transformed_primitive_ssg_for_compatible_input_supercell(monkeypatch):
+    find_spin_group_module = importlib.import_module("findspingroup.find_spin_group")
+    original_identify = find_spin_group_module.identify_spin_space_group_result
+    calls = []
+
+    def counting_identify(*args, **kwargs):
+        calls.append(len(args[0].positions))
+        return original_identify(*args, **kwargs)
+
+    monkeypatch.setattr(
+        find_spin_group_module,
+        "identify_spin_space_group_result",
+        counting_identify,
+    )
+
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.31_MnO.mcif")
+
+    assert calls == [4]
+    assert result.input_setting_warning is None
+    assert result.input_ssg_may_be_incomplete is False
+    assert len(result.input_ssg_ops_spin_cartesian) == 1536
+
+
+def test_find_spin_group_input_setting_payload_warns_when_input_ssg_differs_from_true_setting(monkeypatch):
+    find_spin_group_module = importlib.import_module("findspingroup.find_spin_group")
+    original_identify = find_spin_group_module.identify_spin_space_group_result
+    calls = []
+
+    def counting_identify(*args, **kwargs):
+        calls.append(len(args[0].positions))
+        return original_identify(*args, **kwargs)
+
+    monkeypatch.setattr(
+        find_spin_group_module,
+        "identify_spin_space_group_result",
+        counting_identify,
+    )
+
     result = find_spin_group("tests/testset/mcif_241130_no2186/0.396_MnPtGa.mcif")
 
+    assert calls == [6]
     assert result.input_cell_detail is not None
     assert result.input_ssg_may_be_incomplete is True
     assert result.input_setting_warning == (
@@ -2609,6 +2668,43 @@ def test_find_spin_group_input_setting_payload_warns_when_input_ssg_differs_from
         assert suppressed_tag not in input_identified_scif
     with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
         result.to_scif(cell_mode="input")
+
+
+def test_input_setting_oriented_seitz_uses_cartesian_order_with_input_spin_frame():
+    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
+        result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+
+    raw_oriented_ops = [
+        SpinSpaceGroupOperation(
+            op["spin_rotation"],
+            op["real_rotation"],
+            op["translation"],
+        )
+        for op in result.input_ssg_ops_spin_oriented
+    ]
+    raw_nonorthogonal_latex = SpinSpaceGroup(raw_oriented_ops).seitz_symbols_latex
+
+    assert len(result.input_ssg_ops_spin_oriented) == len(
+        result.input_ssg_seitz_latex_spin_oriented
+    )
+    assert r"12^{1}_{001}" in raw_nonorthogonal_latex[12]
+    assert r"12^{11}_{001}" in result.input_ssg_seitz_latex_spin_oriented[12]
+    assert r"12^{1}_{001}" in result.input_ssg_seitz_latex_spin_oriented[20]
+    assert np.allclose(
+        np.asarray(result.input_ssg_ops_spin_oriented[12]["spin_rotation"], dtype=float)
+        @ np.asarray(result.input_ssg_ops_spin_oriented[20]["spin_rotation"], dtype=float),
+        np.eye(3),
+        atol=1e-8,
+    )
+    assert np.allclose(
+        np.mod(
+            np.asarray(result.input_ssg_ops_spin_oriented[12]["translation"], dtype=float)
+            + np.asarray(result.input_ssg_ops_spin_oriented[20]["translation"], dtype=float),
+            1.0,
+        ),
+        np.zeros(3),
+        atol=1e-8,
+    )
 
 
 @pytest.mark.parametrize(
