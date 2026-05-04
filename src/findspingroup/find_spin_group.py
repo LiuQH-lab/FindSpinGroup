@@ -286,31 +286,61 @@ def _build_cell_preservation_checker(
         key = (elements[index], *_cell_position_bucket_key(position, bins))
         buckets.setdefault(key, []).append(index)
 
-    def op_preserves_cell(op: SpinSpaceGroupOperation) -> bool:
-        real_rotation = np.asarray(op.rotation, dtype=float)
-        spin_rotation = np.asarray(op.spin_rotation, dtype=float)
-        translation = np.asarray(op.translation, dtype=float)
+    spatial_cache: dict[tuple[int, ...], list[list[int]] | None] = {}
+
+    def spatial_key(rotation: np.ndarray, translation: np.ndarray) -> tuple[int, ...]:
+        key_tol = 1e-8
+        normalized_translation = normalize_vector_to_zero(translation, atol=key_tol)
+        return (
+            *np.rint(np.asarray(rotation, dtype=float).ravel() / key_tol).astype(np.int64),
+            *np.rint(normalized_translation.ravel() / key_tol).astype(np.int64),
+        )
+
+    def spatial_candidates_for_op(
+        real_rotation: np.ndarray,
+        translation: np.ndarray,
+    ) -> list[list[int]] | None:
+        key = spatial_key(real_rotation, translation)
+        if key in spatial_cache:
+            return spatial_cache[key]
+
+        candidates_by_atom: list[list[int]] = []
         for atom_index, position in enumerate(positions):
             transformed_position = normalize_vector_to_zero(
                 real_rotation @ position + translation,
                 atol=1e-8,
             )
-            transformed_moment = spin_rotation @ moments[atom_index]
             bucket_key = _cell_position_bucket_key(transformed_position, bins)
-            matched = False
+            candidates: list[int] = []
             for neighbor_key in _cell_position_neighbor_keys(bucket_key, bins, neighbor_radius):
                 for candidate_index in buckets.get((elements[atom_index], *neighbor_key), ()):
                     if abs(occupancies[atom_index] - occupancies[candidate_index]) >= tol.occupancy:
                         continue
                     if getNormInf(transformed_position, positions[candidate_index]) >= tol.space:
                         continue
-                    if np.linalg.norm(transformed_moment - moments[candidate_index]) >= tol.moment:
-                        continue
-                    matched = True
-                    break
-                if matched:
-                    break
-            if not matched:
+                    candidates.append(candidate_index)
+            if not candidates:
+                spatial_cache[key] = None
+                return None
+            candidates_by_atom.append(candidates)
+
+        spatial_cache[key] = candidates_by_atom
+        return candidates_by_atom
+
+    def op_preserves_cell(op: SpinSpaceGroupOperation) -> bool:
+        real_rotation = np.asarray(op.rotation, dtype=float)
+        spin_rotation = np.asarray(op.spin_rotation, dtype=float)
+        translation = np.asarray(op.translation, dtype=float)
+        candidates_by_atom = spatial_candidates_for_op(real_rotation, translation)
+        if candidates_by_atom is None:
+            return False
+
+        transformed_moments = moments @ spin_rotation.T
+        for atom_index, candidates in enumerate(candidates_by_atom):
+            if not any(
+                np.linalg.norm(transformed_moments[atom_index] - moments[candidate_index]) < tol.moment
+                for candidate_index in candidates
+            ):
                 return False
         return True
 
@@ -359,7 +389,10 @@ def _input_compatible_ssg_from_transformed_primitive(
     ]
     if not compatible_ops:
         return None
-    if _candidate_audit_failure(compatible_ops, group_tol=tol) is not None:
+    if len(compatible_ops) != len(transformed_ssg.ops) and _candidate_audit_failure(
+        compatible_ops,
+        group_tol=tol,
+    ) is not None:
         return None
     return SpinSpaceGroup(
         compatible_ops,
