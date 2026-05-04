@@ -230,6 +230,10 @@ def _matrix_vector_ops_cache_key(ops) -> tuple:
     )
 
 
+def _matrix_ops_cache_key(ops) -> tuple:
+    return tuple(_matrix_bytes_key(rotation) for rotation in ops)
+
+
 @lru_cache(maxsize=512)
 def _cached_space_group_dataset_by_key(ops_key: tuple):
     ops = [
@@ -285,18 +289,75 @@ def _cached_magnetic_space_group_info_by_key(ops_key: tuple):
     return None if info is None else deepcopy(info)
 
 
+def _matrix_lookup_key(matrix, *, key_tol: float) -> tuple[int, ...]:
+    return tuple(np.rint(np.asarray(matrix, dtype=float).reshape(-1) / key_tol).astype(np.int64))
+
+
+def _matrix_close_atol(left, right, *, tol: float, rtol: float = 1e-05) -> bool:
+    left_array = np.asarray(left, dtype=float)
+    right_array = np.asarray(right, dtype=float)
+    return bool(np.all(np.abs(left_array - right_array) <= tol + rtol * np.abs(right_array)))
+
+
+class _MatrixOperationLookup:
+    def __init__(self, matrices=(), *, tol: float, rtol: float = 1e-05):
+        self.tol = float(tol)
+        self.rtol = float(rtol)
+        self.key_tol = max(self.tol * 0.01, 1e-8)
+        self.ops: list[np.ndarray] = []
+        self._buckets: dict[tuple[int, ...], list[int]] = {}
+        self._array = None
+        self._array_dirty = True
+        for matrix in matrices:
+            self.add(matrix)
+
+    def add(self, matrix) -> None:
+        arr = np.asarray(matrix, dtype=float).reshape(3, 3)
+        index = len(self.ops)
+        self.ops.append(arr)
+        self._buckets.setdefault(_matrix_lookup_key(arr, key_tol=self.key_tol), []).append(index)
+        self._array_dirty = True
+
+    def _ensure_array(self) -> None:
+        if not self._array_dirty:
+            return
+        self._array = (
+            np.empty((0, 3, 3), dtype=float)
+            if not self.ops
+            else np.asarray(self.ops, dtype=float)
+        )
+        self._array_dirty = False
+
+    def contains(self, matrix) -> bool:
+        arr = np.asarray(matrix, dtype=float).reshape(3, 3)
+        for index in self._buckets.get(_matrix_lookup_key(arr, key_tol=self.key_tol), ()):
+            if _matrix_close_atol(arr, self.ops[index], tol=self.tol, rtol=self.rtol):
+                return True
+
+        self._ensure_array()
+        if len(self.ops) == 0:
+            return False
+        close = np.all(
+            np.abs(arr - self._array) <= self.tol + self.rtol * np.abs(self._array),
+            axis=(1, 2),
+        )
+        return bool(np.any(close))
+
+
 def _matrix_group_closure(generators, *, tol: float, limit: int = 256):
     ops = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in generators], tol=tol)
     changed = True
     while changed:
         changed = False
         current = list(ops)
+        lookup = _MatrixOperationLookup(ops, tol=tol)
         for left in current:
             for right in current:
                 product = np.asarray(left, dtype=float) @ np.asarray(right, dtype=float)
-                if any(np.allclose(product, existing, atol=tol) for existing in ops):
+                if lookup.contains(product):
                     continue
                 ops.append(product)
+                lookup.add(product)
                 changed = True
                 if len(ops) > limit:
                     raise RuntimeError("Matrix-group closure exceeded the configured limit.")
@@ -309,18 +370,20 @@ def _matrix_sets_match(left, right, *, tol: float) -> bool:
     right = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in right], tol=tol)
     if len(left) != len(right):
         return False
-    return all(any(np.allclose(a, b, atol=tol) for b in right) for a in left)
+    right_lookup = _MatrixOperationLookup(right, tol=tol)
+    return all(right_lookup.contains(a) for a in left)
 
 
 def _point_operation_group_audit_failure(rotations, *, tol: float, label: str) -> str | None:
     rotations = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in rotations], tol=tol)
     if not rotations:
         return f"{label} has no operations"
-    if not any(np.allclose(np.eye(3), op, atol=tol, rtol=0) for op in rotations):
+    strict_lookup = _MatrixOperationLookup(rotations, tol=tol, rtol=0)
+    if not strict_lookup.contains(np.eye(3)):
         return f"{label} has no identity operation"
     for index, op in enumerate(rotations):
         inverse = np.linalg.inv(op)
-        if not any(np.allclose(inverse, candidate, atol=tol, rtol=0) for candidate in rotations):
+        if not strict_lookup.contains(inverse):
             return f"{label} operation {index} has no inverse"
     try:
         closure = _matrix_group_closure(
@@ -335,7 +398,7 @@ def _point_operation_group_audit_failure(rotations, *, tol: float, label: str) -
     return None
 
 
-def _resolve_point_group_info(rotations, *, tol: float, label: str):
+def _resolve_point_group_info_uncached(rotations, *, tol: float, label: str):
     rotations = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in rotations], tol=tol)
     audit_failure = _point_operation_group_audit_failure(rotations, tol=tol, label=label)
     if audit_failure is not None:
@@ -377,6 +440,27 @@ def _resolve_point_group_info(rotations, *, tol: float, label: str):
         )
 
     return info
+
+
+@lru_cache(maxsize=512)
+def _cached_point_group_info_by_key(rotations_key: tuple, tol: float):
+    rotations = [_restore_matrix_from_bytes(rotation_bytes) for rotation_bytes in rotations_key]
+    return deepcopy(
+        _resolve_point_group_info_uncached(
+            rotations,
+            tol=tol,
+            label="point group",
+        )
+    )
+
+
+def _resolve_point_group_info(rotations, *, tol: float, label: str):
+    rotations = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in rotations], tol=tol)
+    rotations_key = _matrix_ops_cache_key(rotations)
+    try:
+        return deepcopy(_cached_point_group_info_by_key(rotations_key, float(tol)))
+    except ValueError:
+        return _resolve_point_group_info_uncached(rotations, tol=tol, label=label)
 
 
 def _effective_proper_rotation(rotation, *, tol: float) -> np.ndarray | None:
