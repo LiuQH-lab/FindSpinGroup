@@ -2590,6 +2590,15 @@ def test_find_spin_group_input_setting_payload_allows_nonprimitive_when_ssg_matc
         result.T_input_to_convention,
         result.T_convention_to_input,
     )
+    input_identified_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_IDENTIFIED)
+    assert f'_space_group_spin.number_Chen_Liu  "{result.index}"' in input_identified_scif
+    assert "_space_group_spin.fsg_G0_number  148" in input_identified_scif
+    assert "_space_group_spin.fsg_L0_number  2" in input_identified_scif
+    assert "_space_group_spin.fsg_it  3" in input_identified_scif
+    assert "_space_group_spin.fsg_ik  4" in input_identified_scif
+    assert '_space_group_spin.fsg_spin_space_point_group_name  "23"' in input_identified_scif
+    assert '_space_group_spin.fsg_magnetic_phase  "AFM(SOM)"' in input_identified_scif
+    assert '_space_group_spin.fsg_spin_arithmetic_crystal_class_symbol  "-3R"' in input_identified_scif
 
 
 def test_find_spin_group_reuses_transformed_primitive_ssg_for_compatible_input_supercell(monkeypatch):
@@ -3252,6 +3261,7 @@ def test_scif_transform_tags_use_basis_relation_contract():
     input_identified_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_IDENTIFIED)
     assert "_space_group_spin.fsg_transform_to_input_Pp  'a,b,c;0,0,0'" in input_identified_scif
     assert "_space_group_spin.fsg_input_setting_warning" not in input_identified_scif
+    assert "_space_group_spin.fsg_G0_number  148" in input_identified_scif
 
     magnetic_primitive_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE)
     assert (

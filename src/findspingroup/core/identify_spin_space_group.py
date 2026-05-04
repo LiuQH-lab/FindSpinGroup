@@ -1016,28 +1016,80 @@ def _candidate_eigvals_key(candidate):
 
 
 def _matrix_operation_equivalent(left, right, tol: float) -> bool:
-    return bool(np.allclose(np.asarray(left, dtype=float), np.asarray(right, dtype=float), atol=tol, rtol=0))
+    return _matrix_close(left, right, tol, rtol=0)
 
 
-def _find_matching_matrix_operation(matrix, universe, tol: float):
-    for operation in universe:
-        if _matrix_operation_equivalent(matrix, operation, tol):
-            return operation
-    return None
+class _MatrixOperationLookup:
+    def __init__(self, matrices=(), *, tol: float):
+        self.tol = float(tol)
+        self.key_tol = max(self.tol * 0.01, 1e-8)
+        self.ops: list[np.ndarray] = []
+        self._buckets: dict[tuple[int, ...], list[int]] = defaultdict(list)
+        self._array = None
+        self._array_dirty = True
+        for matrix in matrices:
+            self.add(matrix)
+
+    def _key(self, matrix) -> tuple[int, ...]:
+        return _matrix_signature(matrix, key_tol=self.key_tol)
+
+    def add(self, matrix) -> None:
+        arr = np.asarray(matrix, dtype=float).reshape(3, 3)
+        index = len(self.ops)
+        self.ops.append(arr)
+        self._buckets[self._key(arr)].append(index)
+        self._array_dirty = True
+
+    def _ensure_array(self) -> None:
+        if not self._array_dirty:
+            return
+        self._array = (
+            np.empty((0, 3, 3), dtype=float)
+            if not self.ops
+            else np.asarray(self.ops, dtype=float)
+        )
+        self._array_dirty = False
+
+    def find(self, matrix):
+        arr = np.asarray(matrix, dtype=float).reshape(3, 3)
+        for index in self._buckets.get(self._key(arr), ()):
+            if _matrix_close(arr, self.ops[index], self.tol, rtol=0):
+                return self.ops[index]
+
+        self._ensure_array()
+        if len(self.ops) == 0:
+            return None
+        close = np.all(np.abs(arr - self._array) <= self.tol, axis=(1, 2))
+        indices = np.flatnonzero(close)
+        if len(indices) == 0:
+            return None
+        return self.ops[int(indices[0])]
+
+    def contains(self, matrix) -> bool:
+        return self.find(matrix) is not None
+
+
+def _find_matching_matrix_operation(matrix, universe, tol: float, lookup: _MatrixOperationLookup | None = None):
+    if lookup is None:
+        lookup = _MatrixOperationLookup(universe, tol=tol)
+    return lookup.find(matrix)
 
 
 def _point_group_closure_within_universe(generators, universe, tol: float, *, limit: int = 256):
-    identity = _find_matching_matrix_operation(np.eye(3), universe, tol)
+    universe_lookup = _MatrixOperationLookup(universe, tol=tol)
+    identity = _find_matching_matrix_operation(np.eye(3), universe, tol, lookup=universe_lookup)
     if identity is None:
         return None
 
     group = [identity]
+    group_lookup = _MatrixOperationLookup(group, tol=tol)
     for generator in generators:
-        matched = _find_matching_matrix_operation(generator, universe, tol)
+        matched = _find_matching_matrix_operation(generator, universe, tol, lookup=universe_lookup)
         if matched is None:
             return None
-        if not any(_matrix_operation_equivalent(matched, existing, tol) for existing in group):
+        if not group_lookup.contains(matched):
             group.append(matched)
+            group_lookup.add(matched)
 
     index = 0
     while index < len(group):
@@ -1046,12 +1098,13 @@ def _point_group_closure_within_universe(generators, universe, tol: float, *, li
         snapshot = list(group)
         for right in snapshot:
             for product in (left @ right, right @ left):
-                matched = _find_matching_matrix_operation(product, universe, tol)
+                matched = _find_matching_matrix_operation(product, universe, tol, lookup=universe_lookup)
                 if matched is None:
                     return None
-                if any(_matrix_operation_equivalent(matched, existing, tol) for existing in group):
+                if group_lookup.contains(matched):
                     continue
                 group.append(matched)
+                group_lookup.add(matched)
                 if len(group) > limit:
                     return None
     return _deduplicate_pg_operations(group, tol=tol)

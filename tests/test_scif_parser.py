@@ -8,7 +8,12 @@ import pytest
 from findspingroup import find_spin_group, find_spin_group_from_data
 from findspingroup.find_spin_group import (
     SCIF_CELL_MODE_INPUT_IDENTIFIED,
+    SCIF_CELL_MODE_INPUT_CARTESIAN,
+    SCIF_CELL_MODE_INPUT_ORIENTED,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
+    SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN,
+    SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+    SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
     SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
 )
 from findspingroup.core import Molecule, PointGroupAnalyzer
@@ -71,6 +76,10 @@ def _serialize_spatial_ops(ops):
         )
         for op in ops
     }
+
+
+def _scif_line(scif_text: str, tag: str) -> str:
+    return next(line for line in scif_text.splitlines() if line.startswith(tag))
 
 
 def _invert_setting_transform(transform: np.ndarray, shift: np.ndarray):
@@ -207,14 +216,55 @@ def test_find_spin_group_exposes_mainline_scif_output():
     assert sorted(result.scif_cell_modes) == sorted(
         [
             SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
-            SCIF_CELL_MODE_INPUT_IDENTIFIED,
-            SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
+            SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
+            SCIF_CELL_MODE_INPUT_ORIENTED,
+            SCIF_CELL_MODE_INPUT_CARTESIAN,
+            SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+            SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN,
         ]
     )
     assert result.to_scif() == result.scif
     assert result.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED) == result.scif
+    assert result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_IDENTIFIED) == result.to_scif(
+        cell_mode=SCIF_CELL_MODE_INPUT_ORIENTED,
+    )
+    assert result.to_scif(cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE) == result.to_scif(
+        cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+    )
     with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
         result.to_scif(cell_mode="input")
+
+
+def test_generated_scif_spin_only_direction_follows_spin_frame():
+    mnte = find_spin_group("examples/0.800_MnTe.mcif")
+
+    assert _scif_line(
+        mnte.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN),
+        "_space_group_spin.collinear_direction_xyz",
+    ) == "_space_group_spin.collinear_direction_xyz '1/2,sqrt(3)/2,0'"
+    assert _scif_line(
+        mnte.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
+        "_space_group_spin.collinear_direction_xyz",
+    ) == "_space_group_spin.collinear_direction_xyz '1,1,0'"
+    assert _scif_line(
+        mnte.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN),
+        "_space_group_spin.coplanar_perp_uvw",
+    ) == "_space_group_spin.coplanar_perp_uvw   . "
+
+    na3co2sb = find_spin_group("examples/2.116_Na3Co2SbO6.mcif")
+
+    assert _scif_line(
+        na3co2sb.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN),
+        "_space_group_spin.collinear_direction_xyz",
+    ) == "_space_group_spin.collinear_direction_xyz ."
+    assert _scif_line(
+        na3co2sb.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN),
+        "_space_group_spin.coplanar_perp_uvw",
+    ) == "_space_group_spin.coplanar_perp_uvw   '0,0,1' "
+    assert _scif_line(
+        na3co2sb.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
+        "_space_group_spin.coplanar_perp_uvw",
+    ) == "_space_group_spin.coplanar_perp_uvw   '-0.553652,0,0.832748' "
 
 
 def test_scif_atom_type_loop_lists_all_emitted_species_for_324():
@@ -231,8 +281,11 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_mnte(
     original = find_spin_group("examples/0.800_MnTe.mcif")
 
     for cell_mode in [
-        SCIF_CELL_MODE_INPUT_IDENTIFIED,
-        SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
+        SCIF_CELL_MODE_INPUT_CARTESIAN,
+        SCIF_CELL_MODE_INPUT_ORIENTED,
+        SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN,
+        SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+        SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
         SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ]:
         roundtrip = _roundtrip_index_from_scif_text(
@@ -896,6 +949,24 @@ def test_generated_scif_uses_cif_legal_fsg_tags_and_full_precision_operations():
 
     assert "_space_group_spin.number_Chen_Liu" in result.scif
     assert "_space_group_spin.name_Chen_Liu" in result.scif
+    chen_name_lines = {
+        next(
+            line
+            for line in result.to_scif(cell_mode=cell_mode).splitlines()
+            if line.startswith("_space_group_spin.name_Chen_Liu")
+        )
+        for cell_mode in [
+            SCIF_CELL_MODE_INPUT_CARTESIAN,
+            SCIF_CELL_MODE_INPUT_ORIENTED,
+            SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN,
+            SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+            SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
+            SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
+        ]
+    }
+    assert chen_name_lines == {
+        '_space_group_spin.name_Chen_Liu     "R 3^{1}_{111}|-3 : (2_{010},2_{001},1;2_{001},2_{010})"'
+    }
     assert " : " in result.convention_ssg_international_linear
     assert "_space_group_spin.fsg_spin_space_group_name_linear" not in result.scif
     assert "_space_group_spin.fsg_oriented_spin_space_group_name_linear" in result.scif
@@ -953,7 +1024,7 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
         (
             "tests/testset/mcif_241130_no2186/1.526_LiCoF4.mcif",
             "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{001}m|1",
-            "a+c,b,c;0,0,0;5.736417as-5.48785cs,4.6462bs,9.220398as+0.736873cs",
+            "a,b,-a+c;0,0,0;5.48785as+0.248568cs,4.6462bs,-0.736873as+9.957271cs",
         ),
         (
             "examples/2.116_Na3Co2SbO6.mcif",
@@ -962,8 +1033,8 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
         ),
         (
             "tests/testset/mcif_241130_no2186/1.570_La3OsO7.mcif",
-            "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{001}m|1",
-            "1/2c,-b,2a+c;0,1/2,0;-2.739924as-5.573532cs,7.6198bs,13.190119as-3.782505cs",
+            "P 1|2_{1}/ 1|c : -1|(0,0,1/2) ∞_{001}m|1",
+            "a+2c,-b,1/2a;0,1/2,0;-5.573532as-2.739924cs,-7.6198bs,-3.782505as+13.190119cs",
         ),
     ],
 )

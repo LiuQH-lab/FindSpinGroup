@@ -25,6 +25,7 @@ from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
 from findspingroup.data import MSGMPG_DB
 from findspingroup.io import parse_poscar_file, parse_structure_file
 from findspingroup.io.scif_generator import (
+    _build_chen_linear_name,
     _format_scif_symbolic_scalar,
     affine_matrix_to_xyz_expression,
     generate_scif,
@@ -114,9 +115,27 @@ ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING = "acc_primitive_poscar_spin_frame"
 OSSG_ORIENTED_SPIN_FRAME_SETTING = "ossg_oriented_spin_frame"
 G0_STANDARD_SETTING = "G0std"
 L0_STANDARD_SETTING = "L0std"
+SCIF_SPIN_FRAME_CARTESIAN = "cartesian"
+SCIF_SPIN_FRAME_ORIENTED = "oriented"
+SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN = "ssg_convention_cartesian"
+SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED = "ssg_convention_oriented"
+SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN = "magnetic_primitive_cartesian"
+SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED = "magnetic_primitive_oriented"
+SCIF_CELL_MODE_INPUT_CARTESIAN = "input_cartesian"
+SCIF_CELL_MODE_INPUT_ORIENTED = "input_oriented"
+
+# Legacy public string modes. Keep them accepted by MagSymmetryResult.to_scif(...)
+# while exposing the explicit setting × spin-frame modes in result.scif_cell_modes.
 SCIF_CELL_MODE_INPUT_IDENTIFIED = "input_identified"
 SCIF_CELL_MODE_MAGNETIC_PRIMITIVE = "magnetic_primitive"
-SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED = "ssg_convention_oriented"
+_SCIF_CELL_MODE_ALIASES = {
+    SCIF_CELL_MODE_INPUT_IDENTIFIED: SCIF_CELL_MODE_INPUT_ORIENTED,
+    SCIF_CELL_MODE_MAGNETIC_PRIMITIVE: SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+}
+
+
+def _resolve_scif_cell_mode(cell_mode: str) -> str:
+    return _SCIF_CELL_MODE_ALIASES.get(cell_mode, cell_mode)
 
 
 def _is_identify_index_database_missing_error(error: Exception) -> bool:
@@ -179,14 +198,20 @@ def _exact_translation_distance(a, b) -> float:
     return float(np.max(np.abs(np.asarray(a, dtype=float) - np.asarray(b, dtype=float))))
 
 
+def _matrix_close_atol(left, right, *, tol: float, rtol: float = 1e-05) -> bool:
+    left_array = np.asarray(left, dtype=float)
+    right_array = np.asarray(right, dtype=float)
+    return bool(np.all(np.abs(left_array - right_array) <= tol + rtol * np.abs(right_array)))
+
+
 def _ops_match_with_exact_translation(
     left: SpinSpaceGroupOperation,
     right: SpinSpaceGroupOperation,
     tol: float,
 ) -> bool:
     return (
-        np.allclose(np.asarray(left[0], dtype=float), np.asarray(right[0], dtype=float), atol=tol)
-        and np.allclose(np.asarray(left[1], dtype=float), np.asarray(right[1], dtype=float), atol=tol)
+        _matrix_close_atol(left[0], right[0], tol=tol)
+        and _matrix_close_atol(left[1], right[1], tol=tol)
         and _exact_translation_distance(left[2], right[2]) < tol
     )
 
@@ -530,7 +555,7 @@ def _collect_unique_real_ops_with_spin_sets(
         translation_key = _fractional_translation_bucket_key(translation, bins)
         for neighbor_key in _fractional_translation_neighbor_keys(translation_key, bins, neighbor_radius):
             for record in exact_buckets.get((rotation_key, neighbor_key), ()):
-                if not np.allclose(real_rotation, record["rotation"], atol=tol, rtol=0):
+                if not _matrix_close_atol(real_rotation, record["rotation"], tol=tol, rtol=0):
                     continue
                 if _exact_translation_distance(translation, record["translation"]) >= tol:
                     continue
@@ -548,7 +573,10 @@ def _collect_unique_real_ops_with_spin_sets(
             records.append(matched)
             exact_buckets.setdefault((rotation_key, translation_key), []).append(matched)
 
-        if not any(np.allclose(spin_rotation, existing, atol=tol, rtol=0) for existing in matched["spin_rotations"]):
+        if not any(
+            _matrix_close_atol(spin_rotation, existing, tol=tol, rtol=0)
+            for existing in matched["spin_rotations"]
+        ):
             matched["spin_rotations"].append(spin_rotation)
 
     for record in records:
@@ -565,28 +593,32 @@ def _match_real_op_record(
     *,
     tol: float,
     pure_translation_vectors: list[np.ndarray],
+    record_index: dict[tuple, list[dict]] | None = None,
 ) -> tuple[dict | None, str]:
     rotation_key = _real_rotation_bucket_key(candidate["rotation"], tol)
-    rotation_candidates = [
-        record
-        for record in records
-        if _real_rotation_bucket_key(record["rotation"], tol) == rotation_key
-    ]
+    if record_index is None:
+        rotation_candidates = [
+            record
+            for record in records
+            if _real_rotation_bucket_key(record["rotation"], tol) == rotation_key
+        ]
+    else:
+        rotation_candidates = record_index.get(rotation_key, [])
 
     for record in rotation_candidates:
-        if np.allclose(candidate["rotation"], record["rotation"], atol=tol, rtol=0) and _exact_translation_distance(
+        if _matrix_close_atol(candidate["rotation"], record["rotation"], tol=tol, rtol=0) and _exact_translation_distance(
             candidate["translation"], record["translation"]
         ) < tol:
             return record, "exact"
 
     for record in rotation_candidates:
-        if np.allclose(candidate["rotation"], record["rotation"], atol=tol, rtol=0) and _translation_equivalent_mod_integer(
+        if _matrix_close_atol(candidate["rotation"], record["rotation"], tol=tol, rtol=0) and _translation_equivalent_mod_integer(
             candidate["translation"], record["translation"], tol
         ):
             return record, "mod_integer"
 
     for record in rotation_candidates:
-        if not np.allclose(candidate["rotation"], record["rotation"], atol=tol, rtol=0):
+        if not _matrix_close_atol(candidate["rotation"], record["rotation"], tol=tol, rtol=0):
             continue
         if _translations_equivalent_mod_pure_translations(
             candidate["translation"],
@@ -597,6 +629,18 @@ def _match_real_op_record(
             return record, "mod_pure_translation"
 
     return None, "none"
+
+
+def _build_real_op_record_match_index(
+    records: list[dict],
+    *,
+    tol: float,
+) -> dict[tuple, list[dict]]:
+    index: dict[tuple, list[dict]] = {}
+    for record in records:
+        rotation_key = _real_rotation_bucket_key(record["rotation"], tol)
+        index.setdefault(rotation_key, []).append(record)
+    return index
 
 
 def audit_spatial_transform_effect(
@@ -648,6 +692,12 @@ def audit_spatial_transform_effect(
 
     source_records = _collect_unique_real_ops_with_spin_sets(source_ops, tol=tol)
     transformed_records = _collect_unique_real_ops_with_spin_sets(transformed_ops, tol=tol)
+    source_record_index = _build_real_op_record_match_index(source_records, tol=tol)
+    transformed_record_index = _build_real_op_record_match_index(transformed_records, tol=tol)
+    source_record_index_by_id = {
+        id(record): index
+        for index, record in enumerate(source_records)
+    }
     pure_translation_vectors = [np.asarray(item[1], dtype=float) for item in ssg.pure_t_group]
 
     transformed_to_source = []
@@ -662,6 +712,7 @@ def audit_spatial_transform_effect(
             source_records,
             tol=tol,
             pure_translation_vectors=pure_translation_vectors,
+            record_index=source_record_index,
         )
         if match_kind != "exact":
             exact_preserved = False
@@ -673,16 +724,13 @@ def audit_spatial_transform_effect(
         spin_set_same = None
         matched_index = None
         if matched_record is not None:
-            matched_index = next(
-                (idx for idx, record in enumerate(source_records) if record is matched_record),
-                None,
-            )
+            matched_index = source_record_index_by_id.get(id(matched_record))
             source_spin_rotations = matched_record["spin_rotations"]
             transformed_spin_rotations = transformed_record["spin_rotations"]
             spin_set_same = (
                 len(source_spin_rotations) == len(transformed_spin_rotations)
                 and all(
-                    np.allclose(left, right, atol=tol, rtol=0)
+                    _matrix_close_atol(left, right, tol=tol, rtol=0)
                     for left, right in zip(source_spin_rotations, transformed_spin_rotations)
                 )
             )
@@ -704,18 +752,14 @@ def audit_spatial_transform_effect(
 
     unmatched_source_indices = []
     for source_index, source_record in enumerate(source_records):
-        matched = False
-        for transformed_record in transformed_records:
-            _, match_kind = _match_real_op_record(
-                source_record,
-                [transformed_record],
-                tol=tol,
-                pure_translation_vectors=pure_translation_vectors,
-            )
-            if match_kind != "none":
-                matched = True
-                break
-        if not matched:
+        _, match_kind = _match_real_op_record(
+            source_record,
+            transformed_records,
+            tol=tol,
+            pure_translation_vectors=pure_translation_vectors,
+            record_index=transformed_record_index,
+        )
+        if match_kind == "none":
             unmatched_source_indices.append(source_index)
 
     return {
@@ -1468,8 +1512,9 @@ class MagSymmetryResult:
         *,
         cell_mode: str = SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ) -> str:
+        resolved_cell_mode = _resolve_scif_cell_mode(cell_mode)
         try:
-            return self.scif_outputs[cell_mode]
+            return self.scif_outputs[resolved_cell_mode]
         except KeyError as exc:
             available = sorted(self.scif_outputs.keys())
             raise ValueError(
@@ -2261,24 +2306,60 @@ def _spin_transform_to_oriented_abc(cell: CrystalCell) -> np.ndarray:
     return np.linalg.inv(lattice_col)
 
 
+def _scif_spin_transform_for_frame(cell: CrystalCell, spin_frame: str) -> np.ndarray:
+    if spin_frame == SCIF_SPIN_FRAME_CARTESIAN:
+        return np.eye(3)
+    if spin_frame == SCIF_SPIN_FRAME_ORIENTED:
+        return _spin_transform_to_oriented_abc(cell)
+    raise ValueError(f"Unsupported SCIF spin frame: {spin_frame}")
+
+
+def _scif_moment_transform_for_frame(cell: CrystalCell, spin_frame: str) -> tuple[np.ndarray, str]:
+    if spin_frame == SCIF_SPIN_FRAME_CARTESIAN:
+        return np.eye(3), "cartesian"
+    if spin_frame == SCIF_SPIN_FRAME_ORIENTED:
+        # Formal SCIF atom moment axes are unit-coordinate components. Keep the
+        # established oriented SCIF contract: operations use true abc, while
+        # axis_u/v/w are stored along normalized lattice directions.
+        return _spin_transform_to_in_lattice(cell), "in_lattice"
+    raise ValueError(f"Unsupported SCIF spin frame: {spin_frame}")
+
+
+def _scif_spinframe_basis_abc_rows(cell: CrystalCell, spin_transform: np.ndarray) -> np.ndarray:
+    lattice_col = _lattice_column_matrix(cell)
+    spin_basis_cartesian = np.linalg.inv(np.asarray(spin_transform, dtype=float))
+    # Rows are the emitted spin-frame basis vectors written in the current
+    # real-space lattice basis. For cartesian spin frame this is L^{-1}e_i;
+    # for oriented spin frame this collapses to a,b,c.
+    return (np.linalg.inv(lattice_col) @ spin_basis_cartesian).T
+
+
+def _scif_moment_basis_cartesian(cell: CrystalCell, spin_frame: str) -> np.ndarray:
+    if spin_frame == SCIF_SPIN_FRAME_CARTESIAN:
+        return np.eye(3)
+    if spin_frame == SCIF_SPIN_FRAME_ORIENTED:
+        unit_lattice_basis = np.array(
+            [vector / np.linalg.norm(vector) for vector in np.asarray(cell.lattice_matrix, dtype=float)],
+            dtype=float,
+        ).T
+        return unit_lattice_basis
+    raise ValueError(f"Unsupported SCIF spin frame: {spin_frame}")
+
+
 def _build_scif_export_targets(
     *,
     input_cell: CrystalCell,
     acc_magnetic_primitive_cell: CrystalCell,
     acc_magnetic_primitive_ssg: SpinSpaceGroup,
-    G0std_cell: CrystalCell,
-    G0std_ssg: SpinSpaceGroup,
+    convention_cell: CrystalCell,
+    convention_ssg: SpinSpaceGroup,
+    convention_setting: str,
     transformation_input_to_acc_primitive: tuple[np.ndarray, np.ndarray],
+    transformation_input_to_convention: tuple[np.ndarray, np.ndarray],
     transformation_input_to_G0std: tuple[np.ndarray, np.ndarray],
     transformation_input_to_L0std: tuple[np.ndarray, np.ndarray],
     input_identified_ssg: SpinSpaceGroup | None = None,
 ):
-    acc_primitive_in_lattice = _spin_transform_to_in_lattice(acc_magnetic_primitive_cell)
-    g0std_in_lattice = _spin_transform_to_in_lattice(G0std_cell)
-    acc_primitive_true_abc = _spin_transform_to_oriented_abc(acc_magnetic_primitive_cell)
-    g0std_true_abc = _spin_transform_to_oriented_abc(G0std_cell)
-    input_true_abc = _spin_transform_to_oriented_abc(input_cell)
-
     def _basis_tag_transforms_for_export(
         transformation_input_to_export: tuple[np.ndarray, np.ndarray],
     ) -> dict[str, tuple[np.ndarray, np.ndarray]]:
@@ -2304,36 +2385,88 @@ def _build_scif_export_targets(
             ),
         }
 
-    targets = {
-        SCIF_CELL_MODE_MAGNETIC_PRIMITIVE: {
-            "export_cell": acc_magnetic_primitive_cell.transform_spin(acc_primitive_in_lattice, "in_lattice"),
-            "export_ssg": acc_magnetic_primitive_ssg.transform_spin(acc_primitive_true_abc),
-            "transform_input_to_export": transformation_input_to_acc_primitive,
+    def _target(
+        *,
+        cell_mode: str,
+        base_cell: CrystalCell,
+        base_ssg: SpinSpaceGroup,
+        transformation_input_to_export: tuple[np.ndarray, np.ndarray],
+        setting_name: str,
+        spin_frame: str,
+        is_input_setting: bool = False,
+    ):
+        spin_transform = _scif_spin_transform_for_frame(base_cell, spin_frame)
+        moment_transform, moment_setting = _scif_moment_transform_for_frame(base_cell, spin_frame)
+        return cell_mode, {
+            "export_cell": base_cell.transform_spin(moment_transform, moment_setting),
+            "export_ssg": base_ssg.transform_spin(spin_transform),
+            "transform_input_to_export": transformation_input_to_export,
             "basis_tag_transforms": _basis_tag_transforms_for_export(
-                transformation_input_to_acc_primitive,
+                transformation_input_to_export,
             ),
-            "setting_name": ACC_PRIMITIVE_SETTING,
-        },
-        SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED: {
-            "export_cell": G0std_cell.transform_spin(g0std_in_lattice, "in_lattice"),
-            "export_ssg": G0std_ssg.transform_spin(g0std_true_abc),
-            "transform_input_to_export": transformation_input_to_G0std,
-            "basis_tag_transforms": _basis_tag_transforms_for_export(
-                transformation_input_to_G0std,
-            ),
-            "setting_name": G0_STANDARD_SETTING,
-        },
-    }
-    if input_identified_ssg is not None:
-        targets[SCIF_CELL_MODE_INPUT_IDENTIFIED] = {
-            "export_cell": input_cell,
-            "export_ssg": input_identified_ssg.transform_spin(input_true_abc),
-            "transform_input_to_export": (np.eye(3), np.zeros(3)),
-            "basis_tag_transforms": _basis_tag_transforms_for_export(
-                (np.eye(3), np.zeros(3)),
-            ),
-            "setting_name": "input_identified",
+            "setting_name": setting_name,
+            "spin_frame": spin_frame,
+            "spinframe_basis_abc_rows": _scif_spinframe_basis_abc_rows(base_cell, spin_transform),
+            "moment_basis_cartesian": _scif_moment_basis_cartesian(base_cell, spin_frame),
+            "is_input_setting": is_input_setting,
         }
+
+    targets = dict([
+        _target(
+            cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
+            base_cell=convention_cell,
+            base_ssg=convention_ssg,
+            transformation_input_to_export=transformation_input_to_convention,
+            setting_name=convention_setting,
+            spin_frame=SCIF_SPIN_FRAME_CARTESIAN,
+        ),
+        _target(
+            cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
+            base_cell=convention_cell,
+            base_ssg=convention_ssg,
+            transformation_input_to_export=transformation_input_to_convention,
+            setting_name=convention_setting,
+            spin_frame=SCIF_SPIN_FRAME_ORIENTED,
+        ),
+        _target(
+            cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN,
+            base_cell=acc_magnetic_primitive_cell,
+            base_ssg=acc_magnetic_primitive_ssg,
+            transformation_input_to_export=transformation_input_to_acc_primitive,
+            setting_name=ACC_PRIMITIVE_SETTING,
+            spin_frame=SCIF_SPIN_FRAME_CARTESIAN,
+        ),
+        _target(
+            cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+            base_cell=acc_magnetic_primitive_cell,
+            base_ssg=acc_magnetic_primitive_ssg,
+            transformation_input_to_export=transformation_input_to_acc_primitive,
+            setting_name=ACC_PRIMITIVE_SETTING,
+            spin_frame=SCIF_SPIN_FRAME_ORIENTED,
+        ),
+    ])
+    if input_identified_ssg is not None:
+        identity = (np.eye(3), np.zeros(3))
+        targets.update(dict([
+            _target(
+                cell_mode=SCIF_CELL_MODE_INPUT_CARTESIAN,
+                base_cell=input_cell,
+                base_ssg=input_identified_ssg,
+                transformation_input_to_export=identity,
+                setting_name="input",
+                spin_frame=SCIF_SPIN_FRAME_CARTESIAN,
+                is_input_setting=True,
+            ),
+            _target(
+                cell_mode=SCIF_CELL_MODE_INPUT_ORIENTED,
+                base_cell=input_cell,
+                base_ssg=input_identified_ssg,
+                transformation_input_to_export=identity,
+                setting_name="input",
+                spin_frame=SCIF_SPIN_FRAME_ORIENTED,
+                is_input_setting=True,
+            ),
+        ]))
     return targets
 
 
@@ -3812,6 +3945,7 @@ def _find_spin_group_from_parsed(
         input_setting_ssg,
         input_cell_cartesian,
     )
+    input_setting_index_differs = input_setting_identify_info != identify_info
 
     public_ossg_ssg = _ossg_oriented_spin_frame_ssg(convention_ssg, convention_cell)
     try:
@@ -3912,26 +4046,33 @@ def _find_spin_group_from_parsed(
     ) = _seitz_symbols_from_descriptions(input_oriented_seitz_descriptions)
 
     scif_export_targets = _build_scif_export_targets(
-        input_cell=input_cell,
+        input_cell=input_cell_cartesian,
         acc_magnetic_primitive_cell=acc_magnetic_primitive_cell,
         acc_magnetic_primitive_ssg=acc_magnetic_primitive_ssg,
-        G0std_cell=G0std_cell,
-        G0std_ssg=G0std_ssg,
+        convention_cell=convention_cell,
+        convention_ssg=convention_ssg,
+        convention_setting=convention_setting,
         transformation_input_to_acc_primitive=transformation_input_to_acc_primitive,
+        transformation_input_to_convention=transformation_input_to_convention,
         transformation_input_to_G0std=transformation_input_to_G0std,
         transformation_input_to_L0std=transformation_input_to_L0std,
         input_identified_ssg=input_setting_ssg,
     )
-    scif_export_targets[SCIF_CELL_MODE_INPUT_IDENTIFIED].update(
-        {
-            "spin_space_group_index": input_setting_identify_info,
-            "spin_space_group_name_linear": input_setting_ossg.international_symbol_linear_current_frame,
-            "spin_space_group_name_latex": input_setting_ossg.international_symbol_latex_current_frame,
-            "identify_index_details": input_setting_identify_index_details,
-            "input_setting_warning": input_setting_warning,
-            "suppress_repo_local_summary": True,
-        }
-    )
+    for input_scif_mode in (SCIF_CELL_MODE_INPUT_CARTESIAN, SCIF_CELL_MODE_INPUT_ORIENTED):
+        scif_export_targets[input_scif_mode].update(
+            {
+                "spin_space_group_index": input_setting_identify_info,
+                "spin_space_group_name_linear": (
+                    input_setting_ossg.international_symbol_linear_current_frame
+                ),
+                "spin_space_group_name_latex": (
+                    input_setting_ossg.international_symbol_latex_current_frame
+                ),
+                "identify_index_details": input_setting_identify_index_details,
+                "input_setting_warning": input_setting_warning,
+                "suppress_repo_local_summary": input_setting_index_differs,
+            }
+        )
     wp_chain = _build_wp_chain_payload(G0std_cell, G0std_ssg, tol_cfg)
     acc_primitive_wp_chain = _build_wp_chain_payload(
         acc_primitive_output_cell,
@@ -3944,11 +4085,21 @@ def _find_spin_group_from_parsed(
         else None
     )
 
+    canonical_scif_target = scif_export_targets[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]
+    actual_chen_linear_name = _build_chen_linear_name(
+        source_name,
+        canonical_scif_target["export_cell"],
+        canonical_scif_target["export_ssg"],
+        canonical_scif_target["basis_tag_transforms"],
+        ssg_primitive,
+        identify_index_details,
+    )
+
     scif_outputs = {}
     for cell_mode, export_target in scif_export_targets.items():
         export_cell = export_target["export_cell"]
         export_ssg = export_target["export_ssg"]
-        is_input_like_scif = cell_mode == SCIF_CELL_MODE_INPUT_IDENTIFIED
+        is_input_like_scif = bool(export_target.get("is_input_setting", False))
         export_spin_space_group_index = export_target.get("spin_space_group_index", identify_info)
         export_spin_space_group_name_linear = export_target.get(
             "spin_space_group_name_linear",
@@ -3988,6 +4139,11 @@ def _find_spin_group_from_parsed(
             ssg_primitive,
             spin_space_group_index=export_spin_space_group_index,
             spin_space_group_name=export_spin_space_group_name_linear,
+            spin_space_group_name_chen=(
+                actual_chen_linear_name
+                if export_spin_space_group_index == identify_info
+                else None
+            ),
             spin_space_group_name_linear=export_spin_space_group_name_linear,
             spin_space_group_name_latex=export_spin_space_group_name_latex,
             magnetic_phase=magnetic_phase,
@@ -3998,6 +4154,8 @@ def _find_spin_group_from_parsed(
             parent_space_group_comparison=parent_space_group_comparison,
             input_setting_warning=export_target.get("input_setting_warning"),
             suppress_repo_local_summary=bool(export_target.get("suppress_repo_local_summary", False)),
+            spinframe_basis_abc_rows=export_target.get("spinframe_basis_abc_rows"),
+            moment_basis_cartesian=export_target.get("moment_basis_cartesian"),
         )
 
     scif = scif_outputs[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]

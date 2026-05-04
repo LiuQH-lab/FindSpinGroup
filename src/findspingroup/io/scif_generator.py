@@ -340,6 +340,22 @@ def _format_basis_transform_rows(
     return ",".join(rows)
 
 
+def _format_spinframe_transform_abc(
+    spinframe_basis_abc_rows,
+    *,
+    coeff_precision: int = 6,
+) -> str:
+    rows = (
+        np.eye(3)
+        if spinframe_basis_abc_rows is None
+        else np.asarray(spinframe_basis_abc_rows, dtype=float)
+    )
+    return (
+        "_space_group_spin.transform_spinframe_P_abc  "
+        f"'{_format_basis_transform_rows(rows, ('a', 'b', 'c'), tol=10 ** (-coeff_precision))}'"
+    )
+
+
 def _format_repo_local_magnetic_phase(value: str | None) -> str:
     if value is None:
         return ""
@@ -503,6 +519,12 @@ def _build_transform_chen_pp_abcs(
     )
     if transform_parts is None:
         return None
+    return _format_transform_chen_pp_abcs(transform_parts)
+
+
+def _format_transform_chen_pp_abcs(transform_parts: dict | None):
+    if transform_parts is None:
+        return None
     space_matrix = transform_parts["space_matrix"]
     space_shift = transform_parts["space_shift"]
     spin_basis_rows = transform_parts["spin_basis_rows"]
@@ -645,6 +667,14 @@ def _build_chen_linear_name(
         ssg_primitive=ssg_primitive,
         identify_index_details=identify_index_details,
     )
+    return _chen_linear_name_from_transform_parts(source_name, ssg, transform_parts)
+
+
+def _chen_linear_name_from_transform_parts(
+    source_name: str,
+    ssg: SpinSpaceGroup,
+    transform_parts: dict | None,
+) -> str | None:
     if transform_parts is None:
         return None
     try:
@@ -901,6 +931,7 @@ def write_scif_atoms(
     position_precision: int = 8,
     moment_precision: int = SCIF_OPERATION_FULL_PRECISION,
     magnitude_precision: int = 3,
+    moment_basis_cartesian=None,
 ):
     def _absolute_symmform_from_moment(moment_components, *, zero_tol: float = 1e-10) -> str:
         """
@@ -933,7 +964,7 @@ def write_scif_atoms(
 
         return ",".join(tokens)
 
-    def _relative_symmform_from_moment(moment_components, lattice_rows, *, zero_tol: float = 1e-10) -> str:
+    def _relative_symmform_from_moment(moment_components, basis_lengths, *, zero_tol: float = 1e-10) -> str:
         """
         Express the representative moment as a relative ``u,v,w`` relation.
 
@@ -944,7 +975,7 @@ def write_scif_atoms(
         basis coincides with the lattice basis declared in the file.
         """
         moment = np.asarray(moment_components, dtype=float)
-        basis_lengths = np.linalg.norm(np.asarray(lattice_rows, dtype=float), axis=1)
+        basis_lengths = np.asarray(basis_lengths, dtype=float).reshape(3)
         relative = np.zeros(3, dtype=float)
         nonzero_basis = basis_lengths > zero_tol
         relative[nonzero_basis] = moment[nonzero_basis] / basis_lengths[nonzero_basis]
@@ -976,6 +1007,12 @@ def write_scif_atoms(
 
     coords = np.array(ssg_cell[1])
     spins = np.array(ssg_cell[3])
+    moment_basis_cartesian = (
+        np.array([v / np.linalg.norm(v) for v in ssg_cell[0]], dtype=float).T
+        if moment_basis_cartesian is None
+        else np.asarray(moment_basis_cartesian, dtype=float)
+    )
+    moment_basis_lengths = np.linalg.norm(moment_basis_cartesian, axis=0)
     element_symbols = [atom_dict[i] for i in ssg_cell[2]]
     element_occupancies = [occup_dict[i] for i in ssg_cell[2]]
     all_site_symbols = []
@@ -1052,9 +1089,9 @@ def write_scif_atoms(
         symmform_rel_uvw = (
             _solver_constraints_to_relative_symmform(constraint_map[rep_idx])
             if rep_idx in constraint_map
-            else _relative_symmform_from_moment(spins[rep_idx], ssg_cell[0])
+            else _relative_symmform_from_moment(spins[rep_idx], moment_basis_lengths)
         )
-        magnitude = np.linalg.norm(np.array([v/np.linalg.norm(v) for v in ssg_cell[0]]).T @ spins[rep_idx])
+        magnitude = np.linalg.norm(moment_basis_cartesian @ spins[rep_idx])
         output_lines.append(
             f"{label}\t{_format_scif_float(x, precision=moment_precision)}\t"
             f"{_format_scif_float(y, precision=moment_precision)}\t"
@@ -1077,6 +1114,7 @@ def generate_scif(
     *,
     spin_space_group_index: str | None = None,
     spin_space_group_name: str | None = None,
+    spin_space_group_name_chen: str | None = None,
     spin_space_group_name_linear: str | None = None,
     spin_space_group_name_latex: str | None = None,
     magnetic_phase: str | None = None,
@@ -1092,6 +1130,8 @@ def generate_scif(
     parent_space_group_comparison: dict | None = None,
     input_setting_warning: str | None = None,
     suppress_repo_local_summary: bool = False,
+    spinframe_basis_abc_rows=None,
+    moment_basis_cartesian=None,
 ):
     """
     input:
@@ -1117,19 +1157,26 @@ def generate_scif(
 
     tags = _scif_spin_tag_names()
     repo_tags = _scif_repo_local_extension_tag_names()
-    transform_spinframe = "_space_group_spin.transform_spinframe_P_abc  'a,b,c'"
+    transform_spinframe = _format_spinframe_transform_abc(
+        spinframe_basis_abc_rows,
+        coeff_precision=coeff_precision,
+    )
     # oriented
 
     spin_only = write_scif_spin_only(configuration, norm_direction)
 
+    chen_transform_parts = _resolve_transform_chen_parts(
+        cell_G0=cell_G0,
+        ssg=ssg,
+        basis_tag_transforms=basis_tag_transforms,
+        ssg_primitive=ssg_primitive,
+        identify_index_details=identify_index_details,
+    )
     chen_number = spin_space_group_index
-    chen_name = _build_chen_linear_name(
-        filename,
-        cell_G0,
-        ssg,
-        basis_tag_transforms,
-        ssg_primitive,
-        identify_index_details,
+    chen_name = (
+        spin_space_group_name_chen
+        if spin_space_group_name_chen is not None
+        else _chen_linear_name_from_transform_parts(filename, ssg, chen_transform_parts)
     )
     latex_name = spin_space_group_name_latex
     oriented_linear_name = spin_space_group_name_linear
@@ -1150,14 +1197,7 @@ def generate_scif(
         ssg_name_latex = f"{repo_tags['ssg_name_latex']}     ?"
     else:
         ssg_name_latex = f"{repo_tags['ssg_name_latex']}     {_quote_scif_string(latex_name)}"
-    transform_chen_pp_abcs = _build_transform_chen_pp_abcs(
-        filename,
-        cell_G0,
-        ssg,
-        basis_tag_transforms,
-        ssg_primitive,
-        identify_index_details,
-    )
+    transform_chen_pp_abcs = _format_transform_chen_pp_abcs(chen_transform_parts)
 
     transform_to_input_Pp = (
         f"{repo_tags['transform_to_input_Pp']}  "
@@ -1299,6 +1339,7 @@ def generate_scif(
         position_precision=position_precision,
         moment_precision=moment_precision,
         magnitude_precision=magnitude_precision,
+        moment_basis_cartesian=moment_basis_cartesian,
     )
 
     sections = [

@@ -19,7 +19,16 @@ def parse_structure_file(filename, atol=0.02, return_metadata=False):
             parsed, metadata = parse_scif_file(filename, atol=atol, return_metadata=True)
             enriched = {} if metadata is None else dict(metadata)
             enriched.setdefault("source_format", "scif")
-            enriched.setdefault("spin_setting", "in_lattice")
+            spinframe_abc = (
+                enriched.get("space_group_spin", {}).get("transform_spinframe_P_abc")
+                if isinstance(enriched.get("space_group_spin"), dict)
+                else None
+            )
+            normalized_spinframe = None if spinframe_abc is None else "".join(str(spinframe_abc).split())
+            enriched.setdefault(
+                "spin_setting",
+                "in_lattice" if normalized_spinframe in {None, "a,b,c"} else "cartesian",
+            )
             return parsed, enriched
         return parse_scif_file(filename, atol=atol)
     if suffix in {'.vasp', '.poscar'} or basename in {'poscar', 'contcar'}:
