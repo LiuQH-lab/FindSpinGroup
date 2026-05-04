@@ -15,6 +15,7 @@ from findspingroup.core.identify_symmetry_from_ops import (
 )
 from findspingroup.core.tolerances import Tolerances, DEFAULT_TOL
 from findspingroup.structure.cell import MAGNETIC_PRESENCE_TOL
+from findspingroup.utils.matrix_utils import getNormInf, normalize_vector_to_zero
 from findspingroup.structure import *
 
 
@@ -54,6 +55,115 @@ def check_atom_in_list(atom:AtomicSite, atom_list, tol:Tolerances=DEFAULT_TOL):
             return True
     return False
 
+
+def _distance_within_tolerance(distance: float, tolerance: float) -> bool:
+    distance = float(distance)
+    tolerance = float(tolerance)
+    slack = 64.0 * np.finfo(float).eps * max(1.0, abs(distance), abs(tolerance))
+    return distance <= tolerance + slack
+
+
+def _mag_atom_bucket_params(tol: float) -> tuple[int, int]:
+    bins = max(1, int(np.ceil(1.0 / max(float(tol), 1e-12))))
+    bucket_width = 1.0 / bins
+    neighbor_radius = max(1, int(np.ceil(float(tol) / bucket_width)))
+    return bins, neighbor_radius
+
+
+def _mag_atom_bucket_key(position, bins: int) -> tuple[int, int, int]:
+    wrapped = np.mod(np.asarray(position, dtype=float), 1.0)
+    indices = np.floor(wrapped * bins).astype(int) % bins
+    return tuple(int(value) for value in indices)
+
+
+def _mag_atom_neighbor_keys(bucket_key: tuple[int, int, int], bins: int, neighbor_radius: int):
+    for dx in range(-neighbor_radius, neighbor_radius + 1):
+        for dy in range(-neighbor_radius, neighbor_radius + 1):
+            for dz in range(-neighbor_radius, neighbor_radius + 1):
+                yield (
+                    (bucket_key[0] + dx) % bins,
+                    (bucket_key[1] + dy) % bins,
+                    (bucket_key[2] + dz) % bins,
+                )
+
+
+def _build_magnetic_atom_preservation_checker(mag_atoms, tol: Tolerances):
+    positions = np.asarray([atom.position for atom in mag_atoms], dtype=float)
+    moments = np.asarray([atom.magnetic_moment for atom in mag_atoms], dtype=float)
+    elements = [atom.element_symbol for atom in mag_atoms]
+    occupancies = np.asarray([float(atom.occupancy) for atom in mag_atoms], dtype=float)
+    bins, neighbor_radius = _mag_atom_bucket_params(tol.space)
+    buckets: dict[tuple[object, int, int, int], list[int]] = defaultdict(list)
+    for index, position in enumerate(positions):
+        buckets[(elements[index], *_mag_atom_bucket_key(position, bins))].append(index)
+
+    spatial_cache: dict[tuple[int, ...], list[list[int]] | None] = {}
+
+    def spatial_key(rotation: np.ndarray, translation: np.ndarray) -> tuple[int, ...]:
+        key_tol = 1e-8
+        normalized_translation = normalize_vector_to_zero(translation, atol=key_tol)
+        return (
+            *np.rint(np.asarray(rotation, dtype=float).ravel() / key_tol).astype(np.int64),
+            *np.rint(normalized_translation.ravel() / key_tol).astype(np.int64),
+        )
+
+    def spatial_candidates_for_op(real_rotation, translation) -> list[list[int]] | None:
+        real_rotation = np.asarray(real_rotation, dtype=float)
+        translation = np.asarray(translation, dtype=float)
+        key = spatial_key(real_rotation, translation)
+        if key in spatial_cache:
+            return spatial_cache[key]
+
+        candidates_by_atom: list[list[int]] = []
+        for atom_index, position in enumerate(positions):
+            transformed_position = normalize_vector_to_zero(
+                real_rotation @ position + translation,
+                atol=1e-9,
+            )
+            bucket_key = _mag_atom_bucket_key(transformed_position, bins)
+            candidates: list[int] = []
+            for neighbor_key in _mag_atom_neighbor_keys(bucket_key, bins, neighbor_radius):
+                for candidate_index in buckets.get((elements[atom_index], *neighbor_key), ()):
+                    if not _distance_within_tolerance(
+                        abs(occupancies[atom_index] - occupancies[candidate_index]),
+                        tol.occupancy,
+                    ):
+                        continue
+                    if not _distance_within_tolerance(
+                        getNormInf(transformed_position, positions[candidate_index]),
+                        tol.space,
+                    ):
+                        continue
+                    candidates.append(candidate_index)
+            if not candidates:
+                spatial_cache[key] = None
+                return None
+            candidates_by_atom.append(candidates)
+
+        spatial_cache[key] = candidates_by_atom
+        return candidates_by_atom
+
+    def operation_preserves(spin_rotation, real_rotation, translation) -> bool:
+        candidates_by_atom = spatial_candidates_for_op(real_rotation, translation)
+        if candidates_by_atom is None:
+            return False
+
+        spin_rotation = np.asarray(spin_rotation, dtype=float)
+        transformed_moments = moments @ spin_rotation.T
+        for atom_index, candidates in enumerate(candidates_by_atom):
+            if not any(
+                _distance_within_tolerance(
+                    np.linalg.norm(transformed_moments[atom_index] - moments[candidate_index]),
+                    tol.moment,
+                )
+                for candidate_index in candidates
+            ):
+                return False
+        return True
+
+    return operation_preserves
+
+
 def get_ssg_ops(sg,pg,mag_atoms, tol: Tolerances = DEFAULT_TOL):
     """
     Get the spin space group operations that leave the magnetic moments invariant.
@@ -75,21 +185,14 @@ def get_ssg_ops(sg,pg,mag_atoms, tol: Tolerances = DEFAULT_TOL):
     """
 
     ssg_ops = []
+    operation_preserves = _build_magnetic_atom_preservation_checker(mag_atoms, tol)
     for R, t in sg:
         R = np.array(R, dtype=np.float64)
         t = np.array(t, dtype=np.float64)
         for Rs in pg:
             Rs = np.array(Rs, dtype=np.float64)
-            # check if this (R,Rs) can keep all moments invariant
-            ok = True
-            ssg_op = SpinSpaceGroupOperation(Rs,R,t)
-            for atom in mag_atoms:
-                new_atom = ssg_op @ atom
-                if not check_atom_in_list(new_atom, mag_atoms, tol=tol):
-                    ok = False
-                    break
-            if ok:
-                ssg_ops.append(ssg_op)
+            if operation_preserves(Rs, R, t):
+                ssg_ops.append(SpinSpaceGroupOperation(Rs, R, t))
     return ssg_ops
 
 
@@ -220,10 +323,8 @@ def _ssg_operation_preserves_magnetic_atoms(
     mag_atoms,
     tol: Tolerances,
 ) -> bool:
-    for atom in mag_atoms:
-        if not check_atom_in_list(op @ atom, mag_atoms, tol=tol):
-            return False
-    return True
+    operation_preserves = _build_magnetic_atom_preservation_checker(mag_atoms, tol)
+    return operation_preserves(op.spin_rotation, op.rotation, op.translation)
 
 
 def _normalize_fractional_translation(translation, *, boundary_tol=1e-8):
@@ -423,6 +524,7 @@ def _complete_ssg_ops_by_closure(
     if not completed:
         return completed
 
+    operation_preserves = _build_magnetic_atom_preservation_checker(mag_atoms, tol)
     limit = max(512, len(completed) * len(completed) * 4 + len(completed) + 1)
     changed = True
     while changed:
@@ -436,7 +538,11 @@ def _complete_ssg_ops_by_closure(
                 cache_key = _spin_space_operation_signature(product, key_tol=lookup.key_tol)
                 preserves = None if preserve_cache is None else preserve_cache.get(cache_key)
                 if preserves is None:
-                    preserves = _ssg_operation_preserves_magnetic_atoms(product, mag_atoms, tol)
+                    preserves = operation_preserves(
+                        product.spin_rotation,
+                        product.rotation,
+                        product.translation,
+                    )
                     if preserve_cache is not None:
                         preserve_cache[cache_key] = preserves
                 if not preserves:
@@ -1521,6 +1627,7 @@ def _project_ssg_spin_rotations_to_exact_point_group(
 
     projected_ops = []
     max_projection_residual = 0.0
+    operation_preserves = _build_magnetic_atom_preservation_checker(mag_atoms, tol)
     for raw_op in ssg_ops:
         projected_spin, projection_residual = _match_projected_spin_rotation(
             raw_op[0],
@@ -1529,7 +1636,7 @@ def _project_ssg_spin_rotations_to_exact_point_group(
         )
         max_projection_residual = max(max_projection_residual, projection_residual)
         projected_op = SpinSpaceGroupOperation(projected_spin, raw_op[1], raw_op[2])
-        if not _ssg_operation_preserves_magnetic_atoms(projected_op, mag_atoms, tol):
+        if not operation_preserves(projected_op.spin_rotation, projected_op.rotation, projected_op.translation):
             position_residual, moment_residual = _magnetic_action_residual(projected_op, mag_atoms, tol)
             raise ValueError(
                 f"{label} projected spin operation does not preserve the magnetic structure "
