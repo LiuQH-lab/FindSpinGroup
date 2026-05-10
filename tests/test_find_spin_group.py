@@ -302,7 +302,7 @@ def test_acc_primitive_oriented_seitz_uses_same_spin_frame_as_oriented_ops_for_3
     assert len(result.acc_primitive_ssg_ops_oriented) == len(
         result.acc_primitive_ssg_seitz_latex_oriented
     )
-    assert r"2_{211}" in result.acc_primitive_ssg_seitz_latex_oriented[1]
+    assert r"2_{112}" in result.acc_primitive_ssg_seitz_latex_oriented[1]
     assert r"2_{001}" not in result.acc_primitive_ssg_seitz_latex_oriented[1]
     assert r"3^{2}_{110}" in result.acc_primitive_ssg_seitz_latex_oriented[10]
     assert r"3^{1}_{110}" not in result.acc_primitive_ssg_seitz_latex_oriented[10]
@@ -313,7 +313,7 @@ def test_find_spin_group_acc_primitive_oriented_seitz_uses_acc_lattice_frame_for
         "tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif"
     )
 
-    assert r"2_{211}" in payload["acc_primitive_ssg_seitz_latex_oriented"][1]
+    assert r"2_{112}" in payload["acc_primitive_ssg_seitz_latex_oriented"][1]
     assert r"2_{001}" not in payload["acc_primitive_ssg_seitz_latex_oriented"][1]
 
 
@@ -2053,9 +2053,62 @@ def test_find_spin_group_basic_matches_manual_checked_identify_222_index_changes
 
 def test_find_spin_group_basic_does_not_fallback_when_identify_database_entry_is_missing():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+        with pytest.raises(KeyError, match="not in identify-index database"):
+            find_spin_group_basic("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
-    assert str(payload["index"]).startswith("not in identify-index database:")
+
+def test_find_spin_group_basic_uses_global_acc_primitive_selection():
+    payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/1.115_Dy3Ru4Al12.mcif")
+
+    assert payload["index"] == "12.2.2.3"
+    assert payload["acc_primitive_standard_setting"] == "G0std"
+    audit = payload["acc_primitive_resolution_audit"]["G0std_transform_selection"]
+    assert audit["selected_strategy"] == "nofrac_lattice_shear:r2+=(-2)r0"
+    assert all(
+        "legacy" not in candidate["strategy"]
+        for candidate in audit["rejected_candidates"]
+    )
+
+
+def test_find_spin_group_basic_uses_monoclinic_ac_column_reduction_for_index2_convention():
+    payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/2.116_Na3Co2SbO6.mcif")
+
+    assert payload["index"] == "10.2.2.21.P2"
+    assert payload["acc_primitive_standard_setting"] == "G0std"
+    audit = payload["acc_primitive_resolution_audit"]["G0std_transform_selection"]
+    assert audit["selected_strategy"].startswith("monoclinic_ac_column_reduce:")
+    assert "det_factor=2" in audit["selected_strategy"]
+    selected_matrix = np.asarray(audit["selected_matrix"], dtype=float)
+    convention_to_acc = find_spin_group_module._acc_aligned_convention_to_primitive_transform(
+        payload["index"]
+    )[0]
+    assert np.isclose(abs(np.linalg.det(convention_to_acc @ selected_matrix)), 1.0)
+
+
+def test_find_spin_group_basic_uses_it_ik_to_select_g0std_for_t_type_linear_index():
+    payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/0.1017_CePdAl3.mcif")
+
+    assert payload["index"] == "63.38.1.1.L"
+    assert payload["it"] == 2
+    assert payload["ik"] == 1
+    assert payload["acc_primitive_standard_setting"] == "G0std"
+    audit = payload["acc_primitive_resolution_audit"]["G0std_transform_selection"]
+    assert audit["selected_strategy"] == "current_integerized"
+    assert audit["preferred_standard_setting"] == "G0std"
+    assert audit["standard_setting_rule"] == "t_index/k_index"
+
+
+def test_find_spin_group_basic_uses_it_ik_to_select_l0std_for_k_type_p_index():
+    payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/1.455_Mn6Ni16Si7.mcif")
+
+    assert payload["index"] == "69.65.2.2.P1"
+    assert payload["it"] == 1
+    assert payload["ik"] == 2
+    assert payload["acc_primitive_standard_setting"] == "L0std"
+    audit = payload["acc_primitive_resolution_audit"]["L0std_transform_selection"]
+    assert audit["selected_strategy"] == "current_integerized"
+    assert audit["preferred_standard_setting"] == "L0std"
+    assert audit["standard_setting_rule"] == "t_index/k_index"
 
 
 def test_find_spin_group_basic_reraises_non_database_identify_errors(monkeypatch):
@@ -2076,32 +2129,15 @@ def test_find_spin_group_basic_reraises_non_database_identify_errors(monkeypatch
 
 def test_find_spin_group_acc_primitive_does_not_fallback_when_identify_database_entry_is_missing():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        payload = find_spin_group_acc_primitive("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+        with pytest.raises(KeyError, match="not in identify-index database"):
+            find_spin_group_acc_primitive("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
-    assert str(payload["index"]).startswith("not in identify-index database:")
 
-
-def test_find_spin_group_gracefully_degrades_when_identify_database_entry_is_missing():
+def test_find_spin_group_does_not_fallback_when_identify_database_entry_is_missing():
     source_name = "tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif"
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        result = find_spin_group(source_name)
-
-    assert str(result.index).startswith("not in identify-index database:")
-    assert result.conf == "Coplanar"
-    assert result.identify_index_details is None
-    direct_ssg = SpinSpaceGroup(
-        result.input_magnetic_primitive_ssg_ops,
-        identify_source_name=source_name,
-    )
-    assert str(direct_ssg.index).startswith("not in identify-index database:")
-
-    metadata = parse_scif_metadata(source_text=result.scif)
-    assert metadata["space_group_spin"]["spin_space_group_number_chen"] == result.index
-    assert metadata["space_group_spin"]["spin_space_group_name_chen"] is None
-    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] is None
-    assert metadata["space_group_spin"]["spin_space_group_name_linear"] == (
-        result.convention_ssg_international_linear
-    )
+        with pytest.raises(KeyError, match="not in identify-index database"):
+            find_spin_group(source_name)
 
 
 def test_g_type_output_ossg_uses_shortest_nonzero_axis_translations():
@@ -3478,6 +3514,181 @@ def test_acc_primitive_poscar_preserves_core_acc_primitive_lattice_and_moments(t
         np.eye(3),
         atol=1e-8,
     )
+
+
+def test_acc_primitive_is_built_from_identified_index_p_map_and_roundtrips(tmp_path):
+    result = find_spin_group("src/findspingroup/examples/1.237_VCl2.mcif")
+
+    assert result.index == "164.149.6.1.P"
+    assert result.msg_bns_number == "159.64"
+    assert len(result.acc_primitive_magnetic_cell_detail["positions"]) == 18
+    assert np.allclose(
+        np.asarray(result.T_convention_to_acc_primitive[0], dtype=float),
+        np.asarray([[-1, 2, 0], [-2, 1, 0], [0, 0, 1]], dtype=float),
+        atol=1e-8,
+    )
+
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(result.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
+    lattice, positions, elements, occupancies, _labels, moments = parse_poscar_file(poscar_path)
+    roundtrip = find_spin_group_from_data(
+        str(poscar_path),
+        lattice,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        input_spin_setting="cartesian",
+    )
+
+    assert roundtrip.index == result.index
+    assert roundtrip.msg_bns_number == result.msg_bns_number
+
+
+def _normalize_origin_shift_for_test(vector):
+    normalized = np.mod(np.asarray(vector, dtype=float), 1.0)
+    normalized[np.isclose(normalized, 0.0, atol=1e-8)] = 0.0
+    normalized[np.isclose(normalized, 1.0, atol=1e-8)] = 0.0
+    return normalized
+
+
+@pytest.mark.parametrize(
+    ("path", "expected_strategy"),
+    [
+        (
+            "tests/testset/mcif_241130_no2186/1.67_TmPtIn.mcif",
+            "identify_space_transform_current_to_database_after_current",
+        ),
+        (
+            "tests/testset/mcif_241130_no2186/1.75_BiMn2O5.mcif",
+            "identify_space_transform_current_to_database_after_current",
+        ),
+        (
+            "tests/testset/mcif_241130_no2186/2.101_TbSbTe.mcif",
+            "identify_space_transform_current_to_database_after_current",
+        ),
+        (
+            "tests/testset/mcif_241130_no2186/2.102_TbSbTe.mcif",
+            "identify_space_transform_current_to_database_after_current",
+        ),
+    ],
+)
+def test_acc_primitive_database_gauge_transform_scales_origin_shift_and_roundtrips(
+    tmp_path,
+    path,
+    expected_strategy,
+):
+    result = find_spin_group(path)
+    audit = result.acc_primitive_resolution_audit["G0std_transform_selection"]
+
+    assert audit["selected_strategy"] == expected_strategy
+
+    current_candidate = next(
+        candidate
+        for candidate in audit["rejected_candidates"]
+        if candidate["strategy"] == "current_integerized"
+    )
+    current_matrix = np.asarray(current_candidate["matrix"], dtype=float)
+    current_shift = np.asarray(current_candidate["origin_shift"], dtype=float)
+    identify_matrix = np.asarray(
+        result.identify_index_details["space_group_transformation"][0],
+        dtype=float,
+    )
+    identify_shift = np.asarray(
+        result.identify_index_details["space_group_transformation"][1],
+        dtype=float,
+    )
+    identify_matrix = np.linalg.inv(identify_matrix)
+    identify_shift = -identify_matrix @ identify_shift
+
+    expected_matrix = identify_matrix @ current_matrix
+    expected_shift = _normalize_origin_shift_for_test(
+        identify_matrix @ current_shift + identify_shift
+    )
+
+    assert np.allclose(
+        np.asarray(audit["selected_matrix"], dtype=float),
+        expected_matrix,
+        atol=1e-8,
+    )
+    assert np.allclose(
+        _normalize_origin_shift_for_test(audit["selected_origin_shift"]),
+        expected_shift,
+        atol=1e-8,
+    )
+
+    input_primitive_lattice = np.asarray(
+        result.input_magnetic_primitive_cell_detail["lattice"],
+        dtype=float,
+    )
+    acc_primitive_lattice = np.asarray(
+        result.acc_primitive_magnetic_cell_detail["lattice"],
+        dtype=float,
+    )
+    lattice_relation = acc_primitive_lattice @ np.linalg.inv(input_primitive_lattice)
+    rounded_relation = np.rint(lattice_relation)
+    assert np.allclose(lattice_relation, rounded_relation, atol=1e-6)
+    assert abs(round(np.linalg.det(rounded_relation))) == 1
+
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(result.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
+    lattice, positions, elements, occupancies, _labels, moments = parse_poscar_file(poscar_path)
+    roundtrip = find_spin_group_from_data(
+        str(poscar_path),
+        lattice,
+        positions,
+        elements,
+        occupancies,
+        moments,
+        input_spin_setting="cartesian",
+    )
+
+    assert roundtrip.index == result.index
+
+
+def test_acc_primitive_lightweight_route_uses_identified_index_p_map():
+    payload = find_spin_group_acc_primitive("src/findspingroup/examples/1.237_VCl2.mcif")
+
+    assert payload["index"] == "164.149.6.1.P"
+    assert len(payload["acc_primitive_cell_detail"]["positions"]) == 18
+    assert np.allclose(
+        np.asarray(payload["T_input_to_acc_primitive"][0], dtype=float),
+        np.asarray([[-1, 2, 0], [-2, 1, 0], [0, 0, 1]], dtype=float),
+        atol=1e-8,
+    )
+
+
+def test_acc_primitive_g0std_matrix_selection_uses_nofrac_lattice_shear_not_legacy_fallback():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.115_Dy3Ru4Al12.mcif")
+
+    assert result.index == "12.2.2.3"
+    audit = result.acc_primitive_resolution_audit["G0std_transform_selection"]
+    assert audit["selected_strategy"] == "nofrac_lattice_shear:r2+=(-2)r0"
+    assert all(
+        "legacy" not in candidate["strategy"]
+        for candidate in audit["rejected_candidates"]
+    )
+    assert np.allclose(
+        np.asarray(audit["selected_matrix"], dtype=float),
+        np.asarray([[0.0, -0.5, 0.5], [1.0, 0.5, 0.5], [0.0, 0.0, 1.0]]),
+        atol=1e-8,
+    )
+
+    identity_translations = {
+        tuple(np.round(np.mod(np.asarray(op[2], dtype=float), 1.0), 6))
+        for op in result.convention_ssg_ops
+        if np.allclose(np.asarray(op[1], dtype=float), np.eye(3), atol=1e-8)
+    }
+    assert (0.0, 0.5, 0.5) not in identity_translations
+    assert (0.5, 0.0, 0.5) not in identity_translations
+
+
+def test_acc_primitive_l0std_uses_direct_composed_identify_p_transform():
+    payload = find_spin_group_acc_primitive("tests/testset/mcif_241130_no2186/1.367_Pu2O3.mcif")
+
+    assert payload["index"] == "12.12.2.1.L"
+    assert len(payload["acc_primitive_cell_detail"]["positions"]) == 10
+    assert len(payload["acc_primitive_ssg_operation_matrices"]) == 32
 
 
 def test_find_spin_group_exposes_convention_nssg_views():

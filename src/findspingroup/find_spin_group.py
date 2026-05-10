@@ -2,6 +2,8 @@ import json
 import re
 import warnings
 from fractions import Fraction
+from functools import lru_cache
+from itertools import permutations, product
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -23,6 +25,9 @@ from findspingroup.core.identify_index.contract_222 import (
 )
 from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
 from findspingroup.data import MSGMPG_DB
+from findspingroup.data.acc_aligned_p_index_loader import (
+    get_acc_aligned_conventional_to_primitive_p,
+)
 from findspingroup.io import parse_poscar_file, parse_structure_file
 from findspingroup.io.scif_generator import (
     _build_chen_linear_name,
@@ -1231,6 +1236,8 @@ class MagSymmetryResult:
         self.primitive_magnetic_cell_ssg_type = symmetry.get('primitive_magnetic_cell_ssg_type', None)
         self.spin_part_point_group = symmetry['full_spin_part_point_group']
         self.identify_index_details = symmetry.get('identify_index_details', None)
+        self.acc_primitive_resolution_audit = symmetry.get('acc_primitive_resolution_audit', None)
+        self.g0std_axis_collapse_audit = symmetry.get('g0std_axis_collapse_audit', None)
         self.msg_num = symmetry.get('msg_num', None)
         self.msg_type = symmetry.get('msg_type', None)
         self.msg_symbol = symmetry.get('msg_symbol', None)
@@ -1254,6 +1261,18 @@ class MagSymmetryResult:
         self.gspg_symbol_linear = symmetry.get('gspg_symbol_linear', None)
         self.gspg_symbol_latex = symmetry.get('gspg_symbol_latex', None)
         self.gspg_effective_mpg_symbol = symmetry.get('gspg_effective_mpg_symbol', None)
+        self.gspg_npg_symbol_s = symmetry.get('gspg_npg_symbol_s', None)
+        self.gspg_output_mode = symmetry.get('gspg_output_mode', None)
+        self.gspg_point_part_linear = symmetry.get('gspg_point_part_linear', None)
+        self.gspg_real_space_setting = symmetry.get('gspg_real_space_setting', None)
+        self.gspg_spin_frame_setting = symmetry.get('gspg_spin_frame_setting', None)
+        self.gspg_spin_only_component_symbol_s = symmetry.get(
+            'gspg_spin_only_component_symbol_s',
+            None,
+        )
+        self.gspg_spin_only_part_linear = symmetry.get('gspg_spin_only_part_linear', None)
+        self.gspg_symbol_mode = symmetry.get('gspg_symbol_mode', None)
+        self.gspg_tentative_symbol_s = symmetry.get('gspg_tentative_symbol_s', None)
         self.g0_standard_ssg_ops = symmetry.get('g0_standard_ssg_ops', None)
         self.g0_standard_ssg_seitz = symmetry.get('g0_standard_ssg_seitz', None)
         self.g0_standard_ssg_seitz_latex = symmetry.get('g0_standard_ssg_seitz_latex', None)
@@ -1374,6 +1393,7 @@ class MagSymmetryResult:
             ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING,
         )
         self.T_input_to_G0std = symmetry.get('T_input_to_G0std', None)
+        self.T_input_to_G0std_ops_nofrac = symmetry.get('T_input_to_G0std_ops_nofrac', None)
         self.T_G0std_to_primitive = symmetry.get('T_G0std_to_primitive', None)
         self.T_G0std_to_acc_primitive = symmetry.get(
             'T_G0std_to_acc_primitive',
@@ -1487,7 +1507,17 @@ class MagSymmetryResult:
 
     def gspg_summary(self):
         return {
+            'effective_mpg_symbol': self.gspg_effective_mpg_symbol,
+            'npg_symbol_s': self.gspg_npg_symbol_s,
+            'output_mode': self.gspg_output_mode,
+            'point_part_linear': self.gspg_point_part_linear,
+            'real_space_setting': self.gspg_real_space_setting,
+            'spin_frame_setting': self.gspg_spin_frame_setting,
+            'spin_only_component_symbol_s': self.gspg_spin_only_component_symbol_s,
+            'spin_only_part_linear': self.gspg_spin_only_part_linear,
             'symbol_linear': self.gspg_symbol_linear,
+            'symbol_mode': self.gspg_symbol_mode,
+            'tentative_symbol_s': self.gspg_tentative_symbol_s,
         }
 
     def to_summary_dict(self):
@@ -1496,7 +1526,6 @@ class MagSymmetryResult:
             'conf': self.conf,
             'phase': self.magnetic_phase,
             'acc': self.acc,
-            'msg_acc': self.msg_acc,
             'properties': self.properties_summary(),
             'gspg': self.gspg_summary(),
         }
@@ -1990,6 +2019,18 @@ def _build_gspg_payload(
         if point_part_latex
         else spin_only_symbol["latex"]
     )
+    npg_symbol_s = ssg.n_spin_part_point_group_symbol_s
+    spin_only_component_symbol_s = spin_only_symbol["s"]
+    if ssg.conf == "Noncoplanar" and spin_only_component_symbol_s != "C1":
+        symbol_mode = "point_part_and_spin_only"
+        tentative_symbol_s = None
+    else:
+        symbol_mode = "npg_x_spin_only"
+        tentative_symbol_s = (
+            npg_symbol_s
+            if spin_only_component_symbol_s in {"", "C1"}
+            else f"{npg_symbol_s} x {spin_only_component_symbol_s}"
+        )
 
     return {
         "gspg_ops": _serialize_gspg_ops(presented_ops),
@@ -2003,6 +2044,15 @@ def _build_gspg_payload(
         "gspg_symbol_linear": symbol_linear,
         "gspg_symbol_latex": symbol_latex,
         "gspg_effective_mpg_symbol": empg_symbol,
+        "gspg_npg_symbol_s": npg_symbol_s,
+        "gspg_output_mode": output_mode,
+        "gspg_point_part_linear": point_part_linear,
+        "gspg_real_space_setting": real_space_setting,
+        "gspg_spin_frame_setting": spin_frame_setting,
+        "gspg_spin_only_component_symbol_s": spin_only_component_symbol_s,
+        "gspg_spin_only_part_linear": spin_only_symbol["linear"],
+        "gspg_symbol_mode": symbol_mode,
+        "gspg_tentative_symbol_s": tentative_symbol_s,
     }
 
 
@@ -2058,6 +2108,1049 @@ def _invert_setting_transform(
     transform_inv = np.linalg.inv(transform)
     shift_inv = normalize_vector_to_zero(-transform_inv @ shift, atol=1e-10)
     return transform_inv, shift_inv
+
+
+def _space_op_mod_integer_key(rotation, translation, *, tol: float) -> tuple[tuple[float, ...], tuple[float, ...]]:
+    decimals = _real_op_bucket_decimals(tol)
+    rotation_key = tuple(np.round(np.asarray(rotation, dtype=float).reshape(-1), decimals))
+    wrapped_translation = normalize_vector_to_zero(
+        np.mod(np.asarray(translation, dtype=float), 1.0),
+        atol=max(tol, 1e-8),
+    )
+    translation_key = tuple(np.round(wrapped_translation.reshape(-1), decimals))
+    return rotation_key, translation_key
+
+
+def _unique_space_op_mod_integer_count(ops, *, tol: float) -> int:
+    return len(
+        {
+            _space_op_mod_integer_key(op[1], op[2], tol=tol)
+            for op in ops
+        }
+    )
+
+
+def _unique_G0_space_op_mod_integer_count(ssg: SpinSpaceGroup, *, tol: float) -> int:
+    return len(
+        {
+            _space_op_mod_integer_key(rotation, translation, tol=tol)
+            for rotation, translation in ssg.G0_ops
+        }
+    )
+
+
+def _select_G0std_axis_collapse(
+    ssg_primitive: SpinSpaceGroup,
+    G0std_ssg: SpinSpaceGroup,
+    *,
+    identify_index_details: dict | None,
+    tol: float,
+) -> tuple[np.ndarray, dict | None]:
+    if not identify_index_details:
+        return np.eye(3), None
+
+    cell_size = identify_index_details.get("identify_cell_size")
+    if cell_size is None:
+        return np.eye(3), None
+    try:
+        cell_size = int(cell_size)
+    except (TypeError, ValueError):
+        return np.eye(3), None
+    if cell_size <= 0:
+        return np.eye(3), None
+    if int(ssg_primitive.G0_num) > 15:
+        return np.eye(3), None
+
+    expected_unique_space_count = (
+        _unique_G0_space_op_mod_integer_count(ssg_primitive, tol=tol) * cell_size
+    )
+    current_unique_space_count = _unique_space_op_mod_integer_count(G0std_ssg.ops, tol=tol)
+    basis_fix = (
+        np.asarray(ssg_primitive.transformation_to_G0std_id, dtype=float)
+        @ np.linalg.inv(np.asarray(ssg_primitive.transformation_to_G0std, dtype=float))
+    )
+    basis_fix_is_diagonal = np.allclose(
+        basis_fix,
+        np.diag(np.diag(basis_fix)),
+        atol=max(tol, 1e-8),
+    )
+    basis_fix_diag = np.rint(np.diag(basis_fix)).astype(int) if basis_fix_is_diagonal else None
+    basis_fix_requests_x_collapse = (
+        basis_fix_diag is not None
+        and basis_fix_diag[0] == 2
+        and basis_fix_diag[2] == 2
+        and current_unique_space_count % 2 == 0
+    )
+    if (
+        current_unique_space_count <= expected_unique_space_count
+        and not basis_fix_requests_x_collapse
+    ):
+        return np.eye(3), None
+
+    axis_candidates = [
+        ("x", np.diag([2.0, 1.0, 1.0])),
+        ("y", np.diag([1.0, 2.0, 1.0])),
+        ("z", np.diag([1.0, 1.0, 2.0])),
+    ]
+    for axis, collapse_matrix in axis_candidates:
+        collapsed_ssg = G0std_ssg.transform(collapse_matrix, np.zeros(3))
+        collapsed_unique_space_count = _unique_space_op_mod_integer_count(
+            collapsed_ssg.ops,
+            tol=tol,
+        )
+        if collapsed_unique_space_count == expected_unique_space_count:
+            return collapse_matrix, {
+                "strategy": "axis_collapse",
+                "axis": axis,
+                "cell_size": cell_size,
+                "expected_unique_space_op_count": expected_unique_space_count,
+                "current_unique_space_op_count": current_unique_space_count,
+                "collapsed_unique_space_op_count": collapsed_unique_space_count,
+                "collapse_matrix": collapse_matrix.tolist(),
+            }
+        if (
+            axis == "x"
+            and basis_fix_requests_x_collapse
+            and collapsed_unique_space_count * 2 == current_unique_space_count
+            and collapsed_unique_space_count
+            >= _unique_G0_space_op_mod_integer_count(ssg_primitive, tol=tol)
+        ):
+            return collapse_matrix, {
+                "strategy": "axis_collapse",
+                "axis": axis,
+                "cell_size": cell_size,
+                "expected_unique_space_op_count": expected_unique_space_count,
+                "current_unique_space_op_count": current_unique_space_count,
+                "collapsed_unique_space_op_count": collapsed_unique_space_count,
+                "collapse_matrix": collapse_matrix.tolist(),
+                "basis_fix_before_collapse": basis_fix.tolist(),
+                "basis_fix_rule": "x_and_z_doubled",
+            }
+
+    return np.eye(3), None
+
+
+def _acc_aligned_convention_to_primitive_transform(index: str) -> tuple[np.ndarray, np.ndarray]:
+    basis_p = np.asarray(
+        [
+            [float(value) for value in row]
+            for row in get_acc_aligned_conventional_to_primitive_p(index)
+        ],
+        dtype=float,
+    )
+    # The generated index stores the direct-space basis relation
+    # (a_acc,b_acc,c_acc)=(a_conv,b_conv,c_conv)P.  Internal setting
+    # transforms are coordinate transforms x_target=A x_source + o, so
+    # basis_source=basis_target A and A=P^{-1}.
+    return np.linalg.inv(basis_p), np.zeros(3)
+
+
+def _setting_transform_signature(
+    transform: tuple[np.ndarray, np.ndarray],
+    *,
+    tol: float = 1e-10,
+) -> tuple[tuple[int, ...], tuple[int, ...]]:
+    matrix = np.asarray(transform[0], dtype=float)
+    shift = normalize_vector_to_zero(np.asarray(transform[1], dtype=float), atol=tol)
+    scale = 1.0 / max(tol, 1e-12)
+    return (
+        tuple(np.rint(matrix.reshape(-1) * scale).astype(np.int64)),
+        tuple(np.rint(shift.reshape(-1) * scale).astype(np.int64)),
+    )
+
+
+def _append_unique_setting_transform_candidate(
+    candidates: list[tuple[str, tuple[np.ndarray, np.ndarray]]],
+    seen: set[tuple[tuple[int, ...], tuple[int, ...]]],
+    name: str,
+    transform: tuple[np.ndarray, np.ndarray],
+    *,
+    tol: float,
+) -> None:
+    normalized = (
+        np.asarray(transform[0], dtype=float),
+        normalize_vector_to_zero(np.asarray(transform[1], dtype=float), atol=1e-10),
+    )
+    signature = _setting_transform_signature(normalized, tol=tol)
+    if signature in seen:
+        return
+    seen.add(signature)
+    candidates.append((name, normalized))
+
+
+def _integer_row_gcd(row: np.ndarray, *, tol: float) -> int | None:
+    rounded = np.rint(np.asarray(row, dtype=float)).astype(int)
+    if not np.allclose(row, rounded, atol=tol):
+        return None
+    gcd_value = 0
+    for value in rounded:
+        gcd_value = int(np.gcd(gcd_value, abs(int(value))))
+    return gcd_value
+
+
+def _append_nofrac_lattice_shear_candidates(
+    candidates: list[tuple[str, tuple[np.ndarray, np.ndarray]]],
+    seen: set[tuple[tuple[int, ...], tuple[int, ...]]],
+    ssg_primitive: SpinSpaceGroup,
+    raw_transformation_primitive_to_G0std: tuple[np.ndarray, np.ndarray],
+    *,
+    tol: float,
+) -> None:
+    """Generate no-fraction candidates inside the current integerized lattice.
+
+    ``integerize_matrix`` fixes a no-fraction sublattice by clearing the
+    denominators of the spglib standard transform.  The old greedy choice also
+    fixed a particular basis of that sublattice, which can point the doubled
+    conventional axis at the wrong primitive representative.  Here we keep the
+    same sublattice and only shear rows whose integerized generator has a common
+    factor, e.g. ``c' = c - 2a`` for the monoclinic C cases.
+    """
+    transformation_to_G0std_id = np.asarray(
+        ssg_primitive.transformation_to_G0std_id,
+        dtype=float,
+    )
+    origin_shift_to_G0std_id = np.asarray(
+        ssg_primitive.origin_shift_to_G0std_id,
+        dtype=float,
+    )
+    raw_matrix = np.asarray(raw_transformation_primitive_to_G0std[0], dtype=float)
+    try:
+        raw_basis_fix = transformation_to_G0std_id @ np.linalg.inv(raw_matrix)
+    except np.linalg.LinAlgError:
+        return
+
+    raw_basis_fix_integer = np.rint(raw_basis_fix).astype(int)
+    if not np.allclose(raw_basis_fix, raw_basis_fix_integer, atol=tol):
+        return
+
+    transformation_to_G0std_id_inv = np.linalg.inv(transformation_to_G0std_id)
+    origin_seed = transformation_to_G0std_id_inv @ origin_shift_to_G0std_id
+    multiplier_order = (-1, 1, -2, 2)
+    for target_row in range(3):
+        row_gcd = _integer_row_gcd(raw_basis_fix_integer[target_row], tol=tol)
+        if row_gcd is None or row_gcd <= 1:
+            continue
+        for source_row in range(3):
+            if source_row == target_row:
+                continue
+            for multiplier_factor in multiplier_order:
+                multiplier = int(multiplier_factor * row_gcd)
+                shear = np.eye(3, dtype=int)
+                shear[target_row, source_row] = multiplier
+                sheared_basis_fix = shear @ raw_basis_fix_integer
+                candidate_integer_basis = (
+                    transformation_to_G0std_id_inv @ sheared_basis_fix
+                )
+                candidate_integer_basis_rounded = np.rint(candidate_integer_basis).astype(int)
+                if not np.allclose(
+                    candidate_integer_basis,
+                    candidate_integer_basis_rounded,
+                    atol=tol,
+                ):
+                    continue
+                try:
+                    candidate_matrix = np.linalg.inv(
+                        candidate_integer_basis_rounded.astype(float)
+                    )
+                except np.linalg.LinAlgError:
+                    continue
+                candidate_origin_shift = normalize_vector_to_zero(
+                    candidate_matrix @ origin_seed,
+                    atol=1e-10,
+                )
+                _append_unique_setting_transform_candidate(
+                    candidates,
+                    seen,
+                    (
+                        "nofrac_lattice_shear:"
+                        f"r{target_row}+=({multiplier})r{source_row}"
+                    ),
+                    (candidate_matrix, candidate_origin_shift),
+                    tol=tol,
+                )
+
+
+def _identify_space_group_setting_transform(
+    identify_index_details: dict | None,
+) -> tuple[np.ndarray, np.ndarray] | None:
+    if not identify_index_details:
+        return None
+    transform = identify_index_details.get("space_group_transformation")
+    if transform is None:
+        return None
+    if len(transform) != 2:
+        return None
+    return np.asarray(transform[0], dtype=float), np.asarray(transform[1], dtype=float)
+
+
+def _identify_index_setting_transform(
+    identify_index_details: dict | None,
+) -> tuple[np.ndarray, np.ndarray] | None:
+    if not identify_index_details:
+        return None
+    transform = identify_index_details.get("transformation_matrix")
+    if transform is None:
+        return None
+    if len(transform) != 2:
+        return None
+    return np.asarray(transform[0], dtype=float), np.asarray(transform[1], dtype=float)
+
+
+def _selected_standard_setting_from_identify_index_details(
+    identify_index_details: dict | None,
+) -> str:
+    if identify_index_details is None:
+        raise ValueError(
+            "Cannot select G0std/L0std without identify-index details. "
+            "The standard setting is determined from t_index/k_index, not "
+            "from the printable index suffix."
+        )
+    try:
+        it = int(identify_index_details["t_index"])
+        ik = int(identify_index_details["k_index"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError(
+            "Cannot select G0std/L0std because identify-index details do not "
+            "contain integer t_index/k_index."
+        ) from exc
+
+    # k-type SSGs (it=1, ik>1) are naturally represented in L0std.
+    # t-type (it>1, ik=1), g-type (it>1, ik>1), and trivial cases use G0std.
+    # The suffix in the public index, e.g. `.L`, describes the spin
+    # configuration branch and is not the real-space standard-cell type.
+    if it == 1 and ik > 1:
+        return L0_STANDARD_SETTING
+    return G0_STANDARD_SETTING
+
+
+def _append_identify_setting_transform_candidates(
+    candidates: list[tuple[str, tuple[np.ndarray, np.ndarray]]],
+    seen: set[tuple[tuple[int, ...], tuple[int, ...]]],
+    base_transform: tuple[np.ndarray, np.ndarray],
+    identify_index_details: dict | None,
+    *,
+    tol: float,
+) -> None:
+    transform = _identify_space_group_setting_transform(identify_index_details)
+    if transform is None:
+        return
+
+    # `space_group_transformation` is the identify-index database-gauge
+    # equivalence written from the database representative into the current
+    # no-fraction generator gauge.  The ACC P table is defined in the database
+    # convention, so the cell/SSG chain must first move current -> database.
+    transform_current_to_database = _invert_setting_transform(transform[0], transform[1])
+    _append_unique_setting_transform_candidate(
+        candidates,
+        seen,
+        "identify_space_transform_current_to_database_after_current",
+        _chain_setting_transform(
+            base_transform[0],
+            base_transform[1],
+            transform_current_to_database[0],
+            transform_current_to_database[1],
+        ),
+        tol=tol,
+    )
+
+
+def _reciprocal_integer_determinant_factor(
+    matrix: np.ndarray,
+    *,
+    tol: float,
+) -> int | None:
+    determinant = abs(float(np.linalg.det(np.asarray(matrix, dtype=float))))
+    determinant_tol = max(tol, 1e-8)
+    if np.isclose(determinant, 1.0, atol=determinant_tol, rtol=0):
+        return None
+    if determinant <= determinant_tol or determinant > 1.0:
+        return None
+    reciprocal = 1.0 / determinant
+    factor = int(round(reciprocal))
+    if factor <= 1:
+        return None
+    if not np.isclose(determinant, 1.0 / factor, atol=determinant_tol, rtol=0):
+        return None
+    return factor
+
+
+@lru_cache(maxsize=8)
+def _fixed_b_ac_unimodular_column_transforms(
+    max_entry: int,
+) -> tuple[tuple[tuple[int, int, int, int], tuple[tuple[int, ...], ...]], ...]:
+    transforms: list[
+        tuple[tuple[int, int, int, int], tuple[tuple[int, ...], ...]]
+    ] = []
+    for p, q, r, s in product(range(-max_entry, max_entry + 1), repeat=4):
+        if p * s - q * r != 1:
+            continue
+        matrix = (
+            (p, 0, q),
+            (0, 1, 0),
+            (r, 0, s),
+        )
+        values = (p, q, r, s)
+        transforms.append((values, matrix))
+
+    def sort_key(
+        item: tuple[tuple[int, int, int, int], tuple[tuple[int, ...], ...]]
+    ) -> tuple[int, int, int, tuple[int, int, int, int]]:
+        values, matrix = item
+        identity_rank = 0 if matrix == ((1, 0, 0), (0, 1, 0), (0, 0, 1)) else 1
+        return (
+            identity_rank,
+            max(abs(value) for value in values),
+            sum(abs(value) for value in values),
+            values,
+        )
+
+    return tuple(sorted(transforms, key=sort_key))
+
+
+def _append_monoclinic_ac_column_reduction_candidates(
+    candidates: list[tuple[str, tuple[np.ndarray, np.ndarray]]],
+    seen: set[tuple[tuple[int, ...], tuple[int, ...]]],
+    standard_setting: str,
+    ssg_primitive: SpinSpaceGroup,
+    base_transform: tuple[np.ndarray, np.ndarray],
+    identify_info: str,
+    identify_index_details: dict | None,
+    *,
+    tol: float,
+) -> None:
+    """Reduce a doubled monoclinic a/c column after identify setting alignment.
+
+    For monoclinic G0 (ITA 3..15), the database convention fixes the unique
+    b axis but leaves a/c representatives related by integer unimodular column
+    changes.  If the selected convention-to-ACC P matrix and the current
+    primitive-to-convention transform compose to an index-n primitive cell,
+    search only those fixed-b a/c changes for a column divisible by n.  The
+    resulting candidates still go through the normal paired cell+SSG+P
+    validation; this is not a legacy fallback source.
+    """
+    try:
+        G0_num = int(ssg_primitive.G0_num)
+    except (TypeError, ValueError):
+        return
+    if not 3 <= G0_num <= 15:
+        return
+
+    transform_database_to_current = _identify_space_group_setting_transform(
+        identify_index_details
+    )
+    if transform_database_to_current is None:
+        return
+
+    try:
+        transform_current_to_database = _invert_setting_transform(
+            transform_database_to_current[0],
+            transform_database_to_current[1],
+        )
+        transform_primitive_to_database = _chain_setting_transform(
+            base_transform[0],
+            base_transform[1],
+            transform_current_to_database[0],
+            transform_current_to_database[1],
+        )
+        transform_database_to_acc = _acc_aligned_convention_to_primitive_transform(
+            identify_info
+        )
+    except (KeyError, np.linalg.LinAlgError, ValueError):
+        return
+
+    determinant_factor = _reciprocal_integer_determinant_factor(
+        transform_database_to_acc[0] @ transform_primitive_to_database[0],
+        tol=tol,
+    )
+    if determinant_factor is None:
+        return
+
+    try:
+        basis_primitive_to_database = np.linalg.inv(
+            np.asarray(transform_primitive_to_database[0], dtype=float)
+        )
+    except np.linalg.LinAlgError:
+        return
+    basis_integer = np.rint(basis_primitive_to_database).astype(int)
+    if not np.allclose(basis_primitive_to_database, basis_integer, atol=max(tol, 1e-8)):
+        return
+
+    origin_database = np.asarray(transform_primitive_to_database[1], dtype=float)
+    generated_count = 0
+    max_generated_candidates = 64
+    for values, matrix_tuple in _fixed_b_ac_unimodular_column_transforms(8):
+        ac_change = np.asarray(matrix_tuple, dtype=int)
+        changed_basis = basis_integer @ ac_change
+        for column_index in (0, 2):
+            if np.any(changed_basis[:, column_index] % determinant_factor != 0):
+                continue
+            reduced_basis = changed_basis.astype(float)
+            reduced_basis[:, column_index] /= float(determinant_factor)
+            try:
+                candidate_matrix = np.linalg.inv(reduced_basis)
+            except np.linalg.LinAlgError:
+                continue
+            if not np.isclose(
+                abs(float(np.linalg.det(transform_database_to_acc[0] @ candidate_matrix))),
+                1.0,
+                atol=max(tol, 1e-8),
+                rtol=0,
+            ):
+                continue
+            candidate_origin_shift = normalize_vector_to_zero(
+                candidate_matrix @ basis_integer.astype(float) @ origin_database,
+                atol=1e-10,
+            )
+            before_count = len(candidates)
+            _append_unique_setting_transform_candidate(
+                candidates,
+                seen,
+                (
+                    "monoclinic_ac_column_reduce:"
+                    f"setting={standard_setting};"
+                    f"det_factor={determinant_factor};"
+                    f"col={column_index};"
+                    f"U_ac={values}"
+                ),
+                (candidate_matrix, candidate_origin_shift),
+                tol=tol,
+            )
+            if len(candidates) > before_count:
+                generated_count += 1
+                if generated_count >= max_generated_candidates:
+                    return
+
+
+def _signed_permutation_matrices() -> list[tuple[str, np.ndarray]]:
+    matrices: list[tuple[str, np.ndarray]] = []
+    identity = np.eye(3)
+    for permutation in permutations(range(3)):
+        for signs in product((-1, 1), repeat=3):
+            matrix = np.zeros((3, 3), dtype=float)
+            for row, source_row in enumerate(permutation):
+                matrix[row, source_row] = float(signs[row])
+            if np.allclose(matrix, identity):
+                continue
+            if np.linalg.det(matrix) < 0:
+                continue
+            name = (
+                "signed_permutation:"
+                f"rows={','.join(str(item) for item in permutation)};"
+                f"signs={','.join(str(item) for item in signs)}"
+            )
+            matrices.append((name, matrix))
+    return matrices
+
+
+def _append_signed_permutation_setting_candidates(
+    candidates: list[tuple[str, tuple[np.ndarray, np.ndarray]]],
+    seen: set[tuple[tuple[int, ...], tuple[int, ...]]],
+    base_transform: tuple[np.ndarray, np.ndarray],
+    *,
+    tol: float,
+) -> None:
+    base_matrix = np.asarray(base_transform[0], dtype=float)
+    base_shift = np.asarray(base_transform[1], dtype=float)
+    for name, permutation_matrix in _signed_permutation_matrices():
+        _append_unique_setting_transform_candidate(
+            candidates,
+            seen,
+            name,
+            (
+                permutation_matrix @ base_matrix,
+                normalize_vector_to_zero(permutation_matrix @ base_shift, atol=1e-10),
+            ),
+            tol=tol,
+        )
+
+
+def _build_standard_transform_candidates(
+    standard_setting: str,
+    ssg_primitive: SpinSpaceGroup,
+    raw_transform: tuple[np.ndarray, np.ndarray],
+    identify_info: str,
+    identify_index_details: dict | None,
+    *,
+    tol: float,
+) -> list[tuple[str, tuple[np.ndarray, np.ndarray]]]:
+    candidates: list[tuple[str, tuple[np.ndarray, np.ndarray]]] = []
+    seen: set[tuple[tuple[int, ...], tuple[int, ...]]] = set()
+    _append_unique_setting_transform_candidate(
+        candidates,
+        seen,
+        "current_integerized",
+        raw_transform,
+        tol=tol,
+    )
+    if standard_setting == G0_STANDARD_SETTING:
+        _append_nofrac_lattice_shear_candidates(
+            candidates,
+            seen,
+            ssg_primitive,
+            raw_transform,
+            tol=tol,
+        )
+        _append_unique_setting_transform_candidate(
+            candidates,
+            seen,
+            "spglib_id",
+            (
+                np.asarray(ssg_primitive.transformation_to_G0std_id, dtype=float),
+                np.asarray(ssg_primitive.origin_shift_to_G0std_id, dtype=float),
+            ),
+            tol=tol,
+        )
+    _append_identify_setting_transform_candidates(
+        candidates,
+        seen,
+        raw_transform,
+        identify_index_details,
+        tol=tol,
+    )
+    _append_monoclinic_ac_column_reduction_candidates(
+        candidates,
+        seen,
+        standard_setting,
+        ssg_primitive,
+        raw_transform,
+        identify_info,
+        identify_index_details,
+        tol=tol,
+    )
+    _append_signed_permutation_setting_candidates(
+        candidates,
+        seen,
+        raw_transform,
+        tol=tol,
+    )
+    return candidates
+
+
+def _try_select_one_standard_transform_for_acc_alignment(
+    standard_setting: str,
+    ssg_primitive: SpinSpaceGroup,
+    magnetic_primitive_cell: CrystalCell,
+    raw_transformation_primitive_to_standard: tuple[np.ndarray, np.ndarray],
+    legacy_transformation_primitive_to_acc_primitive: tuple[np.ndarray, np.ndarray],
+    legacy_acc_primitive_cell: CrystalCell,
+    *,
+    identify_info: str,
+    identify_index_details: dict | None,
+    tol: Tolerances,
+) -> tuple[tuple[np.ndarray, np.ndarray], dict]:
+    """
+    Choose a standard transform as a cell/SSG setting transform, not only as an
+    operation-list basis change.
+
+    The identify-index P matrix is defined between the database conventional
+    setting and its ACC primitive setting.  Therefore a valid standard candidate
+    must compose with that same P to reproduce the ACC primitive cell directly
+    from the magnetic primitive SSG/cell pair.
+    """
+    transformation_standard_to_acc_primitive = (
+        _acc_aligned_convention_to_primitive_transform(identify_info)
+    )
+
+    candidate_tol = max(tol.m_matrix_tol, 1e-10)
+    candidates = _build_standard_transform_candidates(
+        standard_setting,
+        ssg_primitive,
+        raw_transformation_primitive_to_standard,
+        identify_info,
+        identify_index_details,
+        tol=candidate_tol,
+    )
+
+    rejected: list[dict] = []
+    for name, candidate in candidates:
+        try:
+            candidate_standard_ssg = ssg_primitive.transform(*candidate)
+            _ = candidate_standard_ssg.international_symbol_type
+            transformation_primitive_to_acc_primitive = _chain_setting_transform(
+                candidate[0],
+                candidate[1],
+                transformation_standard_to_acc_primitive[0],
+                transformation_standard_to_acc_primitive[1],
+            )
+            candidate_acc_primitive_cell = magnetic_primitive_cell.transform(
+                *transformation_primitive_to_acc_primitive
+            )
+            _assert_acc_primitive_lattice_matches_magnetic_primitive(
+                magnetic_primitive_cell,
+                candidate_acc_primitive_cell,
+                tol=tol,
+                label=f"{identify_info}:{name}",
+            )
+            candidate_acc_primitive_ssg = ssg_primitive.transform(
+                *transformation_primitive_to_acc_primitive
+            )
+            _ = candidate_acc_primitive_ssg.international_symbol_type
+            transformation_legacy_acc_to_candidate_acc = _compose_setting_transform(
+                legacy_transformation_primitive_to_acc_primitive[0],
+                legacy_transformation_primitive_to_acc_primitive[1],
+                transformation_primitive_to_acc_primitive[0],
+                transformation_primitive_to_acc_primitive[1],
+            )
+            _assert_acc_primitive_cells_equivalent(
+                legacy_acc_primitive_cell,
+                candidate_acc_primitive_cell,
+                transformation_legacy_acc_to_candidate_acc,
+                tol=tol,
+                label=f"{identify_info}:{name}",
+            )
+        except Exception as exc:
+            rejected.append(
+                {
+                    "strategy": name,
+                    "error_type": type(exc).__name__,
+                    "error": str(exc),
+                    "matrix": np.asarray(candidate[0], dtype=float).tolist(),
+                    "origin_shift": np.asarray(candidate[1], dtype=float).tolist(),
+                }
+            )
+            continue
+
+        return candidate, {
+            "strategy": "acc_aligned_p_candidate_selection",
+            "standard_setting": standard_setting,
+            "selected_strategy": name,
+            "selected_matrix": np.asarray(candidate[0], dtype=float).tolist(),
+            "selected_origin_shift": np.asarray(candidate[1], dtype=float).tolist(),
+            "rejected_candidates": rejected,
+        }
+
+    raise ValueError(
+        f"No non-fallback {standard_setting} transform candidate composes with the "
+        "identify-index P matrix for "
+        f"{identify_info}. Legacy ACC-primitive-derived fallback candidates "
+        "are intentionally disabled so the wrong standard-cell matrix is "
+        "exposed instead of hidden. rejected_candidates="
+        f"{json.dumps(rejected, cls=NumpyEncoder, sort_keys=True)}"
+    )
+
+
+def _select_standard_transform_for_acc_alignment(
+    ssg_primitive: SpinSpaceGroup,
+    magnetic_primitive_cell: CrystalCell,
+    raw_transform_by_standard: dict[str, tuple[np.ndarray, np.ndarray]],
+    legacy_transformation_primitive_to_acc_primitive: tuple[np.ndarray, np.ndarray],
+    legacy_acc_primitive_cell: CrystalCell,
+    *,
+    identify_info: str,
+    identify_index_details: dict | None,
+    tol: Tolerances,
+) -> tuple[str, tuple[np.ndarray, np.ndarray], dict]:
+    if identify_index_details is None and identify_info is not None:
+        raise KeyError(identify_info)
+    standard_setting = _selected_standard_setting_from_identify_index_details(
+        identify_index_details
+    )
+    try:
+        candidate, audit = _try_select_one_standard_transform_for_acc_alignment(
+            standard_setting,
+            ssg_primitive,
+            magnetic_primitive_cell,
+            raw_transform_by_standard[standard_setting],
+            legacy_transformation_primitive_to_acc_primitive,
+            legacy_acc_primitive_cell,
+            identify_info=identify_info,
+            identify_index_details=identify_index_details,
+            tol=tol,
+        )
+    except ValueError as exc:
+        raise ValueError(
+            f"No non-fallback {standard_setting} transform candidate composes "
+            "with the identify-index P matrix for "
+            f"{identify_info}. The standard setting was selected from "
+            f"t_index={identify_index_details.get('t_index') if identify_index_details else None}, "
+            f"k_index={identify_index_details.get('k_index') if identify_index_details else None}; "
+            "cross-setting fallback is intentionally disabled."
+        ) from exc
+
+    audit["preferred_standard_setting"] = standard_setting
+    audit["standard_setting_rule"] = "t_index/k_index"
+    audit["rejected_standard_settings"] = []
+    return standard_setting, candidate, audit
+
+
+def _fractional_position_distance(left, right) -> float:
+    diff = np.abs(np.mod(np.asarray(left, dtype=float) - np.asarray(right, dtype=float), 1.0))
+    wrapped = np.minimum(diff, 1.0 - diff)
+    return float(np.max(wrapped))
+
+
+def _magnetic_cells_equivalent(
+    left: CrystalCell,
+    right: CrystalCell,
+    *,
+    space_tol: float,
+    moment_tol: float,
+    occupancy_tol: float,
+    lattice_tol: float,
+) -> bool:
+    if len(left.positions) != len(right.positions):
+        return False
+    if not np.allclose(left.lattice_matrix, right.lattice_matrix, atol=lattice_tol, rtol=0):
+        return False
+
+    unmatched = set(range(len(right.positions)))
+    for left_index, left_position in enumerate(left.positions):
+        left_element = left.elements[left_index]
+        left_occupancy = float(left.occupancies[left_index])
+        left_moment = np.asarray(left.moments[left_index], dtype=float)
+        matched_index = None
+        for right_index in list(unmatched):
+            if left_element != right.elements[right_index]:
+                continue
+            if abs(left_occupancy - float(right.occupancies[right_index])) > occupancy_tol:
+                continue
+            if _fractional_position_distance(left_position, right.positions[right_index]) > space_tol:
+                continue
+            if np.max(np.abs(left_moment - np.asarray(right.moments[right_index], dtype=float))) > moment_tol:
+                continue
+            matched_index = right_index
+            break
+        if matched_index is None:
+            return False
+        unmatched.remove(matched_index)
+    return not unmatched
+
+
+def _assert_acc_primitive_cells_equivalent(
+    reference_cell: CrystalCell,
+    candidate_cell: CrystalCell,
+    reference_to_candidate: tuple[np.ndarray, np.ndarray],
+    *,
+    tol: Tolerances,
+    label: str,
+) -> None:
+    transformed_reference = reference_cell.transform(
+        np.asarray(reference_to_candidate[0], dtype=float),
+        np.asarray(reference_to_candidate[1], dtype=float),
+    )
+    if _magnetic_cells_equivalent(
+        transformed_reference,
+        candidate_cell,
+        space_tol=tol.space,
+        moment_tol=tol.moment,
+        occupancy_tol=tol.occupancy,
+        lattice_tol=max(tol.space * 1e-3, 1e-6),
+    ):
+        return
+    raise ValueError(
+        f"ACC-aligned primitive validation failed for {label}: "
+        "the convention-index P transform does not reproduce the legacy "
+        "magnetic primitive structure under the derived setting change."
+    )
+
+
+def _assert_acc_primitive_lattice_matches_magnetic_primitive(
+    magnetic_primitive_cell: CrystalCell,
+    candidate_acc_primitive_cell: CrystalCell,
+    *,
+    tol: Tolerances,
+    label: str,
+) -> None:
+    """Require the ACC primitive output lattice to be the same primitive lattice.
+
+    The identify-index P matrix is defined for the database conventional gauge.
+    If it is applied in a merely equivalent but differently gauged convention
+    setting, it can produce a same-volume cell that is not a unimodular basis
+    change of the magnetic primitive lattice.  That cell is not a valid
+    standalone magnetic primitive POSCAR even though the paired algebraic SSG
+    transform exists.
+    """
+
+    reference_lattice = np.asarray(magnetic_primitive_cell.lattice_matrix, dtype=float)
+    candidate_lattice = np.asarray(candidate_acc_primitive_cell.lattice_matrix, dtype=float)
+    lattice_relation = candidate_lattice @ np.linalg.inv(reference_lattice)
+    rounded_relation = np.rint(lattice_relation)
+    relation_tol = max(tol.m_matrix_tol, tol.space * 1e-3, 1e-8)
+    if not np.allclose(lattice_relation, rounded_relation, atol=relation_tol, rtol=0):
+        raise ValueError(
+            f"ACC primitive lattice validation failed for {label}: "
+            "the identify-index P matrix produced a same-volume lattice that "
+            "is not an integer basis change of the magnetic primitive lattice. "
+            f"candidate_to_magnetic_primitive={lattice_relation.tolist()}."
+        )
+
+    determinant = int(round(float(np.linalg.det(rounded_relation))))
+    if abs(determinant) != 1:
+        raise ValueError(
+            f"ACC primitive lattice validation failed for {label}: "
+            "the candidate lattice is integer-related to the magnetic primitive "
+            f"lattice but not unimodular, det={determinant}. "
+            f"candidate_to_magnetic_primitive={rounded_relation.astype(int).tolist()}."
+        )
+
+
+def _resolve_acc_primitive_from_selected_standard(
+    selected_standard_cell: CrystalCell,
+    selected_standard_ssg: SpinSpaceGroup,
+    magnetic_primitive_cell: CrystalCell,
+    ssg_primitive: SpinSpaceGroup,
+    transformation_input_to_primitive: tuple[np.ndarray, np.ndarray],
+    transformation_input_to_selected_standard: tuple[np.ndarray, np.ndarray],
+    transformation_input_to_database_standard: tuple[np.ndarray, np.ndarray],
+    legacy_acc_primitive_cell: CrystalCell,
+    legacy_transformation_input_to_acc_primitive: tuple[np.ndarray, np.ndarray],
+    *,
+    identify_info: str,
+    tol: Tolerances,
+) -> tuple[
+    CrystalCell,
+    SpinSpaceGroup,
+    tuple[np.ndarray, np.ndarray],
+    tuple[np.ndarray, np.ndarray],
+    dict,
+]:
+    transformation_database_standard_to_acc_primitive = (
+        _acc_aligned_convention_to_primitive_transform(identify_info)
+    )
+    transformation_selected_standard_to_database_standard = _compose_setting_transform(
+        transformation_input_to_selected_standard[0],
+        transformation_input_to_selected_standard[1],
+        transformation_input_to_database_standard[0],
+        transformation_input_to_database_standard[1],
+    )
+    transformation_selected_standard_to_acc_primitive = _chain_setting_transform(
+        transformation_selected_standard_to_database_standard[0],
+        transformation_selected_standard_to_database_standard[1],
+        transformation_database_standard_to_acc_primitive[0],
+        transformation_database_standard_to_acc_primitive[1],
+    )
+    acc_primitive_cell = selected_standard_cell.transform(
+        *transformation_selected_standard_to_acc_primitive
+    )
+    _assert_acc_primitive_lattice_matches_magnetic_primitive(
+        magnetic_primitive_cell,
+        acc_primitive_cell,
+        tol=tol,
+        label=identify_info,
+    )
+    transformation_input_to_acc_primitive = _chain_setting_transform(
+        transformation_input_to_selected_standard[0],
+        transformation_input_to_selected_standard[1],
+        transformation_selected_standard_to_acc_primitive[0],
+        transformation_selected_standard_to_acc_primitive[1],
+    )
+    transformation_primitive_to_acc_primitive = _compose_setting_transform(
+        transformation_input_to_primitive[0],
+        transformation_input_to_primitive[1],
+        transformation_input_to_acc_primitive[0],
+        transformation_input_to_acc_primitive[1],
+    )
+    acc_primitive_ssg = ssg_primitive.transform(
+        *transformation_primitive_to_acc_primitive
+    )
+    primitive_acc_primitive_cell = magnetic_primitive_cell.transform(
+        *transformation_primitive_to_acc_primitive
+    )
+    if not _magnetic_cells_equivalent(
+        primitive_acc_primitive_cell,
+        acc_primitive_cell,
+        space_tol=tol.space,
+        moment_tol=tol.moment,
+        occupancy_tol=tol.occupancy,
+        lattice_tol=max(tol.space * 1e-3, 1e-6),
+    ):
+        raise ValueError(
+            f"ACC primitive validation failed for {identify_info}: "
+            "the final-convention cell path and the primitive-composed SSG path "
+            "do not produce the same magnetic primitive cell."
+        )
+    # Force the lazy symbol/index invariants now. Invalid P-derived cells should
+    # fail here instead of being hidden by a later serialization path.
+    _ = acc_primitive_ssg.international_symbol_type
+    transformation_legacy_acc_to_acc_primitive = _compose_setting_transform(
+        legacy_transformation_input_to_acc_primitive[0],
+        legacy_transformation_input_to_acc_primitive[1],
+        transformation_input_to_acc_primitive[0],
+        transformation_input_to_acc_primitive[1],
+    )
+    _assert_acc_primitive_cells_equivalent(
+        legacy_acc_primitive_cell,
+        acc_primitive_cell,
+        transformation_legacy_acc_to_acc_primitive,
+        tol=tol,
+        label=identify_info,
+    )
+    return (
+        acc_primitive_cell,
+        acc_primitive_ssg,
+        transformation_input_to_acc_primitive,
+        transformation_selected_standard_to_acc_primitive,
+        {"strategy": "identify_index_p"},
+    )
+
+
+def _resolve_acc_primitive_from_primitive_standard_transform(
+    magnetic_primitive_cell: CrystalCell,
+    ssg_primitive: SpinSpaceGroup,
+    transformation_input_to_primitive: tuple[np.ndarray, np.ndarray],
+    transformation_input_to_selected_standard: tuple[np.ndarray, np.ndarray],
+    legacy_acc_primitive_cell: CrystalCell,
+    legacy_transformation_input_to_acc_primitive: tuple[np.ndarray, np.ndarray],
+    *,
+    identify_info: str,
+    tol: Tolerances,
+) -> tuple[
+    CrystalCell,
+    SpinSpaceGroup,
+    tuple[np.ndarray, np.ndarray],
+    tuple[np.ndarray, np.ndarray],
+    dict,
+]:
+    transformation_selected_standard_to_acc_primitive = (
+        _acc_aligned_convention_to_primitive_transform(identify_info)
+    )
+    transformation_primitive_to_selected_standard = _compose_setting_transform(
+        transformation_input_to_primitive[0],
+        transformation_input_to_primitive[1],
+        transformation_input_to_selected_standard[0],
+        transformation_input_to_selected_standard[1],
+    )
+    transformation_primitive_to_acc_primitive = _chain_setting_transform(
+        transformation_primitive_to_selected_standard[0],
+        transformation_primitive_to_selected_standard[1],
+        transformation_selected_standard_to_acc_primitive[0],
+        transformation_selected_standard_to_acc_primitive[1],
+    )
+    acc_primitive_cell = magnetic_primitive_cell.transform(
+        *transformation_primitive_to_acc_primitive
+    )
+    acc_primitive_ssg = ssg_primitive.transform(
+        *transformation_primitive_to_acc_primitive
+    )
+    # Force lazy symbol/index invariants now. Invalid P-derived transforms
+    # should fail here instead of being hidden by a later serialization path.
+    _ = acc_primitive_ssg.international_symbol_type
+    transformation_input_to_acc_primitive = _chain_setting_transform(
+        transformation_input_to_primitive[0],
+        transformation_input_to_primitive[1],
+        transformation_primitive_to_acc_primitive[0],
+        transformation_primitive_to_acc_primitive[1],
+    )
+    transformation_legacy_acc_to_acc_primitive = _compose_setting_transform(
+        legacy_transformation_input_to_acc_primitive[0],
+        legacy_transformation_input_to_acc_primitive[1],
+        transformation_input_to_acc_primitive[0],
+        transformation_input_to_acc_primitive[1],
+    )
+    _assert_acc_primitive_cells_equivalent(
+        legacy_acc_primitive_cell,
+        acc_primitive_cell,
+        transformation_legacy_acc_to_acc_primitive,
+        tol=tol,
+        label=identify_info,
+    )
+    return (
+        acc_primitive_cell,
+        acc_primitive_ssg,
+        transformation_input_to_acc_primitive,
+        transformation_selected_standard_to_acc_primitive,
+        {"strategy": "identify_index_p_direct_composed"},
+    )
 
 
 def _identity_setting_transform() -> tuple[np.ndarray, np.ndarray]:
@@ -3059,6 +4152,8 @@ def _identify_ssg_index_details(file_name,ssg_primitive:SpinSpaceGroup,tol = 0.0
     """
     from findspingroup.data.SG_SYMBOL import SGgeneratorDict
     from findspingroup.data.PG_SYMBOL import PG_SCH_TO_ID_INDEX
+    from findspingroup.core.identify_index.functions import make_4d_matrix
+    from findspingroup.core.identify_index.functions.find_ssg_reduce import find_ssg_transformation
     from findspingroup.core.identify_index.functions.get_stand_trans import get_stand_trans
 
     def _normalized_direction(vector):
@@ -3428,6 +4523,16 @@ def _identify_ssg_index_details(file_name,ssg_primitive:SpinSpaceGroup,tol = 0.0
         last_index = f'.{coplanar_suffix}' if coplanar_suffix is not None else '.P'
     else:
         last_index = ''
+    identify_reduction = find_ssg_transformation(
+        L0_id,
+        G0_id,
+        it,
+        ik,
+        iso,
+        make_4d_matrix(T),
+        tol=tol,
+        use_222_contract=use_222_contract,
+    )
     try:
         map_result = get_stand_trans(
             L0_id,
@@ -3507,6 +4612,7 @@ def _identify_ssg_index_details(file_name,ssg_primitive:SpinSpaceGroup,tol = 0.0
         't_index': it,
         'k_index': ik,
         'point_group_id': pg,
+        'identify_cell_size': identify_reduction.get('cell_size'),
         'equivalent_map_index': map_num,
         'configuration_suffix': last_index.lstrip('.'),
         'name_maps': name_maps,
@@ -3736,10 +4842,53 @@ def _find_spin_group_from_parsed(
         np.asarray(ssg_primitive.transformation_to_L0std, dtype=float),
         np.asarray(ssg_primitive.origin_shift_to_L0std, dtype=float),
     )
+    legacy_transformation_primitive_to_acc_primitive = (
+        np.asarray(ssg_primitive.acc_primitive_trans, dtype=float),
+        np.asarray(ssg_primitive.acc_primitive_origin_shift, dtype=float),
+    )
+    legacy_acc_magnetic_primitive_cell = magnetic_primitive_cell.transform(
+        *legacy_transformation_primitive_to_acc_primitive
+    )
+    legacy_acc_magnetic_primitive_ssg = ssg_primitive.transform(
+        *legacy_transformation_primitive_to_acc_primitive
+    )
+    legacy_transformation_input_to_acc_primitive = _chain_setting_transform(
+        transformation_input_to_primitive[0],
+        transformation_input_to_primitive[1],
+        legacy_transformation_primitive_to_acc_primitive[0],
+        legacy_transformation_primitive_to_acc_primitive[1],
+    )
+    (
+        selected_standard_setting,
+        selected_transformation_primitive_to_standard,
+        standard_transform_selection_audit,
+    ) = _select_standard_transform_for_acc_alignment(
+        ssg_primitive,
+        magnetic_primitive_cell,
+        {
+            G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
+            L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
+        },
+        legacy_transformation_primitive_to_acc_primitive,
+        legacy_acc_magnetic_primitive_cell,
+        identify_info=identify_info,
+        identify_index_details=identify_index_details,
+        tol=tol_cfg,
+    )
+    if selected_standard_setting == G0_STANDARD_SETTING:
+        raw_transformation_primitive_to_G0std = selected_transformation_primitive_to_standard
+    else:
+        raw_transformation_primitive_to_L0std = selected_transformation_primitive_to_standard
     raw_G0std_cell = magnetic_primitive_cell.transform(*raw_transformation_primitive_to_G0std)
     raw_L0std_cell = magnetic_primitive_cell.transform(*raw_transformation_primitive_to_L0std)
     raw_G0std_ssg = ssg_primitive.transform(*raw_transformation_primitive_to_G0std)
     raw_L0std_ssg = ssg_primitive.transform(*raw_transformation_primitive_to_L0std)
+    G0std_axis_collapse_matrix, G0std_axis_collapse_audit = _select_G0std_axis_collapse(
+        ssg_primitive,
+        raw_G0std_ssg,
+        identify_index_details=identify_index_details,
+        tol=tol_cfg.space,
+    )
 
     raw_transformation_input_to_G0std = _chain_setting_transform(
         transformation_input_to_primitive[0],
@@ -3771,22 +4920,45 @@ def _find_spin_group_from_parsed(
         allow_identity_collapse=allow_input_collapse,
     )
 
-    transformation_primitive_to_acc_primitive = (
-        np.asarray(ssg_primitive.acc_primitive_trans, dtype=float),
-        np.asarray(ssg_primitive.acc_primitive_origin_shift, dtype=float),
-    )
-    acc_magnetic_primitive_cell = magnetic_primitive_cell.transform(*transformation_primitive_to_acc_primitive)
-    acc_magnetic_primitive_ssg = ssg_primitive.transform(*transformation_primitive_to_acc_primitive)
-    transformation_input_to_acc_primitive = _chain_setting_transform(
-        transformation_input_to_primitive[0],
-        transformation_input_to_primitive[1],
-        transformation_primitive_to_acc_primitive[0],
-        transformation_primitive_to_acc_primitive[1],
-    )
     transformation_primitive_to_input = _invert_setting_transform(
         transformation_input_to_primitive[0],
         transformation_input_to_primitive[1],
     )
+    if selected_standard_setting == G0_STANDARD_SETTING:
+        selected_standard_cell = G0std_cell
+        selected_standard_ssg = G0std_ssg
+        transformation_input_to_selected_standard = transformation_input_to_G0std
+        transformation_input_to_database_standard = raw_transformation_input_to_G0std
+    else:
+        selected_standard_cell = L0std_cell
+        selected_standard_ssg = L0std_ssg
+        transformation_input_to_selected_standard = transformation_input_to_L0std
+        transformation_input_to_database_standard = raw_transformation_input_to_L0std
+
+    (
+        acc_magnetic_primitive_cell,
+        acc_magnetic_primitive_ssg,
+        transformation_input_to_acc_primitive,
+        transformation_selected_standard_to_acc_primitive,
+        acc_primitive_resolution_audit,
+    ) = _resolve_acc_primitive_from_selected_standard(
+        selected_standard_cell,
+        selected_standard_ssg,
+        magnetic_primitive_cell,
+        ssg_primitive,
+        transformation_input_to_primitive,
+        transformation_input_to_selected_standard,
+        transformation_input_to_database_standard,
+        legacy_acc_magnetic_primitive_cell,
+        legacy_transformation_input_to_acc_primitive,
+        identify_info=identify_info,
+        tol=tol_cfg,
+    )
+    acc_primitive_resolution_audit["standard_transform_selection"] = standard_transform_selection_audit
+    if selected_standard_setting == G0_STANDARD_SETTING:
+        acc_primitive_resolution_audit["G0std_transform_selection"] = standard_transform_selection_audit
+    else:
+        acc_primitive_resolution_audit["L0std_transform_selection"] = standard_transform_selection_audit
     transformation_G0std_to_primitive = _compose_setting_transform(
         transformation_input_to_G0std[0],
         transformation_input_to_G0std[1],
@@ -3813,21 +4985,6 @@ def _find_spin_group_from_parsed(
     msg_num = None if internal_msg_info is None else internal_msg_info.get("msg_int_num")
     msg_type = None if internal_msg_info is None else internal_msg_info.get("msg_type")
     msg_symbol = None if internal_msg_info is None else internal_msg_info.get("msg_bns_symbol")
-    selected_standard_setting = (
-        L0_STANDARD_SETTING
-        if acc_magnetic_primitive_ssg.international_symbol_type == "k"
-        else G0_STANDARD_SETTING
-    )
-    if selected_standard_setting == G0_STANDARD_SETTING:
-        selected_standard_cell = G0std_cell
-        selected_standard_ssg = G0std_ssg
-        transformation_input_to_selected_standard = transformation_input_to_G0std
-        transformation_selected_standard_to_acc_primitive = transformation_G0std_to_primitive
-    else:
-        selected_standard_cell = L0std_cell
-        selected_standard_ssg = L0std_ssg
-        transformation_input_to_selected_standard = transformation_input_to_L0std
-        transformation_selected_standard_to_acc_primitive = transformation_L0std_to_primitive
 
     actual_transformation_acc_primitive_to_acc_conventional = (
         np.asarray(acc_magnetic_primitive_ssg.cptrans, dtype=float),
@@ -3948,6 +5105,22 @@ def _find_spin_group_from_parsed(
     input_setting_index_differs = input_setting_identify_info != identify_info
 
     public_ossg_ssg = _ossg_oriented_spin_frame_ssg(convention_ssg, convention_cell)
+    G0std_ops_nofrac_transform = None
+    g0_standard_ssg_ops = G0std_ssg.ops
+    public_convention_ssg_ops = public_ossg_ssg.ops
+    if G0std_axis_collapse_audit and G0std_axis_collapse_audit["strategy"] == "axis_collapse":
+        G0std_ops_nofrac_transform = _chain_setting_transform(
+            transformation_input_to_G0std[0],
+            transformation_input_to_G0std[1],
+            G0std_axis_collapse_matrix,
+            np.zeros(3),
+        )
+        g0_standard_ssg_ops = G0std_ssg.transform(G0std_axis_collapse_matrix, np.zeros(3)).ops
+        if convention_setting == G0_STANDARD_SETTING:
+            public_convention_ssg_ops = public_ossg_ssg.transform(
+                G0std_axis_collapse_matrix,
+                np.zeros(3),
+            ).ops
     try:
         msg_acc = SpinSpaceGroup(public_ossg_ssg.msg_ops).acc
     except Exception:
@@ -4320,7 +5493,9 @@ def _find_spin_group_from_parsed(
                 'primitive_magnetic_cell_ssg_type':acc_magnetic_primitive_ssg.international_symbol_type,
                 'full_spin_part_point_group':ssg_primitive.spin_part_point_group_symbol_hm,
                 'identify_index_details':identify_index_details,
-                'g0_standard_ssg_ops': G0std_ssg.ops,
+                'acc_primitive_resolution_audit': acc_primitive_resolution_audit,
+                'g0std_axis_collapse_audit': G0std_axis_collapse_audit,
+                'g0_standard_ssg_ops': g0_standard_ssg_ops,
                 'g0_standard_ssg_seitz': G0std_ssg.seitz_symbols,
                 'g0_standard_ssg_seitz_latex': G0std_ssg.seitz_symbols_latex,
                 'g0_standard_ssg_seitz_descriptions': _serialize_seitz_descriptions(
@@ -4342,7 +5517,7 @@ def _find_spin_group_from_parsed(
                 'acc_conventional_ssg_international_linear': acc_conventional_ssg.international_symbol_linear,
                 'acc_conventional_ssg_international_latex': acc_conventional_ssg.international_symbol_latex,
                 'acc_conventional_ssg_symbol_calibration_tol': acc_conventional_ssg.symbol_calibration_tol,
-                'convention_ssg_ops': public_ossg_ssg.ops,
+                'convention_ssg_ops': public_convention_ssg_ops,
                 'convention_ssg_setting': convention_setting,
                 'convention_ssg_spin_frame_setting': OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 'ossg_space_group_number': ossg_space_group_number,
@@ -4407,6 +5582,14 @@ def _find_spin_group_from_parsed(
                 'T_input_to_G0std': (
                     np.asarray(transformation_input_to_G0std[0], dtype=float).tolist(),
                     np.asarray(transformation_input_to_G0std[1], dtype=float).tolist(),
+                ),
+                'T_input_to_G0std_ops_nofrac': (
+                    None
+                    if G0std_ops_nofrac_transform is None
+                    else (
+                        np.asarray(G0std_ops_nofrac_transform[0], dtype=float).tolist(),
+                        np.asarray(G0std_ops_nofrac_transform[1], dtype=float).tolist(),
+                    )
                 ),
                 'raw_T_input_to_G0std': (
                     np.asarray(raw_transformation_input_to_G0std[0], dtype=float).tolist(),
@@ -4637,13 +5820,109 @@ def _find_spin_group_basic_from_parsed(
         mpg_identifier=primitive_ossg_for_phase.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
     )
+    ss_w_soc = spin_splitting_w_soc(ssg_primitive)
+    ahc_w_soc = is_ahc(primitive_ossg_for_phase.mpg_num)
+    ss_wo_soc = magnetic_phase_payload["spin_splitting_without_soc"]
+    ahc_wo_soc = is_ahc(ssg_primitive.gspg.empg_symbol)
 
-    transformation_primitive_to_acc_primitive = (
+    transformation_input_to_primitive_setting = (
+        np.asarray(transformation_input_to_primitive, dtype=float),
+        np.zeros(3),
+    )
+    legacy_transformation_primitive_to_acc_primitive = (
         np.asarray(ssg_primitive.acc_primitive_trans, dtype=float),
         np.asarray(ssg_primitive.acc_primitive_origin_shift, dtype=float),
     )
-    acc_magnetic_primitive_cell = magnetic_primitive_cell.transform(*transformation_primitive_to_acc_primitive)
-    acc_magnetic_primitive_ssg = ssg_primitive.transform(*transformation_primitive_to_acc_primitive)
+    legacy_acc_magnetic_primitive_cell = magnetic_primitive_cell.transform(
+        *legacy_transformation_primitive_to_acc_primitive
+    )
+    legacy_transformation_input_to_acc_primitive = _chain_setting_transform(
+        transformation_input_to_primitive_setting[0],
+        transformation_input_to_primitive_setting[1],
+        legacy_transformation_primitive_to_acc_primitive[0],
+        legacy_transformation_primitive_to_acc_primitive[1],
+    )
+    raw_transformation_primitive_to_G0std = (
+        np.asarray(ssg_primitive.transformation_to_G0std, dtype=float),
+        np.asarray(ssg_primitive.origin_shift_to_G0std, dtype=float),
+    )
+    raw_transformation_primitive_to_L0std = (
+        np.asarray(ssg_primitive.transformation_to_L0std, dtype=float),
+        np.asarray(ssg_primitive.origin_shift_to_L0std, dtype=float),
+    )
+    (
+        selected_standard_setting,
+        selected_transformation_primitive_to_standard,
+        standard_transform_selection_audit,
+    ) = _select_standard_transform_for_acc_alignment(
+        ssg_primitive,
+        magnetic_primitive_cell,
+        {
+            G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
+            L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
+        },
+        legacy_transformation_primitive_to_acc_primitive,
+        legacy_acc_magnetic_primitive_cell,
+        identify_info=identify_info,
+        identify_index_details=identify_index_details,
+        tol=tol_cfg,
+    )
+    if selected_standard_setting == G0_STANDARD_SETTING:
+        raw_transformation_primitive_to_G0std = selected_transformation_primitive_to_standard
+    else:
+        raw_transformation_primitive_to_L0std = selected_transformation_primitive_to_standard
+    raw_transformation_input_to_G0std = _chain_setting_transform(
+        transformation_input_to_primitive_setting[0],
+        transformation_input_to_primitive_setting[1],
+        raw_transformation_primitive_to_G0std[0],
+        raw_transformation_primitive_to_G0std[1],
+    )
+    raw_transformation_input_to_L0std = _chain_setting_transform(
+        transformation_input_to_primitive_setting[0],
+        transformation_input_to_primitive_setting[1],
+        raw_transformation_primitive_to_L0std[0],
+        raw_transformation_primitive_to_L0std[1],
+    )
+    transformation_input_to_selected_standard = (
+        raw_transformation_input_to_G0std
+        if selected_standard_setting == G0_STANDARD_SETTING
+        else raw_transformation_input_to_L0std
+    )
+    selected_transformation_primitive_to_standard = (
+        raw_transformation_primitive_to_G0std
+        if selected_standard_setting == G0_STANDARD_SETTING
+        else raw_transformation_primitive_to_L0std
+    )
+    selected_standard_cell = magnetic_primitive_cell.transform(
+        *selected_transformation_primitive_to_standard
+    )
+    selected_standard_ssg = ssg_primitive.transform(
+        *selected_transformation_primitive_to_standard
+    )
+    (
+        acc_magnetic_primitive_cell,
+        acc_magnetic_primitive_ssg,
+        transformation_input_to_acc_primitive,
+        transformation_selected_standard_to_acc_primitive,
+        acc_primitive_resolution_audit,
+    ) = _resolve_acc_primitive_from_selected_standard(
+        selected_standard_cell,
+        selected_standard_ssg,
+        magnetic_primitive_cell,
+        ssg_primitive,
+        transformation_input_to_primitive_setting,
+        transformation_input_to_selected_standard,
+        transformation_input_to_selected_standard,
+        legacy_acc_magnetic_primitive_cell,
+        legacy_transformation_input_to_acc_primitive,
+        identify_info=identify_info,
+        tol=tol_cfg,
+    )
+    acc_primitive_resolution_audit["standard_transform_selection"] = standard_transform_selection_audit
+    if selected_standard_setting == G0_STANDARD_SETTING:
+        acc_primitive_resolution_audit["G0std_transform_selection"] = standard_transform_selection_audit
+    else:
+        acc_primitive_resolution_audit["L0std_transform_selection"] = standard_transform_selection_audit
     acc_primitive_ossg = _ossg_oriented_spin_frame_ssg(
         acc_magnetic_primitive_ssg,
         acc_magnetic_primitive_cell,
@@ -4666,6 +5945,16 @@ def _find_spin_group_basic_from_parsed(
         "nsspg": ssg_primitive.n_spin_part_point_group_symbol_hm,
         "sspg": ssg_primitive.spin_part_point_group_symbol_hm,
         "acc_symbol": ssg_primitive.acc,
+        "acc_primitive_resolution_audit": acc_primitive_resolution_audit,
+        "acc_primitive_standard_setting": selected_standard_setting,
+        "T_input_to_acc_primitive": (
+            np.asarray(transformation_input_to_acc_primitive[0], dtype=float).tolist(),
+            np.asarray(transformation_input_to_acc_primitive[1], dtype=float).tolist(),
+        ),
+        "T_selected_standard_to_acc_primitive": (
+            np.asarray(transformation_selected_standard_to_acc_primitive[0], dtype=float).tolist(),
+            np.asarray(transformation_selected_standard_to_acc_primitive[1], dtype=float).tolist(),
+        ),
         "space_group_symbol": input_space_group_symbol,
         "space_group_number": input_space_group_number,
         "msg_symbol": msg_symbol,
@@ -4673,7 +5962,18 @@ def _find_spin_group_basic_from_parsed(
         "msg_og_number": msg_parent_info["og_number"],
         "empg": ssg_primitive.gspg.empg_symbol,
         "conf": ssg_primitive.conf,
+        "phase": magnetic_phase_payload["phase"],
         "magnetic_phase": magnetic_phase_payload["phase"],
+        "properties": {
+            "ss_w_soc": ss_w_soc,
+            "ss_wo_soc": ss_wo_soc,
+            "ahc_w_soc": ahc_w_soc,
+            "ahc_wo_soc": ahc_wo_soc,
+            "is_alter": magnetic_phase_payload["is_alter"],
+            "is_spin_orbit_magnet": magnetic_phase_payload["is_spin_orbit_magnet"],
+            "magnetic_phase_base": magnetic_phase_payload["base_phase"],
+            "magnetic_phase_modifier": magnetic_phase_payload["modifier"],
+        },
         "is_alter": magnetic_phase_payload["is_alter"],
         "is_som": magnetic_phase_payload["is_spin_orbit_magnet"],
         "sg_is_polar": space_group_is_polar(input_space_group_number),
@@ -4742,29 +6042,21 @@ def _find_spin_group_acc_primitive_from_parsed(
             raise
         identify_info = _handle_missing_identify_index(source_name, exc)
 
-    transformation_primitive_to_acc_primitive = (
+    legacy_transformation_primitive_to_acc_primitive = (
         np.asarray(ssg_primitive.acc_primitive_trans, dtype=float),
         np.asarray(ssg_primitive.acc_primitive_origin_shift, dtype=float),
     )
-    acc_primitive_cell = magnetic_primitive_cell.transform(*transformation_primitive_to_acc_primitive)
-    acc_primitive_ssg = ssg_primitive.transform(*transformation_primitive_to_acc_primitive)
-    transformation_input_to_acc_primitive = _chain_setting_transform(
+    legacy_acc_primitive_cell = magnetic_primitive_cell.transform(
+        *legacy_transformation_primitive_to_acc_primitive
+    )
+    legacy_acc_primitive_ssg = ssg_primitive.transform(
+        *legacy_transformation_primitive_to_acc_primitive
+    )
+    legacy_transformation_input_to_acc_primitive = _chain_setting_transform(
         transformation_input_to_primitive[0],
         transformation_input_to_primitive[1],
-        transformation_primitive_to_acc_primitive[0],
-        transformation_primitive_to_acc_primitive[1],
-    )
-    acc_primitive_poscar = acc_primitive_cell.to_poscar(source_name)
-    acc_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_primitive_cell)
-    poscar_spin_frame_to_acc_real_cartesian = np.linalg.inv(
-        acc_real_cartesian_to_poscar_spin_frame
-    )
-    acc_primitive_ssg_in_poscar_spin_frame = acc_primitive_ssg.transform_spin(
-        acc_real_cartesian_to_poscar_spin_frame
-    )
-    acc_primitive_ossg = _ossg_oriented_spin_frame_ssg(
-        acc_primitive_ssg,
-        acc_primitive_cell,
+        legacy_transformation_primitive_to_acc_primitive[0],
+        legacy_transformation_primitive_to_acc_primitive[1],
     )
 
     raw_transformation_primitive_to_G0std = (
@@ -4775,10 +6067,37 @@ def _find_spin_group_acc_primitive_from_parsed(
         np.asarray(ssg_primitive.transformation_to_L0std, dtype=float),
         np.asarray(ssg_primitive.origin_shift_to_L0std, dtype=float),
     )
+    (
+        selected_standard_setting,
+        selected_transformation_primitive_to_standard,
+        standard_transform_selection_audit,
+    ) = _select_standard_transform_for_acc_alignment(
+        ssg_primitive,
+        magnetic_primitive_cell,
+        {
+            G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
+            L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
+        },
+        legacy_transformation_primitive_to_acc_primitive,
+        legacy_acc_primitive_cell,
+        identify_info=identify_info,
+        identify_index_details=identify_index_details,
+        tol=tol_cfg,
+    )
+    if selected_standard_setting == G0_STANDARD_SETTING:
+        raw_transformation_primitive_to_G0std = selected_transformation_primitive_to_standard
+    else:
+        raw_transformation_primitive_to_L0std = selected_transformation_primitive_to_standard
     raw_G0std_cell = magnetic_primitive_cell.transform(*raw_transformation_primitive_to_G0std)
     raw_L0std_cell = magnetic_primitive_cell.transform(*raw_transformation_primitive_to_L0std)
     raw_G0std_ssg = ssg_primitive.transform(*raw_transformation_primitive_to_G0std)
     raw_L0std_ssg = ssg_primitive.transform(*raw_transformation_primitive_to_L0std)
+    G0std_axis_collapse_matrix, G0std_axis_collapse_audit = _select_G0std_axis_collapse(
+        ssg_primitive,
+        raw_G0std_ssg,
+        identify_index_details=identify_index_details,
+        tol=tol_cfg.space,
+    )
     raw_transformation_input_to_G0std = _chain_setting_transform(
         transformation_input_to_primitive[0],
         transformation_input_to_primitive[1],
@@ -4806,6 +6125,53 @@ def _find_spin_group_acc_primitive_from_parsed(
         raw_L0std_ssg,
         raw_transformation_input_to_L0std,
         allow_identity_collapse=allow_input_collapse,
+    )
+    if selected_standard_setting == G0_STANDARD_SETTING:
+        selected_standard_cell = G0std_cell
+        selected_standard_ssg = G0std_ssg
+        transformation_input_to_selected_standard = transformation_input_to_G0std
+        transformation_input_to_database_standard = raw_transformation_input_to_G0std
+    else:
+        selected_standard_cell = L0std_cell
+        selected_standard_ssg = L0std_ssg
+        transformation_input_to_selected_standard = transformation_input_to_L0std
+        transformation_input_to_database_standard = raw_transformation_input_to_L0std
+
+    (
+        acc_primitive_cell,
+        acc_primitive_ssg,
+        transformation_input_to_acc_primitive,
+        transformation_convention_to_acc_primitive,
+        acc_primitive_resolution_audit,
+    ) = _resolve_acc_primitive_from_selected_standard(
+        selected_standard_cell,
+        selected_standard_ssg,
+        magnetic_primitive_cell,
+        ssg_primitive,
+        transformation_input_to_primitive,
+        transformation_input_to_selected_standard,
+        transformation_input_to_database_standard,
+        legacy_acc_primitive_cell,
+        legacy_transformation_input_to_acc_primitive,
+        identify_info=identify_info,
+        tol=tol_cfg,
+    )
+    acc_primitive_resolution_audit["standard_transform_selection"] = standard_transform_selection_audit
+    if selected_standard_setting == G0_STANDARD_SETTING:
+        acc_primitive_resolution_audit["G0std_transform_selection"] = standard_transform_selection_audit
+    else:
+        acc_primitive_resolution_audit["L0std_transform_selection"] = standard_transform_selection_audit
+    acc_primitive_poscar = acc_primitive_cell.to_poscar(source_name)
+    acc_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_primitive_cell)
+    poscar_spin_frame_to_acc_real_cartesian = np.linalg.inv(
+        acc_real_cartesian_to_poscar_spin_frame
+    )
+    acc_primitive_ssg_in_poscar_spin_frame = acc_primitive_ssg.transform_spin(
+        acc_real_cartesian_to_poscar_spin_frame
+    )
+    acc_primitive_ossg = _ossg_oriented_spin_frame_ssg(
+        acc_primitive_ssg,
+        acc_primitive_cell,
     )
     transformation_acc_primitive_to_G0std = _compose_setting_transform(
         transformation_input_to_acc_primitive[0],
