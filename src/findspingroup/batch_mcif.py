@@ -341,7 +341,10 @@ def _normalize_jsonable(value):
 
 def _build_export_root(result) -> dict:
     if isinstance(result, dict):
-        return _normalize_jsonable(dict(result))
+        payload = _normalize_jsonable(dict(result))
+        if "phase" not in payload and "magnetic_phase" in payload:
+            payload["phase"] = payload["magnetic_phase"]
+        return payload
     payload = _normalize_jsonable(dict(result.to_dict()))
     payload["phase"] = result.magnetic_phase
     payload["properties"] = result.properties_summary()

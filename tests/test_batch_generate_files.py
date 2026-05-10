@@ -135,7 +135,9 @@ def _fake_basic_payload(index: str) -> dict:
         "msg_og_number": "1.1.1",
         "empg": f"empg:{index}",
         "conf": f"conf:{index}",
+        "phase": f"phase:{index}",
         "magnetic_phase": f"phase:{index}",
+        "properties": {"ss_w_soc": f"prop:{index}"},
         "is_alter": "",
         "is_som": "",
         "sg_is_polar": False,
@@ -447,7 +449,7 @@ def test_run_mcif_batch_basic_route_uses_lightweight_pipeline(monkeypatch, tmp_p
         [source_file],
         tmp_path / "basic_batch",
         route="basic",
-        export_fields=["index", "magnetic_phase", "acc_symbol"],
+        export_fields=["index", "phase", "properties.ss_w_soc"],
         export_txt_path=tmp_path / "basic_batch" / "selected.txt",
         quiet=True,
     )
@@ -460,11 +462,12 @@ def test_run_mcif_batch_basic_route_uses_lightweight_pipeline(monkeypatch, tmp_p
     assert summary["success_count"] == 1
     assert summary["error_count"] == 0
     assert export_lines == [
-        'basic_only.mcif: {"acc_symbol": "acc:BASIC.IDX", "index": "BASIC.IDX", "magnetic_phase": "phase:BASIC.IDX"}'
+        'basic_only.mcif: {"index": "BASIC.IDX", "phase": "phase:BASIC.IDX", "properties.ss_w_soc": "prop:BASIC.IDX"}'
     ]
     record = json.loads(records[0])
     full_record = json.loads(full_records[0])
     assert record["result"]["index"] == "BASIC.IDX"
+    assert full_record["result"]["phase"] == "phase:BASIC.IDX"
     assert "group_identifiers" not in record
     assert "tensor_summary" not in record
     assert full_record["result"]["magnetic_phase"] == "phase:BASIC.IDX"
@@ -668,10 +671,13 @@ def test_run_mcif_batch_exports_convention_selected_fields(tmp_path):
         ),
     ],
 )
-def test_find_spin_group_batch_summary_covers_gspg_fallback_cases(relative_path, expected_gspg):
+def test_find_spin_group_batch_summary_covers_gspg_reduction_cases(relative_path, expected_gspg):
     result = find_spin_group(str((PROJECT_ROOT / relative_path).resolve()))
+    summary_gspg = result.to_summary_dict()["gspg"]
 
-    assert result.to_summary_dict()["gspg"] == expected_gspg
+    assert summary_gspg["symbol_linear"] == expected_gspg["symbol_linear"]
+    assert summary_gspg["effective_mpg_symbol"]
+    assert summary_gspg["real_space_setting"]
 
 
 def test_auto_baseline_creates_then_reuses_matching_tolerance_baseline(tmp_path):

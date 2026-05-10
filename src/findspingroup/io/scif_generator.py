@@ -970,7 +970,7 @@ def write_scif_atoms(
 
         Current formal `.scif` direction follows the Manu-style interpretation:
         ``axis_u/v/w`` are absolute components along the chosen spin basis,
-        while ``symmform_uvw`` should describe the same moment in relative
+        while ``symmform_rel_uvw`` should describe the same moment in relative
         ``u,v,w`` coordinates. For the current mainline generator, the spin
         basis coincides with the lattice basis declared in the file.
         """
