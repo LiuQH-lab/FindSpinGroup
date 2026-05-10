@@ -5,6 +5,7 @@ import datetime as dt
 import json
 import math
 import tempfile
+import time
 import traceback
 from pathlib import Path
 
@@ -20,7 +21,11 @@ from .batch_mcif import (
     _source_fractional_occupancy_annotation,
     _write_json,
 )
-from .find_spin_group import NumpyEncoder, find_spin_group, find_spin_group_from_data
+from .find_spin_group import (
+    NumpyEncoder,
+    find_spin_group,
+    find_spin_group_from_data,
+)
 from .io import parse_poscar_file
 from .structure.cell import CrystalCell
 from .version import __version__
@@ -159,6 +164,7 @@ def _roundtrip_from_poscar_text(
     *,
     source_name: str,
     poscar_text: str,
+    compare_mode: str,
     space_tol: float,
     mtol: float,
     meigtol: float,
@@ -179,14 +185,14 @@ def _roundtrip_from_poscar_text(
             lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(parse_target)
         finally:
             parse_target.unlink(missing_ok=True)
-        return find_spin_group_from_data(
-            source_name,
-            lattice_factors,
-            positions,
-            elements,
-            occupancies,
-            moments,
-            input_spin_setting="cartesian",
+        return _identify_roundtrip_from_poscar_data(
+            source_name=source_name,
+            lattice_factors=lattice_factors,
+            positions=positions,
+            elements=elements,
+            occupancies=occupancies,
+            moments=moments,
+            compare_mode=compare_mode,
             space_tol=space_tol,
             mtol=mtol,
             meigtol=meigtol,
@@ -194,6 +200,37 @@ def _roundtrip_from_poscar_text(
         )
 
     lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(parse_target)
+    return _identify_roundtrip_from_poscar_data(
+        source_name=source_name,
+        lattice_factors=lattice_factors,
+        positions=positions,
+        elements=elements,
+        occupancies=occupancies,
+        moments=moments,
+        compare_mode=compare_mode,
+        space_tol=space_tol,
+        mtol=mtol,
+        meigtol=meigtol,
+        matrix_tol=matrix_tol,
+    )
+
+
+def _identify_roundtrip_from_poscar_data(
+    *,
+    source_name: str,
+    lattice_factors,
+    positions,
+    elements,
+    occupancies,
+    moments,
+    compare_mode: str,
+    space_tol: float,
+    mtol: float,
+    meigtol: float,
+    matrix_tol: float,
+):
+    if compare_mode not in COMPARE_MODE_CHOICES:
+        raise ValueError(f"Unsupported compare_mode: {compare_mode}")
     return find_spin_group_from_data(
         source_name,
         lattice_factors,
@@ -239,12 +276,18 @@ def _normalize_compare_value(value, *, field_name: str | None = None, top_level:
 
 def _basic_compare_payload(result, *, compare_conf: bool) -> dict:
     payload = {
-        key: _normalize_compare_value(getattr(result, attr, None), field_name=key)
+        key: _normalize_compare_value(_result_value(result, attr, key=key), field_name=key)
         for key, attr in BASIC_COMPARE_ATTRS
     }
     if not compare_conf:
         payload.pop("conf", None)
     return payload
+
+
+def _result_value(result, attr: str, *, key: str | None = None):
+    if isinstance(result, dict):
+        return result.get(key or attr)
+    return getattr(result, attr, None)
 
 
 def _full_compare_payload(result) -> dict:
@@ -440,12 +483,12 @@ def _result_payload(
     )
     payload = {
         "compare_mode": compare_mode,
-        "original_index": original.index,
-        "roundtrip_index": roundtrip.index,
-        "index_match": roundtrip.index == original.index,
-        "original_conf": original.conf,
-        "roundtrip_conf": roundtrip.conf,
-        "conf_match": roundtrip.conf == original.conf,
+        "original_index": _result_value(original, "index"),
+        "roundtrip_index": _result_value(roundtrip, "index"),
+        "index_match": _result_value(roundtrip, "index") == _result_value(original, "index"),
+        "original_conf": _result_value(original, "conf"),
+        "roundtrip_conf": _result_value(roundtrip, "conf"),
+        "conf_match": _result_value(roundtrip, "conf") == _result_value(original, "conf"),
         "compared_field_count": len(expected),
         "difference_count": len(differences) + truncated_count,
         "differences_truncated_count": truncated_count,
@@ -494,6 +537,9 @@ def run_poscar_roundtrip_batch(
     input_format = None
 
     for source_path in files:
+        case_start = time.perf_counter()
+        original_duration = None
+        roundtrip_duration = None
         processed_cases += 1
         case_id = _normalize_case_id(source_path)
         file_name = source_path.name
@@ -506,6 +552,7 @@ def run_poscar_roundtrip_batch(
         if not quiet:
             print(f"[{processed_cases}/{len(files)}] {case_id}")
         try:
+            original_start = time.perf_counter()
             original = find_spin_group(
                 str(source_path),
                 space_tol=space_tol,
@@ -513,6 +560,7 @@ def run_poscar_roundtrip_batch(
                 meigtol=meigtol,
                 matrix_tol=matrix_tol,
             )
+            original_duration = round(time.perf_counter() - original_start, 6)
             occupancy_annotation = _source_fractional_occupancy_annotation(original)
             if occupancy_annotation["source_has_fractional_occupancy"]:
                 fractional_occupancy_case_count += 1
@@ -524,9 +572,11 @@ def run_poscar_roundtrip_batch(
             if input_format is None:
                 input_format = record_input_format
 
+            roundtrip_start = time.perf_counter()
             roundtrip = _roundtrip_from_poscar_text(
                 source_name=source_name,
                 poscar_text=poscar_text,
+                compare_mode=compare_mode,
                 space_tol=space_tol,
                 mtol=mtol,
                 meigtol=meigtol,
@@ -534,6 +584,7 @@ def run_poscar_roundtrip_batch(
                 output_dir=output_root,
                 save_poscar=save_poscar,
             )
+            roundtrip_duration = round(time.perf_counter() - roundtrip_start, 6)
             payload, differences = _result_payload(
                 original,
                 roundtrip,
@@ -548,9 +599,12 @@ def run_poscar_roundtrip_batch(
                 "case_id": case_id,
                 "file_name": file_name,
                 "status": "ok" if not differences else "mismatch",
+                "duration_seconds": round(time.perf_counter() - case_start, 6),
+                "original_duration_seconds": original_duration,
+                "roundtrip_duration_seconds": roundtrip_duration,
                 "original": {
-                    "index": original.index,
-                    "conf": original.conf,
+                    "index": _result_value(original, "index"),
+                    "conf": _result_value(original, "conf"),
                 },
                 "roundtrip": payload,
             }
@@ -580,6 +634,9 @@ def run_poscar_roundtrip_batch(
                     "case_id": case_id,
                     "file_name": file_name,
                     "status": "error",
+                    "duration_seconds": round(time.perf_counter() - case_start, 6),
+                    "original_duration_seconds": original_duration,
+                    "roundtrip_duration_seconds": roundtrip_duration,
                     **occupancy_annotation,
                     "error": {
                         "type": type(exc).__name__,

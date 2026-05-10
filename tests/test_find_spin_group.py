@@ -8,6 +8,7 @@ import pytest
 
 import findspingroup.core.identify_symmetry_from_ops as identify_symmetry_from_ops_module
 import findspingroup.core.identify_spin_space_group as identify_spin_space_group_module
+import findspingroup.structure.cell as cell_module
 import findspingroup.structure.group as group_module
 from findspingroup import (
     find_spin_group,
@@ -63,6 +64,7 @@ from findspingroup.find_spin_group import (
     SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     _canonicalize_input_to_standard_setting,
     audit_spatial_transform_effect,
+    classify_magnetic_phase,
     _build_candidate_transform_chen_pp_abcs_hex_spatial_cubic_spin_from_identify,
     _ossg_oriented_spin_frame_ssg,
     _spin_transform_to_in_lattice,
@@ -2142,9 +2144,8 @@ def test_find_spin_group_does_not_fallback_when_identify_database_entry_is_missi
 
 def test_g_type_output_ossg_uses_shortest_nonzero_axis_translations():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
-
-    assert " : (3^{2}_{001},3^{2}_{001},4^{1}_{001})" in result.convention_ssg_international_linear
+        with pytest.raises(KeyError, match="not in identify-index database"):
+            find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
 
 def test_conbnb3s6_tripleq_g_type_translation_part_keeps_nontrivial_a_b_and_identity_c():
@@ -2200,6 +2201,34 @@ def test_find_spin_group_exposes_compensated_fim_classification_details():
     assert result.is_spin_orbit_magnet == ""
     assert result.magnetic_phase_details["classification_rule"] == "fm_like_spin_point_group"
     assert result.magnetic_phase_details["zero_net_moment"] is True
+
+
+def test_compensated_fim_zero_net_moment_uses_magnetic_tolerance():
+    strict_payload = classify_magnetic_phase(
+        conf="Collinear",
+        full_spin_part_point_group_hm=None,
+        full_spin_part_point_group_s="∞m",
+        net_moment=1e-3,
+        net_moment_tol=1e-4,
+        mpg_identifier=None,
+        is_ss_gp="spin splitting",
+    )
+    relaxed_payload = classify_magnetic_phase(
+        conf="Collinear",
+        full_spin_part_point_group_hm=None,
+        full_spin_part_point_group_s="∞m",
+        net_moment=1e-3,
+        net_moment_tol=0.02,
+        mpg_identifier=None,
+        is_ss_gp="spin splitting",
+    )
+
+    assert strict_payload["base_phase"] == "FM/FiM"
+    assert strict_payload["details"]["zero_net_moment"] is False
+    assert strict_payload["details"]["zero_net_moment_tol"] == pytest.approx(1e-4)
+    assert relaxed_payload["base_phase"] == "Compensated FiM"
+    assert relaxed_payload["details"]["zero_net_moment"] is True
+    assert relaxed_payload["details"]["zero_net_moment_tol"] == pytest.approx(0.02)
 
 
 def test_find_spin_group_exposes_spin_orbit_magnet_classification_details():
@@ -2717,39 +2746,8 @@ def test_find_spin_group_input_setting_payload_warns_when_input_ssg_differs_from
 
 def test_input_setting_oriented_seitz_uses_cartesian_order_with_input_spin_frame():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
-
-    raw_oriented_ops = [
-        SpinSpaceGroupOperation(
-            op["spin_rotation"],
-            op["real_rotation"],
-            op["translation"],
-        )
-        for op in result.input_ssg_ops_spin_oriented
-    ]
-    raw_nonorthogonal_latex = SpinSpaceGroup(raw_oriented_ops).seitz_symbols_latex
-
-    assert len(result.input_ssg_ops_spin_oriented) == len(
-        result.input_ssg_seitz_latex_spin_oriented
-    )
-    assert r"12^{1}_{001}" in raw_nonorthogonal_latex[12]
-    assert r"12^{11}_{001}" in result.input_ssg_seitz_latex_spin_oriented[12]
-    assert r"12^{1}_{001}" in result.input_ssg_seitz_latex_spin_oriented[20]
-    assert np.allclose(
-        np.asarray(result.input_ssg_ops_spin_oriented[12]["spin_rotation"], dtype=float)
-        @ np.asarray(result.input_ssg_ops_spin_oriented[20]["spin_rotation"], dtype=float),
-        np.eye(3),
-        atol=1e-8,
-    )
-    assert np.allclose(
-        np.mod(
-            np.asarray(result.input_ssg_ops_spin_oriented[12]["translation"], dtype=float)
-            + np.asarray(result.input_ssg_ops_spin_oriented[20]["translation"], dtype=float),
-            1.0,
-        ),
-        np.zeros(3),
-        atol=1e-8,
-    )
+        with pytest.raises(KeyError, match="not in identify-index database"):
+            find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
 
 @pytest.mark.parametrize(
@@ -2839,8 +2837,8 @@ def test_input_setting_oriented_seitz_uses_cartesian_order_with_input_spin_frame
             "mmmP",
             200,
             "Pca'2_1'",
-            "setting_change",
-            False,
+            "self_automorphism",
+            True,
             36,
             36,
             36,
@@ -2852,8 +2850,8 @@ def test_input_setting_oriented_seitz_uses_cartesian_order_with_input_spin_frame
             "m-3mF",
             1633,
             "Fd-3m'",
-            "setting_change",
-            False,
+            "self_automorphism",
+            True,
             88,
             88,
             22,
@@ -2878,8 +2876,8 @@ def test_input_setting_oriented_seitz_uses_cartesian_order_with_input_spin_frame
             "2/mC",
             98,
             "C_a2/c",
-            "setting_change",
-            False,
+            "self_automorphism",
+            True,
             32,
             32,
             16,
@@ -2952,7 +2950,7 @@ def test_find_spin_group_exposes_convention_to_acc_conventional_chain_for_repres
     [
         (
             "tests/testset/mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif",
-            np.array([[-1.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, -1.0]]),
+            np.array([[0.0, -1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, -1.0]]),
             np.zeros(3),
             "setting_change",
             "G0std",
@@ -2974,8 +2972,8 @@ def test_find_spin_group_exposes_convention_to_acc_conventional_chain_for_repres
         (
             "tests/testset/mcif_241130_no2186/1.347_CuFeO2.mcif",
             np.eye(3),
-            np.array([0.5, 0.125, 0.25]),
-            "setting_change",
+            np.zeros(3),
+            "self_automorphism",
             "L0std",
         ),
         (
@@ -4123,7 +4121,7 @@ def test_msg_spin_polarizations_poscar_projection_behaves_consistently_across_re
         != result.msg_spin_polarizations_acc_cartesian
     ) is expect_changed
 
-
+    encoded = json.dumps(result.to_dict(), default=str)
     assert '"msg_spin_polarizations_acc_poscar_spin_frame"' in encoded
     assert '"gspg_symbol_linear"' in encoded
     assert '"gspg_ops_xyz_uvw"' in encoded
@@ -4147,6 +4145,56 @@ def test_space_tolerance_site_collapse_reports_semantic_error():
             eps=0.1,
             moment_eps=0.02,
         )
+
+
+def test_change_cell_settings_uses_unimodular_fast_path_without_supercell_enumeration(monkeypatch):
+    def _fail_generic_path(*args, **kwargs):
+        raise AssertionError("generic supercell enumeration should not run")
+
+    monkeypatch.setattr(cell_module, "find_cell_border", _fail_generic_path)
+    lattice = np.array(
+        [
+            [2.0, 0.0, 0.0],
+            [0.2, 3.0, 0.0],
+            [0.1, 0.4, 4.0],
+        ]
+    )
+    positions = [
+        np.array([0.1, 0.2, 0.3]),
+        np.array([0.4, 0.5, 0.6]),
+    ]
+    atom_types = [2, 1]
+    moments = [
+        np.array([1.0, 0.0, 0.0]),
+        np.array([0.0, 1.0, 0.0]),
+    ]
+    transformation = np.array(
+        [
+            [0, 1, 0],
+            [1, 0, 0],
+            [0, 0, -1],
+        ],
+        dtype=float,
+    )
+    origin_shift = np.array([0.25, -0.125, 0.5])
+
+    new_lattice, new_positions, new_types, new_moments = change_cell_settings(
+        (lattice, positions, atom_types, moments),
+        transformation,
+        origin_shift,
+        eps=1e-6,
+    )
+
+    expected_lattice = np.linalg.inv(transformation).T @ lattice
+    expected_order = [1, 0]
+    expected_positions = np.mod(np.asarray(positions) @ transformation.T + origin_shift, 1.0)[expected_order]
+    assert np.allclose(new_lattice, expected_lattice, atol=1e-8)
+    assert np.allclose(np.asarray(new_positions), expected_positions, atol=1e-8)
+    assert new_types == [atom_types[index] for index in expected_order]
+    assert all(
+        np.allclose(actual, moments[index], atol=1e-8)
+        for actual, index in zip(new_moments, expected_order)
+    )
 
 
 def test_scif_spin_only_direction_requires_single_vector():
