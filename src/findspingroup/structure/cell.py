@@ -1,4 +1,5 @@
 import copy
+import itertools
 import math
 from dataclasses import dataclass, field
 from typing import List, Tuple, Optional, Dict
@@ -280,9 +281,119 @@ def _fractional_neighbor_keys(bucket_key, bins: int, neighbor_radius: int):
                 )
 
 
+def _as_integer_unimodular_matrix(matrix, *, tol: float):
+    matrix = np.asarray(matrix, dtype=float)
+    if matrix.shape != (3, 3):
+        return None
+    rounded = np.rint(matrix).astype(int)
+    if not np.allclose(matrix, rounded, atol=tol, rtol=0.0):
+        return None
+    rounded_det = round(np.linalg.det(rounded))
+    if abs(rounded_det) != 1:
+        return None
+    if not np.isclose(np.linalg.det(matrix), rounded_det, atol=tol, rtol=0.0):
+        return None
+    return rounded
 
 
-import itertools
+def _fractional_positions_unique_by_type(positions, types, *, eps: float):
+    bins, neighbor_radius = _fractional_bucket_params(eps)
+    position_buckets: dict[tuple, list[np.ndarray]] = {}
+    for position, atom_type in zip(positions, types):
+        wrapped = np.mod(np.asarray(position, dtype=float), 1.0)
+        bucket_key = _fractional_bucket_key(wrapped, bins)
+        for neighbor_key in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius):
+            for existing in position_buckets.get((atom_type, neighbor_key), ()):
+                if getNormInf(wrapped, existing) < eps:
+                    return False
+        position_buckets.setdefault((atom_type, bucket_key), []).append(wrapped)
+    return True
+
+
+def _change_cell_settings_unimodular_fast_path(
+    old_cell,
+    transformation_matrix,
+    origin_shift,
+    mag,
+    *,
+    eps: float,
+    moment_eps: float,
+):
+    integer_transformation = _as_integer_unimodular_matrix(transformation_matrix, tol=max(eps, 1e-10))
+    if integer_transformation is None:
+        return None
+
+    old_positions = np.asarray(old_cell[1], dtype=float)
+    old_types = list(old_cell[2])
+    if not _fractional_positions_unique_by_type(old_positions, old_types, eps=eps):
+        return None
+
+    transformation = integer_transformation.astype(float)
+    origin_shift = np.asarray(origin_shift, dtype=float)
+    inverse_transformation = np.linalg.inv(transformation)
+    new_cell_lattice = np.linalg.inv(transformation).T @ np.asarray(old_cell[0], dtype=float)
+    direct_positions = old_positions @ transformation.T + origin_shift
+    old_moments = [np.asarray(item, dtype=float) for item in mag]
+    candidate_entries = []
+    for atom_index, direct_position in enumerate(direct_positions):
+        offset_options = []
+        for component in direct_position:
+            base = math.floor(-float(component))
+            component_offsets = []
+            for offset in range(base - 2, base + 4):
+                shifted = float(component) + offset
+                if -eps < shifted < 1.0 + eps:
+                    component_offsets.append(offset)
+            if not component_offsets:
+                return None
+            offset_options.append(component_offsets)
+
+        for offset in itertools.product(*offset_options):
+            offset = np.asarray(offset, dtype=float)
+            shift = offset @ inverse_transformation
+            rounded_shift = np.rint(shift).astype(int)
+            if not np.allclose(shift, rounded_shift, atol=max(eps, 1e-10), rtol=0.0):
+                continue
+            candidate_entries.append(
+                (
+                    tuple(int(value) for value in rounded_shift),
+                    atom_index,
+                    direct_position + offset,
+                )
+            )
+    if not candidate_entries:
+        return None
+
+    candidate_entries.sort(key=lambda item: (item[0], item[1]))
+    new_cell_positions = []
+    new_cell_types = []
+    new_cell_moments = []
+    bins, neighbor_radius = _fractional_bucket_params(eps)
+    position_buckets: dict[tuple, list[int]] = {}
+    for _shift, atom_index, position in candidate_entries:
+        atom_type = old_types[atom_index]
+        bucket_key = _fractional_bucket_key(position, bins)
+        duplicate_index = None
+        for neighbor_key in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius):
+            for candidate_index in position_buckets.get((atom_type, neighbor_key), ()):
+                if getNormInf(position, new_cell_positions[candidate_index]) < eps:
+                    duplicate_index = candidate_index
+                    break
+            if duplicate_index is not None:
+                break
+        if duplicate_index is not None:
+            if _moment_distance(old_moments[atom_index], new_cell_moments[duplicate_index]) > moment_eps:
+                return None
+            continue
+        new_cell_positions.append(normalize_vector_to_zero(position, atol=1e-8))
+        new_cell_types.append(atom_type)
+        new_cell_moments.append(old_moments[atom_index])
+        position_buckets.setdefault((atom_type, bucket_key), []).append(len(new_cell_positions) - 1)
+
+    if len(new_cell_positions) != len(old_positions):
+        return None
+    return new_cell_lattice, new_cell_positions, new_cell_types, new_cell_moments
+
 
 
 def find_cell_border(a, b, c):
@@ -348,18 +459,27 @@ def change_cell_settings(old_cell, transformation_matrix, origin_shift, eps=0.00
     return new_cell -> [lattice,positions,types,moments]
     """
 
-    # temporary fix
-    transformation_matrix = np.linalg.inv(transformation_matrix)
-    origin_shift = - transformation_matrix @ origin_shift
-
-
-
     if len(old_cell) == 3:
         mag = np.array([[0,0,0]]*len(old_cell[1]))
     elif len(old_cell) == 4:
         mag = [np.array(i)for i in copy.deepcopy(old_cell[3])]
     else:
         raise ValueError("old_cell should be a tuple of (lattice,positions,types) or (lattice,positions,types,moments)")
+
+    fast_result = _change_cell_settings_unimodular_fast_path(
+        old_cell,
+        transformation_matrix,
+        origin_shift,
+        mag,
+        eps=eps,
+        moment_eps=moment_eps,
+    )
+    if fast_result is not None:
+        return fast_result
+
+    # temporary fix
+    transformation_matrix = np.linalg.inv(transformation_matrix)
+    origin_shift = - transformation_matrix @ origin_shift
 
     #1.generate the temp cell that includes the new cell
     if abs(np.linalg.det(transformation_matrix)) < 0.001:

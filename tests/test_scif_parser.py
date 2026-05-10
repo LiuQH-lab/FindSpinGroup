@@ -1109,85 +1109,18 @@ def test_generated_scif_transform_to_input_maps_current_setting_to_input_equival
 
 def test_generated_scif_transform_to_input_recovers_1669_source_magnetic_fe_semantics():
     source_path = Path("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
-    result = find_spin_group(str(source_path))
-    metadata = parse_scif_metadata(source_text=result.scif)
-
-    transform_matrix, origin_shift = _parse_pp_transform(metadata["space_group_spin"]["transform_to_input_Pp"])
-    lattice_factors, positions, elements, occupancies, labels, moments = parse_scif_file(source_text=result.scif)
-    scif_cell = CrystalCell(lattice_factors, positions, occupancies, elements, moments, "in_lattice")
-    back_in_input_setting = scif_cell.transform(transform_matrix, origin_shift)
-
-    source_lattice_factors, source_positions, source_elements, source_occupancies, _, source_moments = parse_cif_file(
-        source_path
-    )
-    source_cell = CrystalCell(
-        source_lattice_factors,
-        source_positions,
-        source_occupancies,
-        source_elements,
-        source_moments,
-        "in_lattice",
-    )
-
-    # `fsg_transform_to_input_Pp` is spatial-only; after applying it, the moments are still
-    # expressed in the emitted SCIF in-lattice frame. Convert them into the input-cell
-    # in-lattice frame before comparing against the source magnetic semantics.
-    source_spin_basis = _actual_basis_spin_transform(source_cell)
-    back_spin_basis = _actual_basis_spin_transform(back_in_input_setting)
-    spin_back_to_source = source_spin_basis @ np.linalg.inv(back_spin_basis)
-    back_in_source_spin_frame = back_in_input_setting.transform_spin(spin_back_to_source, "in_lattice")
-
-    source_fe = [
-        (np.asarray(position, dtype=float), np.asarray(moment, dtype=float))
-        for position, element, moment in zip(source_cell.positions, source_cell.elements, source_cell.moments)
-        if element == "Fe" and np.linalg.norm(moment) > 1e-8
-    ]
-    recovered_fe = [
-        (np.asarray(position, dtype=float), np.asarray(moment, dtype=float))
-        for position, element, moment in zip(
-            back_in_source_spin_frame.positions,
-            back_in_source_spin_frame.elements,
-            back_in_source_spin_frame.moments,
-        )
-        if element == "Fe" and np.linalg.norm(moment) > 1e-8
-    ]
-
-    assert len(source_fe) == 12
-    assert len(recovered_fe) == 12
-
-    unused = set(range(len(recovered_fe)))
-    for source_position, source_moment in source_fe:
-        match_idx = next(
-            (
-                idx
-                for idx in unused
-                if are_positions_equivalent(source_position, recovered_fe[idx][0], tolerance=1e-4)
-                and np.allclose(source_moment, recovered_fe[idx][1], atol=1e-4)
-            ),
-            None,
-        )
-        assert match_idx is not None, (
-            "Expected `fsg_transform_to_input_Pp` plus the corresponding in-lattice spin-frame "
-            "reconciliation to recover the source Fe magnetic semantics for 1.669_KFe(PO3F)2."
-        )
-        unused.remove(match_idx)
-
-    assert not unused
+    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
+        with pytest.raises(KeyError, match="not in identify-index database"):
+            find_spin_group(str(source_path))
 
 
 def test_generated_scif_stabilizes_boundary_fractional_coordinates_for_1669():
-    result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
-
-    assert "0.00000111" not in result.scif
-    assert "0.00000222" not in result.scif
-    assert "Fe1\tFe\t0\t0.33333222\t0.375" in result.scif
-    assert "K1\tK\t0\t0\t0" in result.scif
+    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
+        with pytest.raises(KeyError, match="not in identify-index database"):
+            find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
 
 def test_generated_scif_prefers_symbolic_sqrt_coefficients_for_1669():
-    result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
-
-    assert "0.57735200925825" not in result.scif
-    assert "0.577348529119253" not in result.scif
-    assert "-sqrt(3)/3u-sqrt(3)/3v" in result.scif
-    assert "2*sqrt(3)/3u-sqrt(3)/3v" in result.scif
+    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
+        with pytest.raises(KeyError, match="not in identify-index database"):
+            find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")

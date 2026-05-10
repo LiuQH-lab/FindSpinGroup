@@ -390,6 +390,54 @@ def test_run_poscar_roundtrip_batch_supports_g0_cptrans_candidate_source_mode(mo
     assert "# MAGMOM=" in captured["poscar_text"]
 
 
+def test_poscar_roundtrip_basic_compare_uses_full_roundtrip_route(monkeypatch, tmp_path):
+    calls = {"full": 0}
+
+    monkeypatch.setattr(
+        batch_poscar_roundtrip,
+        "parse_poscar_file",
+        lambda path: (
+            [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+            [[0.0, 0.0, 0.0]],
+            ["Fe"],
+            [1.0],
+            ["Fe1"],
+            [[1.0, 0.0, 0.0]],
+        ),
+    )
+
+    def _full_from_data(*args, **kwargs):
+        calls["full"] += 1
+        return type(
+            "RoundtripResult",
+            (),
+            {
+                "index": "1.1.1.1",
+                "conf": "Collinear",
+                "G0_symbol": "P1",
+                "G0_num": 1,
+                "gspg_effective_mpg_symbol": "1",
+            },
+        )()
+
+    monkeypatch.setattr(batch_poscar_roundtrip, "find_spin_group_from_data", _full_from_data)
+
+    result = batch_poscar_roundtrip._roundtrip_from_poscar_text(
+        source_name="case.POSCAR",
+        poscar_text="fake poscar\n",
+        compare_mode=batch_poscar_roundtrip.COMPARE_MODE_BASIC,
+        space_tol=0.02,
+        mtol=0.02,
+        meigtol=0.00002,
+        matrix_tol=0.01,
+        output_dir=tmp_path,
+        save_poscar=False,
+    )
+
+    assert calls == {"full": 1}
+    assert batch_poscar_roundtrip._basic_compare_payload(result, compare_conf=True)["index"] == "1.1.1.1"
+
+
 def test_run_mcif_batch_writes_baseline_meta_and_export_txt(tmp_path):
     files = [(PROJECT_ROOT / MANIFEST_ENTRIES[0]).resolve()]
 
