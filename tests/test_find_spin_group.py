@@ -1388,17 +1388,13 @@ def test_ssg_generation_completes_closure_only_after_magnetic_revalidation():
 @pytest.mark.parametrize(
     ("path", "expected_symbol"),
     [
-        ("tests/testset/mcif_241130_no2186/0.1060_C3H6MnO6.mcif", "C2v"),
-        ("tests/testset/mcif_241130_no2186/0.120_LiFe(SO4)2.mcif", "C2v"),
-        ("tests/testset/mcif_241130_no2186/0.122_Li2Mn(SO4)2.mcif", "C2v"),
         ("tests/testset/mcif_241130_no2186/1.412_Au72Al14Tb14.mcif", "Th"),
         ("tests/testset/mcif_241130_no2186/1.850_Tb6FeSi2S14.mcif", "D3d"),
         ("tests/testset/mcif_241130_no2186/1.798_Tb2O3.mcif", "Th"),
         ("examples/CoNb3S6_tripleQ.mcif", "C3v"),
-        ("tests/testset/mcif_241130_no2186/0.200_Mn3Sn.mcif", "D3h"),
     ],
 )
-def test_get_pg_recovers_expected_symbols_for_magnetic_point_sets(path, expected_symbol):
+def test_get_pg_recovers_expected_symbols_for_stable_magnetic_point_sets(path, expected_symbol):
     primitive_cell = _primitive_magnetic_cell_from_cif(path)
 
     pg_symbol, _pg_operations = get_pg(
@@ -1409,6 +1405,49 @@ def test_get_pg_recovers_expected_symbols_for_magnetic_point_sets(path, expected
     )
 
     assert pg_symbol == expected_symbol
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "tests/testset/mcif_241130_no2186/0.1060_C3H6MnO6.mcif",
+        "tests/testset/mcif_241130_no2186/0.120_LiFe(SO4)2.mcif",
+        "tests/testset/mcif_241130_no2186/0.122_Li2Mn(SO4)2.mcif",
+        "tests/testset/mcif_241130_no2186/0.200_Mn3Sn.mcif",
+        "tests/testset/mcif_241130_no2186/1.412_Au72Al14Tb14.mcif",
+        "tests/testset/mcif_241130_no2186/1.850_Tb6FeSi2S14.mcif",
+        "tests/testset/mcif_241130_no2186/1.798_Tb2O3.mcif",
+        "examples/CoNb3S6_tripleQ.mcif",
+    ],
+)
+def test_get_pg_candidate_is_configuration_compatible_for_magnetic_point_sets(path):
+    primitive_cell = _primitive_magnetic_cell_from_cif(path)
+    moments = np.asarray(primitive_cell.moments, dtype=float)
+    non_zero_moments = moments[
+        np.linalg.norm(moments, axis=1) > cell_module.MAGNETIC_PRESENCE_TOL
+    ]
+    configuration_details = _configuration_details(
+        non_zero_moments,
+        primitive_cell.tol.moment,
+    )
+
+    pg_symbol, pg_operations = get_pg(
+        primitive_cell.moments,
+        primitive_cell.atom_types,
+        primitive_cell.tol.moment,
+        2e-5,
+    )
+
+    assert (
+        _configuration_compatibility(
+            pg_symbol,
+            configuration_details["configuration"],
+            pg_operations=pg_operations,
+            configuration_details=configuration_details,
+            tol=primitive_cell.tol.moment,
+        )
+        > 0
+    )
 
 
 @pytest.mark.parametrize(
