@@ -1,0 +1,61 @@
+# generated using pymatgen
+data_Cr3Te4
+_symmetry_space_group_name_H-M   'P 1'
+_cell_length_a   7.01020931
+_cell_length_b   7.00983216
+_cell_length_c   39.24534165
+_cell_angle_alpha   90.00000000
+_cell_angle_beta   90.00000000
+_cell_angle_gamma   60.00177964
+_symmetry_Int_Tables_number   1
+_chemical_formula_structural   Cr3Te4
+_chemical_formula_sum   'Cr9 Te12'
+_cell_volume   1670.18715212
+_cell_formula_units_Z   3
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  Cr  Cr0  1  0.00000000  0.00000000  0.50000000  1.0
+  Cr  Cr1  1  0.66666667  0.66666667  0.50000000  1.0
+  Cr  Cr2  1  0.33333333  0.33333333  0.50000000  1.0
+  Cr  Cr3  1  0.33333333  0.33401700  0.41526400  1.0
+  Cr  Cr4  1  0.00000000  0.00068400  0.41526400  1.0
+  Cr  Cr5  1  0.66666667  0.66735000  0.41526400  1.0
+  Cr  Cr6  1  0.00000000  0.99931600  0.58473600  1.0
+  Cr  Cr7  1  0.66666667  0.66598300  0.58473600  1.0
+  Cr  Cr8  1  0.33333333  0.33265000  0.58473600  1.0
+  Te  Te9  1  0.33333333  0.66599600  0.62139200  1.0
+  Te  Te10  1  0.00000000  0.33266300  0.62139200  1.0
+  Te  Te11  1  0.66666667  0.99933000  0.62139200  1.0
+  Te  Te12  1  0.33333333  0.66712700  0.45796000  1.0
+  Te  Te13  1  0.00000000  0.33379400  0.45796000  1.0
+  Te  Te14  1  0.66666667  0.00046000  0.45796000  1.0
+  Te  Te15  1  0.00000000  0.66733700  0.37860800  1.0
+  Te  Te16  1  0.66666667  0.33400400  0.37860800  1.0
+  Te  Te17  1  0.33333333  0.00067000  0.37860800  1.0
+  Te  Te18  1  0.00000000  0.66620600  0.54204000  1.0
+  Te  Te19  1  0.66666667  0.33287300  0.54204000  1.0
+  Te  Te20  1  0.33333333  0.99954000  0.54204000  1.0
+loop_
+ _atom_site_moment_label
+ _atom_site_moment_crystalaxis_x
+ _atom_site_moment_crystalaxis_y
+ _atom_site_moment_crystalaxis_z
+  Cr0  -2.17961819  -2.17888084  0.00000000
+  Cr1  4.35838181  -2.17888084  0.00000000
+  Cr2  -2.17934093  4.35891637  0.00000000
+  Cr3  -1.91031500  3.82083556  0.00000000
+  Cr4  -1.90955384  -1.91099512  -0.00100000
+  Cr5  3.82044616  -1.91099512  0.00000000
+  Cr6  -1.91013115  -1.90984044  0.00000000
+  Cr7  3.82086885  -1.90984044  -0.00100000
+  Cr8  -1.91031500  3.82083556  -0.00100000

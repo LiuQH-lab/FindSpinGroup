@@ -37,6 +37,8 @@ MTOL="${MTOL:-0.02}"
 MEIGTOL="${MEIGTOL:-0.00002}"
 MATRIX_TOL="${MATRIX_TOL:-0.01}"
 BATCH_ROUTE="${BATCH_ROUTE:-full}"
+CALCULATION_MODE="${CALCULATION_MODE:-auto}"
+VACUUM_AXIS="${VACUUM_AXIS:-}"
 EXPORT_RUNTIME_ROWS="${EXPORT_RUNTIME_ROWS:-1}"
 EXPORT_ROWS_JSONL_NAME="${EXPORT_ROWS_JSONL_NAME:-export_rows.jsonl}"
 EXPORT_ROWS_XLSX_NAME="${EXPORT_ROWS_XLSX_NAME:-export_rows.xlsx}"
@@ -93,6 +95,8 @@ CMD=(
   "$MATRIX_TOL"
   --route
   "$BATCH_ROUTE"
+  --calculation-mode
+  "$CALCULATION_MODE"
   --shard-index
   "$SHARD_INDEX"
   --shard-count
@@ -103,6 +107,13 @@ if [[ -n "$LIMIT" ]]; then
   CMD+=(
     --limit
     "$LIMIT"
+  )
+fi
+
+if [[ -n "$VACUUM_AXIS" ]]; then
+  CMD+=(
+    --vacuum-axis
+    "$VACUUM_AXIS"
   )
 fi
 
@@ -152,6 +163,12 @@ else
 fi
 echo "Tolerances  : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRIX_TOL"
 echo "Batch route : $BATCH_ROUTE"
+echo "Calculation mode: $CALCULATION_MODE"
+if [[ -n "$VACUUM_AXIS" ]]; then
+  echo "Vacuum axis : $VACUUM_AXIS"
+else
+  echo "Vacuum axis : <auto>"
+fi
 echo "Shard       : $SHARD_INDEX / $SHARD_COUNT"
 if [[ -n "$LIMIT" ]]; then
   echo "Limit       : $LIMIT"

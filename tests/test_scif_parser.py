@@ -18,7 +18,13 @@ from findspingroup.find_spin_group import (
 )
 from findspingroup.core import Molecule, PointGroupAnalyzer
 from findspingroup.core.identify_spin_space_group import dedup_moments_with_tol
-from findspingroup.io import parse_cif_file, parse_scif_file, parse_scif_metadata, parse_scif_text
+from findspingroup.io import (
+    parse_cif_file,
+    parse_cif_metadata,
+    parse_scif_file,
+    parse_scif_metadata,
+    parse_scif_text,
+)
 from findspingroup.io.scif_generator import (
     _parse_solver_component_expression,
     _parse_solver_numeric_token,
@@ -806,6 +812,55 @@ _space_group_spin.transform_spinframe_P_abc 'a,b,c'
     assert metadata["space_group_spin"]["rotation_axis_xyz"]["numeric_components"] == [0.0, 0.0, 1.0]
     assert metadata["space_group_spin"]["rotation_axis_cartn"]["numeric_components"] == [0.0, 0.0, 1.0]
     assert metadata["space_group_spin"]["transform_spinframe_P_abc"] == "a,b,c"
+
+
+def test_parse_scif_metadata_reads_quasi2d_repo_local_fields(tmp_path):
+    scif_text = """#\\#CIF_2.0
+data_test
+_space_group_spin.fsg_calculation_mode "quasi2d"
+_space_group_spin.fsg_dimension "2d"
+_space_group_spin.fsg_vacuum_axis_input "c"
+_space_group_spin.fsg_vacuum_axis_source "explicit"
+_space_group_spin.fsg_spin_splitting_2d "spin splitting"
+_space_group_spin.fsg_spin_splitting_2d_interpretation "in_plane_k_dependent"
+"""
+    scif_path = Path(tmp_path) / "quasi2d_metadata.scif"
+    scif_path.write_text(scif_text, encoding="utf-8")
+
+    metadata = parse_scif_metadata(scif_path)
+
+    assert metadata["space_group_spin"]["calculation_mode"] == "quasi2d"
+    assert metadata["space_group_spin"]["dimension"] == "2d"
+    assert metadata["space_group_spin"]["vacuum_axis_input"] == "c"
+    assert metadata["space_group_spin"]["vacuum_axis_source"] == "explicit"
+    assert metadata["space_group_spin"]["spin_splitting_2d"] == "spin splitting"
+    assert metadata["space_group_spin"]["spin_splitting_2d_interpretation"] == "in_plane_k_dependent"
+    assert metadata["space_group_spin"]["repo_local_extensions"]["dimension"] == "2d"
+    assert metadata["space_group_spin"]["repo_local_extensions"]["calculation_mode"] == "quasi2d"
+
+
+def test_parse_cif_metadata_reads_quasi2d_calculation_mode_fields(tmp_path):
+    cif_text = """data_test
+_cell_length_a 1
+_cell_length_b 1
+_cell_length_c 10
+_cell_angle_alpha 90
+_cell_angle_beta 90
+_cell_angle_gamma 90
+_space_group_spin.fsg_calculation_mode "quasi2d"
+_space_group_spin.fsg_vacuum_axis_input "c"
+"""
+    cif_path = Path(tmp_path) / "quasi2d_input.mcif"
+    cif_path.write_text(cif_text, encoding="utf-8")
+
+    metadata = parse_cif_metadata(cif_path)
+
+    assert metadata["space_group_spin"]["calculation_mode"] == "quasi2d"
+    assert metadata["space_group_spin"]["vacuum_axis_input"] == "c"
+    assert metadata["space_group_spin"]["repo_local_extensions"]["calculation_mode"] == "quasi2d"
+    assert metadata["space_group_spin"]["source_tags"]["calculation_mode"] == (
+        "_space_group_spin.fsg_calculation_mode"
+    )
 
 
 def test_parse_scif_metadata_reads_symbolic_spin_vectors(tmp_path):

@@ -1,0 +1,55 @@
+# generated using pymatgen
+data_Mn(BiTe2)2
+_symmetry_space_group_name_H-M   'P 1'
+_cell_length_a   7.58125693
+_cell_length_b   7.58125693
+_cell_length_c   40.90668598
+_cell_angle_alpha   90.00000000
+_cell_angle_beta   90.00000000
+_cell_angle_gamma   60.00000000
+_symmetry_Int_Tables_number   1
+_chemical_formula_structural   Mn(BiTe2)2
+_chemical_formula_sum   'Mn3 Bi6 Te12'
+_cell_volume   2036.13870275
+_cell_formula_units_Z   3
+loop_
+ _symmetry_equiv_pos_site_id
+ _symmetry_equiv_pos_as_xyz
+  1  'x, y, z'
+loop_
+ _atom_site_type_symbol
+ _atom_site_label
+ _atom_site_symmetry_multiplicity
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+  Mn  Mn0  1  0.00000000  0.00000000  0.50000000  1.0
+  Mn  Mn1  1  0.66666667  0.66666667  0.50000000  1.0
+  Mn  Mn2  1  0.33333333  0.33333333  0.50000000  1.0
+  Bi  Bi3  1  0.33333333  0.66666667  0.59140800  1.0
+  Bi  Bi4  1  0.00000000  0.33333333  0.59140800  1.0
+  Bi  Bi5  1  0.66666667  0.00000000  0.59140800  1.0
+  Bi  Bi6  1  0.00000000  0.66666667  0.40859200  1.0
+  Bi  Bi7  1  0.66666667  0.33333333  0.40859200  1.0
+  Bi  Bi8  1  0.33333333  0.00000000  0.40859200  1.0
+  Te  Te9  1  0.00000000  0.00000000  0.63363100  1.0
+  Te  Te10  1  0.66666667  0.66666667  0.63363100  1.0
+  Te  Te11  1  0.33333333  0.33333333  0.63363100  1.0
+  Te  Te12  1  0.00000000  0.00000000  0.36636900  1.0
+  Te  Te13  1  0.66666667  0.66666667  0.36636900  1.0
+  Te  Te14  1  0.33333333  0.33333333  0.36636900  1.0
+  Te  Te15  1  0.33333333  0.66666667  0.46095500  1.0
+  Te  Te16  1  0.00000000  0.33333333  0.46095500  1.0
+  Te  Te17  1  0.66666667  0.00000000  0.46095500  1.0
+  Te  Te18  1  0.00000000  0.66666667  0.53904500  1.0
+  Te  Te19  1  0.66666667  0.33333333  0.53904500  1.0
+  Te  Te20  1  0.33333333  0.00000000  0.53904500  1.0
+loop_
+ _atom_site_moment_label
+ _atom_site_moment_crystalaxis_x
+ _atom_site_moment_crystalaxis_y
+ _atom_site_moment_crystalaxis_z
+  Mn0  -2.62568284  -2.62463432  0.00000000
+  Mn1  5.25031716  -2.62463432  0.00000000
+  Mn2  -2.62521167  5.25042335  0.00000000

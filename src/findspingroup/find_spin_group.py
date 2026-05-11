@@ -35,6 +35,7 @@ from findspingroup.io.scif_generator import (
     affine_matrix_to_xyz_expression,
     generate_scif,
 )
+from findspingroup.quasi2d import build_quasi2d_diagnostics
 from findspingroup.structure import SpinSpaceGroup,SpinSpaceGroupOperation
 from findspingroup.structure.group import integer_points_in_new_cell, op_key, _resolve_point_group_info
 from findspingroup.structure.cell import (
@@ -1019,6 +1020,13 @@ class MagSymmetryResult:
             'spin_polarizations_acc_poscar_spin_frame_setting',
             ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING,
         )
+        self.quasi_2d = symmetry.get('quasi_2d', None)
+        self.spin_splitting_2d_interpretation = symmetry.get(
+            'spin_splitting_2d_interpretation',
+            None,
+        )
+        self.spin_splitting_2d = symmetry.get('spin_splitting_2d', None)
+        self.is_alter_2d = symmetry.get('is_alter_2d', None)
 
 
         self.input_magnetic_primitive_ssg_ops = symmetry.get('input_magnetic_primitive_ssg_ops', None)
@@ -2507,6 +2515,33 @@ def _fixed_b_ac_unimodular_column_transforms(
     return tuple(sorted(transforms, key=sort_key))
 
 
+@lru_cache(maxsize=4)
+def _unrestricted_unimodular_column_transforms(
+    max_entry: int,
+) -> tuple[tuple[tuple[int, ...], tuple[tuple[int, ...], ...]], ...]:
+    transforms: list[tuple[tuple[int, ...], tuple[tuple[int, ...], ...]]] = []
+    for values in product(range(-max_entry, max_entry + 1), repeat=9):
+        matrix = np.asarray(values, dtype=int).reshape(3, 3)
+        determinant = round(float(np.linalg.det(matrix)))
+        if determinant != 1 or not np.isclose(np.linalg.det(matrix), 1.0):
+            continue
+        transforms.append((values, tuple(tuple(int(v) for v in row) for row in matrix)))
+
+    def sort_key(
+        item: tuple[tuple[int, ...], tuple[tuple[int, ...], ...]]
+    ) -> tuple[int, int, int, tuple[int, ...]]:
+        values, matrix = item
+        identity_rank = 0 if matrix == ((1, 0, 0), (0, 1, 0), (0, 0, 1)) else 1
+        return (
+            identity_rank,
+            max(abs(value) for value in values),
+            sum(abs(value) for value in values),
+            values,
+        )
+
+    return tuple(sorted(transforms, key=sort_key))
+
+
 def _append_monoclinic_ac_column_reduction_candidates(
     candidates: list[tuple[str, tuple[np.ndarray, np.ndarray]]],
     seen: set[tuple[tuple[int, ...], tuple[int, ...]]],
@@ -2621,6 +2656,147 @@ def _append_monoclinic_ac_column_reduction_candidates(
                     return
 
 
+def _append_triclinic_column_reduction_candidates(
+    candidates: list[tuple[str, tuple[np.ndarray, np.ndarray]]],
+    seen: set[tuple[tuple[int, ...], tuple[int, ...]]],
+    standard_setting: str,
+    ssg_primitive: SpinSpaceGroup,
+    base_transform: tuple[np.ndarray, np.ndarray],
+    identify_info: str,
+    identify_index_details: dict | None,
+    *,
+    tol: float,
+) -> None:
+    """Reduce a triclinic no-fraction supercell with unrestricted GL(3,Z).
+
+    Triclinic G0 has no unique axis convention to preserve.  When the selected
+    convention-to-ACC P matrix and the primitive-to-convention transform compose
+    to an index-n supercell, search full orientation-preserving unimodular
+    column changes for a reducible column.  The resulting candidates are still
+    validated later as paired cell+SSG transforms.
+    """
+    try:
+        G0_num = int(ssg_primitive.G0_num)
+    except (TypeError, ValueError):
+        return
+    if G0_num not in {1, 2}:
+        return
+
+    transform_database_to_current = _identify_space_group_setting_transform(
+        identify_index_details
+    )
+    if transform_database_to_current is None:
+        return
+
+    try:
+        transform_current_to_database = _invert_setting_transform(
+            transform_database_to_current[0],
+            transform_database_to_current[1],
+        )
+        transform_primitive_to_database = _chain_setting_transform(
+            base_transform[0],
+            base_transform[1],
+            transform_current_to_database[0],
+            transform_current_to_database[1],
+        )
+        transform_database_to_acc = _acc_aligned_convention_to_primitive_transform(
+            identify_info
+        )
+    except (KeyError, np.linalg.LinAlgError, ValueError):
+        return
+
+    determinant_factor = _reciprocal_integer_determinant_factor(
+        transform_database_to_acc[0] @ transform_primitive_to_database[0],
+        tol=tol,
+    )
+    if determinant_factor is None:
+        return
+
+    try:
+        basis_primitive_to_database = np.linalg.inv(
+            np.asarray(transform_primitive_to_database[0], dtype=float)
+        )
+    except np.linalg.LinAlgError:
+        return
+    basis_integer = np.rint(basis_primitive_to_database).astype(int)
+    if not np.allclose(basis_primitive_to_database, basis_integer, atol=max(tol, 1e-8)):
+        return
+
+    origin_database = np.asarray(transform_primitive_to_database[1], dtype=float)
+    raw_candidates: list[
+        tuple[
+            tuple[int, int, int, int, tuple[int, ...], int],
+            tuple[str, tuple[np.ndarray, np.ndarray]],
+        ]
+    ] = []
+    for values, matrix_tuple in _unrestricted_unimodular_column_transforms(2):
+        column_change = np.asarray(matrix_tuple, dtype=int)
+        changed_basis = basis_integer @ column_change
+        for column_index in range(3):
+            if np.any(changed_basis[:, column_index] % determinant_factor != 0):
+                continue
+            reduced_basis = changed_basis.astype(float)
+            reduced_basis[:, column_index] /= float(determinant_factor)
+            determinant = abs(float(np.linalg.det(reduced_basis)))
+            if not np.isclose(determinant, 1.0, atol=max(tol, 1e-8), rtol=0):
+                continue
+            try:
+                candidate_matrix = np.linalg.inv(reduced_basis)
+            except np.linalg.LinAlgError:
+                continue
+            if not np.isclose(
+                abs(float(np.linalg.det(transform_database_to_acc[0] @ candidate_matrix))),
+                1.0,
+                atol=max(tol, 1e-8),
+                rtol=0,
+            ):
+                continue
+            candidate_origin_shift = normalize_vector_to_zero(
+                candidate_matrix @ basis_integer.astype(float) @ origin_database,
+                atol=1e-10,
+            )
+            reduced_basis_integer = np.rint(reduced_basis).astype(int)
+            candidate_matrix_integer = np.rint(candidate_matrix).astype(int)
+            raw_candidates.append(
+                (
+                    (
+                        int(np.max(np.abs(reduced_basis_integer))),
+                        int(np.sum(np.abs(reduced_basis_integer))),
+                        int(np.max(np.abs(candidate_matrix_integer))),
+                        int(np.sum(np.abs(candidate_matrix_integer))),
+                        values,
+                        column_index,
+                    ),
+                    (
+                        (
+                            "triclinic_column_reduce:"
+                            f"setting={standard_setting};"
+                            f"det_factor={determinant_factor};"
+                            f"col={column_index};"
+                            f"U={values}"
+                        ),
+                        (candidate_matrix, candidate_origin_shift),
+                    ),
+                )
+            )
+
+    generated_count = 0
+    max_generated_candidates = 64
+    for _, (name, transform) in sorted(raw_candidates, key=lambda item: item[0]):
+        before_count = len(candidates)
+        _append_unique_setting_transform_candidate(
+            candidates,
+            seen,
+            name,
+            transform,
+            tol=tol,
+        )
+        if len(candidates) > before_count:
+            generated_count += 1
+            if generated_count >= max_generated_candidates:
+                return
+
+
 def _signed_permutation_matrices() -> list[tuple[str, np.ndarray]]:
     matrices: list[tuple[str, np.ndarray]] = []
     identity = np.eye(3)
@@ -2708,6 +2884,16 @@ def _build_standard_transform_candidates(
         tol=tol,
     )
     _append_monoclinic_ac_column_reduction_candidates(
+        candidates,
+        seen,
+        standard_setting,
+        ssg_primitive,
+        raw_transform,
+        identify_info,
+        identify_index_details,
+        tol=tol,
+    )
+    _append_triclinic_column_reduction_candidates(
         candidates,
         seen,
         standard_setting,
@@ -4786,6 +4972,8 @@ def _find_spin_group_from_parsed(
     source_metadata: dict | None = None,
     parser_atol: float | None = None,
     input_spin_setting: str = "in_lattice",
+    calculation_mode: str | None = None,
+    vacuum_axis: str | None = None,
 ) -> MagSymmetryResult:
     input_cell = CrystalCell(
         lattice_factors,
@@ -5197,6 +5385,15 @@ def _find_spin_group_from_parsed(
     KPOINTS = acc_primitive_output_ssg.KPOINTS
     SS =  acc_primitive_output_ssg.spin_polarizations
     SS_poscar = acc_primitive_output_ssg_in_poscar_spin_frame.spin_polarizations
+    quasi_2d_diagnostics = build_quasi2d_diagnostics(
+        input_cell_detail=_serialize_cell_snapshot(input_cell_cartesian),
+        transformation_input_to_acc_primitive=transformation_input_to_acc_primitive_output,
+        acc_primitive_ssg=acc_primitive_output_ssg,
+        base_is_alter=alter,
+        tol=tol_cfg.m_matrix_tol,
+        calculation_mode=calculation_mode,
+        vacuum_axis=vacuum_axis,
+    )
     ssg_little_groups = _get_ssg_little_groups(
         acc_primitive_output_ssg,
         tol=tol_cfg.m_matrix_tol,
@@ -5357,6 +5554,7 @@ def _find_spin_group_from_parsed(
             suppress_repo_local_summary=bool(export_target.get("suppress_repo_local_summary", False)),
             spinframe_basis_abc_rows=export_target.get("spinframe_basis_abc_rows"),
             moment_basis_cartesian=export_target.get("moment_basis_cartesian"),
+            quasi_2d=quasi_2d_diagnostics,
         )
 
     scif = scif_outputs[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]
@@ -5373,7 +5571,8 @@ def _find_spin_group_from_parsed(
         'poscar_mp':acc_primitive_output_poscar,
         'acc':ssg_primitive.acc,
         'msg_acc': msg_acc,
-        'KPOINTS':KPOINTS
+        'KPOINTS':KPOINTS,
+        'quasi_2d': quasi_2d_diagnostics,
     }
 
     cell = {
@@ -5443,6 +5642,10 @@ def _find_spin_group_from_parsed(
                 'KPOINTS':KPOINTS,
                 'KPOINTS_setting': ACC_PRIMITIVE_SETTING,
                 'KPOINTS_real_space_setting': ACC_PRIMITIVE_SETTING,
+                'quasi_2d': quasi_2d_diagnostics,
+                'spin_splitting_2d_interpretation': quasi_2d_diagnostics.get('interpretation'),
+                'spin_splitting_2d': quasi_2d_diagnostics.get('spin_splitting_2d'),
+                'is_alter_2d': quasi_2d_diagnostics.get('is_alter_2d'),
                 'input_magnetic_primitive_ssg_ops': ssg_primitive.ops,
                 'input_magnetic_primitive_ssg_setting': INPUT_MAGNETIC_PRIMITIVE_SETTING,
                 'input_magnetic_primitive_ssg_seitz': ssg_primitive.seitz_symbols,
@@ -6286,6 +6489,8 @@ def find_spin_group_from_data(
     mtol = 0.02,
     meigtol = 0.00002,
     matrix_tol = 0.01,
+    calculation_mode: str | None = None,
+    vacuum_axis: str | None = None,
 ) -> MagSymmetryResult:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     return _find_spin_group_from_parsed(
@@ -6299,6 +6504,8 @@ def find_spin_group_from_data(
         source_metadata=source_metadata,
         parser_atol=None,
         input_spin_setting=input_spin_setting,
+        calculation_mode=calculation_mode,
+        vacuum_axis=vacuum_axis,
     )
 
 
@@ -6540,6 +6747,8 @@ def find_spin_group(
     meigtol=0.00002,
     matrix_tol=0.01,
     parser_atol=0.02,
+    calculation_mode: str | None = None,
+    vacuum_axis: str | None = None,
 ) -> MagSymmetryResult:
     """
     Find the spin space group of a crystal structure given in a CIF file.
@@ -6573,6 +6782,8 @@ def find_spin_group(
         source_metadata=source_metadata,
         parser_atol=parser_atol,
         input_spin_setting=input_spin_setting,
+        calculation_mode=calculation_mode,
+        vacuum_axis=vacuum_axis,
     )
 
 

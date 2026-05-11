@@ -23,6 +23,8 @@ Environment overrides:
   MEIGTOL        current: ${MEIGTOL:-0.00002}
   MATRIX_TOL     current: ${MATRIX_TOL:-0.01}
   BATCH_ROUTE    current: ${BATCH_ROUTE:-full}
+  CALCULATION_MODE current: ${CALCULATION_MODE:-auto}
+  VACUUM_AXIS    current: ${VACUUM_AXIS:-<auto>}
   EXPORT_TXT     current: ${EXPORT_TXT:-selected.txt}
   EXPORT_FIELDS  current: ${EXPORT_FIELDS:-index,phase,properties.ss_w_soc}
   INCLUDE_G0_SELF_AUDIT current: ${INCLUDE_G0_SELF_AUDIT:-0}
@@ -51,6 +53,8 @@ MTOL="${MTOL:-0.02}"
 MEIGTOL="${MEIGTOL:-0.00002}"
 MATRIX_TOL="${MATRIX_TOL:-0.01}"
 BATCH_ROUTE="${BATCH_ROUTE:-full}"
+CALCULATION_MODE="${CALCULATION_MODE:-auto}"
+VACUUM_AXIS="${VACUUM_AXIS:-}"
 SHARD_INDEX="${SHARD_INDEX:-0}"
 SHARD_COUNT="${SHARD_COUNT:-1}"
 LIMIT="${LIMIT:-}"
@@ -105,6 +109,8 @@ echo "Baseline suite : $BASELINE_SUITE"
 echo "Baseline root  : $BASELINE_ROOT"
 echo "Tolerances     : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRIX_TOL"
 echo "Batch route    : $BATCH_ROUTE"
+echo "Calculation mode: $CALCULATION_MODE"
+echo "Vacuum axis    : ${VACUUM_AXIS:-<auto>}"
 echo "Export txt     : ${EXPORT_TXT:-<none>}"
 echo "Export fields  : ${EXPORT_FIELDS:-<none>}"
 echo "G0 self audit  : ${INCLUDE_G0_SELF_AUDIT:-0}"
@@ -129,6 +135,8 @@ MTOL="$MTOL" \
 MEIGTOL="$MEIGTOL" \
 MATRIX_TOL="$MATRIX_TOL" \
 BATCH_ROUTE="$BATCH_ROUTE" \
+CALCULATION_MODE="$CALCULATION_MODE" \
+VACUUM_AXIS="$VACUUM_AXIS" \
 EXPORT_TXT="$EXPORT_TXT" \
 EXPORT_FIELDS="$EXPORT_FIELDS" \
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}" \

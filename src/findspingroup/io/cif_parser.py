@@ -243,6 +243,76 @@ def _parse_optional_numeric_scalar(value):
     return numeric if numeric is not None else normalized
 
 
+def _extract_repo_local_quasi2d_metadata(data: dict) -> dict:
+    return {
+        "calculation_mode": _normalize_scif_scalar(
+            _get_first_existing(
+                data,
+                _repo_local_scif_tag_candidates('calculation_mode'),
+            )
+        ),
+        "dimension": _normalize_scif_scalar(
+            _get_first_existing(
+                data,
+                _repo_local_scif_tag_candidates('dimension'),
+            )
+        ),
+        "vacuum_axis_input": _normalize_scif_scalar(
+            _get_first_existing(
+                data,
+                _repo_local_scif_tag_candidates('vacuum_axis_input'),
+            )
+        ),
+        "vacuum_axis_source": _normalize_scif_scalar(
+            _get_first_existing(
+                data,
+                _repo_local_scif_tag_candidates('vacuum_axis_source'),
+            )
+        ),
+        "spin_splitting_2d": _normalize_scif_scalar(
+            _get_first_existing(
+                data,
+                _repo_local_scif_tag_candidates('spin_splitting_2d'),
+            )
+        ),
+        "spin_splitting_2d_interpretation": _normalize_scif_scalar(
+            _get_first_existing(
+                data,
+                _repo_local_scif_tag_candidates('spin_splitting_2d_interpretation'),
+            )
+        ),
+    }
+
+
+def _extract_repo_local_quasi2d_source_tags(data: dict) -> dict:
+    return {
+        "calculation_mode": _get_first_existing_with_key(
+            data,
+            _repo_local_scif_tag_candidates('calculation_mode'),
+        )[0],
+        "dimension": _get_first_existing_with_key(
+            data,
+            _repo_local_scif_tag_candidates('dimension'),
+        )[0],
+        "vacuum_axis_input": _get_first_existing_with_key(
+            data,
+            _repo_local_scif_tag_candidates('vacuum_axis_input'),
+        )[0],
+        "vacuum_axis_source": _get_first_existing_with_key(
+            data,
+            _repo_local_scif_tag_candidates('vacuum_axis_source'),
+        )[0],
+        "spin_splitting_2d": _get_first_existing_with_key(
+            data,
+            _repo_local_scif_tag_candidates('spin_splitting_2d'),
+        )[0],
+        "spin_splitting_2d_interpretation": _get_first_existing_with_key(
+            data,
+            _repo_local_scif_tag_candidates('spin_splitting_2d_interpretation'),
+        )[0],
+    }
+
+
 def _extract_cif_metadata(data: dict):
     parent_name_key, parent_name_value = _get_first_existing_with_key(
         data,
@@ -283,6 +353,8 @@ def _extract_cif_metadata(data: dict):
         key: _normalize_scif_scalar(data.get(key))
         for key in cell_parameter_keys
     }
+    quasi2d_extensions = _extract_repo_local_quasi2d_metadata(data)
+    quasi2d_source_tags = _extract_repo_local_quasi2d_source_tags(data)
 
     return {
         "cell_parameter_strings": cell_parameter_strings,
@@ -297,6 +369,18 @@ def _extract_cif_metadata(data: dict):
                 "transform_Pp_abc": parent_transform_key,
                 "child_transform_Pp_abc": parent_child_transform_key,
             },
+        },
+        "space_group_spin": {
+            "calculation_mode": quasi2d_extensions["calculation_mode"],
+            "dimension": quasi2d_extensions["dimension"],
+            "vacuum_axis_input": quasi2d_extensions["vacuum_axis_input"],
+            "vacuum_axis_source": quasi2d_extensions["vacuum_axis_source"],
+            "spin_splitting_2d": quasi2d_extensions["spin_splitting_2d"],
+            "spin_splitting_2d_interpretation": quasi2d_extensions[
+                "spin_splitting_2d_interpretation"
+            ],
+            "repo_local_extensions": quasi2d_extensions,
+            "source_tags": quasi2d_source_tags,
         },
         "raw_cif_tags": copy.deepcopy(data),
     }
@@ -643,6 +727,7 @@ def _extract_scif_metadata(data: dict):
                 _repo_local_scif_tag_candidates('transform_to_parent_space_group_Pp'),
             )
         ),
+        **_extract_repo_local_quasi2d_metadata(data),
     }
 
     return {
@@ -700,6 +785,14 @@ def _extract_scif_metadata(data: dict):
             "parent_space_group_matches_input": repo_local_extensions["parent_space_group_matches_input"],
             "input_parent_space_group_name_H_M_alt": repo_local_extensions["input_parent_space_group_name_H_M_alt"],
             "input_parent_space_group_IT_number": repo_local_extensions["input_parent_space_group_IT_number"],
+            "calculation_mode": repo_local_extensions["calculation_mode"],
+            "dimension": repo_local_extensions["dimension"],
+            "vacuum_axis_input": repo_local_extensions["vacuum_axis_input"],
+            "vacuum_axis_source": repo_local_extensions["vacuum_axis_source"],
+            "spin_splitting_2d": repo_local_extensions["spin_splitting_2d"],
+            "spin_splitting_2d_interpretation": repo_local_extensions[
+                "spin_splitting_2d_interpretation"
+            ],
             "repo_local_extensions": repo_local_extensions,
             "source_tags": {
                 "collinear_direction": collinear_key,
@@ -720,6 +813,7 @@ def _extract_scif_metadata(data: dict):
                 "spin_space_point_group_name": spin_space_point_group_key,
                 "transform_spinframe_P_abc": transform_spinframe_abc_key,
                 "transform_spinframe_P_matrix": transform_spinframe_matrix_key,
+                **_extract_repo_local_quasi2d_source_tags(data),
             },
         },
         "space_group_symop_spin_operation": {

@@ -34,11 +34,62 @@ def _compact_wp_chain(wp_chain: Any, *, limit: int = 24) -> str | None:
     return " | ".join(items)
 
 
+def _quasi2d_export_values(quasi_2d: Any) -> dict[str, Any]:
+    payload = quasi_2d if isinstance(quasi_2d, dict) else {}
+    diagnostic_points = payload.get("diagnostic_points") or []
+    generated_point = diagnostic_points[0] if diagnostic_points else {}
+    kpoints = payload.get("kpoints") or []
+    projection_summary = payload.get("kpoint_projection_summary") or {}
+    gp_comparison = payload.get("generic_point_comparison") or {}
+    gp_3d = gp_comparison.get("gp_3d") or {}
+    gp_2d = gp_comparison.get("gp_2d") or {}
+    return {
+        "calculation_mode": payload.get("calculation_mode"),
+        "dimension": payload.get("dimension"),
+        "quasi2d_status": payload.get("status"),
+        "quasi2d_source": payload.get("source"),
+        "vacuum_axis_input": payload.get("vacuum_axis_input"),
+        "spin_splitting_2d": payload.get("spin_splitting_2d"),
+        "spin_splitting_2d_interpretation": payload.get("interpretation"),
+        "is_alter_2d": payload.get("is_alter_2d"),
+        "quasi2d_gp_label": generated_point.get("label"),
+        "quasi2d_gp_k_input": generated_point.get("k_input_reciprocal"),
+        "quasi2d_gp_k_acc": generated_point.get("k_acc_primitive"),
+        "quasi2d_gp_spin_splitting": generated_point.get("spin_splitting"),
+        "quasi2d_gp_spin_polarizations": generated_point.get("spin_polarizations"),
+        "quasi2d_kpoint_projection_summary": projection_summary,
+        "quasi2d_3d_gp_k_input": gp_3d.get("k_input_reciprocal"),
+        "quasi2d_3d_gp_k_acc": gp_3d.get("k_acc_primitive"),
+        "quasi2d_3d_gp_plane": gp_3d.get("plane_classification"),
+        "quasi2d_3d_gp_spin_splitting": gp_3d.get("spin_splitting"),
+        "quasi2d_3d_gp_spin_polarizations": gp_3d.get("spin_polarizations"),
+        "quasi2d_2d_gp_k_input": gp_2d.get("k_input_reciprocal"),
+        "quasi2d_2d_gp_k_acc": gp_2d.get("k_acc_primitive"),
+        "quasi2d_2d_gp_plane": gp_2d.get("plane_classification"),
+        "quasi2d_2d_gp_spin_splitting": gp_2d.get("spin_splitting"),
+        "quasi2d_2d_gp_spin_polarizations": gp_2d.get("spin_polarizations"),
+        "quasi2d_gp_k_input_delta": gp_comparison.get("k_input_delta_wrapped"),
+        "quasi2d_gp_k_acc_delta": gp_comparison.get("k_acc_delta_wrapped"),
+        "quasi2d_gp_k_input_changed": gp_comparison.get("k_input_changed"),
+        "quasi2d_gp_spin_splitting_changed": gp_comparison.get("spin_splitting_changed"),
+        "quasi2d_gp_spin_polarization_changed": gp_comparison.get("spin_polarization_changed"),
+        "quasi2d_gp_comparison_summary": gp_comparison.get("summary"),
+        "quasi2d_kpoints": [
+            {
+                "label": row.get("label"),
+                "plane": row.get("plane_classification"),
+                "spin_splitting": row.get("spin_splitting"),
+            }
+            for row in kpoints
+        ],
+    }
+
+
 def _row_from_result(file_path: Path, result, *, duration_seconds: float | None = None) -> dict[str, Any]:
     identify = result.identify_index_details or {}
     primitive_ssg = SpinSpaceGroup(result.primitive_magnetic_cell_ssg_ops)
 
-    return {
+    row = {
         "case_id": batch_mcif._normalize_case_id(file_path),
         "file_name": file_path.name,
         "status": "ok",
@@ -80,6 +131,8 @@ def _row_from_result(file_path: Path, result, *, duration_seconds: float | None 
         "msg_is_chiral": result.msg_is_chiral,
         "wyckoff_split": _compact_wp_chain(result.wp_chain),
     }
+    row.update(_quasi2d_export_values(getattr(result, "quasi_2d", None)))
+    return row
 
 
 def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]:
@@ -88,7 +141,7 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
     primitive_ops = payload.get("primitive_magnetic_cell_ssg_ops") or []
     primitive_ssg = SpinSpaceGroup(primitive_ops) if primitive_ops else None
 
-    return {
+    row = {
         "case_id": record.get("case_id"),
         "file_name": record.get("file_name"),
         "status": record.get("status", "ok"),
@@ -136,6 +189,8 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "error_type": record.get("error", {}).get("type"),
         "error_message": record.get("error", {}).get("message"),
     }
+    row.update(_quasi2d_export_values(payload.get("quasi_2d")))
+    return row
 
 
 def _row_from_error(
@@ -185,6 +240,37 @@ def _row_from_error(
         "msg_is_polar": None,
         "msg_is_chiral": None,
         "wyckoff_split": None,
+        "calculation_mode": None,
+        "dimension": None,
+        "quasi2d_status": None,
+        "quasi2d_source": None,
+        "vacuum_axis_input": None,
+        "spin_splitting_2d": None,
+        "spin_splitting_2d_interpretation": None,
+        "is_alter_2d": None,
+        "quasi2d_gp_label": None,
+        "quasi2d_gp_k_input": None,
+        "quasi2d_gp_k_acc": None,
+        "quasi2d_gp_spin_splitting": None,
+        "quasi2d_gp_spin_polarizations": None,
+        "quasi2d_kpoint_projection_summary": None,
+        "quasi2d_3d_gp_k_input": None,
+        "quasi2d_3d_gp_k_acc": None,
+        "quasi2d_3d_gp_plane": None,
+        "quasi2d_3d_gp_spin_splitting": None,
+        "quasi2d_3d_gp_spin_polarizations": None,
+        "quasi2d_2d_gp_k_input": None,
+        "quasi2d_2d_gp_k_acc": None,
+        "quasi2d_2d_gp_plane": None,
+        "quasi2d_2d_gp_spin_splitting": None,
+        "quasi2d_2d_gp_spin_polarizations": None,
+        "quasi2d_gp_k_input_delta": None,
+        "quasi2d_gp_k_acc_delta": None,
+        "quasi2d_gp_k_input_changed": None,
+        "quasi2d_gp_spin_splitting_changed": None,
+        "quasi2d_gp_spin_polarization_changed": None,
+        "quasi2d_gp_comparison_summary": None,
+        "quasi2d_kpoints": None,
         "error_type": type(exc).__name__,
         "error_message": str(exc),
     }
@@ -231,6 +317,37 @@ COLUMNS = [
     "msg_is_polar",
     "msg_is_chiral",
     "wyckoff_split",
+    "calculation_mode",
+    "dimension",
+    "quasi2d_status",
+    "quasi2d_source",
+    "vacuum_axis_input",
+    "spin_splitting_2d",
+    "spin_splitting_2d_interpretation",
+    "is_alter_2d",
+    "quasi2d_gp_label",
+    "quasi2d_gp_k_input",
+    "quasi2d_gp_k_acc",
+    "quasi2d_gp_spin_splitting",
+    "quasi2d_gp_spin_polarizations",
+    "quasi2d_kpoint_projection_summary",
+    "quasi2d_3d_gp_k_input",
+    "quasi2d_3d_gp_k_acc",
+    "quasi2d_3d_gp_plane",
+    "quasi2d_3d_gp_spin_splitting",
+    "quasi2d_3d_gp_spin_polarizations",
+    "quasi2d_2d_gp_k_input",
+    "quasi2d_2d_gp_k_acc",
+    "quasi2d_2d_gp_plane",
+    "quasi2d_2d_gp_spin_splitting",
+    "quasi2d_2d_gp_spin_polarizations",
+    "quasi2d_gp_k_input_delta",
+    "quasi2d_gp_k_acc_delta",
+    "quasi2d_gp_k_input_changed",
+    "quasi2d_gp_spin_splitting_changed",
+    "quasi2d_gp_spin_polarization_changed",
+    "quasi2d_gp_comparison_summary",
+    "quasi2d_kpoints",
     "error_type",
     "error_message",
 ]
