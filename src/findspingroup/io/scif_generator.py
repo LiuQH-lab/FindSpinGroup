@@ -65,6 +65,12 @@ def _scif_repo_local_extension_tag_names() -> dict[str, str]:
         "it": "_space_group_spin.fsg_it",
         "ik": "_space_group_spin.fsg_ik",
         "spin_space_point_group_name": "_space_group_spin.fsg_spin_space_point_group_name",
+        "calculation_mode": "_space_group_spin.fsg_calculation_mode",
+        "dimension": "_space_group_spin.fsg_dimension",
+        "vacuum_axis_input": "_space_group_spin.fsg_vacuum_axis_input",
+        "vacuum_axis_source": "_space_group_spin.fsg_vacuum_axis_source",
+        "spin_splitting_2d": "_space_group_spin.fsg_spin_splitting_2d",
+        "spin_splitting_2d_interpretation": "_space_group_spin.fsg_spin_splitting_2d_interpretation",
         "transform_to_input_Pp": "_space_group_spin.fsg_transform_to_input_Pp",
         "transform_to_magnetic_primitive_Pp": "_space_group_spin.fsg_transform_to_magnetic_primitive_Pp",
         "transform_to_L0std_Pp": "_space_group_spin.fsg_transform_to_L0std_Pp",
@@ -1132,6 +1138,7 @@ def generate_scif(
     suppress_repo_local_summary: bool = False,
     spinframe_basis_abc_rows=None,
     moment_basis_cartesian=None,
+    quasi_2d: dict | None = None,
 ):
     """
     input:
@@ -1260,6 +1267,24 @@ def generate_scif(
             magnetic_acc_line,
         ]
     )
+    quasi_2d_lines = []
+    if quasi_2d is not None and quasi_2d.get("dimension") == "2d":
+        quasi_2d_lines = [
+            f"{repo_tags['calculation_mode']}  {_quote_scif_string('quasi2d')}",
+            f"{repo_tags['dimension']}  {_quote_scif_string('2d')}",
+            (
+                f"{repo_tags['vacuum_axis_input']}  "
+                f"{_quote_scif_string(str(quasi_2d.get('vacuum_axis_input')))}"
+                if quasi_2d.get("vacuum_axis_input") is not None
+                else f"{repo_tags['vacuum_axis_input']}  ."
+            ),
+            f"{repo_tags['vacuum_axis_source']}  {_quote_scif_string(str(quasi_2d.get('source', 'unknown')))}",
+            f"{repo_tags['spin_splitting_2d']}  {_quote_scif_string(str(quasi_2d.get('spin_splitting_2d', 'unknown')))}",
+            (
+                f"{repo_tags['spin_splitting_2d_interpretation']}  "
+                f"{_quote_scif_string(str(quasi_2d.get('interpretation', 'unknown')))}"
+            ),
+        ]
     scif_repo_local_extension_lines = [
         "##############",
         "# repo-local FINDSPINGROUP extensions",
@@ -1271,6 +1296,7 @@ def generate_scif(
         ssg_name_linear,
         ssg_name_latex,
         *repo_local_summary_lines,
+        *quasi_2d_lines,
         "",
         transform_to_input_Pp,
         transform_to_magnetic_primitive_Pp,

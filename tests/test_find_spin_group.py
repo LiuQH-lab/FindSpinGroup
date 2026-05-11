@@ -140,6 +140,22 @@ def _assert_setting_transform_inverse(forward, backward):
     assert np.allclose(residual_shift, np.zeros(3), atol=1e-8)
 
 
+def _assert_setting_transform_chain(first, second, target):
+    first_matrix = np.asarray(first[0], dtype=float)
+    first_shift = np.asarray(first[1], dtype=float)
+    second_matrix = np.asarray(second[0], dtype=float)
+    second_shift = np.asarray(second[1], dtype=float)
+    target_matrix = np.asarray(target[0], dtype=float)
+    target_shift = np.asarray(target[1], dtype=float)
+
+    chained_matrix = second_matrix @ first_matrix
+    chained_shift = second_matrix @ first_shift + second_shift
+    assert np.allclose(chained_matrix, target_matrix, atol=1e-8)
+    residual_shift = chained_shift - target_shift
+    residual_shift = residual_shift - np.round(residual_shift)
+    assert np.allclose(residual_shift, np.zeros(3), atol=1e-8)
+
+
 def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
     def _unexpected(*args, **kwargs):
         raise AssertionError("unexpected heavy-route call")
@@ -2126,6 +2142,77 @@ def test_find_spin_group_basic_uses_monoclinic_ac_column_reduction_for_index2_co
     assert np.isclose(abs(np.linalg.det(convention_to_acc @ selected_matrix)), 1.0)
 
 
+@pytest.mark.parametrize(
+    ("index", "primitive_to_database_matrix"),
+    [
+        (
+            "2.1.3.1.P",
+            [
+                [-7.0 / 3.0, -11.0 / 3.0, 0.0],
+                [-2.0, -3.0, 0.0],
+                [0.0, 0.0, -1.0],
+            ],
+        ),
+        (
+            "2.1.4.4.P",
+            [
+                [8.0, 0.5, 0.0],
+                [7.0, 0.5, 0.0],
+                [0.0, 0.0, 1.0],
+            ],
+        ),
+        (
+            "2.1.2.1.P2",
+            [
+                [-2.5, -1.5, 0.0],
+                [-2.0, -1.0, 0.0],
+                [0.0, 0.0, -1.0],
+            ],
+        ),
+    ],
+)
+def test_triclinic_column_reduction_handles_spin_translation_supercell(
+    index,
+    primitive_to_database_matrix,
+):
+    class _FakeTriclinicSSG:
+        G0_num = 2
+
+    candidates = []
+    seen = set()
+    find_spin_group_module._append_triclinic_column_reduction_candidates(
+        candidates,
+        seen,
+        find_spin_group_module.G0_STANDARD_SETTING,
+        _FakeTriclinicSSG(),
+        (np.asarray(primitive_to_database_matrix, dtype=float), np.zeros(3)),
+        index,
+        {
+            "space_group_transformation": [
+                np.eye(3).tolist(),
+                np.zeros(3).tolist(),
+            ],
+        },
+        tol=0.01,
+    )
+
+    triclinic_candidates = [
+        (name, transform)
+        for name, transform in candidates
+        if name.startswith("triclinic_column_reduce:")
+    ]
+    assert triclinic_candidates
+
+    convention_to_acc = find_spin_group_module._acc_aligned_convention_to_primitive_transform(
+        index
+    )[0]
+    assert np.isclose(
+        abs(float(np.linalg.det(convention_to_acc @ triclinic_candidates[0][1][0]))),
+        1.0,
+        atol=1e-8,
+    )
+
+
 def test_find_spin_group_basic_uses_it_ik_to_select_g0std_for_t_type_linear_index():
     payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/0.1017_CePdAl3.mcif")
 
@@ -2627,6 +2714,126 @@ def test_find_spin_group_exposes_source_structure_metadata_from_mcif():
     assert result.source_parent_space_group["child_transform_Pp_abc"] == "2a,2b,2c;0,0,0"
     assert result.source_cell_parameter_strings["_cell_length_a"] == "14.88540"
     assert result.source_cell_parameter_strings["_cell_angle_alpha"] == "90.00000"
+
+
+def test_find_spin_group_reports_quasi2d_diagnostics_without_changing_3d_fields():
+    result = find_spin_group("tests/testset/structure_2d_1.cif")
+
+    assert result.index == "164.149.3.1.P"
+    assert result.spinsplitting_wo_soc == "k-dependent"
+    assert result.quasi_2d["status"] == "heuristic"
+    assert result.quasi_2d["source"] == "heuristic"
+    assert result.quasi_2d["dimension"] == "2d"
+    assert result.quasi_2d["vacuum_axis_input"] == "c"
+    assert result.quasi_2d["interpretation"] == "in_plane_k_dependent"
+    assert result.quasi_2d["spin_splitting_2d"] == "spin splitting"
+    assert result.spin_splitting_2d_interpretation == "in_plane_k_dependent"
+    assert result.quasi_2d["diagnostic_points"][0]["label"] == "GP2D"
+    assert result.quasi_2d["diagnostic_points"][0]["plane_classification"] == "in_plane"
+    assert result.quasi_2d["generic_point_comparison"]["status"] == "compared"
+    assert result.quasi_2d["generic_point_comparison"]["k_input_changed"] is True
+    assert (
+        result.quasi_2d["generic_point_comparison"]["spin_splitting_changed"]
+        is False
+    )
+    assert result.quasi_2d["kpoint_projection_summary"]["by_plane_count"]["mixed"] > 0
+
+
+def test_v2se2o_quasi2d_case_study_uses_final_acc_primitive_transform_chain():
+    result = find_spin_group("tests/testset/V2Se2O_2d.mcif")
+
+    assert result.index == "123.47.1.1.L"
+    assert result.acc == "4/mmmP"
+    assert result.spinsplitting_wo_soc == "k-dependent"
+    assert result.is_alter == "(Altermagnet)"
+
+    quasi_2d = result.quasi_2d
+    assert quasi_2d["status"] == "heuristic"
+    assert quasi_2d["source"] == "heuristic"
+    assert quasi_2d["dimension"] == "2d"
+    assert quasi_2d["vacuum_axis_input"] == "c"
+    assert quasi_2d["interpretation"] == "in_plane_k_dependent"
+    assert quasi_2d["spin_splitting_2d"] == "spin splitting"
+    assert quasi_2d["is_alter_2d"] == "(Altermagnet)"
+    assert quasi_2d["diagnostic_points"][0]["label"] == "GP2D"
+    assert quasi_2d["diagnostic_points"][0]["plane_classification"] == "in_plane"
+    assert quasi_2d["diagnostic_points"][0]["spin_splitting"] == "spin splitting"
+    assert quasi_2d["generic_point_comparison"]["gp_3d"]["label"] == "GP"
+    assert quasi_2d["generic_point_comparison"]["gp_3d"]["plane_classification"] == "mixed"
+    assert quasi_2d["generic_point_comparison"]["gp_2d"]["label"] == "GP2D"
+    assert quasi_2d["generic_point_comparison"]["gp_2d"]["plane_classification"] == "in_plane"
+    assert quasi_2d["generic_point_comparison"]["k_input_changed"] is True
+    assert quasi_2d["generic_point_comparison"]["spin_splitting_changed"] is False
+    assert quasi_2d["generic_point_comparison"]["summary"] == "k_changed_spin_splitting_same"
+
+    _assert_setting_transform_inverse(result.T_input_to_G0std, result.T_G0std_to_input)
+    _assert_setting_transform_inverse(result.T_input_to_L0std, result.T_L0std_to_input)
+    _assert_setting_transform_inverse(
+        result.T_input_to_acc_primitive,
+        result.T_acc_primitive_to_input,
+    )
+    _assert_setting_transform_inverse(
+        result.T_acc_primitive_to_G0std,
+        result.T_G0std_to_acc_primitive,
+    )
+    _assert_setting_transform_inverse(
+        result.T_acc_primitive_to_L0std,
+        result.T_L0std_to_acc_primitive,
+    )
+    _assert_setting_transform_chain(
+        result.T_input_to_G0std,
+        result.T_G0std_to_acc_primitive,
+        result.T_input_to_acc_primitive,
+    )
+    _assert_setting_transform_chain(
+        result.T_input_to_L0std,
+        result.T_L0std_to_acc_primitive,
+        result.T_input_to_acc_primitive,
+    )
+    _assert_setting_transform_chain(
+        result.T_input_to_convention,
+        result.T_convention_to_acc_primitive,
+        result.T_input_to_acc_primitive,
+    )
+
+
+def test_quasi2d_calculation_mode_parameter_overrides_geometry_heuristic():
+    source_path = next(Path("tests/testset/quasi2d_small/2CrI3-1").glob("*.mcif"))
+    result = find_spin_group(
+        str(source_path),
+        calculation_mode="quasi2d",
+        vacuum_axis="c",
+    )
+
+    assert result.index == "149.149.1.1.L"
+    assert result.quasi_2d["calculation_mode"] == "quasi2d"
+    assert result.quasi_2d["status"] == "explicit"
+    assert result.quasi_2d["source"] == "runtime_parameter"
+    assert result.quasi_2d["dimension"] == "2d"
+    assert result.quasi_2d["vacuum_axis_input"] == "c"
+    assert result.quasi_2d["spin_splitting_2d"] == "spin splitting"
+    assert result.quasi_2d["interpretation"] == "in_plane_k_dependent"
+    assert result.quasi_2d["generic_point_comparison"]["k_input_changed"] is True
+    assert result.quasi_2d["generic_point_comparison"]["spin_splitting_changed"] is False
+
+
+def test_quasi2d_input_tags_do_not_control_runtime_mode(tmp_path):
+    source_path = next(Path("tests/testset/quasi2d_small/2CrI3-1").glob("*.mcif"))
+    tagged_path = tmp_path / "tagged_CrI3.mcif"
+    tagged_path.write_text(
+        source_path.read_text(encoding="utf-8")
+        + "\n"
+        + '_space_group_spin.fsg_calculation_mode "quasi2d"\n'
+        + '_space_group_spin.fsg_vacuum_axis_input "c"\n',
+        encoding="utf-8",
+    )
+
+    result = find_spin_group(str(tagged_path))
+
+    assert result.index == "149.149.1.1.L"
+    assert result.quasi_2d["calculation_mode"] == "auto"
+    assert result.quasi_2d["status"] == "not_applicable"
+    assert result.quasi_2d["dimension"] == "3d_or_unknown"
 
 
 def test_find_spin_group_exposes_input_setting_payload_for_magnetic_primitive_poscar(tmp_path):

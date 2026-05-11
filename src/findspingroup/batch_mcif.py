@@ -740,6 +740,8 @@ def run_mcif_batch(
     export_txt_path: Path | None = None,
     quiet: bool = False,
     include_g0_self_audit: bool = False,
+    calculation_mode: str | None = None,
+    vacuum_axis: str | None = None,
 ) -> dict:
     if route not in {"full", "basic"}:
         raise ValueError(f"Unsupported batch route: {route}")
@@ -784,6 +786,8 @@ def run_mcif_batch(
                     mtol=mtol,
                     meigtol=meigtol,
                     matrix_tol=matrix_tol,
+                    calculation_mode=calculation_mode,
+                    vacuum_axis=vacuum_axis,
                 )
                 snapshot = result.to_summary_dict()
             duration = round(time.perf_counter() - case_start, 6)
@@ -898,6 +902,8 @@ def run_mcif_batch(
         "stop_reason": stop_reason,
         "duration_seconds": round(time.perf_counter() - total_start, 6),
         "baseline_path": baseline_path.resolve().as_posix() if baseline_path else None,
+        "calculation_mode": calculation_mode or "auto",
+        "vacuum_axis": vacuum_axis,
         "comparison": baseline_compare,
     }
     _write_json(output_dir / "summary.json", summary)
@@ -929,6 +935,8 @@ def run_mcif_batch_with_auto_baseline(
     export_txt_path: Path | None = None,
     quiet: bool = False,
     include_g0_self_audit: bool = False,
+    calculation_mode: str | None = None,
+    vacuum_axis: str | None = None,
 ) -> dict:
     auto_paths = _resolve_auto_baseline_paths(
         baseline_root=baseline_root,
@@ -970,6 +978,8 @@ def run_mcif_batch_with_auto_baseline(
         export_txt_path=export_txt_path,
         quiet=quiet,
         include_g0_self_audit=include_g0_self_audit,
+        calculation_mode=calculation_mode,
+        vacuum_axis=vacuum_axis,
     )
 
     run_baseline = _load_json(output_dir / "baseline.json")
@@ -1071,6 +1081,18 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--mtol", type=float, default=0.02)
     parser.add_argument("--meigtol", type=float, default=0.00002)
     parser.add_argument("--matrix-tol", type=float, default=0.01)
+    parser.add_argument(
+        "--calculation-mode",
+        choices=["auto", "quasi2d", "2d", "3d", "bulk", "slab", "layer"],
+        default="auto",
+        help="Quasi-2D interpretation mode for additive diagnostics.",
+    )
+    parser.add_argument(
+        "--vacuum-axis",
+        choices=["a", "b", "c", "x", "y", "z", "0", "1", "2"],
+        default=None,
+        help="Input-cell vacuum axis for --calculation-mode quasi2d/2d.",
+    )
     parser.add_argument("--limit", type=int, help="Only process the first N resolved .mcif files.")
     parser.add_argument(
         "--shard-index",
@@ -1241,6 +1263,8 @@ def main() -> None:
         "export_fields": args.export_field,
         "export_txt": export_txt_path.resolve().as_posix() if export_txt_path else None,
         "include_g0_self_audit": args.include_g0_self_audit,
+        "calculation_mode": args.calculation_mode,
+        "vacuum_axis": args.vacuum_axis,
     }
     _write_json(args.output_dir / "run_config.json", config)
 
@@ -1260,6 +1284,8 @@ def main() -> None:
             export_txt_path=export_txt_path,
             quiet=args.quiet,
             include_g0_self_audit=args.include_g0_self_audit,
+            calculation_mode=args.calculation_mode,
+            vacuum_axis=args.vacuum_axis,
         )
     else:
         summary = run_mcif_batch(
@@ -1278,6 +1304,8 @@ def main() -> None:
             export_txt_path=export_txt_path,
             quiet=args.quiet,
             include_g0_self_audit=args.include_g0_self_audit,
+            calculation_mode=args.calculation_mode,
+            vacuum_axis=args.vacuum_axis,
         )
     raise SystemExit(summary["exit_code"])
 

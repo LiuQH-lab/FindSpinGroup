@@ -182,6 +182,8 @@ def _legacy_mode_payload(args):
         meigtol=args.meigtol,
         matrix_tol=args.matrix_tol,
         parser_atol=args.parser_atol,
+        calculation_mode=args.calculation_mode,
+        vacuum_axis=args.vacuum_axis,
     )
     return _to_serializable_payload(result)
 
@@ -228,6 +230,18 @@ def main():
     parser.add_argument("--meigtol", type=float, default=0.00002, help="Point-group eigenvalue tolerance")
     parser.add_argument("--matrix_tol", type=float, default=0.01, help="Point-group standardization tolerance")
     parser.add_argument("--parser_atol", type=float, default=0.02, help="CIF/SCIF parser expansion tolerance")
+    parser.add_argument(
+        "--calculation-mode",
+        choices=["auto", "quasi2d", "2d", "3d", "bulk", "slab", "layer"],
+        default="auto",
+        help="Quasi-2D interpretation mode for additive diagnostics.",
+    )
+    parser.add_argument(
+        "--vacuum-axis",
+        choices=["a", "b", "c", "x", "y", "z", "0", "1", "2"],
+        default=None,
+        help="Input-cell vacuum axis for --calculation-mode quasi2d/2d.",
+    )
 
     args = parser.parse_args()
 
@@ -275,6 +289,8 @@ def main():
                     meigtol=args.meigtol,
                     matrix_tol=args.matrix_tol,
                     parser_atol=args.parser_atol,
+                    calculation_mode=args.calculation_mode,
+                    vacuum_axis=args.vacuum_axis,
                 )
             )
         else:

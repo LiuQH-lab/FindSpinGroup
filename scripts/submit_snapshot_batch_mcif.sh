@@ -18,13 +18,17 @@ else
   REMOTE_OUTPUT_ROOT="${REMOTE_OUTPUT_ROOT:-}"
 fi
 INPUT_SUBDIR="${INPUT_SUBDIR:-tests/testset/mcif_241130_no2186}"
+REMOTE_INPUT_DIR_OVERRIDE="${REMOTE_INPUT_DIR_OVERRIDE:-}"
 BASELINE_SUITE="${BASELINE_SUITE:-mcif_241130_no2186}"
+REMOTE_TMP_DIR="${REMOTE_TMP_DIR:-}"
 
 SPACE_TOL="${SPACE_TOL:-0.02}"
 MTOL="${MTOL:-0.02}"
 MEIGTOL="${MEIGTOL:-0.00002}"
 MATRIX_TOL="${MATRIX_TOL:-0.01}"
 BATCH_ROUTE="${BATCH_ROUTE:-full}"
+CALCULATION_MODE="${CALCULATION_MODE:-auto}"
+VACUUM_AXIS="${VACUUM_AXIS:-}"
 EXPORT_TXT="${EXPORT_TXT:-selected.txt}"
 EXPORT_FIELDS="${EXPORT_FIELDS:-index,phase,properties.ss_w_soc}"
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}"
@@ -44,6 +48,8 @@ Defaults:
   REMOTE_SNAPSHOT_ROOT ${REMOTE_SNAPSHOT_ROOT:-<required>}
   REMOTE_OUTPUT_ROOT   ${REMOTE_OUTPUT_ROOT:-<required>}
   INPUT_SUBDIR         $INPUT_SUBDIR
+  REMOTE_INPUT_DIR_OVERRIDE ${REMOTE_INPUT_DIR_OVERRIDE:-<none>}
+  REMOTE_TMP_DIR       ${REMOTE_TMP_DIR:-<auto under output root>}
   BASELINE_SUITE       $BASELINE_SUITE
 EOF
 }
@@ -81,7 +87,14 @@ fi
 SNAPSHOT_BASENAME="$(basename "$SNAPSHOT_PATH")"
 REMOTE_TARBALL="$REMOTE_SNAPSHOT_ROOT/$SNAPSHOT_BASENAME"
 REMOTE_REPO_ROOT="$REMOTE_SNAPSHOT_ROOT/$SNAPSHOT_ROOT_NAME"
-REMOTE_INPUT_DIR="$REMOTE_REPO_ROOT/$INPUT_SUBDIR"
+if [[ -z "$REMOTE_TMP_DIR" ]]; then
+  REMOTE_TMP_DIR="$REMOTE_OUTPUT_ROOT/tmp"
+fi
+if [[ -n "$REMOTE_INPUT_DIR_OVERRIDE" ]]; then
+  REMOTE_INPUT_DIR="$REMOTE_INPUT_DIR_OVERRIDE"
+else
+  REMOTE_INPUT_DIR="$REMOTE_REPO_ROOT/$INPUT_SUBDIR"
+fi
 REMOTE_BASELINE_ROOT="$REMOTE_REPO_ROOT/batch_baselines"
 
 echo "$BUILD_OUTPUT"
@@ -93,25 +106,24 @@ scp "$SNAPSHOT_PATH" "$SERVER_ALIAS:$REMOTE_TARBALL"
 
 ssh "$SERVER_ALIAS" "
   set -euo pipefail
+  mkdir -p '$REMOTE_TMP_DIR'
+  export TMPDIR='$REMOTE_TMP_DIR'
   cd '$REMOTE_SNAPSHOT_ROOT'
   rm -rf '$REMOTE_REPO_ROOT'
-  tar -xzf '$REMOTE_TARBALL'
+  tar --warning=no-unknown-keyword -xzf '$REMOTE_TARBALL'
   cd '$REMOTE_REPO_ROOT'
   ln -sfn '$REMOTE_SHARED_REPO/.venv' .venv
   ln -sfn '$REMOTE_SHARED_REPO/batch_baselines' batch_baselines
   test -x ./.venv/bin/python
   test -d '$REMOTE_INPUT_DIR'
-  PYTHONPATH=\"\$PWD/src\" ./.venv/bin/python - <<'PY'
-import spintensor
-from findspingroup.version import __version__
-print('snapshot_version', __version__)
-print('spintensor_ok')
-PY
+  PYTHONPATH=\"\$PWD/src\" ./.venv/bin/python -c \"import spintensor; from findspingroup.version import __version__; print('snapshot_version', __version__); print('spintensor_ok')\"
   SPACE_TOL='$SPACE_TOL' \
   MTOL='$MTOL' \
   MEIGTOL='$MEIGTOL' \
   MATRIX_TOL='$MATRIX_TOL' \
   BATCH_ROUTE='$BATCH_ROUTE' \
+  CALCULATION_MODE='$CALCULATION_MODE' \
+  VACUUM_AXIS='$VACUUM_AXIS' \
   EXPORT_TXT='$EXPORT_TXT' \
   EXPORT_FIELDS='$EXPORT_FIELDS' \
   INCLUDE_G0_SELF_AUDIT='$INCLUDE_G0_SELF_AUDIT' \
