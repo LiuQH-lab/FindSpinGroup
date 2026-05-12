@@ -4972,8 +4972,8 @@ def _find_spin_group_from_parsed(
     source_metadata: dict | None = None,
     parser_atol: float | None = None,
     input_spin_setting: str = "in_lattice",
-    calculation_mode: str | None = None,
-    vacuum_axis: str | None = None,
+    calculation_mode: str | None = "3d",
+    vacuum_axis: str | None = "c",
 ) -> MagSymmetryResult:
     input_cell = CrystalCell(
         lattice_factors,
@@ -5643,9 +5643,15 @@ def _find_spin_group_from_parsed(
                 'KPOINTS_setting': ACC_PRIMITIVE_SETTING,
                 'KPOINTS_real_space_setting': ACC_PRIMITIVE_SETTING,
                 'quasi_2d': quasi_2d_diagnostics,
-                'spin_splitting_2d_interpretation': quasi_2d_diagnostics.get('interpretation'),
-                'spin_splitting_2d': quasi_2d_diagnostics.get('spin_splitting_2d'),
-                'is_alter_2d': quasi_2d_diagnostics.get('is_alter_2d'),
+                'spin_splitting_2d_interpretation': (
+                    None if quasi_2d_diagnostics is None else quasi_2d_diagnostics.get('interpretation')
+                ),
+                'spin_splitting_2d': (
+                    None if quasi_2d_diagnostics is None else quasi_2d_diagnostics.get('spin_splitting_2d')
+                ),
+                'is_alter_2d': (
+                    None if quasi_2d_diagnostics is None else quasi_2d_diagnostics.get('is_alter_2d')
+                ),
                 'input_magnetic_primitive_ssg_ops': ssg_primitive.ops,
                 'input_magnetic_primitive_ssg_setting': INPUT_MAGNETIC_PRIMITIVE_SETTING,
                 'input_magnetic_primitive_ssg_seitz': ssg_primitive.seitz_symbols,
@@ -6489,8 +6495,8 @@ def find_spin_group_from_data(
     mtol = 0.02,
     meigtol = 0.00002,
     matrix_tol = 0.01,
-    calculation_mode: str | None = None,
-    vacuum_axis: str | None = None,
+    calculation_mode: str | None = "3d",
+    vacuum_axis: str | None = "c",
 ) -> MagSymmetryResult:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     return _find_spin_group_from_parsed(
@@ -6747,8 +6753,8 @@ def find_spin_group(
     meigtol=0.00002,
     matrix_tol=0.01,
     parser_atol=0.02,
-    calculation_mode: str | None = None,
-    vacuum_axis: str | None = None,
+    calculation_mode: str | None = "3d",
+    vacuum_axis: str | None = "c",
 ) -> MagSymmetryResult:
     """
     Find the spin space group of a crystal structure given in a CIF file.

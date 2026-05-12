@@ -740,8 +740,8 @@ def run_mcif_batch(
     export_txt_path: Path | None = None,
     quiet: bool = False,
     include_g0_self_audit: bool = False,
-    calculation_mode: str | None = None,
-    vacuum_axis: str | None = None,
+    calculation_mode: str | None = "3d",
+    vacuum_axis: str | None = "c",
 ) -> dict:
     if route not in {"full", "basic"}:
         raise ValueError(f"Unsupported batch route: {route}")
@@ -902,8 +902,8 @@ def run_mcif_batch(
         "stop_reason": stop_reason,
         "duration_seconds": round(time.perf_counter() - total_start, 6),
         "baseline_path": baseline_path.resolve().as_posix() if baseline_path else None,
-        "calculation_mode": calculation_mode or "auto",
-        "vacuum_axis": vacuum_axis,
+        "calculation_mode": calculation_mode or "3d",
+        "vacuum_axis": vacuum_axis or "c",
         "comparison": baseline_compare,
     }
     _write_json(output_dir / "summary.json", summary)
@@ -935,8 +935,8 @@ def run_mcif_batch_with_auto_baseline(
     export_txt_path: Path | None = None,
     quiet: bool = False,
     include_g0_self_audit: bool = False,
-    calculation_mode: str | None = None,
-    vacuum_axis: str | None = None,
+    calculation_mode: str | None = "3d",
+    vacuum_axis: str | None = "c",
 ) -> dict:
     auto_paths = _resolve_auto_baseline_paths(
         baseline_root=baseline_root,
@@ -1084,13 +1084,13 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--calculation-mode",
         choices=["auto", "quasi2d", "2d", "3d", "bulk", "slab", "layer"],
-        default="auto",
+        default="3d",
         help="Quasi-2D interpretation mode for additive diagnostics.",
     )
     parser.add_argument(
         "--vacuum-axis",
         choices=["a", "b", "c", "x", "y", "z", "0", "1", "2"],
-        default=None,
+        default="c",
         help="Input-cell vacuum axis for --calculation-mode quasi2d/2d.",
     )
     parser.add_argument("--limit", type=int, help="Only process the first N resolved .mcif files.")

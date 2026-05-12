@@ -2717,12 +2717,15 @@ def test_find_spin_group_exposes_source_structure_metadata_from_mcif():
 
 
 def test_find_spin_group_reports_quasi2d_diagnostics_without_changing_3d_fields():
-    result = find_spin_group("tests/testset/structure_2d_1.cif")
+    result = find_spin_group(
+        "tests/testset/structure_2d_1.cif",
+        calculation_mode="quasi2d",
+    )
 
     assert result.index == "164.149.3.1.P"
     assert result.spinsplitting_wo_soc == "k-dependent"
-    assert result.quasi_2d["status"] == "heuristic"
-    assert result.quasi_2d["source"] == "heuristic"
+    assert result.quasi_2d["status"] == "explicit"
+    assert result.quasi_2d["source"] == "runtime_parameter"
     assert result.quasi_2d["dimension"] == "2d"
     assert result.quasi_2d["vacuum_axis_input"] == "c"
     assert result.quasi_2d["interpretation"] == "in_plane_k_dependent"
@@ -2740,7 +2743,10 @@ def test_find_spin_group_reports_quasi2d_diagnostics_without_changing_3d_fields(
 
 
 def test_v2se2o_quasi2d_case_study_uses_final_acc_primitive_transform_chain():
-    result = find_spin_group("tests/testset/V2Se2O_2d.mcif")
+    result = find_spin_group(
+        "tests/testset/V2Se2O_2d.mcif",
+        calculation_mode="quasi2d",
+    )
 
     assert result.index == "123.47.1.1.L"
     assert result.acc == "4/mmmP"
@@ -2748,8 +2754,8 @@ def test_v2se2o_quasi2d_case_study_uses_final_acc_primitive_transform_chain():
     assert result.is_alter == "(Altermagnet)"
 
     quasi_2d = result.quasi_2d
-    assert quasi_2d["status"] == "heuristic"
-    assert quasi_2d["source"] == "heuristic"
+    assert quasi_2d["status"] == "explicit"
+    assert quasi_2d["source"] == "runtime_parameter"
     assert quasi_2d["dimension"] == "2d"
     assert quasi_2d["vacuum_axis_input"] == "c"
     assert quasi_2d["interpretation"] == "in_plane_k_dependent"
@@ -2831,9 +2837,8 @@ def test_quasi2d_input_tags_do_not_control_runtime_mode(tmp_path):
     result = find_spin_group(str(tagged_path))
 
     assert result.index == "149.149.1.1.L"
-    assert result.quasi_2d["calculation_mode"] == "auto"
-    assert result.quasi_2d["status"] == "not_applicable"
-    assert result.quasi_2d["dimension"] == "3d_or_unknown"
+    assert result.quasi_2d is None
+    assert result.spin_splitting_2d_interpretation is None
 
 
 def test_find_spin_group_exposes_input_setting_payload_for_magnetic_primitive_poscar(tmp_path):
