@@ -72,7 +72,7 @@ def _normalize_dimension(value) -> str | None:
 def _normalize_calculation_mode(value) -> str | None:
     text = _normalize_scalar(value)
     if text is None:
-        return None
+        return "3d"
     normalized = text.lower().replace("_", "-").replace(" ", "")
     if normalized in {"auto", "default"}:
         return "auto"
@@ -400,15 +400,15 @@ def build_quasi2d_diagnostics(
     acc_primitive_ssg,
     base_is_alter: str,
     tol: float,
-    calculation_mode: str | None = None,
-    vacuum_axis: str | None = None,
-) -> dict:
+    calculation_mode: str | None = "3d",
+    vacuum_axis: str | None = "c",
+) -> dict | None:
     calculation_mode = _normalize_calculation_mode(calculation_mode)
+    if calculation_mode == "3d":
+        return None
     dimension = None
     if calculation_mode == "quasi2d":
         dimension = "2d"
-    elif calculation_mode == "3d":
-        dimension = "3d"
     explicit_axis, explicit_axis_index = _normalize_axis(vacuum_axis)
     heuristic_status, heuristic_axis_index, candidates, heuristic_axis = _select_heuristic_vacuum_axis(
         input_cell_detail

@@ -233,13 +233,13 @@ def main():
     parser.add_argument(
         "--calculation-mode",
         choices=["auto", "quasi2d", "2d", "3d", "bulk", "slab", "layer"],
-        default="auto",
+        default="3d",
         help="Quasi-2D interpretation mode for additive diagnostics.",
     )
     parser.add_argument(
         "--vacuum-axis",
         choices=["a", "b", "c", "x", "y", "z", "0", "1", "2"],
-        default=None,
+        default="c",
         help="Input-cell vacuum axis for --calculation-mode quasi2d/2d.",
     )
 
