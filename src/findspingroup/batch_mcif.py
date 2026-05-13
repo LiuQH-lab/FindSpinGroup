@@ -1077,10 +1077,22 @@ def _parse_args() -> argparse.Namespace:
         default="full",
         help="Choose the full pipeline or the lightweight basic route for each case.",
     )
-    parser.add_argument("--space-tol", type=float, default=0.02)
+    parser.add_argument(
+        "--space-tol",
+        "--space_tol",
+        dest="space_tol",
+        type=float,
+        default=0.02,
+    )
     parser.add_argument("--mtol", type=float, default=0.02)
     parser.add_argument("--meigtol", type=float, default=0.00002)
-    parser.add_argument("--matrix-tol", type=float, default=0.01)
+    parser.add_argument(
+        "--matrix-tol",
+        "--matrix_tol",
+        dest="matrix_tol",
+        type=float,
+        default=0.01,
+    )
     parser.add_argument(
         "--calculation-mode",
         choices=["auto", "quasi2d", "2d", "3d", "bulk", "slab", "layer"],
