@@ -35,7 +35,7 @@ from findspingroup.io.scif_generator import (
     affine_matrix_to_xyz_expression,
     generate_scif,
 )
-from findspingroup.quasi2d import build_quasi2d_diagnostics
+from findspingroup.quasi2d import build_quasi2d_diagnostics, prepare_quasi2d_input_cell
 from findspingroup.structure import SpinSpaceGroup,SpinSpaceGroupOperation
 from findspingroup.structure.group import integer_points_in_new_cell, op_key, _resolve_point_group_info
 from findspingroup.structure.cell import (
@@ -1584,6 +1584,44 @@ def spin_splitting_wo_soc(magnetic_phase_base, is_ss_gp):
             return 'No'
         return 'k-dependent'
     return 'Zeeman'
+
+
+def _spin_splitting_wo_soc_quasi2d(magnetic_phase_base: str, spin_splitting_2d: str | None) -> str:
+    if magnetic_phase_base in FM_LIKE_BASE_PHASES:
+        return 'Zeeman'
+    if spin_splitting_2d == "spin splitting":
+        return 'k-dependent'
+    if spin_splitting_2d == "no spin splitting":
+        return 'No'
+    if spin_splitting_2d in {"ambiguous", "unknown", "not_applicable"}:
+        return str(spin_splitting_2d)
+    return 'unknown'
+
+
+def _build_quasi2d_magnetic_phase(
+    *,
+    parent_magnetic_phase_payload: dict,
+    quasi_2d: dict | None,
+) -> str | None:
+    if not isinstance(quasi_2d, dict):
+        return None
+    base_phase = parent_magnetic_phase_payload['base_phase']
+    spin_splitting_2d = quasi_2d.get('spin_splitting_2d')
+    ss_wo_soc_2d = _spin_splitting_wo_soc_quasi2d(base_phase, spin_splitting_2d)
+    alter_tag_2d = is_alter(
+        parent_magnetic_phase_payload['details'].get('conf'),
+        base_phase,
+        ss_wo_soc_2d,
+    )
+    som_tag = (
+        parent_magnetic_phase_payload['spin_orbit_magnet_tag']
+        if base_phase == 'AFM'
+        else ''
+    )
+    phase = base_phase + alter_tag_2d
+    if som_tag:
+        phase += '\n' + som_tag
+    return phase
 
 def spin_splitting_w_soc(ssg:SpinSpaceGroup):
     if ssg.is_PT:
@@ -4024,6 +4062,66 @@ def _build_msg_little_group_core(
     return primitive_msg_ops, little_groups, little_group_symbols
 
 
+def _quasi2d_in_plane_acc_kpoint_indices(quasi_2d: dict | None) -> list[int]:
+    if not isinstance(quasi_2d, dict):
+        return []
+    indices = []
+    acc_index = 0
+    for row in quasi_2d.get("kpoints") or []:
+        if row.get("kind") != "acc_table":
+            continue
+        if row.get("plane_classification") == "in_plane":
+            indices.append(acc_index)
+        acc_index += 1
+    return indices
+
+
+def _select_indices(values, indices: list[int]) -> list:
+    return [values[index] for index in indices if 0 <= index < len(values)]
+
+
+def _build_quasi2d_little_group_payload(
+    *,
+    quasi_2d: dict | None,
+    acc_primitive_ssg: SpinSpaceGroup,
+    ssg_little_groups: list[list[SpinSpaceGroupOperation]],
+    msg_little_groups: list[list[list]],
+    msg_little_group_symbols: list[str | None],
+    msg_spin_polarizations: list[list[str]],
+    tol: float,
+) -> dict:
+    indices = _quasi2d_in_plane_acc_kpoint_indices(quasi_2d)
+    if not indices:
+        return {
+            "ssg_little_group_symbol_2d": [],
+            "msg_little_group_symbol_2d": [],
+            "msg_spin_polarization_2d": [],
+            "ssg_little_group_ops_2d": [],
+            "ssg_little_group_seitz_latex_2d": [],
+            "msg_little_group_ops_2d": [],
+            "msg_little_group_seitz_latex_2d": [],
+        }
+
+    ssg_little_group_symbols = list(acc_primitive_ssg.little_groups_symbols)
+    ssg_little_groups_2d = _select_indices(ssg_little_groups, indices)
+    msg_little_groups_2d = _select_indices(msg_little_groups, indices)
+    return {
+        "ssg_little_group_symbol_2d": _select_indices(ssg_little_group_symbols, indices),
+        "msg_little_group_symbol_2d": _select_indices(msg_little_group_symbols, indices),
+        "msg_spin_polarization_2d": _select_indices(msg_spin_polarizations, indices),
+        "ssg_little_group_ops_2d": _serialize_ssg_little_group_ops(ssg_little_groups_2d),
+        "ssg_little_group_seitz_latex_2d": _serialize_ssg_little_group_seitz_latex(
+            ssg_little_groups_2d,
+            tol=tol,
+        ),
+        "msg_little_group_ops_2d": _serialize_msg_little_group_ops(msg_little_groups_2d),
+        "msg_little_group_seitz_latex_2d": _serialize_msg_little_group_seitz_latex(
+            msg_little_groups_2d,
+            tol=tol,
+        ),
+    }
+
+
 def _make_wp_chain(wp_sg, wp_ssg, wp_msg, cell, atom_types_dict):
     chain = tuple(
         (
@@ -4975,9 +5073,33 @@ def _find_spin_group_from_parsed(
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
 ) -> MagSymmetryResult:
-    input_cell = CrystalCell(
-        lattice_factors,
+    input_lattice_for_cell = lattice_factors
+    input_positions_for_cell = positions
+    input_lattice_array = np.asarray(lattice_factors, dtype=float)
+    if input_lattice_array.shape == (3, 3):
+        input_lattice_matrix = input_lattice_array
+    else:
+        a, b, c, alpha, beta, gamma = input_lattice_array.reshape(6).tolist()
+        input_lattice_matrix = np.asarray(
+            calculate_vector_coordinates_from_latticefactors(a, b, c, alpha, beta, gamma),
+            dtype=float,
+        )
+    (
+        quasi2d_lattice_for_cell,
+        quasi2d_positions_for_cell,
+        quasi2d_vacuum_padding,
+    ) = prepare_quasi2d_input_cell(
+        input_lattice_matrix,
         positions,
+        calculation_mode=calculation_mode,
+        vacuum_axis=vacuum_axis,
+    )
+    if quasi2d_vacuum_padding is not None:
+        input_lattice_for_cell = quasi2d_lattice_for_cell
+        input_positions_for_cell = quasi2d_positions_for_cell
+    input_cell = CrystalCell(
+        input_lattice_for_cell,
+        input_positions_for_cell,
         occupancies,
         elements,
         moments,
@@ -5393,7 +5515,14 @@ def _find_spin_group_from_parsed(
         tol=tol_cfg.m_matrix_tol,
         calculation_mode=calculation_mode,
         vacuum_axis=vacuum_axis,
+        vacuum_padding=quasi2d_vacuum_padding,
     )
+    quasi_2d_magnetic_phase = _build_quasi2d_magnetic_phase(
+        parent_magnetic_phase_payload=magnetic_phase_payload,
+        quasi_2d=quasi_2d_diagnostics,
+    )
+    if quasi_2d_magnetic_phase is not None:
+        quasi_2d_diagnostics['magnetic_phase'] = quasi_2d_magnetic_phase
     ssg_little_groups = _get_ssg_little_groups(
         acc_primitive_output_ssg,
         tol=tol_cfg.m_matrix_tol,
@@ -5413,6 +5542,18 @@ def _find_spin_group_from_parsed(
         tol=tol_cfg.m_matrix_tol,
         spin_frame_rotation=acc_real_cartesian_to_poscar_spin_frame,
     )
+    if quasi_2d_diagnostics is not None:
+        quasi_2d_diagnostics.update(
+            _build_quasi2d_little_group_payload(
+                quasi_2d=quasi_2d_diagnostics,
+                acc_primitive_ssg=acc_primitive_output_ssg,
+                ssg_little_groups=ssg_little_groups,
+                msg_little_groups=msg_little_groups,
+                msg_little_group_symbols=msg_little_group_symbols,
+                msg_spin_polarizations=msg_spin_polarizations_poscar,
+                tol=tol_cfg.m_matrix_tol,
+            )
+        )
     tensor_outputs = _compute_tensor_outputs(
         acc_magnetic_primitive_ssg,
         acc_magnetic_primitive_cell,

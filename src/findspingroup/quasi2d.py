@@ -5,11 +5,19 @@ from dataclasses import dataclass
 import numpy as np
 
 from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs
-from findspingroup.structure.group import combine_parametric_solutions
+from findspingroup.structure.group import (
+    BrillouinZoneMatcher,
+    combine_parametric_solutions,
+    find_uvw_whole_string,
+    write_kpoints,
+)
 from findspingroup.utils.matrix_utils import getNormInf, rref_with_tolerance
 
 
 AXIS_LABELS = ("a", "b", "c")
+QUASI2D_MIN_VACUUM_AXIS_LENGTH = 20.0
+QUASI2D_MIN_VACUUM_AXIS_LENGTH_RATIO = 1.8
+QUASI2D_MIN_VACUUM_GAP_LENGTH = 15.0
 
 
 @dataclass(frozen=True)
@@ -172,6 +180,118 @@ def _select_heuristic_vacuum_axis(
     return "heuristic", viable[0].axis_index, candidates, viable[0].axis
 
 
+def _occupied_window_fractional(coords: np.ndarray) -> tuple[float, float, float, float, np.ndarray]:
+    coords = np.sort(np.mod(np.asarray(coords, dtype=float).reshape(-1), 1.0))
+    if coords.size == 0:
+        return 0.0, 0.0, 0.0, 1.0, coords
+    if coords.size == 1:
+        return float(coords[0]), float(coords[0]), 0.0, 1.0, coords
+
+    gaps = np.diff(coords)
+    wrap_gap = coords[0] + 1.0 - coords[-1]
+    all_gaps = np.concatenate([gaps, np.array([wrap_gap])])
+    gap_index = int(np.argmax(all_gaps))
+    largest_gap = float(all_gaps[gap_index])
+
+    start = float(coords[(gap_index + 1) % coords.size])
+    end = float(coords[gap_index])
+    if end < start:
+        end += 1.0
+    unwrapped = coords.copy()
+    unwrapped[unwrapped < start - 1e-10] += 1.0
+    return start, end, float(max(0.0, end - start)), largest_gap, unwrapped
+
+
+def prepare_quasi2d_input_cell(
+    lattice_matrix,
+    positions,
+    *,
+    calculation_mode: str | None = "3d",
+    vacuum_axis: str | None = "c",
+    min_axis_length: float = QUASI2D_MIN_VACUUM_AXIS_LENGTH,
+    min_axis_length_ratio: float = QUASI2D_MIN_VACUUM_AXIS_LENGTH_RATIO,
+    min_vacuum_gap_length: float = QUASI2D_MIN_VACUUM_GAP_LENGTH,
+    tol: float = 1e-8,
+) -> tuple[np.ndarray, np.ndarray, dict | None]:
+    calculation_mode = _normalize_calculation_mode(calculation_mode)
+    axis, axis_index = _normalize_axis(vacuum_axis)
+    lattice = np.asarray(lattice_matrix, dtype=float).reshape(3, 3).copy()
+    new_positions = np.asarray(positions, dtype=float).reshape(-1, 3).copy() % 1.0
+    if calculation_mode != "quasi2d" or axis_index is None:
+        return lattice, new_positions, None
+
+    lengths = np.linalg.norm(lattice, axis=1)
+    current_axis_length = float(lengths[axis_index])
+    other_axis_length = float(np.max(np.delete(lengths, axis_index)))
+    if current_axis_length <= tol:
+        return lattice, new_positions, {
+            "applied": False,
+            "status": "invalid_axis_length",
+            "axis": axis,
+            "axis_index": axis_index,
+            "original_axis_length": current_axis_length,
+        }
+
+    coords = new_positions[:, axis_index]
+    cluster_start, cluster_end, occupied_span_fraction, largest_gap_fraction, _ = (
+        _occupied_window_fractional(coords)
+    )
+    occupied_span_length = occupied_span_fraction * current_axis_length
+    target_axis_length = max(
+        current_axis_length,
+        float(min_axis_length),
+        other_axis_length * float(min_axis_length_ratio),
+        occupied_span_length + float(min_vacuum_gap_length),
+    )
+    scale_factor = target_axis_length / current_axis_length
+
+    padding = {
+        "applied": False,
+        "status": "already_sufficient",
+        "axis": axis,
+        "axis_index": axis_index,
+        "method": "scale_input_lattice_axis_preserve_slab_cartesian_span",
+        "minimum_axis_length": _json_float(min_axis_length),
+        "minimum_axis_length_ratio": _json_float(min_axis_length_ratio),
+        "minimum_vacuum_gap_length": _json_float(min_vacuum_gap_length),
+        "original_axis_length": _json_float(current_axis_length),
+        "target_axis_length": _json_float(target_axis_length),
+        "final_axis_length": _json_float(current_axis_length),
+        "scale_factor": 1.0,
+        "occupied_span_fraction": _json_float(occupied_span_fraction),
+        "occupied_span_length": _json_float(occupied_span_length),
+        "original_vacuum_gap_fraction": _json_float(largest_gap_fraction),
+        "original_vacuum_gap_length": _json_float(largest_gap_fraction * current_axis_length),
+        "final_vacuum_gap_length": _json_float(largest_gap_fraction * current_axis_length),
+        "cluster_start_fractional": _json_float(cluster_start % 1.0),
+        "cluster_end_fractional_unwrapped": _json_float(cluster_end),
+    }
+    if scale_factor <= 1.0 + tol:
+        return lattice, new_positions, padding
+
+    unwrapped = np.asarray(coords, dtype=float).copy()
+    unwrapped[unwrapped < cluster_start - 1e-10] += 1.0
+    cluster_center = cluster_start + 0.5 * occupied_span_fraction
+    new_axis_coords = 0.5 + (unwrapped - cluster_center) / scale_factor
+    new_positions[:, axis_index] = np.mod(new_axis_coords, 1.0)
+    lattice[axis_index] *= scale_factor
+
+    padding.update(
+        {
+            "applied": True,
+            "status": "expanded",
+            "final_axis_length": _json_float(target_axis_length),
+            "scale_factor": _json_float(scale_factor),
+            "final_vacuum_gap_length": _json_float(target_axis_length - occupied_span_length),
+            "slab_center_fractional_before": _json_float(cluster_center % 1.0),
+            "slab_center_fractional_after": 0.5,
+            "original_lattice": _json_matrix(lattice_matrix),
+            "padded_lattice": _json_matrix(lattice),
+        }
+    )
+    return lattice, new_positions, padding
+
+
 def _extract_transform_matrix(transform) -> np.ndarray | None:
     if transform is None:
         return None
@@ -272,6 +392,18 @@ def _generic_in_plane_acc_kpoint(
     return np.linalg.solve(input_to_acc_matrix.T, k_input)
 
 
+def _format_k_symbol(label: str, kpoint_string: str | None) -> str | None:
+    if not kpoint_string:
+        return None
+    return f"{label}:{kpoint_string}"
+
+
+def _format_numeric_k_symbol(label: str, kpoint) -> str:
+    values = _json_mod1_vector(kpoint)
+    parts = [f"{value:g}" for value in values]
+    return f"{label}:({','.join(parts)})"
+
+
 def _serialize_kpoint_analysis(
     *,
     label: str,
@@ -282,6 +414,7 @@ def _serialize_kpoint_analysis(
     spin_polarizations,
     tol: float,
     kind: str,
+    k_symbol_2d: str | None = None,
 ) -> dict:
     plane_class, k_input, vacuum_distance = _classify_kpoint_plane(
         k_acc,
@@ -292,6 +425,7 @@ def _serialize_kpoint_analysis(
     return {
         "label": label,
         "kind": kind,
+        "k_symbol_2d": k_symbol_2d,
         "k_acc_primitive": _json_vector(k_acc),
         "k_input_reciprocal": _json_mod1_vector(k_input),
         "plane_classification": plane_class,
@@ -316,6 +450,105 @@ def _kpoint_projection_summary(kpoint_rows: list[dict]) -> dict:
             labels_by_plane.get("out_of_plane", []) + labels_by_plane.get("mixed", [])
         ),
     }
+
+
+def _format_seekpath_label(label: str) -> str:
+    return "Γ" if label == "GAMMA" else str(label).replace("_", "")
+
+
+def _build_in_plane_compact_kpoints(
+    acc_primitive_ssg,
+    kpoint_rows: list[dict],
+    *,
+    input_to_acc_matrix: np.ndarray,
+    vacuum_axis_index: int,
+    tol: float,
+) -> str:
+    in_plane_labels = {
+        row["label"]
+        for row in kpoint_rows
+        if row.get("kind") == "acc_table" and row.get("plane_classification") == "in_plane"
+    }
+    rules = []
+    for label, kpoint_string, spin_splitting in zip(
+        acc_primitive_ssg.kpoints_label,
+        acc_primitive_ssg.kpoints_primitive_string,
+        acc_primitive_ssg.is_spinsplitting,
+    ):
+        if label not in in_plane_labels:
+            continue
+        rules.append((label, kpoint_string, spin_splitting == "spin splitting"))
+    if not rules:
+        return ""
+
+    matcher = BrillouinZoneMatcher(rules)
+    original_kpath = acc_primitive_ssg.kpath_info
+    original_point_coords = original_kpath["point_coords"]
+    filtered_point_coords = {
+        label: coords
+        for label, coords in original_point_coords.items()
+        if _format_seekpath_label(label) in in_plane_labels
+    }
+    filtered_path = []
+    for start_label, end_label in original_kpath["path"]:
+        if start_label not in filtered_point_coords or end_label not in filtered_point_coords:
+            continue
+        start = np.asarray(original_point_coords[start_label], dtype=float)
+        end = np.asarray(original_point_coords[end_label], dtype=float)
+        midpoint = (start + end) / 2.0
+        midpoint_plane, _, _ = _classify_kpoint_plane(
+            midpoint,
+            input_to_acc_matrix,
+            vacuum_axis_index,
+            tol=tol,
+        )
+        if midpoint_plane == "in_plane":
+            filtered_path.append((start_label, end_label))
+
+    low_symm_indices = find_uvw_whole_string(acc_primitive_ssg.kpoints_symbol_primitive)
+    extra_points = [
+        (acc_primitive_ssg.kpoints_primitive[index], acc_primitive_ssg.kpoints_label[index])
+        for index in low_symm_indices
+        if acc_primitive_ssg.kpoints_label[index] in in_plane_labels
+    ]
+    kpoints_text = write_kpoints(
+        {"point_coords": filtered_point_coords, "path": filtered_path},
+        matcher,
+        extra_kpoints=extra_points,
+    )
+    return kpoints_text
+
+
+def _match_acc_table_row_for_kpoint(acc_primitive_ssg, k_acc, rows: list[dict]) -> dict | None:
+    in_plane_acc_labels = {
+        row.get("label")
+        for row in rows
+        if row.get("kind") == "acc_table" and row.get("plane_classification") == "in_plane"
+    }
+    rules = [
+        (label, kpoint_string, spin_splitting == "spin splitting")
+        for label, kpoint_string, spin_splitting in zip(
+            acc_primitive_ssg.kpoints_label,
+            acc_primitive_ssg.kpoints_primitive_string,
+            acc_primitive_ssg.is_spinsplitting,
+        )
+        if label in in_plane_acc_labels
+    ]
+    if not rules:
+        return None
+    matcher = BrillouinZoneMatcher(rules)
+    try:
+        matched_label = matcher.check(*np.asarray(k_acc, dtype=float).reshape(3))["matched_label"]
+    except ValueError:
+        return None
+    return next(
+        (
+            row
+            for row in rows
+            if row.get("kind") == "acc_table" and row.get("label") == matched_label
+        ),
+        None,
+    )
 
 
 def _wrapped_k_delta(target, source) -> np.ndarray:
@@ -402,6 +635,7 @@ def build_quasi2d_diagnostics(
     tol: float,
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
+    vacuum_padding: dict | None = None,
 ) -> dict | None:
     calculation_mode = _normalize_calculation_mode(calculation_mode)
     if calculation_mode == "3d":
@@ -415,6 +649,7 @@ def build_quasi2d_diagnostics(
     )
     geometry = {
         "candidate_axes": [_candidate_to_dict(candidate) for candidate in candidates],
+        "vacuum_padding": vacuum_padding,
     }
 
     source = "none"
@@ -453,6 +688,9 @@ def build_quasi2d_diagnostics(
         "vacuum_axis_input": vacuum_axis,
         "vacuum_axis_index": vacuum_axis_index,
         "geometry": geometry,
+        "KPOINTS": None,
+        "KPOINTS_setting": "acc_primitive",
+        "KPOINTS_filter": "in_plane",
         "kpoints": [],
         "kpoint_projection_summary": {
             "source": "acc_table",
@@ -496,11 +734,13 @@ def build_quasi2d_diagnostics(
     diagnostic_row = None
     kpoints = list(acc_primitive_ssg.kpoints_primitive)
     labels = list(acc_primitive_ssg.kpoints_label)
+    kpoint_strings = list(acc_primitive_ssg.kpoints_primitive_string)
     polarizations = list(acc_primitive_ssg.spin_polarizations)
     spin_splitting_flags = list(acc_primitive_ssg.is_spinsplitting)
-    for label, k_acc, spin_splitting, spin_polarization in zip(
+    for label, k_acc, kpoint_string, spin_splitting, spin_polarization in zip(
         labels,
         kpoints,
+        kpoint_strings,
         spin_splitting_flags,
         polarizations,
     ):
@@ -514,38 +754,56 @@ def build_quasi2d_diagnostics(
                 spin_polarizations=spin_polarization,
                 tol=tol,
                 kind="acc_table",
+                k_symbol_2d=_format_k_symbol(label, kpoint_string),
             )
         )
 
     try:
         diagnostic_k_acc = _generic_in_plane_acc_kpoint(input_to_acc_matrix, vacuum_axis_index)
-        diagnostic_little_group = _little_group_for_primitive_kpoint(
-            acc_primitive_ssg,
-            diagnostic_k_acc,
-            tol=tol,
-        )
-        diagnostic_spin_splitting, diagnostic_spin_polarizations = _spin_splitting_for_little_group(
-            diagnostic_little_group,
-            tol=tol,
-        )
+        gp2d_row = _match_acc_table_row_for_kpoint(acc_primitive_ssg, diagnostic_k_acc, rows)
+        if gp2d_row is None:
+            diagnostic_little_group = _little_group_for_primitive_kpoint(
+                acc_primitive_ssg,
+                diagnostic_k_acc,
+                tol=tol,
+            )
+            diagnostic_spin_splitting, diagnostic_spin_polarizations = _spin_splitting_for_little_group(
+                diagnostic_little_group,
+                tol=tol,
+            )
+            diagnostic_source = "computed_probe"
+        else:
+            diagnostic_spin_splitting = gp2d_row.get("spin_splitting")
+            diagnostic_spin_polarizations = gp2d_row.get("spin_polarizations", [])
+            diagnostic_source = "matched_acc_table"
         diagnostic_row = _serialize_kpoint_analysis(
-            label="GP2D",
+            label="GP",
             k_acc=diagnostic_k_acc,
             input_to_acc_matrix=input_to_acc_matrix,
             vacuum_axis_index=vacuum_axis_index,
-            spin_splitting=diagnostic_spin_splitting,
+            spin_splitting=diagnostic_spin_splitting or "unknown",
             spin_polarizations=diagnostic_spin_polarizations,
             tol=tol,
-            kind="generated_in_plane_generic",
+            kind="generated_in_plane_generic_probe",
+            k_symbol_2d=_format_numeric_k_symbol("GP", diagnostic_k_acc),
         )
-        diagnostic_row["little_group_order"] = len(diagnostic_little_group)
-        rows.append(diagnostic_row)
+        diagnostic_row["source"] = diagnostic_source
+        diagnostic_row["matched_acc_label"] = None if gp2d_row is None else gp2d_row.get("label")
+        diagnostic_row["matched_acc_k_symbol_2d"] = (
+            None if gp2d_row is None else gp2d_row.get("k_symbol_2d")
+        )
+        diagnostic_row["matched_acc_k_acc_primitive"] = (
+            None if gp2d_row is None else gp2d_row.get("k_acc_primitive")
+        )
+        if gp2d_row is None:
+            diagnostic_row["little_group_order"] = len(diagnostic_little_group)
         base_payload["diagnostic_points"] = [diagnostic_row]
     except np.linalg.LinAlgError:
+        diagnostic_row = None
         base_payload["diagnostic_points"] = [
             {
-                "label": "GP2D",
-                "kind": "generated_in_plane_generic",
+                "label": "GP",
+                "kind": "generated_in_plane_generic_probe",
                 "error": "singular_input_to_acc_reciprocal_transform",
             }
         ]
@@ -553,12 +811,20 @@ def build_quasi2d_diagnostics(
     interpretation, spin_splitting_2d = _interpret_2d_spin_splitting(rows)
     projection_summary = _kpoint_projection_summary(rows)
     generic_point_comparison = _generic_point_comparison(rows, diagnostic_row, tol=tol)
+    compact_kpoints = _build_in_plane_compact_kpoints(
+        acc_primitive_ssg,
+        rows,
+        input_to_acc_matrix=input_to_acc_matrix,
+        vacuum_axis_index=vacuum_axis_index,
+        tol=tol,
+    )
     base_payload.update(
         {
             "reciprocal_transform": {
                 "input_to_acc_real_space_matrix": _json_matrix(input_to_acc_matrix),
                 "acc_k_to_input_k_matrix": _json_matrix(input_to_acc_matrix.T),
             },
+            "KPOINTS": compact_kpoints,
             "kpoints": rows,
             "kpoint_projection_summary": projection_summary,
             "generic_point_comparison": generic_point_comparison,

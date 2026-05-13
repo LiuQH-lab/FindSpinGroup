@@ -78,6 +78,7 @@ from findspingroup.find_spin_group import (
 )
 from findspingroup.io import parse_cif_file, parse_poscar_file, parse_scif_metadata
 from findspingroup.io.scif_generator import write_scif_spin_only
+from findspingroup.quasi2d import prepare_quasi2d_input_cell
 from findspingroup.structure import SpinSpaceGroup
 from findspingroup.structure.cell import (
     AtomicSite,
@@ -2731,7 +2732,7 @@ def test_find_spin_group_reports_quasi2d_diagnostics_without_changing_3d_fields(
     assert result.quasi_2d["interpretation"] == "in_plane_k_dependent"
     assert result.quasi_2d["spin_splitting_2d"] == "spin splitting"
     assert result.spin_splitting_2d_interpretation == "in_plane_k_dependent"
-    assert result.quasi_2d["diagnostic_points"][0]["label"] == "GP2D"
+    assert result.quasi_2d["diagnostic_points"][0]["label"] == "GP"
     assert result.quasi_2d["diagnostic_points"][0]["plane_classification"] == "in_plane"
     assert result.quasi_2d["generic_point_comparison"]["status"] == "compared"
     assert result.quasi_2d["generic_point_comparison"]["k_input_changed"] is True
@@ -2761,12 +2762,50 @@ def test_v2se2o_quasi2d_case_study_uses_final_acc_primitive_transform_chain():
     assert quasi_2d["interpretation"] == "in_plane_k_dependent"
     assert quasi_2d["spin_splitting_2d"] == "spin splitting"
     assert quasi_2d["is_alter_2d"] == "(Altermagnet)"
-    assert quasi_2d["diagnostic_points"][0]["label"] == "GP2D"
+    assert quasi_2d["magnetic_phase"] == "AFM(Altermagnet)\n(SOM)"
+    assert "magnetic_phase_base" not in quasi_2d
+    assert not hasattr(result, "magnetic_phase_2d")
+    assert quasi_2d["KPOINTS"].startswith(result.KPOINTS.splitlines()[0])
+    assert "Line-mode\nReciprocal" in quasi_2d["KPOINTS"]
+    assert "  0.000000   0.000000   0.500000 ! Z" not in quasi_2d["KPOINTS"]
+    assert "  0.417000   0.237000   0.000000 ! D" in quasi_2d["KPOINTS"]
+    kpoints_2d = [
+        row
+        for row in quasi_2d["kpoints"]
+        if row["kind"] == "acc_table" and row["plane_classification"] == "in_plane"
+    ]
+    assert [row["label"] for row in kpoints_2d] == ["Γ", "M", "X", "Δ", "Σ", "Y", "D"]
+    assert [row["k_symbol_2d"] for row in kpoints_2d] == [
+        "Γ:(0,0,0)",
+        "M:(1/2,1/2,0)",
+        "X:(0,1/2,0)",
+        "Δ:(0,v,0)",
+        "Σ:(u,u,0)",
+        "Y:(u,1/2,0)",
+        "D:(u,v,0)",
+    ]
+    for key in (
+        "ssg_little_group_symbol_2d",
+        "msg_little_group_symbol_2d",
+        "msg_spin_polarization_2d",
+        "ssg_little_group_ops_2d",
+        "ssg_little_group_seitz_latex_2d",
+        "msg_little_group_ops_2d",
+        "msg_little_group_seitz_latex_2d",
+    ):
+        assert len(quasi_2d[key]) == len(kpoints_2d)
+    assert quasi_2d["msg_little_group_symbol_2d"][0] == result.msg_little_group_symbols[1]
+    assert quasi_2d["msg_spin_polarization_2d"][0] == result.msg_spin_polarizations[1]
+    assert quasi_2d["diagnostic_points"][0]["label"] == "GP"
+    assert quasi_2d["diagnostic_points"][0]["k_symbol_2d"] == "GP:(0.237,0.371,0)"
     assert quasi_2d["diagnostic_points"][0]["plane_classification"] == "in_plane"
     assert quasi_2d["diagnostic_points"][0]["spin_splitting"] == "spin splitting"
+    assert quasi_2d["diagnostic_points"][0]["matched_acc_label"] == "D"
+    assert quasi_2d["diagnostic_points"][0]["matched_acc_k_symbol_2d"] == "D:(u,v,0)"
     assert quasi_2d["generic_point_comparison"]["gp_3d"]["label"] == "GP"
     assert quasi_2d["generic_point_comparison"]["gp_3d"]["plane_classification"] == "mixed"
-    assert quasi_2d["generic_point_comparison"]["gp_2d"]["label"] == "GP2D"
+    assert quasi_2d["generic_point_comparison"]["gp_2d"]["label"] == "GP"
+    assert quasi_2d["generic_point_comparison"]["gp_2d"]["k_symbol_2d"] == "GP:(0.237,0.371,0)"
     assert quasi_2d["generic_point_comparison"]["gp_2d"]["plane_classification"] == "in_plane"
     assert quasi_2d["generic_point_comparison"]["k_input_changed"] is True
     assert quasi_2d["generic_point_comparison"]["spin_splitting_changed"] is False
@@ -2823,6 +2862,54 @@ def test_quasi2d_calculation_mode_parameter_overrides_geometry_heuristic():
     assert result.quasi_2d["generic_point_comparison"]["spin_splitting_changed"] is False
 
 
+def test_quasi2d_input_padding_expands_vacuum_axis_without_stretching_slab():
+    lattice = np.diag([3.0, 3.0, 5.0])
+    positions = np.array(
+        [
+            [0.0, 0.0, 0.45],
+            [0.5, 0.5, 0.55],
+        ],
+        dtype=float,
+    )
+
+    padded_lattice, padded_positions, padding = prepare_quasi2d_input_cell(
+        lattice,
+        positions,
+        calculation_mode="quasi2d",
+        vacuum_axis="c",
+    )
+
+    assert padding["status"] == "expanded"
+    assert padding["applied"] is True
+    assert np.allclose(padded_lattice[0], lattice[0])
+    assert np.allclose(padded_lattice[1], lattice[1])
+    assert np.isclose(np.linalg.norm(padded_lattice[2]), 20.0)
+    assert np.allclose(padded_positions[:, 2], [0.4875, 0.5125])
+    original_span = (positions[1, 2] - positions[0, 2]) * np.linalg.norm(lattice[2])
+    padded_span = (
+        (padded_positions[1, 2] - padded_positions[0, 2])
+        * np.linalg.norm(padded_lattice[2])
+    )
+    assert np.isclose(padded_span, original_span)
+    assert np.isclose(padding["final_vacuum_gap_length"], 19.5)
+
+
+def test_quasi2d_input_padding_is_not_used_for_3d_mode():
+    lattice = np.diag([3.0, 3.0, 5.0])
+    positions = np.array([[0.0, 0.0, 0.45]], dtype=float)
+
+    padded_lattice, padded_positions, padding = prepare_quasi2d_input_cell(
+        lattice,
+        positions,
+        calculation_mode="3d",
+        vacuum_axis="c",
+    )
+
+    assert padding is None
+    assert np.allclose(padded_lattice, lattice)
+    assert np.allclose(padded_positions, positions)
+
+
 def test_quasi2d_input_tags_do_not_control_runtime_mode(tmp_path):
     source_path = next(Path("tests/testset/quasi2d_small/2CrI3-1").glob("*.mcif"))
     tagged_path = tmp_path / "tagged_CrI3.mcif"
@@ -2839,6 +2926,7 @@ def test_quasi2d_input_tags_do_not_control_runtime_mode(tmp_path):
     assert result.index == "149.149.1.1.L"
     assert result.quasi_2d is None
     assert result.spin_splitting_2d_interpretation is None
+    assert not hasattr(result, "magnetic_phase_2d")
 
 
 def test_find_spin_group_exposes_input_setting_payload_for_magnetic_primitive_poscar(tmp_path):
