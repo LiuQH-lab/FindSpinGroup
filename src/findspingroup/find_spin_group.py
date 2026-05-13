@@ -1263,8 +1263,10 @@ class MagSymmetryResult:
         self.gspg_ops = symmetry.get('gspg_ops', None)
         self.gspg_raw_ops = symmetry.get('gspg_raw_ops', None)
         self.gspg_ops_xyz_uvw = symmetry.get('gspg_ops_xyz_uvw', None)
+        self.gspg_raw_ops_xyz_uvw = symmetry.get('gspg_raw_ops_xyz_uvw', None)
         self.gspg_spin_only_ops = symmetry.get('gspg_spin_only_ops', None)
         self.gspg_spin_only_ops_xyz_uvw = symmetry.get('gspg_spin_only_ops_xyz_uvw', None)
+        self.gspg_text = symmetry.get('gspg_text', None)
         self.gspg_collinear_axis = symmetry.get('gspg_collinear_axis', None)
         self.gspg_symbol_linear = symmetry.get('gspg_symbol_linear', None)
         self.gspg_symbol_latex = symmetry.get('gspg_symbol_latex', None)
@@ -1526,6 +1528,7 @@ class MagSymmetryResult:
             'symbol_linear': self.gspg_symbol_linear,
             'symbol_mode': self.gspg_symbol_mode,
             'tentative_symbol_s': self.gspg_tentative_symbol_s,
+            'text': self.gspg_text,
         }
 
     def to_summary_dict(self):
@@ -1818,6 +1821,13 @@ def _serialize_gspg_xyz_uvw_ops(
     return payload
 
 
+def _format_gspg_xyz_uvw_text(rows: list[dict]) -> list[str]:
+    return [
+        f"{row['index']}: xyzt={row['xyzt']}; uvw={row['uvw']}"
+        for row in rows
+    ]
+
+
 def _gspg_public_operation_sets(ssg: SpinSpaceGroup):
     raw_ops = deduplicate_matrix_pairs([[i[0], i[1]] for i in ssg.ops], tol=ssg.tol)
     if ssg.conf == "Collinear":
@@ -2078,12 +2088,33 @@ def _build_gspg_payload(
             else f"{npg_symbol_s} x {spin_only_component_symbol_s}"
         )
 
+    presented_xyz_uvw = _serialize_gspg_xyz_uvw_ops(presented_ops, tol=ssg.tol)
+    raw_xyz_uvw = _serialize_gspg_xyz_uvw_ops(raw_ops, tol=ssg.tol)
+    spin_only_xyz_uvw = _serialize_gspg_xyz_uvw_ops(spin_only_ops, tol=ssg.tol)
+    text_payload = {
+        "symbol_linear": symbol_linear,
+        "effective_mpg_symbol": empg_symbol,
+        "npg_symbol_s": npg_symbol_s,
+        "spin_only_component_symbol_s": spin_only_component_symbol_s,
+        "real_space_setting": real_space_setting,
+        "spin_frame_setting": spin_frame_setting,
+        "output_mode": output_mode,
+        "operation_count": len(presented_ops),
+        "raw_operation_count": len(raw_ops),
+        "spin_only_operation_count": len(spin_only_ops),
+        "operations": _format_gspg_xyz_uvw_text(presented_xyz_uvw),
+        "raw_operations": _format_gspg_xyz_uvw_text(raw_xyz_uvw),
+        "spin_only_operations": _format_gspg_xyz_uvw_text(spin_only_xyz_uvw),
+    }
+
     return {
         "gspg_ops": _serialize_gspg_ops(presented_ops),
         "gspg_raw_ops": _serialize_gspg_ops(raw_ops),
-        "gspg_ops_xyz_uvw": _serialize_gspg_xyz_uvw_ops(presented_ops, tol=ssg.tol),
+        "gspg_ops_xyz_uvw": presented_xyz_uvw,
+        "gspg_raw_ops_xyz_uvw": raw_xyz_uvw,
         "gspg_spin_only_ops": _serialize_gspg_ops(spin_only_ops),
-        "gspg_spin_only_ops_xyz_uvw": _serialize_gspg_xyz_uvw_ops(spin_only_ops, tol=ssg.tol),
+        "gspg_spin_only_ops_xyz_uvw": spin_only_xyz_uvw,
+        "gspg_text": text_payload,
         "gspg_collinear_axis": (
             None if collinear_axis is None else np.asarray(collinear_axis, dtype=float).tolist()
         ),

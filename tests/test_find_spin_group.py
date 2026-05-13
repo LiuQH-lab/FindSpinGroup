@@ -3786,7 +3786,30 @@ def test_find_spin_group_exposes_gspg_xyz_uvw_and_spin_only_exports_for_collinea
     assert result.gspg_spin_only_ops
     assert result.gspg_spin_only_ops_xyz_uvw
     assert all("xyzt" in item and "uvw" in item for item in result.gspg_ops_xyz_uvw)
+    assert all("xyzt" in item and "uvw" in item for item in result.gspg_raw_ops_xyz_uvw)
     assert all("xyzt" in item and "uvw" in item for item in result.gspg_spin_only_ops_xyz_uvw)
+    assert len(result.gspg_raw_ops_xyz_uvw) == len(result.gspg_raw_ops)
+
+
+def test_find_spin_group_exposes_gspg_text_payload_from_public_ossg():
+    result = find_spin_group("examples/0.800_MnTe.mcif")
+    summary_gspg = result.to_summary_dict()["gspg"]
+
+    assert result.gspg_text["symbol_linear"] == result.gspg_symbol_linear
+    assert result.gspg_text["effective_mpg_symbol"] == result.gspg_effective_mpg_symbol
+    assert result.gspg_text["npg_symbol_s"] == result.gspg_npg_symbol_s
+    assert result.gspg_text["real_space_setting"] == result.convention_ssg_setting
+    assert result.gspg_text["spin_frame_setting"] == "ossg_oriented_spin_frame"
+    assert result.gspg_text["output_mode"] == result.gspg_output_mode
+    assert result.gspg_text["operation_count"] == len(result.gspg_ops)
+    assert result.gspg_text["raw_operation_count"] == len(result.gspg_raw_ops)
+    assert result.gspg_text["spin_only_operation_count"] == len(result.gspg_spin_only_ops)
+    assert result.gspg_text["operations"]
+    assert result.gspg_text["operations"][0].startswith("1: xyzt=")
+    assert "; uvw=" in result.gspg_text["operations"][0]
+    assert result.gspg_text["raw_operations"][0].startswith("1: xyzt=")
+    assert result.gspg_text["spin_only_operations"][0].startswith("1: xyzt=")
+    assert summary_gspg["text"] == result.gspg_text
 
 
 @pytest.mark.parametrize(
@@ -4499,7 +4522,9 @@ def test_msg_spin_polarizations_poscar_projection_behaves_consistently_across_re
     assert '"msg_spin_polarizations_acc_poscar_spin_frame"' in encoded
     assert '"gspg_symbol_linear"' in encoded
     assert '"gspg_ops_xyz_uvw"' in encoded
+    assert '"gspg_raw_ops_xyz_uvw"' in encoded
     assert '"gspg_spin_only_ops_xyz_uvw"' in encoded
+    assert '"gspg_text"' in encoded
     assert '"gspg_collinear_axis"' in encoded
 
 
