@@ -744,10 +744,22 @@ def _parse_args() -> argparse.Namespace:
         action="store_false",
         help="Do not save generated POSCAR files.",
     )
-    parser.add_argument("--space-tol", type=float, default=0.02)
+    parser.add_argument(
+        "--space-tol",
+        "--space_tol",
+        dest="space_tol",
+        type=float,
+        default=0.02,
+    )
     parser.add_argument("--mtol", type=float, default=0.02)
     parser.add_argument("--meigtol", type=float, default=0.00002)
-    parser.add_argument("--matrix-tol", type=float, default=0.01)
+    parser.add_argument(
+        "--matrix-tol",
+        "--matrix_tol",
+        dest="matrix_tol",
+        type=float,
+        default=0.01,
+    )
     parser.add_argument("--quiet", action="store_true")
     return parser.parse_args()
 

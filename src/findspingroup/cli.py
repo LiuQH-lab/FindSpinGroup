@@ -225,11 +225,32 @@ def main():
         default="acc-primitive",
         help="Which SSG setting to export when --write-ssg-matrices is used.",
     )
-    parser.add_argument("--space_tol", type=float, default=0.02, help="Spatial tolerance")
+    parser.add_argument(
+        "--space-tol",
+        "--space_tol",
+        dest="space_tol",
+        type=float,
+        default=0.02,
+        help="Spatial tolerance",
+    )
     parser.add_argument("--mtol", type=float, default=0.02, help="Magnetic tolerance")
     parser.add_argument("--meigtol", type=float, default=0.00002, help="Point-group eigenvalue tolerance")
-    parser.add_argument("--matrix_tol", type=float, default=0.01, help="Point-group standardization tolerance")
-    parser.add_argument("--parser_atol", type=float, default=0.02, help="CIF/SCIF parser expansion tolerance")
+    parser.add_argument(
+        "--matrix-tol",
+        "--matrix_tol",
+        dest="matrix_tol",
+        type=float,
+        default=0.01,
+        help="Point-group standardization tolerance",
+    )
+    parser.add_argument(
+        "--parser-atol",
+        "--parser_atol",
+        dest="parser_atol",
+        type=float,
+        default=0.02,
+        help="CIF/SCIF parser expansion tolerance",
+    )
     parser.add_argument(
         "--calculation-mode",
         choices=["auto", "quasi2d", "2d", "3d", "bulk", "slab", "layer"],

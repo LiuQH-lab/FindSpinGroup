@@ -111,5 +111,5 @@ fsg-batch tests/testset/quasi2d_small \
 ```
 
 Common tolerance flags are `--space-tol`, `--mtol`, `--meigtol`, and
-`--matrix-tol`. The single-case CLI uses underscore spellings:
-`--space_tol`, `--mtol`, `--meigtol`, and `--matrix_tol`.
+`--matrix-tol`. The single-case and batch CLIs also keep the older underscore
+spellings, such as `--space_tol` and `--matrix_tol`, as compatibility aliases.

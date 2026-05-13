@@ -432,6 +432,60 @@ def test_cli_all_show_filters_full_route_fields(monkeypatch, capsys):
     assert capsys.readouterr().out.strip() == "Cmcm"
 
 
+def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    captured = {}
+
+    class _FakeResult:
+        def to_dict(self):
+            return {"ok": True}
+
+    def _fake_find_spin_group(path, **kwargs):
+        captured["path"] = path
+        captured.update(kwargs)
+        return _FakeResult()
+
+    monkeypatch.setattr(cli_module, "find_spin_group", _fake_find_spin_group)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "fsg",
+            "--all",
+            "--space-tol",
+            "0.03",
+            "--mtol",
+            "0.04",
+            "--meigtol",
+            "0.0001",
+            "--matrix-tol",
+            "0.02",
+            "--parser-atol",
+            "0.05",
+            "--calculation-mode",
+            "quasi2d",
+            "--vacuum-axis",
+            "b",
+            "dummy.mcif",
+        ],
+    )
+
+    cli_module.main()
+
+    assert json.loads(capsys.readouterr().out) == {"ok": True}
+    assert captured == {
+        "path": "dummy.mcif",
+        "space_tol": pytest.approx(0.03),
+        "mtol": pytest.approx(0.04),
+        "meigtol": pytest.approx(0.0001),
+        "matrix_tol": pytest.approx(0.02),
+        "parser_atol": pytest.approx(0.05),
+        "calculation_mode": "quasi2d",
+        "vacuum_axis": "b",
+    }
+
+
 def test_find_spin_group_poscar_ssg_reports_embedded_magnetic_primitive_case(tmp_path):
     original = find_spin_group("examples/0.800_MnTe.mcif")
     poscar_path = Path(tmp_path) / "POSCAR"
