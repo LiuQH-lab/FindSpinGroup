@@ -91,6 +91,7 @@ print(result.index)
 print(result.acc)
 print(result.convention_ssg_international_linear)
 print(result.magnetic_phase)
+print(result.gspg_text["symbol"])
 print(result.to_scif(cell_mode="ssg_convention_oriented"))
 ```
 
@@ -101,7 +102,37 @@ for the main `MagSymmetryResult` attributes and route-specific outputs.
 
 SCIF export modes are documented at
 [SCIF](https://findspingroup.readthedocs.io/en/latest/scif/). Current modes are
-`ssg_convention_oriented`, `magnetic_primitive`, and `input_identified`.
+`ssg_convention_oriented`, `ssg_convention_cartesian`,
+`database_standard_oriented`, `database_standard_cartesian`,
+`magnetic_primitive_oriented`, `magnetic_primitive_cartesian`,
+`input_oriented`, and `input_cartesian`. Legacy aliases include
+`magnetic_primitive`, `input_identified`, and `database_standard`.
+
+`database_standard_*` SCIF modes emit operations in the selected SSG database
+standard setting: `G0std` for non-type-k results and `L0std` for type-k results.
+The emitted file records its real-space setting and spin-frame setting in
+repo-local `_space_group_spin.fsg_*` tags.
+
+### Quasi-2D Diagnostics
+
+The default API mode is ordinary 3D identification. To add quasi-2D
+spin-splitting diagnostics without changing the base SSG/MSG/ACC route, request
+the mode explicitly:
+
+```python
+result = find_spin_group(
+    "path/to/slab.mcif",
+    calculation_mode="quasi2d",
+    vacuum_axis="c",
+)
+
+print(result.quasi_2d["spin_splitting_2d"])
+print(result.quasi_2d["kpoints"])
+```
+
+In 3D mode, `result.quasi_2d` is `None`. `vacuum_axis` names the input-cell
+axis normal to the intended 2D slab and is only interpreted for quasi-2D
+diagnostics.
 
 ### Lightweight Basic Summary
 
@@ -166,8 +197,11 @@ find_spin_group(
 )
 ```
 
-Use tighter tolerances only when the input structure is numerically clean enough
-to support them.
+`space_tol` controls real-space matching, `mtol` controls magnetic-moment
+matching and zero-net-moment classification thresholds, `meigtol` controls
+point-group eigenvalue decisions, and `matrix_tol` controls point-group
+standardization matrix checks. Use tighter tolerances only when the input
+structure is numerically clean enough to support them.
 
 ## License
 
