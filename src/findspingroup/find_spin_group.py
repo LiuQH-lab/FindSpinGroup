@@ -3039,15 +3039,9 @@ def _try_select_one_standard_transform_for_acc_alignment(
                 tol=tol,
                 label=f"{identify_info}:{name}",
             )
-            candidate_standard_ssg = ssg_primitive.transform(*candidate)
-            _ = candidate_standard_ssg.international_symbol_type
             candidate_acc_primitive_cell = magnetic_primitive_cell.transform(
                 *transformation_primitive_to_acc_primitive
             )
-            candidate_acc_primitive_ssg = ssg_primitive.transform(
-                *transformation_primitive_to_acc_primitive
-            )
-            _ = candidate_acc_primitive_ssg.international_symbol_type
             transformation_legacy_acc_to_candidate_acc = _compose_setting_transform(
                 legacy_transformation_primitive_to_acc_primitive[0],
                 legacy_transformation_primitive_to_acc_primitive[1],
@@ -3061,6 +3055,12 @@ def _try_select_one_standard_transform_for_acc_alignment(
                 tol=tol,
                 label=f"{identify_info}:{name}",
             )
+            candidate_standard_ssg = ssg_primitive.transform(*candidate)
+            _ = candidate_standard_ssg.international_symbol_type
+            candidate_acc_primitive_ssg = ssg_primitive.transform(
+                *transformation_primitive_to_acc_primitive
+            )
+            _ = candidate_acc_primitive_ssg.international_symbol_type
         except Exception as exc:
             rejected.append(
                 {
