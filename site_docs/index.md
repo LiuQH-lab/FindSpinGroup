@@ -20,11 +20,13 @@ Main outputs can include:
 - OSSG information and corresponding MSG information in matched settings;
 - spin Wyckoff positions and Wyckoff splitting from space group (SG) to OSSG and MSG;
 - spin Brillouin zones, high-symmetry k points, and symmetry-allowed spin-polarization components;
+- additive quasi-2D k-point and spin-splitting diagnostics for slab inputs;
 - magnetic-phase classification, including unconventional cases such as altermagnets and spin-orbit magnets;
 - symmetry constraints on anomalous Hall conductivity, nonlinear tensors, and related physical responses;
 - chiral and polar group information with and without spin-orbit coupling;
-- `.scif` files for downstream spin-group-based tensor analysis and data exchange;
+- `.scif` files in public convention, database-standard, magnetic-primitive, or input-cell settings;
 - magnetic primitive-cell POSCAR files in relevant coordinate conventions;
+- compact GSPG text and operation output;
 - KPOINTS files labeled with symmetry-allowed spin-polarization components.
 
 ## Quick start

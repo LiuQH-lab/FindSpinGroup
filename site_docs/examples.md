@@ -36,3 +36,19 @@ result = find_spin_group(path)
 print(result.index)
 print(result.acc)
 ```
+
+## Quasi-2D example
+
+`V2Te2O_input.mcif` is a packaged slab-style example. Quasi-2D diagnostics are
+requested explicitly and do not change the base 3D SSG identification:
+
+```python
+from findspingroup import example_path, find_spin_group
+
+path = example_path("V2Te2O_input.mcif")
+result = find_spin_group(path, calculation_mode="quasi2d", vacuum_axis="c")
+
+print(result.index)
+print(result.quasi_2d["spin_splitting_2d"])
+print(result.quasi_2d["generic_point_comparison"]["summary"])
+```
