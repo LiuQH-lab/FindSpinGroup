@@ -24,7 +24,8 @@ Intended use:
 PYTHONPATH=src ./.venv/bin/python -m findspingroup.batch_mcif \
   tests/testset/quasi2d_small \
   --output-dir /tmp/fsg_quasi2d_small \
-  --calculation-mode auto \
+  --calculation-mode quasi2d \
+  --vacuum-axis c \
   --export-txt selected_2d.txt \
   --export-field index \
   --export-field phase \
@@ -51,5 +52,5 @@ PYTHONPATH=src ./.venv/bin/python -m findspingroup.batch_mcif \
   --vacuum-axis c
 ```
 
-Use `quasi2d` to force the 2D interpretation, `3d`/`bulk` to suppress the
-heuristic, and `auto` to leave geometry detection in control.
+Use `quasi2d` to force the 2D interpretation. Use `3d`/`bulk` to suppress the
+additive 2D diagnostics and keep the public result in ordinary 3D mode.
