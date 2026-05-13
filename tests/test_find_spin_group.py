@@ -48,7 +48,7 @@ from findspingroup.core.identify_spin_space_group import (
     _configuration_details,
     _coplanar_residual,
 )
-from findspingroup.core.tolerances import Tolerances
+from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
 from findspingroup.core.identify_symmetry_from_ops import (
     analyze_transition_matrix_problem,
     deduplicate_matrix_pairs,
@@ -65,6 +65,7 @@ from findspingroup.find_spin_group import (
     _canonicalize_input_to_standard_setting,
     audit_spatial_transform_effect,
     classify_magnetic_phase,
+    get_magnetic_phase,
     _build_candidate_transform_chen_pp_abcs_hex_spatial_cubic_spin_from_identify,
     _ossg_oriented_spin_frame_ssg,
     _spin_transform_to_in_lattice,
@@ -2328,9 +2329,19 @@ def test_find_spin_group_exposes_compensated_fim_classification_details():
     assert result.is_spin_orbit_magnet == ""
     assert result.magnetic_phase_details["classification_rule"] == "fm_like_spin_point_group"
     assert result.magnetic_phase_details["zero_net_moment"] is True
+    assert result.magnetic_phase_details["zero_net_moment_tol"] == pytest.approx(0.02)
+    assert result.tolerances["mtol"] == pytest.approx(0.02)
 
 
 def test_compensated_fim_zero_net_moment_uses_magnetic_tolerance():
+    default_payload = classify_magnetic_phase(
+        conf="Collinear",
+        full_spin_part_point_group_hm=None,
+        full_spin_part_point_group_s="∞m",
+        net_moment=1e-3,
+        mpg_identifier=None,
+        is_ss_gp="spin splitting",
+    )
     strict_payload = classify_magnetic_phase(
         conf="Collinear",
         full_spin_part_point_group_hm=None,
@@ -2350,12 +2361,36 @@ def test_compensated_fim_zero_net_moment_uses_magnetic_tolerance():
         is_ss_gp="spin splitting",
     )
 
+    assert default_payload["base_phase"] == "Compensated FiM"
+    assert default_payload["details"]["zero_net_moment"] is True
+    assert default_payload["details"]["zero_net_moment_tol"] == pytest.approx(DEFAULT_TOL.moment)
     assert strict_payload["base_phase"] == "FM/FiM"
     assert strict_payload["details"]["zero_net_moment"] is False
     assert strict_payload["details"]["zero_net_moment_tol"] == pytest.approx(1e-4)
     assert relaxed_payload["base_phase"] == "Compensated FiM"
     assert relaxed_payload["details"]["zero_net_moment"] is True
     assert relaxed_payload["details"]["zero_net_moment_tol"] == pytest.approx(0.02)
+
+
+def test_get_magnetic_phase_accepts_net_moment_tolerance():
+    strict_phase = get_magnetic_phase(None, "∞m", 1e-3, None, net_moment_tol=1e-4)
+    relaxed_phase = get_magnetic_phase(None, "∞m", 1e-3, None, net_moment_tol=0.02)
+
+    assert strict_phase == "FM/FiM"
+    assert relaxed_phase == "Compensated FiM"
+
+
+def test_find_spin_group_basic_reports_classification_tolerances():
+    result = find_spin_group_basic(
+        "tests/testset/mcif_241130_no2186/0.103_Mn2GeO4.mcif",
+        mtol=0.05,
+    )
+
+    assert result["magnetic_phase"] == "Compensated FiM"
+    assert result["magnetic_phase_base"] == "Compensated FiM"
+    assert result["magnetic_phase_details"]["zero_net_moment"] is True
+    assert result["magnetic_phase_details"]["zero_net_moment_tol"] == pytest.approx(0.05)
+    assert result["tolerances"]["mtol"] == pytest.approx(0.05)
 
 
 def test_find_spin_group_exposes_spin_orbit_magnet_classification_details():

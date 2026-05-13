@@ -4183,10 +4183,12 @@ def classify_magnetic_phase(
     net_moment,
     mpg_identifier,
     is_ss_gp,
-    net_moment_tol=1e-4,
+    net_moment_tol=None,
 ):
     net_moment_value = float(net_moment)
-    zero_net_moment_tol = float(net_moment_tol)
+    zero_net_moment_tol = float(
+        DEFAULT_TOL.moment if net_moment_tol is None else net_moment_tol
+    )
     zero_net_moment = abs(net_moment_value) < zero_net_moment_tol
     fm_like_by_spin_point_group = _is_fm_fim_spin_point_group(
         full_spin_part_point_group_hm,
@@ -4241,7 +4243,15 @@ def classify_magnetic_phase(
     }
 
 
-def get_magnetic_phase(full_spin_part_point_group_hm, full_spin_part_point_group_s, net_moment, mpg, conf=None, is_ss_gp=None):
+def get_magnetic_phase(
+    full_spin_part_point_group_hm,
+    full_spin_part_point_group_s,
+    net_moment,
+    mpg,
+    conf=None,
+    is_ss_gp=None,
+    net_moment_tol=None,
+):
     if conf is None or is_ss_gp is None:
         hm_symbol = full_spin_part_point_group_hm
         s_symbol = full_spin_part_point_group_s
@@ -4253,7 +4263,7 @@ def get_magnetic_phase(full_spin_part_point_group_hm, full_spin_part_point_group
             full_spin_part_point_group_hm=hm_symbol,
             full_spin_part_point_group_s=s_symbol,
             net_moment=net_moment,
-            net_moment_tol=1e-4,
+            net_moment_tol=net_moment_tol,
             mpg_identifier=mpg,
             is_ss_gp='spin splitting',
         )['base_phase']
@@ -6339,6 +6349,9 @@ def _find_spin_group_basic_from_parsed(
         "conf": ssg_primitive.conf,
         "phase": magnetic_phase_payload["phase"],
         "magnetic_phase": magnetic_phase_payload["phase"],
+        "magnetic_phase_base": magnetic_phase_payload["base_phase"],
+        "magnetic_phase_modifier": magnetic_phase_payload["modifier"],
+        "magnetic_phase_details": magnetic_phase_payload["details"],
         "properties": {
             "ss_w_soc": ss_w_soc,
             "ss_wo_soc": ss_wo_soc,
@@ -6357,6 +6370,12 @@ def _find_spin_group_basic_from_parsed(
         "ssg_is_chiral": space_group_is_chiral(ssg_space_group_number),
         "msg_is_polar": msg_parent_info["is_polar"],
         "msg_is_chiral": msg_parent_info["is_chiral"],
+        "tolerances": {
+            "space_tol": float(tol_cfg.space),
+            "mtol": float(tol_cfg.moment),
+            "meigtol": float(tol_cfg.m_eig),
+            "matrix_tol": float(tol_cfg.m_matrix_tol),
+        },
     }
 
 
