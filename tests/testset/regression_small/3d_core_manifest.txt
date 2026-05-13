@@ -1,0 +1,18 @@
+# Small 3D regression manifest for scripts/run_small_regression.py.
+#
+# Coverage:
+# - ordinary 3D public result fields
+# - compensated-FiM / altermagnet-sensitive labeling
+# - current-frame symbol and point-group stress cases
+# - ACC-P / identify-index transform-sensitive monoclinic cases
+# - type-k / L0std route
+# - known expected identify-index database gap
+../mcif_241130_no2186/0.200_Mn3Sn.mcif
+../mcif_241130_no2186/2.116_Na3Co2SbO6.mcif
+../mcif_241130_no2186/2.63_DyCrO3.mcif
+../mcif_241130_no2186/2.64_DyCrO3.mcif
+../mcif_241130_no2186/1.710_BaFe2Se3.mcif
+../mcif_241130_no2186/3.20_TbMn2Ge2.mcif
+../mcif_241130_no2186/3.24_CaFe3Ti4O12.mcif
+../CoNb3S6_tripleQ.mcif
+../mcif_241130_no2186/1.669_KFe(PO3F)2.mcif
