@@ -125,6 +125,8 @@ SCIF_SPIN_FRAME_CARTESIAN = "cartesian"
 SCIF_SPIN_FRAME_ORIENTED = "oriented"
 SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN = "ssg_convention_cartesian"
 SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED = "ssg_convention_oriented"
+SCIF_CELL_MODE_DATABASE_STANDARD_CARTESIAN = "database_standard_cartesian"
+SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED = "database_standard_oriented"
 SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN = "magnetic_primitive_cartesian"
 SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED = "magnetic_primitive_oriented"
 SCIF_CELL_MODE_INPUT_CARTESIAN = "input_cartesian"
@@ -134,9 +136,11 @@ SCIF_CELL_MODE_INPUT_ORIENTED = "input_oriented"
 # while exposing the explicit setting × spin-frame modes in result.scif_cell_modes.
 SCIF_CELL_MODE_INPUT_IDENTIFIED = "input_identified"
 SCIF_CELL_MODE_MAGNETIC_PRIMITIVE = "magnetic_primitive"
+SCIF_CELL_MODE_DATABASE_STANDARD = "database_standard"
 _SCIF_CELL_MODE_ALIASES = {
     SCIF_CELL_MODE_INPUT_IDENTIFIED: SCIF_CELL_MODE_INPUT_ORIENTED,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE: SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+    SCIF_CELL_MODE_DATABASE_STANDARD: SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED,
 }
 
 
@@ -3726,10 +3730,14 @@ def _build_scif_export_targets(
     input_cell: CrystalCell,
     acc_magnetic_primitive_cell: CrystalCell,
     acc_magnetic_primitive_ssg: SpinSpaceGroup,
+    database_standard_cell: CrystalCell,
+    database_standard_ssg: SpinSpaceGroup,
+    database_standard_setting: str,
     convention_cell: CrystalCell,
     convention_ssg: SpinSpaceGroup,
     convention_setting: str,
     transformation_input_to_acc_primitive: tuple[np.ndarray, np.ndarray],
+    transformation_input_to_database_standard: tuple[np.ndarray, np.ndarray],
     transformation_input_to_convention: tuple[np.ndarray, np.ndarray],
     transformation_input_to_G0std: tuple[np.ndarray, np.ndarray],
     transformation_input_to_L0std: tuple[np.ndarray, np.ndarray],
@@ -3801,6 +3809,22 @@ def _build_scif_export_targets(
             base_ssg=convention_ssg,
             transformation_input_to_export=transformation_input_to_convention,
             setting_name=convention_setting,
+            spin_frame=SCIF_SPIN_FRAME_ORIENTED,
+        ),
+        _target(
+            cell_mode=SCIF_CELL_MODE_DATABASE_STANDARD_CARTESIAN,
+            base_cell=database_standard_cell,
+            base_ssg=database_standard_ssg,
+            transformation_input_to_export=transformation_input_to_database_standard,
+            setting_name=database_standard_setting,
+            spin_frame=SCIF_SPIN_FRAME_CARTESIAN,
+        ),
+        _target(
+            cell_mode=SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED,
+            base_cell=database_standard_cell,
+            base_ssg=database_standard_ssg,
+            transformation_input_to_export=transformation_input_to_database_standard,
+            setting_name=database_standard_setting,
             spin_frame=SCIF_SPIN_FRAME_ORIENTED,
         ),
         _target(
@@ -5307,11 +5331,15 @@ def _find_spin_group_from_parsed(
     if selected_standard_setting == G0_STANDARD_SETTING:
         selected_standard_cell = G0std_cell
         selected_standard_ssg = G0std_ssg
+        database_standard_cell = raw_G0std_cell
+        database_standard_ssg = raw_G0std_ssg
         transformation_input_to_selected_standard = transformation_input_to_G0std
         transformation_input_to_database_standard = raw_transformation_input_to_G0std
     else:
         selected_standard_cell = L0std_cell
         selected_standard_ssg = L0std_ssg
+        database_standard_cell = raw_L0std_cell
+        database_standard_ssg = raw_L0std_ssg
         transformation_input_to_selected_standard = transformation_input_to_L0std
         transformation_input_to_database_standard = raw_transformation_input_to_L0std
 
@@ -5629,10 +5657,14 @@ def _find_spin_group_from_parsed(
         input_cell=input_cell_cartesian,
         acc_magnetic_primitive_cell=acc_magnetic_primitive_cell,
         acc_magnetic_primitive_ssg=acc_magnetic_primitive_ssg,
+        database_standard_cell=database_standard_cell,
+        database_standard_ssg=database_standard_ssg,
+        database_standard_setting=selected_standard_setting,
         convention_cell=convention_cell,
         convention_ssg=convention_ssg,
         convention_setting=convention_setting,
         transformation_input_to_acc_primitive=transformation_input_to_acc_primitive,
+        transformation_input_to_database_standard=transformation_input_to_database_standard,
         transformation_input_to_convention=transformation_input_to_convention,
         transformation_input_to_G0std=transformation_input_to_G0std,
         transformation_input_to_L0std=transformation_input_to_L0std,
@@ -5736,6 +5768,8 @@ def _find_spin_group_from_parsed(
             suppress_repo_local_summary=bool(export_target.get("suppress_repo_local_summary", False)),
             spinframe_basis_abc_rows=export_target.get("spinframe_basis_abc_rows"),
             moment_basis_cartesian=export_target.get("moment_basis_cartesian"),
+            real_space_setting=export_target.get("setting_name"),
+            spin_frame_setting=export_target.get("spin_frame"),
             quasi_2d=quasi_2d_diagnostics,
         )
 
