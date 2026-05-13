@@ -10,6 +10,9 @@ from findspingroup.find_spin_group import (
     SCIF_CELL_MODE_INPUT_IDENTIFIED,
     SCIF_CELL_MODE_INPUT_CARTESIAN,
     SCIF_CELL_MODE_INPUT_ORIENTED,
+    SCIF_CELL_MODE_DATABASE_STANDARD,
+    SCIF_CELL_MODE_DATABASE_STANDARD_CARTESIAN,
+    SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
@@ -223,6 +226,8 @@ def test_find_spin_group_exposes_mainline_scif_output():
         [
             SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
             SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
+            SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED,
+            SCIF_CELL_MODE_DATABASE_STANDARD_CARTESIAN,
             SCIF_CELL_MODE_INPUT_ORIENTED,
             SCIF_CELL_MODE_INPUT_CARTESIAN,
             SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
@@ -237,8 +242,47 @@ def test_find_spin_group_exposes_mainline_scif_output():
     assert result.to_scif(cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE) == result.to_scif(
         cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
     )
+    assert result.to_scif(cell_mode=SCIF_CELL_MODE_DATABASE_STANDARD) == result.to_scif(
+        cell_mode=SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED,
+    )
     with pytest.raises(ValueError, match="Unsupported scif output cell_mode: input"):
         result.to_scif(cell_mode="input")
+
+
+def test_generated_database_standard_scif_uses_selected_standard_setting_for_type_k():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.325_PrMn2O5.mcif")
+
+    standard_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED)
+    metadata = parse_scif_metadata(source_text=standard_scif)
+    roundtrip = _roundtrip_index_from_scif_text(
+        standard_scif,
+        "prmn2o5_database_standard_oriented.scif",
+    )
+
+    assert result.primitive_magnetic_cell_ssg_type == "k"
+    assert result.selected_standard_setting == "L0std"
+    assert f'_space_group_spin.number_Chen_Liu  "{result.index}"' in standard_scif
+    assert '_space_group_spin.fsg_scif_real_space_setting  "L0std"' in standard_scif
+    assert '_space_group_spin.fsg_scif_spin_frame_setting  "oriented"' in standard_scif
+    assert "_space_group_spin.transform_spinframe_P_abc  'a,b,c'" in standard_scif
+    assert metadata["space_group_spin"]["spin_space_group_number_chen"] == result.index
+    assert roundtrip.index == result.index
+
+
+def test_generated_database_standard_scif_uses_g0std_for_non_type_k_cartesian_mode():
+    result = find_spin_group("examples/2.116_Na3Co2SbO6.mcif")
+
+    standard_scif = result.to_scif(cell_mode=SCIF_CELL_MODE_DATABASE_STANDARD_CARTESIAN)
+    roundtrip = _roundtrip_index_from_scif_text(
+        standard_scif,
+        "na3co2sb_database_standard_cartesian.scif",
+    )
+
+    assert result.primitive_magnetic_cell_ssg_type == "g"
+    assert result.selected_standard_setting == "G0std"
+    assert '_space_group_spin.fsg_scif_real_space_setting  "G0std"' in standard_scif
+    assert '_space_group_spin.fsg_scif_spin_frame_setting  "cartesian"' in standard_scif
+    assert roundtrip.index == result.index
 
 
 def test_generated_scif_spin_only_direction_follows_spin_frame():
@@ -291,6 +335,8 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_mnte(
         SCIF_CELL_MODE_INPUT_ORIENTED,
         SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN,
         SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+        SCIF_CELL_MODE_DATABASE_STANDARD_CARTESIAN,
+        SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED,
         SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
         SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ]:
@@ -311,6 +357,7 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_324()
     for cell_mode in [
         SCIF_CELL_MODE_INPUT_IDENTIFIED,
         SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
+        SCIF_CELL_MODE_DATABASE_STANDARD,
         SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ]:
         roundtrip = _roundtrip_index_from_scif_text(
@@ -391,6 +438,7 @@ def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_0396(
 
     for cell_mode in [
         SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
+        SCIF_CELL_MODE_DATABASE_STANDARD,
         SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     ]:
         roundtrip = _roundtrip_index_from_scif_text(

@@ -71,6 +71,8 @@ def _scif_repo_local_extension_tag_names() -> dict[str, str]:
         "vacuum_axis_source": "_space_group_spin.fsg_vacuum_axis_source",
         "spin_splitting_2d": "_space_group_spin.fsg_spin_splitting_2d",
         "spin_splitting_2d_interpretation": "_space_group_spin.fsg_spin_splitting_2d_interpretation",
+        "scif_real_space_setting": "_space_group_spin.fsg_scif_real_space_setting",
+        "scif_spin_frame_setting": "_space_group_spin.fsg_scif_spin_frame_setting",
         "transform_to_input_Pp": "_space_group_spin.fsg_transform_to_input_Pp",
         "transform_to_magnetic_primitive_Pp": "_space_group_spin.fsg_transform_to_magnetic_primitive_Pp",
         "transform_to_L0std_Pp": "_space_group_spin.fsg_transform_to_L0std_Pp",
@@ -1138,6 +1140,8 @@ def generate_scif(
     suppress_repo_local_summary: bool = False,
     spinframe_basis_abc_rows=None,
     moment_basis_cartesian=None,
+    real_space_setting: str | None = None,
+    spin_frame_setting: str | None = None,
     quasi_2d: dict | None = None,
 ):
     """
@@ -1292,6 +1296,16 @@ def generate_scif(
             f"{repo_tags['input_setting_warning']}  {_quote_scif_string(input_setting_warning)}"
             if input_setting_warning
             else None
+        ),
+        (
+            f"{repo_tags['scif_real_space_setting']}  {_quote_scif_string(real_space_setting)}"
+            if real_space_setting
+            else f"{repo_tags['scif_real_space_setting']}  ."
+        ),
+        (
+            f"{repo_tags['scif_spin_frame_setting']}  {_quote_scif_string(spin_frame_setting)}"
+            if spin_frame_setting
+            else f"{repo_tags['scif_spin_frame_setting']}  ."
         ),
         ssg_name_linear,
         ssg_name_latex,
