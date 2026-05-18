@@ -10,6 +10,7 @@ from findspingroup.utils.seitz_symbol import (
     calibrated_symbol_tol,
     describe_point_operation,
     format_point_seitz_symbol_latex,
+    format_translation_tau_latex,
 )
 
 
@@ -149,6 +150,13 @@ def test_seitz_descriptions_and_symbol_lists_expose_latex_forms():
 
 def test_seitz_point_latex_keeps_minus_sign_prefix():
     assert format_point_seitz_symbol_latex("-3", "direction", (1, -1, 0), None, 1) == "-3^{1}_{1-10}"
+
+
+def test_seitz_translation_latex_snaps_near_fractional_components():
+    assert (
+        format_translation_tau_latex(np.array([0.49998, 0.00002, 0.99998]), tol=1e-4)
+        == r"\frac{1}{2},0,0"
+    )
 
 
 def test_describe_point_operation_uses_legacy_hex_minus6_branch_labels():

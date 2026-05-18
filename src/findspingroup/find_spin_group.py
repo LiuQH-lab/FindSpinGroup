@@ -1771,16 +1771,90 @@ def _compute_tensor_outputs(ssg: SpinSpaceGroup, cell: CrystalCell, tol: float):
     return tensor_outputs
 
 
-def _serialize_cell_snapshot(cell: CrystalCell) -> dict:
+def _serialize_cell_snapshot(cell: CrystalCell, site_order=None) -> dict:
     lattice, positions, type_ids, moments = cell.to_spglib(mag=True)
+    positions = np.asarray(positions, dtype=float)
+    type_ids = np.asarray(type_ids)
+    moments = np.asarray(moments, dtype=float)
+    if site_order is not None:
+        order = np.asarray(site_order, dtype=int)
+        if order.shape != (len(type_ids),):
+            raise ValueError(
+                f"site_order length {len(order)} does not match cell site count {len(type_ids)}"
+            )
+        positions = positions[order]
+        type_ids = type_ids[order]
+        moments = moments[order]
     return {
         'lattice': np.asarray(lattice, dtype=float).tolist(),
-        'positions': np.asarray(positions, dtype=float).tolist(),
-        'type_ids': list(type_ids),
-        'moments': np.asarray(moments, dtype=float).tolist(),
+        'positions': positions.tolist(),
+        'type_ids': [int(type_id) for type_id in type_ids],
+        'moments': moments.tolist(),
         'elements': [cell.atom_types_to_symbol[type_id] for type_id in type_ids],
         'occupancies': [float(cell.atom_types_to_occupancies[type_id]) for type_id in type_ids],
     }
+
+
+def _cell_to_spglib_in_snapshot_order(cell: CrystalCell, site_order=None):
+    if site_order is None:
+        return cell.to_spglib(mag=True)
+    lattice, positions, type_ids, moments = cell.to_spglib(mag=True)
+    order = np.asarray(site_order, dtype=int)
+    if order.shape != (len(type_ids),):
+        raise ValueError(
+            f"site_order length {len(order)} does not match cell site count {len(type_ids)}"
+        )
+    return (
+        lattice,
+        [positions[index] for index in order],
+        [type_ids[index] for index in order],
+        [moments[index] for index in order],
+    )
+
+
+def _cell_to_poscar_in_snapshot_order(
+    cell: CrystalCell,
+    filename: str,
+    site_order=None,
+) -> str:
+    if site_order is None:
+        return cell.to_poscar(filename)
+    snapshot = _serialize_cell_snapshot(cell, site_order=site_order)
+    species = []
+    counts = []
+    for element in snapshot["elements"]:
+        if species and species[-1] == element:
+            counts[-1] += 1
+        else:
+            species.append(element)
+            counts.append(1)
+
+    information = filename + f'#FINDSPINGROUP(version{__version__})'
+    scale = '1'
+    lattice = '\n'.join(
+        ' '.join(map(str, np.asarray(row, dtype=float).round(6)))
+        for row in snapshot["lattice"]
+    )
+    positions = '\n'.join(
+        ' '.join(f'{value:.8f}' for value in position)
+        for position in snapshot["positions"]
+    )
+    magmom = '# MAGMOM=' + ' '.join(
+        ' '.join(f'{value:.8f}' for value in moment)
+        for moment in snapshot["moments"]
+    )
+    return '\n'.join(
+        [
+            information,
+            scale,
+            lattice,
+            ' '.join(species),
+            ' '.join(map(str, counts)),
+            'direct',
+            positions,
+            magmom,
+        ]
+    )
 
 
 def _build_g0std_domain_reversal_coset_analysis(
@@ -4250,7 +4324,7 @@ def _build_quasi2d_little_group_payload(
     }
 
 
-def _make_wp_chain(wp_sg, wp_ssg, wp_msg, cell, atom_types_dict):
+def _make_wp_chain_and_site_order(wp_sg, wp_ssg, wp_msg, cell, atom_types_dict):
     chain = tuple(
         (
             atom_types_dict[int(cell[2][i])],
@@ -4263,27 +4337,59 @@ def _make_wp_chain(wp_sg, wp_ssg, wp_msg, cell, atom_types_dict):
         )
         for i in range(min(len(wp_sg), len(wp_ssg), len(wp_msg)))
     )
-    return sorted(set(chain), key=lambda item: (str(item[0]), item[1:]))
+    site_order = sorted(range(len(chain)), key=lambda index: (str(chain[index][0]), chain[index][1:]))
+    sorted_chain = []
+    seen = set()
+    for index in site_order:
+        row = chain[index]
+        if row in seen:
+            continue
+        sorted_chain.append(row)
+        seen.add(row)
+    if len(site_order) != len(cell[2]):
+        site_order = None
+    return sorted_chain, site_order
 
 
-def _build_wp_chain_payload(g0_cell: CrystalCell, g0_ssg: SpinSpaceGroup, tol_cfg: Tolerances):
+def _make_wp_chain(wp_sg, wp_ssg, wp_msg, cell, atom_types_dict):
+    wp_chain, _ = _make_wp_chain_and_site_order(wp_sg, wp_ssg, wp_msg, cell, atom_types_dict)
+    return wp_chain
+
+
+def _get_wp_for_original_sites(dataset, site_count: int):
+    # get_G0_dataset_for_cell appends a synthetic generic-site orbit; public
+    # Wyckoff chains must describe only the physical sites in the input cell.
+    return get_wp_from_dataset(dataset, max=False)[:site_count]
+
+
+def _build_wp_chain_payload_and_site_order(
+    g0_cell: CrystalCell,
+    g0_ssg: SpinSpaceGroup,
+    tol_cfg: Tolerances,
+):
     sg_dataset = get_symmetry_dataset(g0_cell.to_spglib(), symprec=tol_cfg.space)
     oriented_ssg = _ossg_oriented_spin_frame_ssg(g0_ssg, g0_cell)
     msg_ops = [[op[1], op[2]] for op in oriented_ssg.msg_ops]
     if not msg_ops:
-        return []
+        return [], None
     msg_dataset = get_G0_dataset_for_cell(msg_ops, g0_cell.to_spglib(mag=True), tol_cfg.space)
     ssg_dataset = get_G0_dataset_for_cell(g0_ssg.G0_ops, g0_cell.to_spglib(mag=True), tol_cfg.space)
+    site_count = len(g0_cell.to_spglib(mag=True)[1])
     wp_extended_sg = get_wp_from_dataset(sg_dataset, max=False)
-    wp_extended_ssg = get_wp_from_dataset(ssg_dataset, max=True)
-    wp_extended_msg = get_wp_from_dataset(msg_dataset, max=True)
-    return _make_wp_chain(
+    wp_extended_ssg = _get_wp_for_original_sites(ssg_dataset, site_count)
+    wp_extended_msg = _get_wp_for_original_sites(msg_dataset, site_count)
+    return _make_wp_chain_and_site_order(
         wp_extended_sg,
         wp_extended_ssg,
         wp_extended_msg,
         g0_cell.to_spglib(mag=True),
         g0_cell.atom_types_to_symbol,
     )
+
+
+def _build_wp_chain_payload(g0_cell: CrystalCell, g0_ssg: SpinSpaceGroup, tol_cfg: Tolerances):
+    wp_chain, _ = _build_wp_chain_payload_and_site_order(g0_cell, g0_ssg, tol_cfg)
+    return wp_chain
 
 
 def _is_fm_fim_spin_point_group_symbol(symbol: str) -> bool:
@@ -5451,7 +5557,6 @@ def _find_spin_group_from_parsed(
         transformation_input_to_acc_primitive[0],
         transformation_input_to_acc_primitive[1],
     )
-    acc_p_c_poscar = acc_magnetic_primitive_cell.to_poscar(source_name)
     acc_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_magnetic_primitive_cell)
     poscar_spin_frame_to_acc_real_cartesian = np.linalg.inv(acc_real_cartesian_to_poscar_spin_frame)
     acc_magnetic_primitive_ssg_in_poscar_spin_frame = acc_magnetic_primitive_ssg.transform_spin(
@@ -5653,7 +5758,6 @@ def _find_spin_group_from_parsed(
         is_altermagnet=alter,
         domain_reversal_coset_analysis=domain_reversal_coset_analysis,
     )
-    acc_primitive_output_poscar = acc_primitive_output_cell.to_poscar(source_name)
     acc_output_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_primitive_output_cell)
     poscar_spin_frame_to_acc_output_real_cartesian = np.linalg.inv(
         acc_output_real_cartesian_to_poscar_spin_frame
@@ -5798,17 +5902,28 @@ def _find_spin_group_from_parsed(
                 "suppress_repo_local_summary": input_setting_index_differs,
             }
         )
-    wp_chain = _build_wp_chain_payload(G0std_cell, G0std_ssg, tol_cfg)
-    acc_primitive_wp_chain = _build_wp_chain_payload(
+    wp_chain, g0std_wp_site_order = _build_wp_chain_payload_and_site_order(
+        G0std_cell,
+        G0std_ssg,
+        tol_cfg,
+    )
+    (
+        acc_primitive_wp_chain,
+        acc_primitive_wp_site_order,
+    ) = _build_wp_chain_payload_and_site_order(
         acc_primitive_output_cell,
         acc_primitive_output_ssg,
         tol_cfg,
     )
-    input_wp_chain = (
-        _build_wp_chain_payload(input_cell_cartesian, input_setting_ssg, tol_cfg)
-        if input_setting_matches_true_ssg
-        else None
-    )
+    input_wp_site_order = None
+    if input_setting_matches_true_ssg:
+        input_wp_chain, input_wp_site_order = _build_wp_chain_payload_and_site_order(
+            input_cell_cartesian,
+            input_setting_ssg,
+            tol_cfg,
+        )
+    else:
+        input_wp_chain = None
 
     canonical_scif_target = scif_export_targets[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]
     actual_chen_linear_name = _build_chen_linear_name(
@@ -5888,6 +6003,20 @@ def _find_spin_group_from_parsed(
 
     scif = scif_outputs[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]
 
+    acc_primitive_output_cell_snapshot = _serialize_cell_snapshot(
+        acc_primitive_output_cell,
+        site_order=acc_primitive_wp_site_order,
+    )
+    acc_primitive_output_cell_tuple = _cell_to_spglib_in_snapshot_order(
+        acc_primitive_output_cell,
+        site_order=acc_primitive_wp_site_order,
+    )
+    acc_primitive_output_poscar = _cell_to_poscar_in_snapshot_order(
+        acc_primitive_output_cell,
+        source_name,
+        site_order=acc_primitive_wp_site_order,
+    )
+    acc_p_c_poscar = acc_primitive_output_poscar
 
     result = {
         'index':identify_info,
@@ -5906,7 +6035,10 @@ def _find_spin_group_from_parsed(
     }
 
     cell = {
-        'input_cell_detail': _serialize_cell_snapshot(input_cell_cartesian),
+        'input_cell_detail': _serialize_cell_snapshot(
+            input_cell_cartesian,
+            site_order=input_wp_site_order,
+        ),
         'input_magnetic_primitive_cell': magnetic_primitive_cell.to_spglib(mag=True),
         'input_magnetic_primitive_cell_setting': INPUT_MAGNETIC_PRIMITIVE_SETTING,
         'input_magnetic_primitive_cell_poscar': input_magnetic_primitive_poscar,
@@ -5914,22 +6046,25 @@ def _find_spin_group_from_parsed(
         'acc_conventional_cell': acc_conventional_cell.to_spglib(mag=True),
         'acc_conventional_cell_setting': ACC_CONVENTIONAL_SETTING,
         'acc_conventional_cell_detail': _serialize_cell_snapshot(acc_conventional_cell),
-        'magnetic_primitive_cell': acc_magnetic_primitive_cell.to_spglib(mag=True),
+        'magnetic_primitive_cell': acc_primitive_output_cell_tuple,
         'magnetic_primitive_cell_setting': ACC_PRIMITIVE_SETTING,
         'magnetic_primitive_cell_poscar': acc_p_c_poscar,
-        'magnetic_primitive_cell_detail': _serialize_cell_snapshot(acc_magnetic_primitive_cell),
-        'primitive_magnetic_cell':acc_magnetic_primitive_cell.to_spglib(mag=True),
+        'magnetic_primitive_cell_detail': acc_primitive_output_cell_snapshot,
+        'primitive_magnetic_cell':acc_primitive_output_cell_tuple,
         'primitive_magnetic_cell_setting': ACC_PRIMITIVE_SETTING,
         'primitive_magnetic_cell_poscar':acc_p_c_poscar,
         'scif': scif,
         'scif_outputs': scif_outputs,
         'scif_cell_modes': sorted(scif_export_targets.keys()),
-        'primitive_magnetic_cell_detail': _serialize_cell_snapshot(acc_magnetic_primitive_cell),
-        'acc_primitive_magnetic_cell': acc_primitive_output_cell.to_spglib(mag=True),
+        'primitive_magnetic_cell_detail': acc_primitive_output_cell_snapshot,
+        'acc_primitive_magnetic_cell': acc_primitive_output_cell_tuple,
         'acc_primitive_magnetic_cell_setting': ACC_PRIMITIVE_SETTING,
         'acc_primitive_magnetic_cell_poscar': acc_primitive_output_poscar,
-        'acc_primitive_magnetic_cell_detail': _serialize_cell_snapshot(acc_primitive_output_cell),
-        'g0_standard_cell': _serialize_cell_snapshot(G0std_cell),
+        'acc_primitive_magnetic_cell_detail': acc_primitive_output_cell_snapshot,
+        'g0_standard_cell': _serialize_cell_snapshot(
+            G0std_cell,
+            site_order=g0std_wp_site_order,
+        ),
         'l0_standard_cell': _serialize_cell_snapshot(L0std_cell),
         'convention_cell': convention_cell.to_spglib(mag=True),
         'convention_cell_setting': convention_setting,
@@ -6745,7 +6880,6 @@ def _find_spin_group_acc_primitive_from_parsed(
         acc_primitive_resolution_audit["G0std_transform_selection"] = standard_transform_selection_audit
     else:
         acc_primitive_resolution_audit["L0std_transform_selection"] = standard_transform_selection_audit
-    acc_primitive_poscar = acc_primitive_cell.to_poscar(source_name)
     acc_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_primitive_cell)
     poscar_spin_frame_to_acc_real_cartesian = np.linalg.inv(
         acc_real_cartesian_to_poscar_spin_frame
@@ -6769,10 +6903,18 @@ def _find_spin_group_acc_primitive_from_parsed(
         transformation_input_to_L0std[0],
         transformation_input_to_L0std[1],
     )
-    acc_primitive_wp_chain = _build_wp_chain_payload(
+    (
+        acc_primitive_wp_chain,
+        acc_primitive_wp_site_order,
+    ) = _build_wp_chain_payload_and_site_order(
         acc_primitive_cell,
         acc_primitive_ssg,
         tol_cfg,
+    )
+    acc_primitive_poscar = _cell_to_poscar_in_snapshot_order(
+        acc_primitive_cell,
+        source_name,
+        site_order=acc_primitive_wp_site_order,
     )
     acc_primitive_oriented_seitz_descriptions = _seitz_descriptions_with_cartesian_spin_symbols(
         acc_primitive_ossg,
@@ -6789,7 +6931,10 @@ def _find_spin_group_acc_primitive_from_parsed(
         "acc_symbol": ssg_primitive.acc,
         "conf": ssg_primitive.conf,
         "acc_primitive_cell_setting": ACC_PRIMITIVE_SETTING,
-        "acc_primitive_cell_detail": _serialize_cell_snapshot(acc_primitive_cell),
+        "acc_primitive_cell_detail": _serialize_cell_snapshot(
+            acc_primitive_cell,
+            site_order=acc_primitive_wp_site_order,
+        ),
         "acc_primitive_poscar": acc_primitive_poscar,
         "acc_primitive_ssg_setting": ACC_PRIMITIVE_SETTING,
         "acc_primitive_ssg_international_linear": acc_primitive_ssg.international_symbol_linear,

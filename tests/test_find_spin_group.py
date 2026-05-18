@@ -4276,12 +4276,26 @@ def test_acc_primitive_poscar_preserves_core_acc_primitive_lattice_and_moments(t
     poscar_path = Path(tmp_path) / "POSCAR"
     poscar_path.write_text(result.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
 
-    lattice, _positions, _elements, _occupancies, _labels, moments = parse_poscar_file(poscar_path)
+    lattice, positions, elements, _occupancies, _labels, moments = parse_poscar_file(poscar_path)
     expected_lattice = np.asarray(result.acc_primitive_magnetic_cell_detail["lattice"], dtype=float)
+    expected_positions = np.asarray(result.acc_primitive_magnetic_cell_detail["positions"], dtype=float)
     expected_moments = np.asarray(result.acc_primitive_magnetic_cell_detail["moments"], dtype=float)
 
     assert np.allclose(lattice, expected_lattice, atol=1e-6)
-    assert sorted(map(tuple, np.round(moments, 8))) == sorted(map(tuple, np.round(expected_moments, 8)))
+    assert elements == result.acc_primitive_magnetic_cell_detail["elements"]
+    assert np.allclose(positions, expected_positions, atol=1e-8)
+    assert np.allclose(moments, expected_moments, atol=1e-8)
+    assert result.acc_primitive_magnetic_cell[2] == result.acc_primitive_magnetic_cell_detail["type_ids"]
+    assert np.allclose(
+        np.asarray(result.acc_primitive_magnetic_cell[1], dtype=float),
+        expected_positions,
+        atol=1e-8,
+    )
+    assert np.allclose(
+        np.asarray(result.acc_primitive_magnetic_cell[3], dtype=float),
+        expected_moments,
+        atol=1e-8,
+    )
     assert np.allclose(
         np.asarray(result.acc_primitive_real_cartesian_to_poscar_spin_frame, dtype=float),
         np.eye(3),
@@ -4553,6 +4567,22 @@ def test_find_spin_group_exposes_msg_little_groups_and_wp_chain():
         assert len(ops) == len(seitz_latex)
         assert all({"index", "time_reversal", "real_rotation", "translation"} <= set(op) for op in ops)
     assert result.wp_chain
+    assert all(len(row) == 7 for row in result.wp_chain)
+    assert [row[0] for row in result.wp_chain] == ["Ag", "Ag", "Ge", "Ge", "Tm", "Tm"]
+    assert result.g0_standard_cell["elements"] == (
+        ["Ag"] * 6 + ["Ge"] * 6 + ["Tm"] * 6
+    )
+    assert [row[0] for row in result.acc_primitive_wp_chain] == [
+        "Ag",
+        "Ag",
+        "Ge",
+        "Ge",
+        "Tm",
+        "Tm",
+    ]
+    assert result.acc_primitive_magnetic_cell_detail["elements"] == (
+        ["Ag"] * 3 + ["Ge"] * 3 + ["Tm"] * 3
+    )
 
 
 def test_spin_space_group_exposes_class_level_msg_ops_for_0200_mn3sn():
