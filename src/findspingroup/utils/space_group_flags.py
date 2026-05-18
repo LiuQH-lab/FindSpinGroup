@@ -52,10 +52,17 @@ def space_group_is_polar(space_group_number: int | None) -> bool | None:
     if space_group_number is None:
         return None
 
+    return bool(space_group_polar_axis_basis(space_group_number))
+
+
+@lru_cache(maxsize=None)
+def space_group_polar_axis_basis(space_group_number: int | None) -> tuple[tuple[float, float, float], ...] | None:
+    if space_group_number is None:
+        return None
+
     hall_number = _hall_number_for_space_group(int(space_group_number))
     dataset = spglib.get_symmetry_from_database(hall_number)
     rotations = np.asarray(dataset["rotations"], dtype=float)
-
     unique_rotations: list[np.ndarray] = []
     for rotation in rotations:
         if not any(np.array_equal(rotation, existing) for existing in unique_rotations):
@@ -67,8 +74,45 @@ def space_group_is_polar(space_group_number: int | None) -> bool | None:
     )
     _, singular_values, vh = np.linalg.svd(constraint_matrix)
     rank = int(np.sum(singular_values > 1e-8))
-    nullity = vh[rank:].T.shape[1]
-    return bool(nullity > 0)
+    basis = vh[rank:]
+    if basis.size == 0:
+        return ()
+    normalized = []
+    for vector in basis:
+        vector = np.asarray(vector, dtype=float)
+        max_abs = float(np.max(np.abs(vector)))
+        if max_abs < 1e-12:
+            continue
+        vector = vector / max_abs
+        vector[np.abs(vector) < 1e-10] = 0.0
+        nonzero_indices = np.where(np.abs(vector) >= 1e-10)[0]
+        if nonzero_indices.size and vector[int(nonzero_indices[0])] < 0:
+            vector = -vector
+        normalized.append(tuple(float(round(component, 12)) for component in vector))
+    return tuple(normalized)
+
+
+def format_polar_axis_vector(vector: tuple[float, float, float] | list[float]) -> str:
+    labels = ("a", "b", "c")
+    parts = []
+    for coefficient, label in zip(vector, labels):
+        if abs(coefficient) < 1e-10:
+            continue
+        sign = "-" if coefficient < 0 else ""
+        magnitude = abs(coefficient)
+        if abs(magnitude - 1.0) < 1e-10:
+            parts.append(f"{sign}{label}")
+        else:
+            parts.append(f"{sign}{magnitude:g}{label}")
+    return " + ".join(parts).replace("+ -", "- ") if parts else "0"
+
+
+def space_group_polar_axis_labels(space_group_number: int | None) -> list[str] | None:
+    basis = space_group_polar_axis_basis(space_group_number)
+    if basis is None:
+        return None
+    return [format_polar_axis_vector(vector) for vector in basis]
+
 
 
 def msg_parent_space_group_info(msg_num: int | None) -> dict[str, int | str | bool | None]:

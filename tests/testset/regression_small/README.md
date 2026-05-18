@@ -19,3 +19,10 @@ Expected behavior:
 
 The quasi-2D suite reuses `tests/testset/quasi2d_small`, which contains
 inputversion-derived 2D materials and the `V2Se2O` case study.
+
+## Ferroelectric Switching Small Set
+
+The `ferroelectric3d` suite reuses
+`tests/testset/ferroelectric_switching_small/3d_manifest.txt`. It checks the
+diagnostic payload across nonpolar-to-polar candidates, polar-parent transport
+cases, and nonpolar controls.

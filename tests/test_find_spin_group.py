@@ -58,6 +58,10 @@ from findspingroup.core.identify_symmetry_from_ops import (
 )
 from findspingroup.core import Molecule, PointGroupAnalyzer
 from findspingroup.core.pg_analyzer import SymmOp, generate_full_symmops
+from findspingroup.ferroelectric import (
+    build_domain_reversal_coset_analysis,
+    build_ferroelectric_switching_payload,
+)
 from findspingroup.find_spin_group import (
     SCIF_CELL_MODE_INPUT_IDENTIFIED,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
@@ -105,6 +109,7 @@ from findspingroup.utils.international_symbol import (
 )
 from findspingroup.utils.space_group_flags import (
     msg_parent_space_group_info,
+    space_group_polar_axis_basis,
     space_group_is_chiral,
     space_group_is_polar,
     space_group_has_real_space_inversion,
@@ -776,6 +781,17 @@ def test_space_group_is_polar_lookup_matches_reference_examples():
         assert space_group_is_polar(sg) is False
 
 
+def test_space_group_polar_axis_basis_matches_reference_examples():
+    assert space_group_polar_axis_basis(33) == ((0.0, 0.0, 1.0),)
+    assert space_group_polar_axis_basis(3) == ((0.0, 1.0, 0.0),)
+    assert space_group_polar_axis_basis(1) == (
+        (1.0, 0.0, 0.0),
+        (0.0, 1.0, 0.0),
+        (0.0, 0.0, 1.0),
+    )
+    assert space_group_polar_axis_basis(14) == ()
+
+
 def test_space_group_is_chiral_lookup_matches_reference_examples():
     for sg in [1, 3, 4, 5, 16, 75, 143, 168, 195, 207, 214]:
         assert space_group_is_chiral(sg) is True
@@ -849,6 +865,314 @@ def test_find_spin_group_exposes_polar_and_chiral_flags_from_identified_numbers(
     assert centro_nonpolar.msg_parent_space_group_number == 14
     assert centro_nonpolar.msg_is_polar is False
     assert centro_nonpolar.msg_is_chiral is False
+
+
+def test_ferroelectric_switching_payload_classifies_parent_ordered_routes():
+    induced = build_ferroelectric_switching_payload(
+        input_space_group_number=63,
+        input_space_group_symbol="Cmcm",
+        ssg_space_group_number=36,
+        ossg_space_group_number=36,
+        msg_parent_space_group_number=4,
+        magnetic_phase="FM/FiM",
+        magnetic_phase_base="FM/FiM",
+        spin_splitting_without_soc="Zeeman",
+        is_altermagnet="",
+    )
+    assert induced["polarity_status"] == "magnetically_induced_polar_candidate"
+    assert induced["status"] == "candidate_requires_parent_ordered_coset"
+    assert induced["switching_detected"] is None
+    assert induced["structural_parent_symmetry"]["is_polar"] is False
+    assert induced["parent_selection"]["default"] == "current_ordered_exact_parent"
+    assert induced["parent_selection"]["high_temperature_parent_status"] == (
+        "not_inferred_from_fsg_inputs"
+    )
+    assert induced["polarization_test_contract"]["mode"] == "polar_axis_basis_only"
+    assert induced["secondary_order_parameter_contract"]["status"] == (
+        "pending_definition_and_transport"
+    )
+    assert induced["secondary_order_parameter_contract"]["default_for_collinear_discussion"] == (
+        "neel_vector"
+    )
+    assert induced["polarization_coupling_contract"]["magnetically_induced_polarization"][
+        "current_status_value"
+    ] == "magnetically_induced_polar_candidate"
+    assert [
+        branch["spin_space_operation"]
+        for branch in induced["polarization_coupling_contract"]["collinear_spin_space_branches"]
+    ] == ["+1", "-1"]
+    assert [
+        relation["label"]
+        for relation in induced["polarization_coupling_contract"]["collinear_relation_classes"]
+    ] == [
+        "p_and_magnetic_order_reversed",
+        "p_reversed_magnetic_order_preserved",
+        "p_preserved_magnetic_order_reversed",
+    ]
+    assert induced["msg_compatibility_rule"]["exchange_only_label"] == (
+        "valid_spin_space_operation_not_msg_compatible"
+    )
+    assert induced["domain_deduplication_contract"]["mode"] == (
+        "transformed_magnetic_structure_equivalence"
+    )
+    assert induced["domain_deduplication_contract"]["domain_level_output"].startswith(
+        "after magnetic-structure equivalence"
+    )
+    assert induced["claim_level_contract"]["current_positive_level"] == (
+        "p_reversal_symmetry_candidate"
+    )
+    assert induced["translation_quotient_contract"]["status"] == (
+        "implemented_by_signed_pattern_dedup_for_collinear_output"
+    )
+    assert induced["domain_relation_output_contract"]["candidate_reversal_domains_scope"] == (
+        "P -> -P candidates only"
+    )
+    assert induced["domain_relation_output_contract"]["internal_descriptor"] == (
+        "signed_collinear_magnetic_pattern"
+    )
+    assert induced["ordered_spin_space_symmetry"]["is_polar"] is True
+    assert induced["soc_magnetic_symmetry"]["is_polar"] is True
+    assert (
+        induced["domain_switching_relation"]["switching_test"]
+        == "real_space_coset_representative_maps_P_to_minus_P"
+    )
+    assert (
+        induced["ferroelectric_altermagnet_screening"]["status"]
+        == "not_candidate_no_k_dependent_nonrelativistic_spin_splitting"
+    )
+
+    nonpolar = build_ferroelectric_switching_payload(
+        input_space_group_number=14,
+        input_space_group_symbol="P2_1/c",
+        ssg_space_group_number=14,
+        ossg_space_group_number=14,
+        msg_parent_space_group_number=14,
+        magnetic_phase="AFM",
+        magnetic_phase_base="AFM",
+        spin_splitting_without_soc="No",
+        is_altermagnet="",
+    )
+    assert nonpolar["polarity_status"] == "ordered_symmetry_nonpolar"
+    assert nonpolar["status"] == "ordered_symmetry_forbids_polarization"
+    assert nonpolar["switching_detected"] is False
+
+    switchable_screening = build_ferroelectric_switching_payload(
+        input_space_group_number=63,
+        input_space_group_symbol="Cmcm",
+        ssg_space_group_number=33,
+        ossg_space_group_number=33,
+        msg_parent_space_group_number=33,
+        magnetic_configuration="Collinear",
+        magnetic_phase="AFM(Altermagnet)",
+        magnetic_phase_base="AFM",
+        spin_splitting_without_soc="k-dependent",
+        is_altermagnet="(Altermagnet)",
+    )
+    assert switchable_screening["ferroelectric_altermagnet_screening"]["status"] == "candidate"
+    assert (
+        switchable_screening["switchable_altermagnet_screening"]["status"]
+        == "candidate_requires_p_s_coset_and_barrier_validation"
+    )
+    assert (
+        switchable_screening["domain_reversal_symmetry_screening"]["status"]
+        == "requires_parent_ordered_coset_validation"
+    )
+    assert (
+        "test_optional_secondary_descriptor_transform_for_each_surviving_candidate"
+        in switchable_screening["domain_reversal_symmetry_screening"]["candidate_operation_tests"]
+    )
+    assert (
+        "which_minus_p_domain_is_selected_by_the_practical_electric_field_path"
+        in switchable_screening["post_fsg_path_validation_requirements"]["checks"]
+    )
+    assert switchable_screening["energy_barrier_workflow"]["status"] == "not_computed_by_findspingroup"
+
+    coplanar_screening = build_ferroelectric_switching_payload(
+        input_space_group_number=63,
+        input_space_group_symbol="Cmcm",
+        ssg_space_group_number=36,
+        ossg_space_group_number=36,
+        msg_parent_space_group_number=4,
+        magnetic_configuration="Coplanar",
+    )
+    assert coplanar_screening["polarity_status"] == "magnetically_induced_polar_candidate"
+    assert coplanar_screening["status"] == "not_evaluated_coplanar_order_collinear_only"
+    assert (
+        coplanar_screening["domain_reversal_symmetry_screening"]["status"]
+        == "not_evaluated_coplanar_order_collinear_only"
+    )
+    assert coplanar_screening["candidate_reversal_domains"] == []
+    assert coplanar_screening["polarization_coupling_contract"]["scope"] == "collinear_only"
+
+    parent_polar_transport = build_ferroelectric_switching_payload(
+        input_space_group_number=33,
+        input_space_group_symbol="Pna2_1",
+        ssg_space_group_number=7,
+        ossg_space_group_number=7,
+        msg_parent_space_group_number=9,
+    )
+    assert (
+        parent_polar_transport["polarity_status"]
+        == "parent_polar_ordered_polar_transport_required"
+    )
+    assert (
+        "parent_to_ordered_polar_axis_coordinate_transport"
+        in parent_polar_transport["required_inputs_for_switching_claim"]
+    )
+
+
+def test_domain_reversal_coset_analysis_finds_parent_operation_flipping_polar_axis():
+    identity = np.eye(3)
+    mirror_z = np.diag([1.0, 1.0, -1.0])
+    zero = np.zeros(3)
+
+    analysis = build_domain_reversal_coset_analysis(
+        parent_ops=[[identity, zero], [mirror_z, zero]],
+        ordered_ops=[[identity, zero]],
+        ordered_space_group_number=33,
+        parent_space_group_number=47,
+        parent_space_group_symbol="Pmmm",
+        basis_setting="test_ordered_basis",
+        tol=1e-8,
+    )
+
+    assert analysis["status"] == "candidate_reversal_domains_found"
+    assert analysis["ordered_subset_of_parent"] is True
+    assert analysis["left_coset_count"] == 2
+    assert analysis["candidate_reversal_domain_count"] == 1
+    candidate = analysis["candidate_reversal_domains"][0]
+    assert candidate["maps_p_to_minus_p"] is True
+    assert candidate["reversed_polar_axes"] == ["c"]
+    assert candidate["representative"]["xyzt"] == "x,y,-z"
+    assert candidate["representative_class"] == "spin_domain_relation_pending"
+
+
+def test_generated_parent_standard_supercell_domain_coset_analysis_keeps_1048_full_representatives():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.0.48_MnSe2.mcif")
+    payload = result.ferroelectric_switching["domain_reversal_symmetry_screening"]
+    assert payload["parent_group_source"] == (
+        "spglib_standard_parent_lifted_to_ordered_standard_supercell"
+    )
+    assert payload["parent_action_scope"] == "parent_space_group_mod_ordered_translation_lattice"
+    assert payload["parent_operation_count"] == 72
+    assert payload["parent_grey_operation_count"] == 144
+    assert payload["ordered_operation_count"] == 4
+    assert payload["left_coset_count"] == 36
+    assert set(payload["left_coset_sizes"]) == {4}
+    assert payload["candidate_reversal_domain_count"] == 6
+    assert payload["translation_quotient_status"] == (
+        "physical_domains_deduplicated_by_signed_collinear_pattern"
+    )
+    assert payload["physical_reversal_domain_count"] == 6
+    first_candidate = payload["candidate_reversal_domains"][0]
+    assert [
+        branch["spin_branch_relation_label"]
+        for branch in first_candidate["collinear_branch_relations"]
+    ] == [
+        "p_reversed_spin_branch_preserved",
+        "p_and_spin_branch_reversed",
+    ]
+    assert {
+        branch["signed_collinear_pattern_relation"]
+        for branch in first_candidate["collinear_branch_relations"]
+    } == {"signed_pattern_changed"}
+    assert {
+        branch["representative_class"]
+        for branch in first_candidate["collinear_branch_relations"]
+    } == {"msg_compatible", "exchange_only"}
+    assert payload["deduplicated_reversal_domains"][0]["soc_allowed_exists"] is True
+    assert payload["deduplicated_reversal_domains"][0]["exchange_only_exists"] is True
+
+
+def test_find_spin_group_exposes_conservative_ferroelectric_switching_payload():
+    polar = find_spin_group("tests/testset/mcif_241130_no2186/0.425_Na2CoP2O7.mcif")
+    nonpolar = find_spin_group("tests/testset/mcif_241130_no2186/1.302_Ba2CoO4.mcif")
+    induced = find_spin_group("tests/testset/mcif_241130_no2186/0.1000_Fe4O5.mcif")
+
+    polar_payload = polar.ferroelectric_switching
+    assert polar_payload["analysis_level"] == "symmetry_only_collinear_switching_not_evaluated"
+    assert polar_payload["polarity_status"] == "parent_polar_axis_preserved"
+    assert polar_payload["status"].endswith("_collinear_only")
+    assert polar_payload["switching_detected"] is None
+    assert polar_payload["governing_symmetry"]["source"] == "ossg_real_space_projection"
+    assert polar_payload["governing_symmetry"]["space_group_number"] == 33
+    assert polar_payload["allowed_polar_axes"] == [
+        {
+            "label": "c",
+            "components": [0.0, 0.0, 1.0],
+            "setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+        }
+    ]
+    assert polar_payload["special_coset"]["status"] == "not_promoted_to_switching_claim"
+    assert (
+        polar_payload["domain_reversal_symmetry_screening"]["status"]
+        == polar_payload["status"]
+    )
+    assert (
+        polar_payload["ferroelectric_altermagnet_screening"]["status"]
+        == "candidate_k_dependent_spin_splitting_not_flagged_altermagnet"
+    )
+    assert (
+        polar_payload["switchable_altermagnet_screening"]["status"]
+        == polar_payload["status"]
+    )
+
+    nonpolar_payload = nonpolar.ferroelectric_switching
+    assert nonpolar_payload["polarity_status"] == "ordered_symmetry_nonpolar"
+    assert nonpolar_payload["status"] == "ordered_symmetry_forbids_polarization"
+    assert nonpolar_payload["switching_detected"] is False
+    assert nonpolar_payload["allowed_polar_axes"] == []
+    assert (
+        nonpolar_payload["ferroelectric_altermagnet_screening"]["status"]
+        == "not_candidate_ordered_symmetry_nonpolar"
+    )
+
+    induced_payload = induced.ferroelectric_switching
+    assert induced_payload["polarity_status"] == "magnetically_induced_polar_candidate"
+    assert induced_payload["status"] == "not_evaluated_coplanar_order_collinear_only"
+    assert induced_payload["switching_detected"] is None
+    assert induced_payload["structural_parent_symmetry"]["space_group_number"] == 63
+    assert induced_payload["comparison_symmetry"]["input_space_group_number"] == 63
+    assert (
+        induced_payload["comparison_symmetry"][
+            "current_ordered_exact_parent_space_group_number"
+        ]
+        == 63
+    )
+    assert induced_payload["domain_switching_relation"]["parent_group"] == (
+        "current_ordered_exact_parent"
+    )
+    assert induced_payload["ordered_spin_space_symmetry"]["space_group_number"] == 36
+    assert induced_payload["soc_magnetic_symmetry"]["space_group_number"] == 4
+    assert (
+        induced_payload["domain_reversal_symmetry_screening"]["status"]
+        == "not_evaluated_coplanar_order_collinear_only"
+    )
+    assert induced_payload["candidate_reversal_domain_status"] == (
+        "not_evaluated_coplanar_order_collinear_only"
+    )
+    assert induced_payload["candidate_reversal_domains"] == []
+    assert induced_payload["polarization_coupling_contract"]["input_magnetic_configuration"] == (
+        "Coplanar"
+    )
+    assert (
+        induced_payload["ferroelectric_altermagnet_screening"]["status"]
+        == "not_candidate_no_k_dependent_nonrelativistic_spin_splitting"
+    )
+
+
+def test_find_spin_group_basic_exposes_ferroelectric_switching_payload():
+    result = find_spin_group_basic("tests/testset/mcif_241130_no2186/0.425_Na2CoP2O7.mcif")
+
+    payload = result["ferroelectric_switching"]
+    assert payload["polarity_status"] == "parent_polar_axis_preserved"
+    assert payload["comparison_symmetry"]["ssg_space_group_number"] == 33
+    assert payload["comparison_symmetry"]["ossg_space_group_number"] is None
+    assert payload["ordered_spin_space_symmetry"]["source"] == "ssg_g0_real_space_projection"
+    assert (
+        payload["ferroelectric_altermagnet_screening"]["status"]
+        == "candidate_k_dependent_spin_splitting_not_flagged_altermagnet"
+    )
 
 
 def test_generate_full_symmops_raises_on_runaway_non_group_closure():

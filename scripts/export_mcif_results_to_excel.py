@@ -9,6 +9,7 @@ from typing import Any
 from findspingroup import batch_mcif
 from findspingroup.find_spin_group import find_spin_group
 from findspingroup.structure.group import SpinSpaceGroup
+from findspingroup.version import __version__ as FSG_VERSION
 
 
 def _stringify(value: Any) -> Any:
@@ -281,7 +282,46 @@ def _row_from_error(
     }
 
 
+def _runtime_export_metadata(runtime_jsonl: Path | None) -> dict[str, Any]:
+    if runtime_jsonl is None:
+        return {
+            "source_fsg_version": FSG_VERSION,
+            "source_run_tag": None,
+            "source_route": "full",
+        }
+
+    summary_path = runtime_jsonl.parent / "summary.json"
+    metadata = {
+        "source_fsg_version": None,
+        "source_run_tag": runtime_jsonl.parent.name,
+        "source_route": None,
+    }
+    if summary_path.exists():
+        try:
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            summary = {}
+        metadata.update(
+            {
+                "source_fsg_version": summary.get("package_version"),
+                "source_run_tag": summary.get("run_tag") or runtime_jsonl.parent.name,
+                "source_route": summary.get("route"),
+            }
+        )
+    return metadata
+
+
+def _apply_export_metadata(rows: list[dict[str, Any]], metadata: dict[str, Any]) -> None:
+    for row in rows:
+        row["source_fsg_version"] = metadata.get("source_fsg_version")
+        row["source_run_tag"] = metadata.get("source_run_tag")
+        row["source_route"] = metadata.get("source_route")
+
+
 COLUMNS = [
+    "source_fsg_version",
+    "source_run_tag",
+    "source_route",
     "case_id",
     "file_name",
     "status",
@@ -414,6 +454,7 @@ def main() -> None:
     if args.output_xlsx is None and args.output_jsonl is None:
         raise ValueError("Provide at least one of --output-xlsx or --output-jsonl.")
     rows: list[dict[str, Any]] = []
+    export_metadata = _runtime_export_metadata(args.runtime_jsonl)
     if args.runtime_jsonl is not None:
         with args.runtime_jsonl.open(encoding="utf-8") as handle:
             records_iter = (json.loads(line) for line in handle if line.strip())
@@ -451,6 +492,8 @@ def main() -> None:
                     f"[{index}/{len(files)}] ERROR {file_path.name} -> "
                     f"{type(exc).__name__}: {exc} ({duration:.3f}s)"
                 )
+
+    _apply_export_metadata(rows, export_metadata)
 
     if args.output_jsonl is not None:
         _write_jsonl(rows, args.output_jsonl)
