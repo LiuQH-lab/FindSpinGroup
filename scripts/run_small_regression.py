@@ -49,6 +49,23 @@ QUASI2D_EXPORT_FIELDS = [
 ]
 
 
+FERROELECTRIC_EXPORT_FIELDS = [
+    "index",
+    "phase",
+    "ferroelectric_switching.polarity_status",
+    "ferroelectric_switching.status",
+    "ferroelectric_switching.switching_detected",
+    "ferroelectric_switching.domain_reversal_symmetry_screening.status",
+    "ferroelectric_switching.ferroelectric_altermagnet_screening.status",
+    "ferroelectric_switching.switchable_altermagnet_screening.status",
+    "ferroelectric_switching.post_fsg_path_validation_requirements.status",
+    "ferroelectric_switching.energy_barrier_workflow.status",
+    "ferroelectric_switching.structural_parent_symmetry.space_group_number",
+    "ferroelectric_switching.ordered_spin_space_symmetry.space_group_number",
+    "ferroelectric_switching.soc_magnetic_symmetry.space_group_number",
+]
+
+
 @dataclass(frozen=True)
 class Suite:
     name: str
@@ -84,6 +101,14 @@ SUITES = {
         calculation_mode="quasi2d",
         inputs=("tests/testset/quasi2d_small",),
         export_fields=tuple(QUASI2D_EXPORT_FIELDS),
+    ),
+    "ferroelectric3d": Suite(
+        name="ferroelectric3d",
+        route="full",
+        calculation_mode="3d",
+        manifest="tests/testset/ferroelectric_switching_small/3d_manifest.txt",
+        inputs=(),
+        export_fields=tuple(FERROELECTRIC_EXPORT_FIELDS),
     ),
 }
 

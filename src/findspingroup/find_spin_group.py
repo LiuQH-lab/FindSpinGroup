@@ -28,6 +28,10 @@ from findspingroup.data import MSGMPG_DB
 from findspingroup.data.acc_aligned_p_index_loader import (
     get_acc_aligned_conventional_to_primitive_p,
 )
+from findspingroup.ferroelectric import (
+    build_ferroelectric_switching_payload,
+    build_parent_standard_supercell_domain_coset_analysis,
+)
 from findspingroup.io import parse_poscar_file, parse_structure_file
 from findspingroup.io.scif_generator import (
     _build_chen_linear_name,
@@ -1031,6 +1035,7 @@ class MagSymmetryResult:
         )
         self.spin_splitting_2d = symmetry.get('spin_splitting_2d', None)
         self.is_alter_2d = symmetry.get('is_alter_2d', None)
+        self.ferroelectric_switching = symmetry.get('ferroelectric_switching', None)
 
 
         self.input_magnetic_primitive_ssg_ops = symmetry.get('input_magnetic_primitive_ssg_ops', None)
@@ -1543,6 +1548,7 @@ class MagSymmetryResult:
             'acc': self.acc,
             'properties': self.properties_summary(),
             'gspg': self.gspg_summary(),
+            'ferroelectric_switching': self.ferroelectric_switching,
         }
 
     def to_dict(self):
@@ -1775,6 +1781,73 @@ def _serialize_cell_snapshot(cell: CrystalCell) -> dict:
         'elements': [cell.atom_types_to_symbol[type_id] for type_id in type_ids],
         'occupancies': [float(cell.atom_types_to_occupancies[type_id]) for type_id in type_ids],
     }
+
+
+def _build_g0std_domain_reversal_coset_analysis(
+    *,
+    g0std_cell: CrystalCell,
+    g0std_ssg: SpinSpaceGroup,
+    ordered_space_group_number: int | None,
+    tol_cfg: Tolerances,
+) -> dict:
+    dataset = get_symmetry_dataset(
+        g0std_cell.to_spglib(mag=False),
+        symprec=tol_cfg.space,
+    )
+    if dataset is None:
+        return {
+            "status": "not_evaluated_parent_space_group_detection_failed",
+            "basis_setting": G0_STANDARD_SETTING,
+            "candidate_reversal_domains": [],
+        }
+
+    # The domain quotient is SG(parent supercell) / OSSG_real, not
+    # SG(parent supercell) / MSG.  MSG compatibility is a later classification
+    # layer for a representative, not the ordered-domain stabilizer.
+    ordered_magnetic_ops = [
+        (
+            np.asarray(rotation, dtype=float),
+            np.asarray(translation, dtype=float),
+            1,
+        )
+        for rotation, translation in g0std_ssg.G0_ops
+    ]
+
+    # spglib's transformation_matrix is the direct coordinate transform from
+    # the current G0std supercell to the detected parent standard setting.  Do
+    # not rebuild this from Cartesian lattice matrices: for rotated standard
+    # cells that loses the integer supercell relation and makes the ordered
+    # OSSG projection fail the parent-subgroup check.
+    child_basis_in_parent = np.asarray(dataset.transformation_matrix, dtype=float)
+    return build_parent_standard_supercell_domain_coset_analysis(
+        parent_space_group_number=int(dataset.number),
+        parent_space_group_symbol=str(dataset.international),
+        parent_hall_number=int(dataset.hall_number),
+        child_basis_in_parent=child_basis_in_parent,
+        child_origin_in_parent=np.asarray(dataset.origin_shift, dtype=float),
+        ordered_magnetic_ops=ordered_magnetic_ops,
+        ordered_space_group_number=ordered_space_group_number,
+        basis_setting=G0_STANDARD_SETTING,
+        ordered_cell=g0std_cell,
+        collinear_axis=g0std_ssg.collinear_axis,
+        tol=tol_cfg.m_matrix_tol,
+    )
+
+
+def _build_domain_reversal_coset_analysis(
+    *,
+    source_metadata: dict | None,
+    g0std_cell: CrystalCell,
+    g0std_ssg: SpinSpaceGroup,
+    ordered_space_group_number: int | None,
+    tol_cfg: Tolerances,
+) -> dict:
+    return _build_g0std_domain_reversal_coset_analysis(
+        g0std_cell=g0std_cell,
+        g0std_ssg=g0std_ssg,
+        ordered_space_group_number=ordered_space_group_number,
+        tol_cfg=tol_cfg,
+    )
 
 
 def _serialize_gspg_ops(ops) -> list[list[list[list[float]]]]:
@@ -5540,6 +5613,46 @@ def _find_spin_group_from_parsed(
     )
     msg_parent_info = msg_parent_space_group_info(msg_num)
     ossg_space_group_number = None if identify_index_details is None else identify_index_details.get("G0_id")
+    ssg_space_group_number = int(ssg_primitive.G0_num)
+    source_parent_space_group = (
+        None if source_metadata is None else source_metadata.get("parent_space_group")
+    )
+    domain_reversal_coset_analysis = None
+    if ssg_primitive.conf == "Collinear":
+        try:
+            domain_reversal_coset_analysis = _build_domain_reversal_coset_analysis(
+                source_metadata=source_metadata,
+                g0std_cell=G0std_cell,
+                g0std_ssg=G0std_ssg,
+                ordered_space_group_number=ossg_space_group_number,
+                tol_cfg=tol_cfg,
+            )
+        except Exception as exc:
+            domain_reversal_coset_analysis = {
+                "status": "not_evaluated_parent_ordered_coset_construction_failed",
+                "basis_setting": G0_STANDARD_SETTING,
+                "error": {
+                    "type": type(exc).__name__,
+                    "message": str(exc),
+                },
+                "candidate_reversal_domains": [],
+            }
+    ferroelectric_switching = build_ferroelectric_switching_payload(
+        input_space_group_number=input_space_group_number,
+        input_space_group_symbol=input_space_group_symbol,
+        ssg_space_group_number=ssg_space_group_number,
+        ossg_space_group_number=ossg_space_group_number,
+        msg_num=msg_num,
+        msg_symbol=msg_symbol,
+        msg_parent_space_group_number=msg_parent_info['bns_parent_space_group_number'],
+        source_parent_space_group=source_parent_space_group,
+        magnetic_phase=magnetic_phase,
+        magnetic_phase_base=magnetic_phase_base,
+        magnetic_configuration=ssg_primitive.conf,
+        spin_splitting_without_soc=ss_wo_soc,
+        is_altermagnet=alter,
+        domain_reversal_coset_analysis=domain_reversal_coset_analysis,
+    )
     acc_primitive_output_poscar = acc_primitive_output_cell.to_poscar(source_name)
     acc_output_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_primitive_output_cell)
     poscar_spin_frame_to_acc_output_real_cartesian = np.linalg.inv(
@@ -5789,6 +5902,7 @@ def _find_spin_group_from_parsed(
         'msg_acc': msg_acc,
         'KPOINTS':KPOINTS,
         'quasi_2d': quasi_2d_diagnostics,
+        'ferroelectric_switching': ferroelectric_switching,
     }
 
     cell = {
@@ -5859,6 +5973,7 @@ def _find_spin_group_from_parsed(
                 'KPOINTS_setting': ACC_PRIMITIVE_SETTING,
                 'KPOINTS_real_space_setting': ACC_PRIMITIVE_SETTING,
                 'quasi_2d': quasi_2d_diagnostics,
+                'ferroelectric_switching': ferroelectric_switching,
                 'spin_splitting_2d_interpretation': (
                     None if quasi_2d_diagnostics is None else quasi_2d_diagnostics.get('interpretation')
                 ),
@@ -6383,6 +6498,21 @@ def _find_spin_group_basic_from_parsed(
     msg_parent_info = msg_parent_space_group_info(msg_num)
 
     ssg_space_group_number = int(ssg_primitive.G0_num)
+    ferroelectric_switching = build_ferroelectric_switching_payload(
+        input_space_group_number=input_space_group_number,
+        input_space_group_symbol=input_space_group_symbol,
+        ssg_space_group_number=ssg_space_group_number,
+        ossg_space_group_number=None,
+        msg_num=msg_num,
+        msg_symbol=msg_symbol,
+        msg_parent_space_group_number=msg_parent_info["bns_parent_space_group_number"],
+        source_parent_space_group=None,
+        magnetic_phase=magnetic_phase_payload["phase"],
+        magnetic_phase_base=magnetic_phase_payload["base_phase"],
+        magnetic_configuration=ssg_primitive.conf,
+        spin_splitting_without_soc=ss_wo_soc,
+        is_altermagnet=magnetic_phase_payload["is_alter"],
+    )
 
     return {
         "index": identify_info,
@@ -6435,6 +6565,7 @@ def _find_spin_group_basic_from_parsed(
         "ssg_is_chiral": space_group_is_chiral(ssg_space_group_number),
         "msg_is_polar": msg_parent_info["is_polar"],
         "msg_is_chiral": msg_parent_info["is_chiral"],
+        "ferroelectric_switching": ferroelectric_switching,
         "tolerances": {
             "space_tol": float(tol_cfg.space),
             "mtol": float(tol_cfg.moment),

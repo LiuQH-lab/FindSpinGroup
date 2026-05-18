@@ -5,6 +5,195 @@
     "result": {
       "acc": "6/mmmP",
       "conf": "Collinear",
+      "ferroelectric_switching": {
+        "allowed_polar_axes": [],
+        "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+        "analysis_level": "symmetry_only_parent_ordered_coset_screened",
+        "candidate_reversal_domain_status": "not_applicable_ordered_symmetry_nonpolar",
+        "candidate_reversal_domains": [],
+        "comparison_symmetry": {
+          "input_is_polar": false,
+          "input_space_group_number": 194,
+          "input_space_group_symbol": "P6_3/mmc",
+          "msg_is_polar": false,
+          "msg_parent_space_group_number": 63,
+          "ossg_is_polar": false,
+          "ossg_space_group_number": 194,
+          "ssg_is_polar": false,
+          "ssg_space_group_number": 194
+        },
+        "domain_reversal_symmetry_screening": {
+          "basis_setting": "G0std",
+          "candidate_operation_tests": [
+            "construct_parent_ordered_coset_representatives",
+            "test_real_space_part_maps_P_to_minus_P",
+            "deduplicate_equivalent_domains_mod_translation_origin_setting_and_sublattice_relabeling",
+            "test_optional_secondary_descriptor_transform_for_each_surviving_candidate",
+            "classify_representative_as_msg_compatible_or_spin_space_only"
+          ],
+          "candidate_reversal_domains": [],
+          "primary_order_parameter": {
+            "name": "electric_polarization",
+            "required_test": "real_space_part_maps_P_to_minus_P",
+            "symbol": "P"
+          },
+          "representative_classes": {
+            "msg_compatible": "SOC-allowed candidate relation",
+            "spin_space_only": "exchange_allowed_nonrelativistic_candidate_relation"
+          },
+          "scope": "symmetry_only",
+          "secondary_order_parameter": {
+            "examples": [
+              "spin_splitting_S",
+              "weak_moment_M",
+              "magnetic_order_parameter"
+            ],
+            "name": "optional_descriptor",
+            "required_test": "transport_descriptor_under_same_representative_and_compare_to_requested_target"
+          },
+          "status": "not_applicable_ordered_symmetry_nonpolar"
+        },
+        "domain_switching_relation": {
+          "barrier_note": "Representative class is a symmetry label, not a barrier estimate; energy barriers require a structural path calculation.",
+          "exchange_allowed_if": "the representative is valid in spin-space symmetry but is not MSG-compatible",
+          "ordered_subgroup": "ossg_real_space_projection",
+          "parent_group": "input_structure_parent",
+          "soc_allowed_if": "the same representative is compatible with the MSG spin-real locking map",
+          "status": "not_applicable_ordered_symmetry_nonpolar",
+          "switching_test": "real_space_coset_representative_maps_P_to_minus_P"
+        },
+        "energy_barrier_workflow": {
+          "barrier_units": "eV_per_unit_cell_or_eV_per_formula_unit",
+          "recommended_workflows": [
+            "mode_decomposition_for_hybrid_improper_ferroelectrics",
+            "linear_interpolation_screening_between_domain_structures",
+            "nudged_elastic_band_or_constrained_relaxation_for_final_barrier"
+          ],
+          "required_inputs": [
+            "initial_domain_structure",
+            "target_domain_structure_or_generating_operation",
+            "polarization_vector_and_basis",
+            "candidate_structural_path_or_mode_decomposition",
+            "dft_total_energy_or_neb_profile"
+          ],
+          "status": "not_computed_by_findspingroup",
+          "symmetry_inference": "MSG-compatible versus spin-space-only representative labels do not determine the switching barrier. The barrier depends on the structural path, unstable modes, and atomic displacements."
+        },
+        "ferroelectric_altermagnet_screening": {
+          "evidence": {
+            "is_altermagnet": true,
+            "magnetic_phase": "AFM(Altermagnet)",
+            "magnetic_phase_base": "AFM",
+            "polarity_status": "ordered_symmetry_nonpolar",
+            "spin_splitting_without_soc": "k-dependent"
+          },
+          "literature_basis": {
+            "doi": "10.1103/PhysRevLett.134.106802",
+            "source": "Gu et al., Phys. Rev. Lett. 134, 106802 (2025)",
+            "supplemental_material": "Table SI lists 22 ferroelectric altermagnet candidates; Section II narrows switchable candidates by structural polarization reversibility and P/S domain comparison."
+          },
+          "screening_rules": [
+            {
+              "name": "ordered_spin_space_real_space_projection_is_polar",
+              "satisfied": false
+            },
+            {
+              "name": "nonrelativistic_spin_splitting_is_k_dependent",
+              "satisfied": true
+            },
+            {
+              "name": "magnetic_phase_is_flagged_as_altermagnet",
+              "satisfied": true
+            }
+          ],
+          "status": "not_candidate_ordered_symmetry_nonpolar"
+        },
+        "governing_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "ossg_real_space_projection",
+          "space_group_number": 194,
+          "space_group_symbol": null
+        },
+        "ordered_allowed_polar_axes": [],
+        "ordered_spin_space_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "ossg_real_space_projection",
+          "space_group_number": 194,
+          "space_group_symbol": null
+        },
+        "parent_allowed_polar_axes": [],
+        "polarity_status": "ordered_symmetry_nonpolar",
+        "post_fsg_path_validation_requirements": {
+          "checks": [
+            "whether_polarization_reversal_is_structurally_switchable",
+            "which_minus_p_domain_is_selected_by_the_practical_electric_field_path",
+            "whether_the_practical_minus_p_domain_has_the_requested_secondary_descriptor_state",
+            "whether_the_candidate_path_has_an_accessible_energy_barrier"
+          ],
+          "note": "These are not FSG failure modes. FSG may list symmetry candidates; structural path selection and barriers require a separate calculation.",
+          "scope": "outside_fsg_symmetry_only_contract",
+          "status": "not_evaluated_by_findspingroup"
+        },
+        "required_inputs_for_switching_claim": [],
+        "soc_allowed_polar_axes": [],
+        "soc_magnetic_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "msg_parent_space_group_space_group_standard_direct_basis",
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "msg_num": 555,
+          "msg_symbol": "Cmcm",
+          "source": "msg_parent_space_group",
+          "space_group_number": 63,
+          "space_group_symbol": null
+        },
+        "source_parent_space_group": {
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "space_group_number": 194,
+          "space_group_symbol": "P 6_3/m m c"
+        },
+        "special_coset": {
+          "reason": "The switching screen uses the structural parent SG modulo the ordered OSSG real-space projection. A representative is only a reversal candidate after the real-space P -> -P test; pure translation does not flip polarization.",
+          "status": "replaced_by_sg_to_ossg_coset_screening"
+        },
+        "status": "ordered_symmetry_forbids_polarization",
+        "structural_parent_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "input_structure_parent_space_group_standard_direct_basis",
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "input_structure_parent",
+          "space_group_number": 194,
+          "space_group_symbol": "P6_3/mmc"
+        },
+        "switchable_altermagnet_screening": {
+          "domain_relation_status": "not_applicable_ordered_symmetry_nonpolar",
+          "representative_classes": {
+            "msg_compatible": "SOC-allowed magnetic-domain representative with spin and real-space locking compatible with the MSG map",
+            "spin_space_only": "exchange-allowed nonrelativistic representative present in spin-space symmetry but not MSG-compatible"
+          },
+          "required_symmetry_tests": [
+            "use_domain_reversal_symmetry_screening_for_P_to_minus_P_candidates",
+            "test_spin_splitting_secondary_descriptor_S_to_minus_S_for_each_candidate",
+            "classify_candidate_representative_as_msg_compatible_or_spin_space_only"
+          ],
+          "status": "not_candidate_from_current_ferroelectric_altermagnet_screening"
+        },
+        "switching_detected": false
+      },
       "gspg": {
         "effective_mpg_symbol": "6/mmm1'",
         "npg_symbol_s": "Ci",
@@ -221,6 +410,215 @@
     "result": {
       "acc": "622P",
       "conf": "Noncoplanar",
+      "ferroelectric_switching": {
+        "allowed_polar_axes": [],
+        "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+        "analysis_level": "symmetry_only_parent_ordered_coset_screened",
+        "candidate_reversal_domain_status": "not_applicable_ordered_symmetry_nonpolar",
+        "candidate_reversal_domains": [],
+        "comparison_symmetry": {
+          "input_is_polar": false,
+          "input_space_group_number": 194,
+          "input_space_group_symbol": "P6_3/mmc",
+          "msg_is_polar": true,
+          "msg_parent_space_group_number": 157,
+          "ossg_is_polar": false,
+          "ossg_space_group_number": 194,
+          "ssg_is_polar": false,
+          "ssg_space_group_number": 194
+        },
+        "domain_reversal_symmetry_screening": {
+          "basis_setting": "G0std",
+          "candidate_operation_tests": [
+            "construct_parent_ordered_coset_representatives",
+            "test_real_space_part_maps_P_to_minus_P",
+            "deduplicate_equivalent_domains_mod_translation_origin_setting_and_sublattice_relabeling",
+            "test_optional_secondary_descriptor_transform_for_each_surviving_candidate",
+            "classify_representative_as_msg_compatible_or_spin_space_only"
+          ],
+          "candidate_reversal_domains": [],
+          "primary_order_parameter": {
+            "name": "electric_polarization",
+            "required_test": "real_space_part_maps_P_to_minus_P",
+            "symbol": "P"
+          },
+          "representative_classes": {
+            "msg_compatible": "SOC-allowed candidate relation",
+            "spin_space_only": "exchange_allowed_nonrelativistic_candidate_relation"
+          },
+          "scope": "symmetry_only",
+          "secondary_order_parameter": {
+            "examples": [
+              "spin_splitting_S",
+              "weak_moment_M",
+              "magnetic_order_parameter"
+            ],
+            "name": "optional_descriptor",
+            "required_test": "transport_descriptor_under_same_representative_and_compare_to_requested_target"
+          },
+          "status": "not_applicable_ordered_symmetry_nonpolar"
+        },
+        "domain_switching_relation": {
+          "barrier_note": "Representative class is a symmetry label, not a barrier estimate; energy barriers require a structural path calculation.",
+          "exchange_allowed_if": "the representative is valid in spin-space symmetry but is not MSG-compatible",
+          "ordered_subgroup": "ossg_real_space_projection",
+          "parent_group": "input_structure_parent",
+          "soc_allowed_if": "the same representative is compatible with the MSG spin-real locking map",
+          "status": "not_applicable_ordered_symmetry_nonpolar",
+          "switching_test": "real_space_coset_representative_maps_P_to_minus_P"
+        },
+        "energy_barrier_workflow": {
+          "barrier_units": "eV_per_unit_cell_or_eV_per_formula_unit",
+          "recommended_workflows": [
+            "mode_decomposition_for_hybrid_improper_ferroelectrics",
+            "linear_interpolation_screening_between_domain_structures",
+            "nudged_elastic_band_or_constrained_relaxation_for_final_barrier"
+          ],
+          "required_inputs": [
+            "initial_domain_structure",
+            "target_domain_structure_or_generating_operation",
+            "polarization_vector_and_basis",
+            "candidate_structural_path_or_mode_decomposition",
+            "dft_total_energy_or_neb_profile"
+          ],
+          "status": "not_computed_by_findspingroup",
+          "symmetry_inference": "MSG-compatible versus spin-space-only representative labels do not determine the switching barrier. The barrier depends on the structural path, unstable modes, and atomic displacements."
+        },
+        "ferroelectric_altermagnet_screening": {
+          "evidence": {
+            "is_altermagnet": false,
+            "magnetic_phase": "AFM\n(SOM)",
+            "magnetic_phase_base": "AFM",
+            "polarity_status": "ordered_symmetry_nonpolar",
+            "spin_splitting_without_soc": "k-dependent"
+          },
+          "literature_basis": {
+            "doi": "10.1103/PhysRevLett.134.106802",
+            "source": "Gu et al., Phys. Rev. Lett. 134, 106802 (2025)",
+            "supplemental_material": "Table SI lists 22 ferroelectric altermagnet candidates; Section II narrows switchable candidates by structural polarization reversibility and P/S domain comparison."
+          },
+          "screening_rules": [
+            {
+              "name": "ordered_spin_space_real_space_projection_is_polar",
+              "satisfied": false
+            },
+            {
+              "name": "nonrelativistic_spin_splitting_is_k_dependent",
+              "satisfied": true
+            },
+            {
+              "name": "magnetic_phase_is_flagged_as_altermagnet",
+              "satisfied": false
+            }
+          ],
+          "status": "not_candidate_ordered_symmetry_nonpolar"
+        },
+        "governing_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "ossg_real_space_projection",
+          "space_group_number": 194,
+          "space_group_symbol": null
+        },
+        "ordered_allowed_polar_axes": [],
+        "ordered_spin_space_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "ossg_real_space_projection",
+          "space_group_number": 194,
+          "space_group_symbol": null
+        },
+        "parent_allowed_polar_axes": [],
+        "polarity_status": "ordered_symmetry_nonpolar",
+        "post_fsg_path_validation_requirements": {
+          "checks": [
+            "whether_polarization_reversal_is_structurally_switchable",
+            "which_minus_p_domain_is_selected_by_the_practical_electric_field_path",
+            "whether_the_practical_minus_p_domain_has_the_requested_secondary_descriptor_state",
+            "whether_the_candidate_path_has_an_accessible_energy_barrier"
+          ],
+          "note": "These are not FSG failure modes. FSG may list symmetry candidates; structural path selection and barriers require a separate calculation.",
+          "scope": "outside_fsg_symmetry_only_contract",
+          "status": "not_evaluated_by_findspingroup"
+        },
+        "required_inputs_for_switching_claim": [],
+        "soc_allowed_polar_axes": [
+          {
+            "components": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "label": "c",
+            "setting": "msg_parent_space_group_space_group_standard_direct_basis"
+          }
+        ],
+        "soc_magnetic_symmetry": {
+          "allowed_polar_axes": [
+            {
+              "components": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "label": "c",
+              "setting": "msg_parent_space_group_space_group_standard_direct_basis"
+            }
+          ],
+          "allowed_polar_axes_setting": "msg_parent_space_group_space_group_standard_direct_basis",
+          "has_real_space_inversion": false,
+          "is_polar": true,
+          "msg_num": 1285,
+          "msg_symbol": "P31m'",
+          "source": "msg_parent_space_group",
+          "space_group_number": 157,
+          "space_group_symbol": null
+        },
+        "source_parent_space_group": {
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "space_group_number": 194,
+          "space_group_symbol": "P 6_3/m m c"
+        },
+        "special_coset": {
+          "reason": "The switching screen uses the structural parent SG modulo the ordered OSSG real-space projection. A representative is only a reversal candidate after the real-space P -> -P test; pure translation does not flip polarization.",
+          "status": "replaced_by_sg_to_ossg_coset_screening"
+        },
+        "status": "ordered_symmetry_forbids_polarization",
+        "structural_parent_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "input_structure_parent_space_group_standard_direct_basis",
+          "has_real_space_inversion": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "input_structure_parent",
+          "space_group_number": 194,
+          "space_group_symbol": "P6_3/mmc"
+        },
+        "switchable_altermagnet_screening": {
+          "domain_relation_status": "not_applicable_ordered_symmetry_nonpolar",
+          "representative_classes": {
+            "msg_compatible": "SOC-allowed magnetic-domain representative with spin and real-space locking compatible with the MSG map",
+            "spin_space_only": "exchange-allowed nonrelativistic representative present in spin-space symmetry but not MSG-compatible"
+          },
+          "required_symmetry_tests": [
+            "use_domain_reversal_symmetry_screening_for_P_to_minus_P_candidates",
+            "test_spin_splitting_secondary_descriptor_S_to_minus_S_for_each_candidate",
+            "classify_candidate_representative_as_msg_compatible_or_spin_space_only"
+          ],
+          "status": "not_candidate_from_current_ferroelectric_altermagnet_screening"
+        },
+        "switching_detected": false
+      },
       "gspg": {
         "effective_mpg_symbol": "6/m'm'm'",
         "npg_symbol_s": "D3d",
@@ -460,6 +858,289 @@
     "result": {
       "acc": "mmmC",
       "conf": "Coplanar",
+      "ferroelectric_switching": {
+        "allowed_polar_axes": [
+          {
+            "components": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "label": "c",
+            "setting": "ossg_real_space_projection_space_group_standard_direct_basis"
+          }
+        ],
+        "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+        "analysis_level": "symmetry_only_parent_ordered_coset_screened",
+        "candidate_reversal_domain_status": "no_parent_ordered_coset_maps_p_to_minus_p",
+        "candidate_reversal_domains": [],
+        "comparison_symmetry": {
+          "input_is_polar": false,
+          "input_space_group_number": 189,
+          "input_space_group_symbol": "P-62m",
+          "msg_is_polar": true,
+          "msg_parent_space_group_number": 38,
+          "ossg_is_polar": true,
+          "ossg_space_group_number": 38,
+          "ssg_is_polar": true,
+          "ssg_space_group_number": 38
+        },
+        "domain_reversal_symmetry_screening": {
+          "basis_setting": "G0std",
+          "candidate_operation_tests": [
+            "construct_parent_ordered_coset_representatives",
+            "test_real_space_part_maps_P_to_minus_P",
+            "deduplicate_equivalent_domains_mod_translation_origin_setting_and_sublattice_relabeling",
+            "test_optional_secondary_descriptor_transform_for_each_surviving_candidate",
+            "classify_representative_as_msg_compatible_or_spin_space_only"
+          ],
+          "candidate_reversal_domain_count": 0,
+          "candidate_reversal_domains": [],
+          "left_coset_convention": "domain cosets are gH with H the ordered subgroup",
+          "left_coset_count": 1,
+          "left_coset_sizes": [
+            8
+          ],
+          "left_equals_right": true,
+          "ordered_operation_count": 8,
+          "ordered_polar_axes": [
+            {
+              "components": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "label": "c",
+              "setting": "G0std"
+            }
+          ],
+          "ordered_space_group_number": 38,
+          "ordered_subgroup_source": "ordered_spin_space_real_space_projection",
+          "ordered_subset_of_parent": true,
+          "parent_group_source": "nonmagnetic_space_group_of_ordered_standard_cell",
+          "parent_operation_count": 8,
+          "parent_space_group_number": 189,
+          "parent_space_group_symbol": "P-62m",
+          "primary_order_parameter": {
+            "name": "electric_polarization",
+            "required_test": "real_space_part_maps_P_to_minus_P",
+            "symbol": "P"
+          },
+          "representative_classes": {
+            "msg_compatible": "SOC-allowed candidate relation",
+            "spin_space_only": "exchange_allowed_nonrelativistic_candidate_relation"
+          },
+          "right_coset_count": 1,
+          "right_coset_sizes": [
+            8
+          ],
+          "scope": "symmetry_only",
+          "secondary_order_parameter": {
+            "examples": [
+              "spin_splitting_S",
+              "weak_moment_M",
+              "magnetic_order_parameter"
+            ],
+            "name": "optional_descriptor",
+            "required_test": "transport_descriptor_under_same_representative_and_compare_to_requested_target"
+          },
+          "status": "no_parent_ordered_coset_maps_p_to_minus_p"
+        },
+        "domain_switching_relation": {
+          "barrier_note": "Representative class is a symmetry label, not a barrier estimate; energy barriers require a structural path calculation.",
+          "exchange_allowed_if": "the representative is valid in spin-space symmetry but is not MSG-compatible",
+          "ordered_subgroup": "ossg_real_space_projection",
+          "parent_group": "input_structure_parent",
+          "soc_allowed_if": "the same representative is compatible with the MSG spin-real locking map",
+          "status": "not_evaluated_missing_parent_ordered_cosets",
+          "switching_test": "real_space_coset_representative_maps_P_to_minus_P"
+        },
+        "energy_barrier_workflow": {
+          "barrier_units": "eV_per_unit_cell_or_eV_per_formula_unit",
+          "recommended_workflows": [
+            "mode_decomposition_for_hybrid_improper_ferroelectrics",
+            "linear_interpolation_screening_between_domain_structures",
+            "nudged_elastic_band_or_constrained_relaxation_for_final_barrier"
+          ],
+          "required_inputs": [
+            "initial_domain_structure",
+            "target_domain_structure_or_generating_operation",
+            "polarization_vector_and_basis",
+            "candidate_structural_path_or_mode_decomposition",
+            "dft_total_energy_or_neb_profile"
+          ],
+          "status": "not_computed_by_findspingroup",
+          "symmetry_inference": "MSG-compatible versus spin-space-only representative labels do not determine the switching barrier. The barrier depends on the structural path, unstable modes, and atomic displacements."
+        },
+        "ferroelectric_altermagnet_screening": {
+          "evidence": {
+            "is_altermagnet": false,
+            "magnetic_phase": "FM/FiM",
+            "magnetic_phase_base": "FM/FiM",
+            "polarity_status": "magnetically_induced_polar_candidate",
+            "spin_splitting_without_soc": "Zeeman"
+          },
+          "literature_basis": {
+            "doi": "10.1103/PhysRevLett.134.106802",
+            "source": "Gu et al., Phys. Rev. Lett. 134, 106802 (2025)",
+            "supplemental_material": "Table SI lists 22 ferroelectric altermagnet candidates; Section II narrows switchable candidates by structural polarization reversibility and P/S domain comparison."
+          },
+          "screening_rules": [
+            {
+              "name": "ordered_spin_space_real_space_projection_is_polar",
+              "satisfied": true
+            },
+            {
+              "name": "nonrelativistic_spin_splitting_is_k_dependent",
+              "satisfied": false
+            },
+            {
+              "name": "magnetic_phase_is_flagged_as_altermagnet",
+              "satisfied": false
+            }
+          ],
+          "status": "not_candidate_no_k_dependent_nonrelativistic_spin_splitting"
+        },
+        "governing_symmetry": {
+          "allowed_polar_axes": [
+            {
+              "components": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "label": "c",
+              "setting": "ossg_real_space_projection_space_group_standard_direct_basis"
+            }
+          ],
+          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "has_real_space_inversion": false,
+          "is_polar": true,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "ossg_real_space_projection",
+          "space_group_number": 38,
+          "space_group_symbol": null
+        },
+        "ordered_allowed_polar_axes": [
+          {
+            "components": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "label": "c",
+            "setting": "ossg_real_space_projection_space_group_standard_direct_basis"
+          }
+        ],
+        "ordered_spin_space_symmetry": {
+          "allowed_polar_axes": [
+            {
+              "components": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "label": "c",
+              "setting": "ossg_real_space_projection_space_group_standard_direct_basis"
+            }
+          ],
+          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "has_real_space_inversion": false,
+          "is_polar": true,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "ossg_real_space_projection",
+          "space_group_number": 38,
+          "space_group_symbol": null
+        },
+        "parent_allowed_polar_axes": [],
+        "polarity_status": "magnetically_induced_polar_candidate",
+        "post_fsg_path_validation_requirements": {
+          "checks": [
+            "whether_polarization_reversal_is_structurally_switchable",
+            "which_minus_p_domain_is_selected_by_the_practical_electric_field_path",
+            "whether_the_practical_minus_p_domain_has_the_requested_secondary_descriptor_state",
+            "whether_the_candidate_path_has_an_accessible_energy_barrier"
+          ],
+          "note": "These are not FSG failure modes. FSG may list symmetry candidates; structural path selection and barriers require a separate calculation.",
+          "scope": "outside_fsg_symmetry_only_contract",
+          "status": "not_evaluated_by_findspingroup"
+        },
+        "required_inputs_for_switching_claim": [
+          "polarization_vector_in_declared_basis",
+          "parent_ordered_coset_representatives",
+          "msg_compatibility_map_for_coset_representatives"
+        ],
+        "soc_allowed_polar_axes": [
+          {
+            "components": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "label": "c",
+            "setting": "msg_parent_space_group_space_group_standard_direct_basis"
+          }
+        ],
+        "soc_magnetic_symmetry": {
+          "allowed_polar_axes": [
+            {
+              "components": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "label": "c",
+              "setting": "msg_parent_space_group_space_group_standard_direct_basis"
+            }
+          ],
+          "allowed_polar_axes_setting": "msg_parent_space_group_space_group_standard_direct_basis",
+          "has_real_space_inversion": false,
+          "is_polar": true,
+          "msg_num": 289,
+          "msg_symbol": "Am'm'2",
+          "source": "msg_parent_space_group",
+          "space_group_number": 38,
+          "space_group_symbol": null
+        },
+        "source_parent_space_group": {
+          "has_real_space_inversion": false,
+          "is_polar": false,
+          "space_group_number": 189,
+          "space_group_symbol": "P  -62m"
+        },
+        "special_coset": {
+          "reason": "The switching screen uses the structural parent SG modulo the ordered OSSG real-space projection. A representative is only a reversal candidate after the real-space P -> -P test; pure translation does not flip polarization.",
+          "status": "replaced_by_sg_to_ossg_coset_screening"
+        },
+        "status": "candidate_requires_parent_ordered_coset",
+        "structural_parent_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "input_structure_parent_space_group_standard_direct_basis",
+          "has_real_space_inversion": false,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "input_structure_parent",
+          "space_group_number": 189,
+          "space_group_symbol": "P-62m"
+        },
+        "switchable_altermagnet_screening": {
+          "domain_relation_status": "not_evaluated_missing_parent_ordered_cosets",
+          "representative_classes": {
+            "msg_compatible": "SOC-allowed magnetic-domain representative with spin and real-space locking compatible with the MSG map",
+            "spin_space_only": "exchange-allowed nonrelativistic representative present in spin-space symmetry but not MSG-compatible"
+          },
+          "required_symmetry_tests": [
+            "use_domain_reversal_symmetry_screening_for_P_to_minus_P_candidates",
+            "test_spin_splitting_secondary_descriptor_S_to_minus_S_for_each_candidate",
+            "classify_candidate_representative_as_msg_compatible_or_spin_space_only"
+          ],
+          "status": "not_candidate_from_current_ferroelectric_altermagnet_screening"
+        },
+        "switching_detected": null
+      },
       "gspg": {
         "effective_mpg_symbol": "mm21'",
         "npg_symbol_s": "C2",
