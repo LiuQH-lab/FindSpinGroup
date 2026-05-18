@@ -389,7 +389,7 @@ def _format_float_latex(value: float, tol: float = 1e-8, max_denominator: int = 
         return str(int(round(numeric)))
 
     frac = Fraction(numeric).limit_denominator(max_denominator)
-    if abs(float(frac) - numeric) < 1e-6:
+    if abs(float(frac) - numeric) < tol:
         return rf"\frac{{{frac.numerator}}}{{{frac.denominator}}}"
 
     return f"{numeric:.6f}".rstrip("0").rstrip(".")
