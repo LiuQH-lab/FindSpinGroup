@@ -5000,19 +5000,25 @@ def get_spin_wyckoff(ssg_cell : CrystalCell, ssg_ops , atol =  0.001) -> (list, 
                         continue
                     seen_candidates.add(candidate)
                     candidate_indices.append(candidate)
-            candidate_indices.sort()
+            best_match = None
+            best_score = None
             for j in candidate_indices:
                 dist = getNormInf(trans, coords[j])
                 if dist < atol:
-                    if j not in class_i:
-                        class_i.append(j)
-                        assigned[j] = True
-                    # Collect every operation that stabilizes the
-                    # representative site, not only the first one that also
-                    # claims the class member.
-                    if i == j:
-                        site_symmetry_ops.append(np.array(op[0]))
-                    break
+                    score = (dist, 0 if i == j else 1, j)
+                    if best_score is None or score < best_score:
+                        best_score = score
+                        best_match = j
+            if best_match is not None:
+                j = best_match
+                if j not in class_i:
+                    class_i.append(j)
+                    assigned[j] = True
+                # Collect every operation that stabilizes the representative
+                # site.  Near-coincident sites can share a tolerance bucket, so
+                # this must use the nearest site rather than the lowest index.
+                if i == j:
+                    site_symmetry_ops.append(np.array(op[0]))
         equivalence_classes.append({
             "representative_index": i,
             "class_indices": class_i,
