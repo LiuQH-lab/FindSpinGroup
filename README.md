@@ -1,29 +1,32 @@
-# FINDSPINGROUP
+# FindSpinGroup
 
-`findspingroup` is a Python toolkit, command-line program, and
-[web application](https://app.findspingroup.com) for identifying and inspecting
-oriented spin space group (OSSG) symmetry in magnetic crystal structures.
+FindSpinGroup is a Python package and command-line program for identifying
+oriented spin space group symmetry in magnetic crystal structures.
 
-It is designed for research workflows involving the interplay between
-exchange-driven magnetic geometry and spin-orbit coupling, which are described
-by spin space group (SSG) and magnetic space group (MSG) frameworks,
-respectively.
+It is designed for research workflows where the same magnetic structure must be
+understood in both spin-space-group and magnetic-space-group language. Given a
+magnetic crystal structure, FindSpinGroup identifies the spin symmetry,
+constructs standard and ACC primitive settings, and prepares symmetry data for
+first-principles, high-throughput, and web-application workflows.
 
-Given a magnetic structure, FINDSPINGROUP identifies the OSSG, derives the
-corresponding MSG, and organizes crystallographic and physical information
-needed to analyze the material with and without spin-orbit coupling.
+The project also powers the public web application:
 
-Main outputs can include:
+[https://app.findspingroup.com](https://app.findspingroup.com)
 
-- OSSG information and corresponding MSG information in matched settings;
-- spin Wyckoff positions and Wyckoff splitting from space group (SG) to OSSG and MSG;
-- spin Brillouin zones, high-symmetry k points, and symmetry-allowed spin-polarization components;
-- magnetic-phase classification, including unconventional cases such as altermagnets and spin-orbit magnets;
-- symmetry constraints on anomalous Hall conductivity, nonlinear tensors, and related physical responses;
-- chiral and polar group information with and without spin-orbit coupling;
-- `.scif` files for downstream spin-group-based tensor analysis and data exchange;
-- magnetic primitive-cell POSCAR files in relevant coordinate conventions;
-- KPOINTS files labeled with symmetry-allowed spin-polarization components.
+## What It Does
+
+FindSpinGroup takes a magnetic structure and organizes its symmetry information
+across the main settings used by the project:
+
+- the input structure and its magnetic primitive cell;
+- the database standard setting used for spin-space-group identification;
+- the public convention setting used for symbols and operation display;
+- the ACC primitive cell used for downstream Brillouin-zone and POSCAR output.
+
+The full route can also prepare SCIF, POSCAR, KPOINTS, Wyckoff-splitting,
+magnetic-site, quasi-2D, tensor, and ferroelectric-switching data. Detailed
+field-level output contracts are intentionally kept in the documentation rather
+than in this README.
 
 ## Installation
 
@@ -31,179 +34,117 @@ Main outputs can include:
 pip install findspingroup
 ```
 
-Python `>= 3.11` is required.
+FindSpinGroup requires Python 3.11 or newer.
+
+For development from a local checkout:
+
+```bash
+python -m pip install -e ".[dev]"
+```
 
 ## Quick Start
 
-```python
-from findspingroup import example_path, find_spin_group
-
-result = find_spin_group(example_path("0.800_MnTe.mcif"))
-
-print(result.index)
-print(result.convention_ssg_international_linear)
-print(result.magnetic_phase)
-```
-
-## Command Line
-
-After installation, the package provides the `fsg` command.
-
-Print a lightweight summary for a file:
+Run a compact identification from the command line:
 
 ```bash
 fsg path/to/structure.mcif
 ```
 
-Input: a supported magnetic structure file, such as `.mcif`, `.scif`, or a
-POSCAR-like file with embedded `MAGMOM`.
-Output: a lightweight JSON summary printed to stdout.
-
-Write input-cell SSG / MSG operations and POSCAR helper files:
+Run the full analysis route:
 
 ```bash
-fsg -w path/to/structure.mcif
+fsg --all path/to/structure.mcif
 ```
 
-Input: a supported magnetic structure file. Output: files written in the current
-directory:
-
-- `ssg_symm.json`
-- `input_poscar.vasp`, for non-POSCAR inputs
-- `magnetic_primitive_poscar.vasp`, when the input cell is not magnetic primitive
-
-Use help to inspect the current command-line options:
-
-```bash
-fsg --help
-```
-
-## Python APIs
-
-### Full Analysis
+Use the Python API when the result will be consumed by another program:
 
 ```python
-from findspingroup import find_spin_group
+from findspingroup import example_path, find_spin_group
 
-result = find_spin_group("path/to/structure.mcif")
-
-print(result.index)
-print(result.acc)
-print(result.convention_ssg_international_linear)
-print(result.magnetic_phase)
-print(result.gspg_text["symbol"])
-print(result.to_scif(cell_mode="ssg_convention_oriented"))
+result = find_spin_group(example_path("0.800_MnTe.mcif"))
+summary = result.to_summary_dict()
 ```
 
-`find_spin_group(...)` returns a `MagSymmetryResult` object with the full
-analysis result. See the
-[usage documentation](https://findspingroup.readthedocs.io/en/latest/usage/)
-for the main `MagSymmetryResult` attributes and route-specific outputs.
+## Choosing A Route
 
-SCIF export modes are documented at
-[SCIF](https://findspingroup.readthedocs.io/en/latest/scif/). Current modes are
-`ssg_convention_oriented`, `ssg_convention_cartesian`,
-`database_standard_oriented`, `database_standard_cartesian`,
-`magnetic_primitive_oriented`, `magnetic_primitive_cartesian`,
-`input_oriented`, and `input_cartesian`. Legacy aliases include
-`magnetic_primitive`, `input_identified`, and `database_standard`.
+Most users should start with the default CLI command or
+`find_spin_group_basic(...)`. It is the fast identification route and returns a
+compact summary.
 
-`database_standard_*` SCIF modes emit operations in the selected SSG database
-standard setting: `G0std` for non-type-k results and `L0std` for type-k results.
-The emitted file records its real-space setting and spin-frame setting in
-repo-local `_space_group_spin.fsg_*` tags.
+Use the full route, `fsg --all` or `find_spin_group(...)`, when you need the
+complete result object, generated artifacts, quasi-2D diagnostics, tensor
+analysis, or route-specific audit information.
 
-### Quasi-2D Diagnostics
+Use `fsg -w` when you want input-setting symmetry helper files written into the
+current directory. This route is intended for downstream tools that consume
+explicit operation files.
 
-The default API mode is ordinary 3D identification. To add quasi-2D
-spin-splitting diagnostics without changing the base SSG/MSG/ACC route, request
-the mode explicitly:
-
-```python
-result = find_spin_group(
-    "path/to/slab.mcif",
-    calculation_mode="quasi2d",
-    vacuum_axis="c",
-)
-
-print(result.quasi_2d["spin_splitting_2d"])
-print(result.quasi_2d["kpoints"])
-```
-
-In 3D mode, `result.quasi_2d` is `None`. `vacuum_axis` names the input-cell
-axis normal to the intended 2D slab and is only interpreted for quasi-2D
-diagnostics.
-
-### Lightweight Basic Summary
-
-```python
-from findspingroup import find_spin_group_basic
-
-summary = find_spin_group_basic("path/to/structure.mcif")
-print(summary["index"])
-print(summary["magnetic_phase"])
-```
-
-This route avoids expensive downstream outputs that are not needed for simple
-identification.
-
-### Input-Cell SSG Operations
-
-```python
-from findspingroup import find_spin_group_input_ssg
-
-payload = find_spin_group_input_ssg("path/to/structure.mcif")
-
-print(payload["summary"])
-print(payload["ssg"]["ops"])
-print(payload["msg"]["ops"])
-```
-
-This route returns SSG operations in the **input cell setting**. If the input
-cell is not already magnetic primitive, those input-cell operations may be fewer
-than the full symmetry operations of the magnetic primitive cell. In that case,
-the payload includes primitive-side identifiers and a warning.
+The legacy `--mode` selector is still available for compatibility, but new CLI
+usage should prefer the default route, `--all`, and `-w`.
 
 ## Supported Inputs
 
-`findspingroup` supports:
+FindSpinGroup supports:
 
-- `.cif`
-- `.mcif`
-- repo-generated `.scif`
-- POSCAR-like files with embedded magnetic moments
+- magnetic CIF / mCIF files;
+- ordinary CIF files when magnetic information is available in supported tags;
+- repo-generated SCIF files;
+- POSCAR-like files, including `POSCAR`, `CONTCAR`, `.vasp`, and `.poscar`.
 
-Input notes:
+Magnetic moments must be present. For POSCAR-like files, the command-line tool
+is optimized for VASP working directories and prefers a sibling `INCAR` MAGMOM
+when available. Direct Python calls read only the POSCAR content unless INCAR
+reading is explicitly enabled, which keeps scripted calls reproducible.
 
-- Magnetic inputs must contain explicit magnetic moments.
-- POSCAR inputs must include an embedded `MAGMOM` payload, for example a trailing
-  `# MAGMOM=...` line.
-- The input-SSG POSCAR route does not read `INCAR`.
-- POSCAR moments are treated as Cartesian.
-- CIF, mCIF, and SCIF moments are converted into the route's Cartesian input-cell
-  frame before operation export.
+When no input file is given, the CLI auto-selects from the current directory in
+this order: SCIF, mCIF, CIF files with magnetic-moment tags, `POSCAR` with
+sibling `INCAR` MAGMOM, `POSCAR` with embedded MAGMOM, `.vasp` / `.poscar`
+files with embedded MAGMOM, and finally `CONTCAR`.
 
-## Tolerances
+## Quasi-2D Calculations
 
-The main APIs accept the same basic tolerance controls:
+The default calculation mode is three-dimensional. Quasi-2D analysis is an
+explicit full-route diagnostic:
 
-```python
-find_spin_group(
-    "path/to/structure.mcif",
-    space_tol=0.02,
-    mtol=0.02,
-    meigtol=0.00002,
-    matrix_tol=0.01,
-)
+```bash
+fsg --all --calculation-mode quasi2d --vacuum-axis c path/to/slab.mcif
 ```
 
-`space_tol` controls real-space matching, `mtol` controls magnetic-moment
-matching and zero-net-moment classification thresholds, `meigtol` controls
-point-group eigenvalue decisions, and `matrix_tol` controls point-group
-standardization matrix checks. Use tighter tolerances only when the input
-structure is numerically clean enough to support them.
+The ordinary 3D symmetry result remains the base result. Quasi-2D data is added
+only when the quasi-2D calculation mode is requested.
+
+## Batch And Validation Tools
+
+Batch entry points are included for regression validation and high-throughput
+screening:
+
+```bash
+fsg-batch --help
+findspingroup-batch --help
+```
+
+Repository scripts under `scripts/` provide additional project-maintenance
+workflows, such as batch submission, tolerance scans, POSCAR roundtrip checks,
+and Excel exports. These scripts are mainly intended for project development
+and database validation.
+
+## Documentation
+
+The README is only the entry point. User-facing documentation lives in `site_docs/` and is published through Read the Docs. Development notes, batch logs, and local validation records should stay outside tracked documentation.
+
+## Development
+
+Run focused tests with:
+
+```bash
+PYTHONPATH=src python -m pytest
+```
+
+For changes that affect symmetry identification, generated cells, route output,
+or public fields, use focused local regression tests first and then run the
+agreed project batch validations.
 
 ## License
 
-This project is licensed under the Apache License, Version 2.0. See
+FindSpinGroup is licensed under the Apache License, Version 2.0. See
 [`LICENSE`](LICENSE) for details.

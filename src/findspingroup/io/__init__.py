@@ -10,7 +10,14 @@ from .cif_parser import (
 from .poscar_parser import parse_poscar_file
 
 
-def parse_structure_file(filename, atol=0.02, return_metadata=False):
+def parse_structure_file(
+    filename,
+    atol=0.02,
+    return_metadata=False,
+    *,
+    poscar_allow_incar_magmom: bool = False,
+    poscar_prefer_incar_magmom: bool = False,
+):
     path = Path(filename)
     suffix = path.suffix.lower()
     basename = path.name.lower()
@@ -32,12 +39,19 @@ def parse_structure_file(filename, atol=0.02, return_metadata=False):
             return parsed, enriched
         return parse_scif_file(filename, atol=atol)
     if suffix in {'.vasp', '.poscar'} or basename in {'poscar', 'contcar'}:
+        parsed = parse_poscar_file(
+            filename,
+            allow_incar_magmom=poscar_allow_incar_magmom,
+            prefer_incar_magmom=poscar_prefer_incar_magmom,
+        )
         if return_metadata:
-            return parse_poscar_file(filename), {
+            return parsed, {
                 "source_format": "poscar",
                 "spin_setting": "cartesian",
+                "poscar_allow_incar_magmom": poscar_allow_incar_magmom,
+                "poscar_prefer_incar_magmom": poscar_prefer_incar_magmom,
             }
-        return parse_poscar_file(filename)
+        return parsed
     if return_metadata:
         parsed, metadata = parse_cif_file(filename, atol=atol, return_metadata=True)
         enriched = {} if metadata is None else dict(metadata)

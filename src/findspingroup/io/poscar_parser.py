@@ -122,12 +122,19 @@ def _extract_magmom_vectors(
     n_sites: int,
     *,
     poscar_filename: str,
-    allow_incar_magmom: bool = True,
+    allow_incar_magmom: bool = False,
+    prefer_incar_magmom: bool = False,
     require_embedded_magmom: bool = False,
 ) -> np.ndarray:
     pattern = re.compile(r"^\s*#*\s*magmom\s*=\s*(.*)$", re.IGNORECASE)
     magmom_index = None
     magmom_text = None
+
+    if allow_incar_magmom and prefer_incar_magmom:
+        incar_magmom_text = _read_incar_magmom_payload(poscar_filename)
+        if incar_magmom_text is not None:
+            return _parse_magmom_payload(incar_magmom_text, n_sites)
+
     for index, line in enumerate(lines):
         match = pattern.match(line)
         if match is not None:
@@ -155,7 +162,8 @@ def _extract_magmom_vectors(
 def parse_poscar_file(
     filename,
     *,
-    allow_incar_magmom: bool = True,
+    allow_incar_magmom: bool = False,
+    prefer_incar_magmom: bool = False,
     require_embedded_magmom: bool = False,
 ):
     text = _read_text(filename)
@@ -216,6 +224,7 @@ def parse_poscar_file(
         n_sites,
         poscar_filename=str(filename),
         allow_incar_magmom=allow_incar_magmom,
+        prefer_incar_magmom=prefer_incar_magmom,
         require_embedded_magmom=require_embedded_magmom,
     )
     elements = _expand_species(species, counts)

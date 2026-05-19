@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -17,6 +18,54 @@ from .find_spin_group import (
 
 _AUTO_INPUT_EXTENSIONS = {".scif", ".mcif", ".cif", ".vasp", ".poscar"}
 _AUTO_IGNORE_NAMES = {"ssg_symm.json", "input_poscar.vasp", "magnetic_primitive_poscar.vasp"}
+_POSCAR_MAGMOM_PATTERN = re.compile(r"^\s*#*\s*magmom\s*=", re.IGNORECASE | re.MULTILINE)
+_INCAR_MAGMOM_PATTERN = re.compile(r"^\s*MAGMOM\s*=", re.IGNORECASE | re.MULTILINE)
+_CIF_MOMENT_TAG_MARKERS = (
+    "_atom_site_moment.",
+    "_atom_site_moment_",
+    "_atom_site_spin_moment.",
+    "_atom_site_spin_moment_",
+    "_atom_site_orbital_moment.",
+    "_atom_site_orbital_moment_",
+)
+
+
+def _read_text_for_auto_detect(path: Path) -> str:
+    raw = path.read_bytes()
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return raw.decode("latin-1")
+
+
+def _has_embedded_poscar_magmom(path: Path) -> bool:
+    try:
+        return _POSCAR_MAGMOM_PATTERN.search(_read_text_for_auto_detect(path)) is not None
+    except OSError:
+        return False
+
+
+def _has_sibling_incar_magmom(path: Path) -> bool:
+    incar_path = path.with_name("INCAR")
+    if not incar_path.is_file():
+        return False
+    try:
+        logical_text = []
+        for raw_line in _read_text_for_auto_detect(incar_path).splitlines():
+            line = re.split(r"[#!]", raw_line, maxsplit=1)[0].strip()
+            if line:
+                logical_text.append(line)
+        return _INCAR_MAGMOM_PATTERN.search("\n".join(logical_text)) is not None
+    except OSError:
+        return False
+
+
+def _has_cif_moment_tags(path: Path) -> bool:
+    try:
+        text = _read_text_for_auto_detect(path).lower()
+    except OSError:
+        return False
+    return any(marker in text for marker in _CIF_MOMENT_TAG_MARKERS)
 
 
 def _discover_structure_candidates(cwd: Path) -> list[Path]:
@@ -28,26 +77,30 @@ def _discover_structure_candidates(cwd: Path) -> list[Path]:
         if name_lower in _AUTO_IGNORE_NAMES:
             continue
         if name_lower in {"poscar", "contcar"} or path.suffix.lower() in _AUTO_INPUT_EXTENSIONS:
+            if _candidate_priority(path) is None:
+                continue
             candidates.append(path)
     return candidates
 
 
-def _candidate_priority(path: Path) -> tuple[int, str]:
+def _candidate_priority(path: Path) -> tuple[int, str] | None:
     name_lower = path.name.lower()
-    if name_lower == "poscar":
-        return (0, name_lower)
-    if name_lower == "contcar":
-        return (1, name_lower)
     suffix = path.suffix.lower()
     if suffix == ".scif":
-        return (2, name_lower)
+        return (0, name_lower)
     if suffix == ".mcif":
+        return (1, name_lower)
+    if suffix == ".cif" and _has_cif_moment_tags(path):
+        return (2, name_lower)
+    if name_lower == "poscar" and _has_sibling_incar_magmom(path):
         return (3, name_lower)
-    if suffix == ".cif":
+    if name_lower == "poscar" and _has_embedded_poscar_magmom(path):
         return (4, name_lower)
-    if suffix in {".vasp", ".poscar"}:
+    if suffix in {".vasp", ".poscar"} and _has_embedded_poscar_magmom(path):
         return (5, name_lower)
-    return (99, name_lower)
+    if name_lower == "contcar":
+        return (6, name_lower)
+    return None
 
 
 def _select_structure_file(explicit_file: str | None) -> str:
@@ -137,7 +190,33 @@ def _write_input_ssg_output_dir(directory: Path, payload: dict) -> list[Path]:
     return written
 
 
+def _uses_full_route(args) -> bool:
+    return bool(args.all or args.mode == "full")
+
+
+def _validate_route_options(args) -> None:
+    if args.mode is not None:
+        if args.all or args.write or args.show:
+            raise ValueError("Use either legacy `--mode` or the new `--all/--show/-w` flags, not both.")
+    elif args.all and args.write:
+        raise ValueError("`--all` and `-w/--write` cannot be used together.")
+
+    if args.write_ssg_matrices and args.mode != "acc-primitive":
+        raise ValueError("`--write-ssg-matrices` is only valid with `--mode acc-primitive`.")
+    if args.write_symmetry_dat and args.mode not in {"input-ssg", "poscar-ssg"}:
+        raise ValueError("`--write-symmetry-dat` is only valid with `--mode input-ssg` or `--mode poscar-ssg`.")
+
+    if args.calculation_mode != "3d" and not _uses_full_route(args):
+        raise ValueError("`--calculation-mode` is only supported by the full route; use `--all` or `--mode full`.")
+    if args.vacuum_axis != "c" and not _uses_full_route(args):
+        raise ValueError("`--vacuum-axis` is only supported by the full route; use `--all` or `--mode full`.")
+
+
 def _legacy_mode_payload(args):
+    poscar_magmom_kwargs = {
+        "poscar_allow_incar_magmom": True,
+        "poscar_prefer_incar_magmom": True,
+    }
     if args.mode == "basic":
         return find_spin_group_basic(
             args.structure_file,
@@ -146,6 +225,7 @@ def _legacy_mode_payload(args):
             meigtol=args.meigtol,
             matrix_tol=args.matrix_tol,
             parser_atol=args.parser_atol,
+            **poscar_magmom_kwargs,
         )
     if args.mode == "acc-primitive":
         payload = find_spin_group_acc_primitive(
@@ -155,6 +235,7 @@ def _legacy_mode_payload(args):
             meigtol=args.meigtol,
             matrix_tol=args.matrix_tol,
             parser_atol=args.parser_atol,
+            **poscar_magmom_kwargs,
         )
         if args.write_ssg_matrices:
             key = (
@@ -171,6 +252,7 @@ def _legacy_mode_payload(args):
             mtol=args.mtol,
             meigtol=args.meigtol,
             matrix_tol=args.matrix_tol,
+            **poscar_magmom_kwargs,
         )
         if args.write_symmetry_dat:
             write_poscar_ssg_symmetry_dat(args.write_symmetry_dat, payload)
@@ -184,12 +266,18 @@ def _legacy_mode_payload(args):
         parser_atol=args.parser_atol,
         calculation_mode=args.calculation_mode,
         vacuum_axis=args.vacuum_axis,
+        **poscar_magmom_kwargs,
     )
     return _to_serializable_payload(result)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Calculate Spin Space Groups from magnetic structure files.")
+    parser.epilog = (
+        "For POSCAR-like inputs, the CLI prefers MAGMOM from a sibling INCAR "
+        "when present. Direct Python calls read only embedded POSCAR MAGMOM "
+        "unless explicitly opted into INCAR reading."
+    )
     parser.add_argument("structure_file", nargs="?", help="Path to the magnetic structure file")
     parser.add_argument(
         "--mode",
@@ -268,16 +356,12 @@ def main():
 
     try:
         args.structure_file = _select_structure_file(args.structure_file)
+        _validate_route_options(args)
 
         if args.mode is not None:
-            if args.all or args.write or args.show:
-                raise ValueError("Use either legacy `--mode` or the new `--all/--show/-w` flags, not both.")
             payload = _legacy_mode_payload(args)
             print(json.dumps(payload, indent=2, ensure_ascii=False, cls=NumpyEncoder))
             return
-
-        if args.all and args.write:
-            raise ValueError("`--all` and `-w/--write` cannot be used together.")
 
         if args.write:
             payload = find_spin_group_input_ssg(
@@ -286,6 +370,8 @@ def main():
                 mtol=args.mtol,
                 meigtol=args.meigtol,
                 matrix_tol=args.matrix_tol,
+                poscar_allow_incar_magmom=True,
+                poscar_prefer_incar_magmom=True,
             )
             written = _write_input_ssg_output_dir(Path.cwd(), payload)
             print(
@@ -312,6 +398,8 @@ def main():
                     parser_atol=args.parser_atol,
                     calculation_mode=args.calculation_mode,
                     vacuum_axis=args.vacuum_axis,
+                    poscar_allow_incar_magmom=True,
+                    poscar_prefer_incar_magmom=True,
                 )
             )
         else:
@@ -322,6 +410,8 @@ def main():
                 meigtol=args.meigtol,
                 matrix_tol=args.matrix_tol,
                 parser_atol=args.parser_atol,
+                poscar_allow_incar_magmom=True,
+                poscar_prefer_incar_magmom=True,
             )
 
         _emit_payload(payload, args.show)

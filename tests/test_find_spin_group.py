@@ -110,9 +110,9 @@ from findspingroup.utils.international_symbol import (
 from findspingroup.utils.space_group_flags import (
     msg_parent_space_group_info,
     space_group_polar_axis_basis,
+    space_group_is_centrosymmetric,
     space_group_is_chiral,
     space_group_is_polar,
-    space_group_has_real_space_inversion,
 )
 from findspingroup.utils.seitz_symbol import describe_point_operation, describe_spin_space_operation
 from findspingroup.utils import general_positions_to_matrix
@@ -175,6 +175,7 @@ def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
     assert payload["index"] == "194.164.1.1.L"
     assert payload["conf"] == "Collinear"
     assert payload["acc_symbol"] == "6/mmmP"
+    assert payload["quasi_2d"] is None
     assert payload["g0_number"] == 194
     assert payload["l0_number"] == 164
     assert payload["space_group_number"] == 194
@@ -381,7 +382,7 @@ def test_cli_acc_primitive_mode_prints_json_and_writes_matrix_file(monkeypatch, 
     assert len(written) == len(payload["acc_primitive_ssg_operation_matrices"])
 
 
-def test_cli_without_explicit_file_autoselects_poscar_and_runs_basic(monkeypatch, capsys, tmp_path):
+def test_cli_without_explicit_file_prefers_mcif_over_poscar_and_runs_basic(monkeypatch, capsys, tmp_path):
     original = find_spin_group("examples/0.800_MnTe.mcif")
     (tmp_path / "POSCAR").write_text(original.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
     (tmp_path / "other.mcif").write_text(Path("examples/0.800_MnTe.mcif").read_text(encoding="utf-8"), encoding="utf-8")
@@ -397,7 +398,83 @@ def test_cli_without_explicit_file_autoselects_poscar_and_runs_basic(monkeypatch
 
     assert payload["index"] == "194.164.1.1.L"
     assert payload["acc_symbol"] == "6/mmmP"
-    assert "Using POSCAR" in stdout.err or "Auto-selected structure file: POSCAR" in stdout.err
+    assert "Using other.mcif" in stdout.err or "Auto-selected structure file: other.mcif" in stdout.err
+
+
+def test_cli_auto_selects_only_magnetic_structure_candidates(monkeypatch, tmp_path):
+    import findspingroup.cli as cli_module
+
+    (tmp_path / "plain.cif").write_text("_cell_length_a 1\n", encoding="utf-8")
+    (tmp_path / "plain.poscar").write_text("no magnetic payload\n", encoding="utf-8")
+    (tmp_path / "CONTCAR").write_text("last resort\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    assert Path(cli_module._select_structure_file(None)).name == "CONTCAR"
+
+
+@pytest.mark.parametrize(
+    ("files", "expected"),
+    [
+        (
+            {
+                "sample.scif": "_space_group_spin.fsg_cell_setting input\n",
+                "sample.mcif": "_atom_site_moment.label Fe1\n",
+                "magnetic.cif": "_atom_site_moment.label Fe1\n",
+                "POSCAR": "# MAGMOM=1\n",
+                "layer.vasp": "# MAGMOM=1\n",
+                "CONTCAR": "fallback\n",
+            },
+            "sample.scif",
+        ),
+        (
+            {
+                "sample.mcif": "_atom_site_moment.label Fe1\n",
+                "magnetic.cif": "_atom_site_moment.label Fe1\n",
+                "POSCAR": "# MAGMOM=1\n",
+            },
+            "sample.mcif",
+        ),
+        (
+            {
+                "magnetic.cif": "_atom_site_spin_moment.axis_u 1\n",
+                "POSCAR": "no embedded magmom\n",
+                "INCAR": "MAGMOM = 1 -1\n",
+            },
+            "magnetic.cif",
+        ),
+        (
+            {
+                "POSCAR": "no embedded magmom\n",
+                "INCAR": "MAGMOM = 1 -1\n",
+                "layer.poscar": "# MAGMOM=1 -1\n",
+            },
+            "POSCAR",
+        ),
+        (
+            {
+                "POSCAR": "# MAGMOM=1 -1\n",
+                "layer.vasp": "# MAGMOM=1 -1\n",
+                "CONTCAR": "fallback\n",
+            },
+            "POSCAR",
+        ),
+        (
+            {
+                "layer.vasp": "# MAGMOM=1 -1\n",
+                "CONTCAR": "fallback\n",
+            },
+            "layer.vasp",
+        ),
+    ],
+)
+def test_cli_auto_select_priority(monkeypatch, tmp_path, files, expected):
+    import findspingroup.cli as cli_module
+
+    for filename, content in files.items():
+        (tmp_path / filename).write_text(content, encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    assert Path(cli_module._select_structure_file(None)).name == expected
 
 
 def test_cli_write_outputs_input_ssg_bundle_into_current_directory(monkeypatch, capsys, tmp_path):
@@ -488,7 +565,91 @@ def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatc
         "parser_atol": pytest.approx(0.05),
         "calculation_mode": "quasi2d",
         "vacuum_axis": "b",
+        "poscar_allow_incar_magmom": True,
+        "poscar_prefer_incar_magmom": True,
     }
+
+
+def test_cli_default_route_forwards_basic_without_quasi2d_options(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    captured = {}
+
+    def _fake_find_spin_group_basic(path, **kwargs):
+        captured["path"] = path
+        captured.update(kwargs)
+        return {"index": "1.1.1.1.P1", "route": "basic"}
+
+    monkeypatch.setattr(cli_module, "find_spin_group_basic", _fake_find_spin_group_basic)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "fsg",
+            "--space-tol",
+            "0.03",
+            "--mtol",
+            "0.04",
+            "--meigtol",
+            "0.0001",
+            "--matrix-tol",
+            "0.02",
+            "--parser-atol",
+            "0.05",
+            "dummy.mcif",
+        ],
+    )
+
+    cli_module.main()
+
+    assert json.loads(capsys.readouterr().out) == {
+        "index": "1.1.1.1.P1",
+        "route": "basic",
+    }
+    assert captured == {
+        "path": "dummy.mcif",
+        "space_tol": pytest.approx(0.03),
+        "mtol": pytest.approx(0.04),
+        "meigtol": pytest.approx(0.0001),
+        "matrix_tol": pytest.approx(0.02),
+        "parser_atol": pytest.approx(0.05),
+        "poscar_allow_incar_magmom": True,
+        "poscar_prefer_incar_magmom": True,
+    }
+    assert "calculation_mode" not in captured
+    assert "vacuum_axis" not in captured
+
+
+def test_cli_rejects_quasi2d_options_without_full_route(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "--calculation-mode", "quasi2d", "dummy.mcif"],
+    )
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 1
+    assert "only supported by the full route" in capsys.readouterr().err
+
+
+def test_cli_rejects_legacy_writer_flags_outside_matching_modes(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "--write-symmetry-dat", "ssg_symm.json", "dummy.mcif"],
+    )
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 1
+    assert "`--write-symmetry-dat` is only valid" in capsys.readouterr().err
 
 
 def test_find_spin_group_poscar_ssg_reports_embedded_magnetic_primitive_case(tmp_path):
@@ -585,6 +746,7 @@ def test_find_spin_group_input_ssg_emits_input_poscar_for_mcif_input():
     payload = find_spin_group_input_ssg("examples/0.800_MnTe.mcif")
 
     assert payload["summary"]["input_ssg_index"] == "194.164.1.1.L"
+    assert payload["quasi_2d"] is None
     assert payload["ssg"]["spin_frame_setting"] == "cartesian"
     assert payload["input_poscar"]
     assert "# MAGMOM=" in payload["input_poscar"]
@@ -765,13 +927,13 @@ def test_combine_parametric_solutions_keeps_multi_free_variable_ordering():
     assert combine_parametric_solutions(rref) == ["0", "Sx", "Sy"]
 
 
-def test_space_group_has_real_space_inversion_lookup_matches_basic_examples():
-    assert space_group_has_real_space_inversion(1) is False
-    assert space_group_has_real_space_inversion(2) is True
-    assert space_group_has_real_space_inversion(33) is False
-    assert space_group_has_real_space_inversion(14) is True
-    assert space_group_has_real_space_inversion(110) is False
-    assert space_group_has_real_space_inversion(123) is True
+def test_space_group_is_centrosymmetric_lookup_matches_basic_examples():
+    assert space_group_is_centrosymmetric(1) is False
+    assert space_group_is_centrosymmetric(2) is True
+    assert space_group_is_centrosymmetric(33) is False
+    assert space_group_is_centrosymmetric(14) is True
+    assert space_group_is_centrosymmetric(110) is False
+    assert space_group_is_centrosymmetric(123) is True
 
 
 def test_space_group_is_polar_lookup_matches_reference_examples():
@@ -799,16 +961,16 @@ def test_space_group_is_chiral_lookup_matches_reference_examples():
         assert space_group_is_chiral(sg) is False
 
 
-def test_msg_bns_and_og_first_segments_agree_on_real_space_inversion_rule():
+def test_msg_bns_and_og_first_segments_agree_on_centrosymmetric_rule():
     from findspingroup.data import MSGMPG_DB
 
     for msg_num in MSGMPG_DB.MSG_INT_TO_BNS:
         if msg_num is None:
             continue
         info = msg_parent_space_group_info(msg_num)
-        assert space_group_has_real_space_inversion(
+        assert space_group_is_centrosymmetric(
             info["bns_parent_space_group_number"]
-        ) == space_group_has_real_space_inversion(
+        ) == space_group_is_centrosymmetric(
             info["og_parent_space_group_number"]
         )
         assert space_group_is_polar(
@@ -823,23 +985,23 @@ def test_msg_bns_and_og_first_segments_agree_on_real_space_inversion_rule():
         )
 
 
-def test_find_spin_group_exposes_real_space_inversion_flags_from_identified_numbers():
+def test_find_spin_group_exposes_centrosymmetric_flags_from_identified_numbers():
     noncentro = find_spin_group("tests/testset/mcif_241130_no2186/0.425_Na2CoP2O7.mcif")
     centro = find_spin_group("tests/testset/mcif_241130_no2186/1.302_Ba2CoO4.mcif")
 
     assert noncentro.input_space_group_number == 33
-    assert noncentro.sg_has_real_space_inversion is False
+    assert noncentro.sg_is_centrosymmetric is False
     assert noncentro.ossg_space_group_number == 33
-    assert noncentro.ossg_has_real_space_inversion is False
+    assert noncentro.ossg_is_centrosymmetric is False
     assert noncentro.msg_parent_space_group_number == 33
-    assert noncentro.msg_has_real_space_inversion is False
+    assert noncentro.msg_is_centrosymmetric is False
 
     assert centro.input_space_group_number == 14
-    assert centro.sg_has_real_space_inversion is True
+    assert centro.sg_is_centrosymmetric is True
     assert centro.ossg_space_group_number == 14
-    assert centro.ossg_has_real_space_inversion is True
+    assert centro.ossg_is_centrosymmetric is True
     assert centro.msg_parent_space_group_number == 14
-    assert centro.msg_has_real_space_inversion is True
+    assert centro.msg_is_centrosymmetric is True
 
 
 def test_find_spin_group_exposes_polar_and_chiral_flags_from_identified_numbers():
@@ -2412,6 +2574,18 @@ def test_identify_spin_space_group_reports_nonmagnetic_error_when_input_is_effec
         identify_spin_space_group_result(cell, find_primitive=False)
 
 
+def test_crystal_cell_initializes_net_moment_without_magnetic_moments():
+    cell = CrystalCell(
+        lattice=[1.0, 1.0, 1.0, 90.0, 90.0, 90.0],
+        positions=[[0.0, 0.0, 0.0]],
+        occupancies=[1.0],
+        elements=["Fe"],
+        moments=None,
+    )
+
+    assert cell.net_moment is None
+
+
 def test_identify_spin_space_group_reports_mtol_induced_o3_degeneracy():
     cell = CrystalCell(
         lattice=[1.0, 1.0, 1.0, 90.0, 90.0, 90.0],
@@ -2490,15 +2664,19 @@ def test_find_spin_group_basic_matches_manual_checked_identify_222_index_changes
 
 def test_find_spin_group_basic_does_not_fallback_when_identify_database_entry_is_missing():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        with pytest.raises(KeyError, match="not in identify-index database"):
-            find_spin_group_basic("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+        payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+
+    assert payload["index"].startswith("not in identify-index database:")
+    assert payload["identify_index_details"] is None
+    assert payload["phase"]
+    assert payload["acc_primitive_resolution_audit"]["status"] == "identify_index_unavailable"
 
 
 def test_find_spin_group_basic_uses_global_acc_primitive_selection():
     payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/1.115_Dy3Ru4Al12.mcif")
 
     assert payload["index"] == "12.2.2.3"
-    assert payload["acc_primitive_standard_setting"] == "G0std"
+    assert "acc_primitive_standard_setting" not in payload
     audit = payload["acc_primitive_resolution_audit"]["G0std_transform_selection"]
     assert audit["selected_strategy"] == "nofrac_lattice_shear:r2+=(-2)r0"
     assert all(
@@ -2511,7 +2689,7 @@ def test_find_spin_group_basic_uses_monoclinic_ac_column_reduction_for_index2_co
     payload = find_spin_group_basic("tests/testset/mcif_241130_no2186/2.116_Na3Co2SbO6.mcif")
 
     assert payload["index"] == "10.2.2.21.P2"
-    assert payload["acc_primitive_standard_setting"] == "G0std"
+    assert "acc_primitive_standard_setting" not in payload
     audit = payload["acc_primitive_resolution_audit"]["G0std_transform_selection"]
     assert audit["selected_strategy"].startswith("monoclinic_ac_column_reduce:")
     assert "det_factor=2" in audit["selected_strategy"]
@@ -2599,7 +2777,7 @@ def test_find_spin_group_basic_uses_it_ik_to_select_g0std_for_t_type_linear_inde
     assert payload["index"] == "63.38.1.1.L"
     assert payload["it"] == 2
     assert payload["ik"] == 1
-    assert payload["acc_primitive_standard_setting"] == "G0std"
+    assert "acc_primitive_standard_setting" not in payload
     audit = payload["acc_primitive_resolution_audit"]["G0std_transform_selection"]
     assert audit["selected_strategy"] == "current_integerized"
     assert audit["preferred_standard_setting"] == "G0std"
@@ -2612,7 +2790,7 @@ def test_find_spin_group_basic_uses_it_ik_to_select_l0std_for_k_type_p_index():
     assert payload["index"] == "69.65.2.2.P1"
     assert payload["it"] == 1
     assert payload["ik"] == 2
-    assert payload["acc_primitive_standard_setting"] == "L0std"
+    assert "acc_primitive_standard_setting" not in payload
     audit = payload["acc_primitive_resolution_audit"]["L0std_transform_selection"]
     assert audit["selected_strategy"] == "current_integerized"
     assert audit["preferred_standard_setting"] == "L0std"
@@ -2637,24 +2815,25 @@ def test_find_spin_group_basic_reraises_non_database_identify_errors(monkeypatch
 
 def test_find_spin_group_acc_primitive_does_not_fallback_when_identify_database_entry_is_missing():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        with pytest.raises(KeyError, match="not in identify-index database"):
-            find_spin_group_acc_primitive("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+        payload = find_spin_group_acc_primitive("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+
+    assert payload["index"].startswith("not in identify-index database:")
+    assert payload["identify_index_details"] is None
+    assert payload["acc_primitive_resolution_audit"]["status"] == "identify_index_unavailable"
 
 
 def test_find_spin_group_does_not_fallback_when_identify_database_entry_is_missing():
     source_name = "tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif"
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        with pytest.raises(KeyError, match="not in identify-index database"):
-            find_spin_group(source_name)
+        result = find_spin_group(source_name)
+
+    assert result.index.startswith("not in identify-index database:")
+    assert result.identify_index_details is None
+    assert result.magnetic_phase
+    assert result.acc_primitive_resolution_audit["status"] == "identify_index_unavailable"
 
 
 def test_g_type_output_ossg_uses_shortest_nonzero_axis_translations():
-    with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        with pytest.raises(KeyError, match="not in identify-index database"):
-            find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
-
-
-def test_conbnb3s6_tripleq_g_type_translation_part_keeps_nontrivial_a_b_and_identity_c():
     result = find_spin_group("examples/CoNb3S6_tripleQ.mcif")
 
     ssg = SpinSpaceGroup(result.convention_ssg_ops)
@@ -2758,6 +2937,20 @@ def test_get_magnetic_phase_accepts_net_moment_tolerance():
     assert relaxed_phase == "Compensated FiM"
 
 
+def test_get_magnetic_phase_returns_base_phase_when_full_context_is_supplied():
+    phase = get_magnetic_phase(
+        "∞m",
+        "C∞v",
+        1e-3,
+        None,
+        conf="Collinear",
+        is_ss_gp="spin splitting",
+        net_moment_tol=0.02,
+    )
+
+    assert phase == "Compensated FiM"
+
+
 def test_find_spin_group_basic_reports_classification_tolerances():
     result = find_spin_group_basic(
         "tests/testset/mcif_241130_no2186/0.103_Mn2GeO4.mcif",
@@ -2768,6 +2961,12 @@ def test_find_spin_group_basic_reports_classification_tolerances():
     assert result["magnetic_phase_base"] == "Compensated FiM"
     assert result["magnetic_phase_details"]["zero_net_moment"] is True
     assert result["magnetic_phase_details"]["zero_net_moment_tol"] == pytest.approx(0.05)
+    assert result["net_moment"] == pytest.approx(
+        result["magnetic_phase_details"]["net_moment"]
+    )
+    assert result["zero_net_moment_tol"] == pytest.approx(0.05)
+    assert result["msg_type"] in {1, 2, 3, 4}
+    assert result["quasi_2d"] is None
     assert result["tolerances"]["mtol"] == pytest.approx(0.05)
 
 
@@ -3144,7 +3343,9 @@ def test_find_spin_group_reports_quasi2d_diagnostics_without_changing_3d_fields(
     assert result.quasi_2d["vacuum_axis_input"] == "c"
     assert result.quasi_2d["interpretation"] == "in_plane_k_dependent"
     assert result.quasi_2d["spin_splitting_2d"] == "spin splitting"
-    assert result.spin_splitting_2d_interpretation == "in_plane_k_dependent"
+    assert "spin_splitting_2d_interpretation" not in result.to_dict()
+    assert "spin_splitting_2d" not in result.to_dict()
+    assert "is_alter_2d" not in result.to_dict()
     assert result.quasi_2d["diagnostic_points"][0]["label"] == "GP"
     assert result.quasi_2d["diagnostic_points"][0]["plane_classification"] == "in_plane"
     assert result.quasi_2d["generic_point_comparison"]["status"] == "compared"
@@ -3338,7 +3539,9 @@ def test_quasi2d_input_tags_do_not_control_runtime_mode(tmp_path):
 
     assert result.index == "149.149.1.1.L"
     assert result.quasi_2d is None
-    assert result.spin_splitting_2d_interpretation is None
+    assert "spin_splitting_2d_interpretation" not in result.to_dict()
+    assert "spin_splitting_2d" not in result.to_dict()
+    assert "is_alter_2d" not in result.to_dict()
     assert not hasattr(result, "magnetic_phase_2d")
 
 
@@ -4124,6 +4327,60 @@ def test_mag_symmetry_result_exposes_core_group_identifiers():
     assert payload["input_space_group_number"] == 194
 
 
+def test_mag_symmetry_result_exposes_structured_output_contract():
+    result = find_spin_group("examples/0.800_MnTe.mcif")
+    structured = result.to_structured_dict()
+
+    assert sorted(structured) == [
+        "artifacts",
+        "cells",
+        "groups",
+        "legacy",
+        "properties",
+        "summary",
+        "transforms",
+    ]
+    assert not hasattr(result, "structured")
+
+    assert structured["summary"]["index"] == result.index
+    assert structured["summary"]["conf"] == result.conf
+    assert structured["summary"]["phase"] == result.magnetic_phase
+    assert structured["summary"]["acc"] == result.acc
+
+    assert structured["groups"]["input_space_group"] == {
+        "number": result.input_space_group_number,
+        "symbol": result.input_space_group_symbol,
+        "basis_or_setting": result.input_space_group_basis_or_setting,
+        "is_centrosymmetric": result.sg_is_centrosymmetric,
+        "is_polar": result.sg_is_polar,
+        "is_chiral": result.sg_is_chiral,
+    }
+    assert structured["groups"]["msg"]["num"] == result.msg_num
+    assert structured["groups"]["msg"]["type"] == result.msg_type
+    assert structured["groups"]["msg"]["bns_number"] == result.msg_bns_number
+    assert structured["groups"]["ssg_by_cell"]["acc_primitive"]["ops"] == result.acc_primitive_ssg_ops
+
+    assert structured["cells"]["acc_primitive"]["setting"] == "acc_primitive"
+    assert structured["cells"]["acc_primitive"]["detail"] == result.acc_primitive_magnetic_cell_detail
+    assert structured["cells"]["database_standard"]["selected"] == result.selected_standard_setting
+
+    assert structured["transforms"]["input_to_acc_primitive"] == result.T_input_to_acc_primitive
+    assert (
+        structured["transforms"]["audit"]["acc_primitive_resolution"]
+        == result.acc_primitive_resolution_audit
+    )
+
+    assert structured["properties"]["magnetic_phase"]["details"] == result.magnetic_phase_details
+    assert structured["properties"]["quasi_2d"] == result.quasi_2d
+    assert structured["properties"]["magnetic_site"] == result.magnetic_site_summary
+
+    assert structured["artifacts"]["scif"]["default"] == result.scif
+    assert structured["artifacts"]["kpoints"]["acc_primitive"]["text"] == result.KPOINTS
+    assert structured["artifacts"]["poscar"]["acc_primitive"] == result.acc_primitive_magnetic_cell_poscar
+    assert structured["legacy"]["index"] == result.index
+    assert "structured" not in structured["legacy"]
+
+
 def test_find_spin_group_exposes_explicit_gspg_payload_for_coplanar_case():
     result = find_spin_group("tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif")
     oriented_ssg = SpinSpaceGroup(result.convention_ssg_ops)
@@ -4583,6 +4840,36 @@ def test_find_spin_group_exposes_msg_little_groups_and_wp_chain():
     assert result.acc_primitive_magnetic_cell_detail["elements"] == (
         ["Ag"] * 3 + ["Ge"] * 3 + ["Tm"] * 3
     )
+
+
+def test_wp_chain_uses_crystallographic_orbits_for_sg_multiplicity():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.197_Fe4Si2Sn7O16.mcif")
+
+    fe_rows = [row for row in result.wp_chain if row[0] == "Fe"]
+    assert [row[1] for row in fe_rows].count("12f") == 2
+    assert "4f" not in {row[1] for row in fe_rows}
+    assert "8f" not in {row[1] for row in fe_rows}
+    assert {row[3] for row in fe_rows if row[1] == "12f"} == {"4d", "8f"}
+    assert result.magnetic_site_summary["status"] == "ok"
+    assert result.magnetic_site_summary["setting"] == "acc_primitive"
+    assert result.magnetic_site_summary["cell_expansion"] == 2
+    assert result.magnetic_site_summary["n_magnetic_orbits_sg"] == 1
+    assert result.magnetic_site_summary["n_magnetic_orbits_ssg"] == 1
+    assert result.magnetic_site_summary["n_magnetic_orbits_msg"] == 1
+    assert result.magnetic_site_summary["max_magnetic_site_dof_ssg"] == 2
+    assert result.magnetic_site_summary["max_magnetic_site_dof_msg"] == 3
+    assert result.magnetic_site_summary["total_magnetic_site_dof_ssg"] == 2
+    assert result.magnetic_site_summary["total_magnetic_site_dof_msg"] == 3
+    magnetic_wp_rows = result.magnetic_site_summary["magnetic_wp_dof_rows"]
+    assert magnetic_wp_rows
+    assert {row["ssg_site_dof"] for row in magnetic_wp_rows} == {2}
+    assert {row["msg_site_dof"] for row in magnetic_wp_rows} == {3}
+    assert {
+        row["ssg_wyckoff_with_dof"] for row in magnetic_wp_rows
+    } == {"4f(2)"}
+    assert {
+        row["msg_wyckoff_with_dof"] for row in magnetic_wp_rows
+    } == {"4f(3)"}
 
 
 def test_spin_space_group_exposes_class_level_msg_ops_for_0200_mn3sn():
