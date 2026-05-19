@@ -122,6 +122,15 @@ def _serialized_property(payload: dict[str, Any], payload_key: str, property_key
     return properties.get(property_key)
 
 
+def _serialized_payload_value(payload: dict[str, Any], key: str, *legacy_keys: str) -> Any:
+    if key in payload:
+        return payload.get(key)
+    for legacy_key in legacy_keys:
+        if legacy_key in payload:
+            return payload.get(legacy_key)
+    return None
+
+
 def _row_from_result(file_path: Path, result, *, duration_seconds: float | None = None) -> dict[str, Any]:
     identify = result.identify_index_details or {}
     primitive_ssg = SpinSpaceGroup(result.primitive_magnetic_cell_ssg_ops)
@@ -214,11 +223,19 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "primitive_ssg_symbol": payload.get("primitive_magnetic_cell_ssg_international_linear"),
         "sg_symbol": payload.get("input_space_group_symbol"),
         "sg_num": payload.get("input_space_group_number"),
-        "sg_is_centrosymmetric": payload.get("sg_is_centrosymmetric"),
+        "sg_is_centrosymmetric": _serialized_payload_value(
+            payload,
+            "sg_is_centrosymmetric",
+            "sg_has_real_space_inversion",
+        ),
         "sg_is_polar": payload.get("sg_is_polar"),
         "sg_is_chiral": payload.get("sg_is_chiral"),
         "ossg_space_group_number": payload.get("ossg_space_group_number"),
-        "ossg_is_centrosymmetric": payload.get("ossg_is_centrosymmetric"),
+        "ossg_is_centrosymmetric": _serialized_payload_value(
+            payload,
+            "ossg_is_centrosymmetric",
+            "ossg_has_real_space_inversion",
+        ),
         "ossg_is_polar": payload.get("ossg_is_polar"),
         "ossg_is_chiral": payload.get("ossg_is_chiral"),
         "msg_symbol": payload.get("msg_symbol"),
@@ -227,7 +244,11 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "msg_bns_number": payload.get("msg_bns_number"),
         "msg_og_number": payload.get("msg_og_number"),
         "msg_parent_space_group_number": payload.get("msg_parent_space_group_number"),
-        "msg_is_centrosymmetric": payload.get("msg_is_centrosymmetric"),
+        "msg_is_centrosymmetric": _serialized_payload_value(
+            payload,
+            "msg_is_centrosymmetric",
+            "msg_has_real_space_inversion",
+        ),
         "msg_is_polar": payload.get("msg_is_polar"),
         "msg_is_chiral": payload.get("msg_is_chiral"),
         "spin_splitting_with_soc": _serialized_property(payload, "spinsplitting_w_soc", "ss_w_soc"),

@@ -184,6 +184,28 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
     assert row["_magnetic_site_orbit_rows"][0]["ssg_site_dof"] == 2
 
 
+def test_runtime_excel_export_accepts_legacy_centrosymmetry_names():
+    exporter = _load_export_mcif_results_module()
+
+    row = exporter._row_from_serialized_result_record(
+        {
+            "case_id": "legacy.mcif",
+            "file_name": "legacy.mcif",
+            "status": "ok",
+            "result": {
+                "sg_has_real_space_inversion": True,
+                "ossg_has_real_space_inversion": False,
+                "msg_has_real_space_inversion": True,
+            },
+        }
+    )
+
+    assert row["sg_is_centrosymmetric"] is True
+    assert row["ossg_is_centrosymmetric"] is False
+    assert row["msg_is_centrosymmetric"] is True
+    assert "sg_has_real_space_inversion" not in row
+
+
 def test_excel_export_schema_is_shared_and_error_rows_are_complete(tmp_path):
     exporter = _load_export_mcif_results_module()
 
