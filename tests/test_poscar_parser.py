@@ -73,7 +73,10 @@ def test_parse_poscar_file_roundtrips_generated_mnte_poscar(tmp_path):
     poscar_path = Path(tmp_path) / "POSCAR"
     poscar_path.write_text(original.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
 
-    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
+    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
+        poscar_path,
+        allow_incar_magmom=True,
+    )
     roundtrip = find_spin_group_from_data(
         str(poscar_path),
         lattice_factors,
@@ -93,7 +96,10 @@ def test_parse_poscar_file_roundtrips_generated_non_orthogonal_acc_primitive_pos
     poscar_path = Path(tmp_path) / "POSCAR"
     poscar_path.write_text(original.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
 
-    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
+    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
+        poscar_path,
+        allow_incar_magmom=True,
+    )
     roundtrip = find_spin_group_from_data(
         str(poscar_path),
         lattice_factors,
@@ -113,7 +119,10 @@ def test_parse_poscar_file_roundtrips_generated_precision_sensitive_pyrochlore_p
     poscar_path = Path(tmp_path) / "POSCAR"
     poscar_path.write_text(original.acc_primitive_magnetic_cell_poscar, encoding="utf-8")
 
-    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
+    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
+        poscar_path,
+        allow_incar_magmom=True,
+    )
     roundtrip = find_spin_group_from_data(
         str(poscar_path),
         lattice_factors,
@@ -336,7 +345,10 @@ def test_parse_poscar_file_reads_official_incar_magmom_vector_syntax(tmp_path):
         "          6*0.0  # trailing comment\n",
     )
 
-    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(poscar_path)
+    lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
+        poscar_path,
+        allow_incar_magmom=True,
+    )
     roundtrip = find_spin_group_from_data(
         str(poscar_path),
         lattice_factors,
@@ -369,8 +381,59 @@ def test_parse_poscar_file_reads_official_incar_magmom_scalar_syntax(tmp_path):
     poscar_path.write_text(poscar_text, encoding="utf-8")
     _write_incar(Path(tmp_path) / "INCAR", "MAGMOM = 1.5 -1.5\n")
 
-    parsed = parse_poscar_file(poscar_path)
+    parsed = parse_poscar_file(poscar_path, allow_incar_magmom=True)
 
     assert len(parsed[5]) == 2
     assert np.allclose(parsed[5][0], np.array([0.0, 0.0, 1.5]), atol=1e-12)
     assert np.allclose(parsed[5][1], np.array([0.0, 0.0, -1.5]), atol=1e-12)
+
+
+def test_parse_poscar_file_ignores_incar_by_default(tmp_path):
+    poscar_text = "\n".join(
+        [
+            "Fe",
+            "1.0",
+            "1 0 0",
+            "0 1 0",
+            "0 0 1",
+            "Fe",
+            "1",
+            "Direct",
+            "0 0 0",
+        ]
+    ) + "\n"
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(poscar_text, encoding="utf-8")
+    _write_incar(Path(tmp_path) / "INCAR", "MAGMOM = 1.5\n")
+
+    parsed = parse_poscar_file(poscar_path)
+
+    assert np.allclose(parsed[5], np.zeros((1, 3)), atol=1e-12)
+
+
+def test_parse_poscar_file_can_prefer_incar_over_embedded_magmom(tmp_path):
+    poscar_text = "\n".join(
+        [
+            "Fe",
+            "1.0",
+            "1 0 0",
+            "0 1 0",
+            "0 0 1",
+            "Fe",
+            "1",
+            "Direct",
+            "0 0 0",
+            "# MAGMOM=0 0 2",
+        ]
+    ) + "\n"
+    poscar_path = Path(tmp_path) / "POSCAR"
+    poscar_path.write_text(poscar_text, encoding="utf-8")
+    _write_incar(Path(tmp_path) / "INCAR", "MAGMOM = 1.5\n")
+
+    parsed = parse_poscar_file(
+        poscar_path,
+        allow_incar_magmom=True,
+        prefer_incar_magmom=True,
+    )
+
+    assert np.allclose(parsed[5][0], np.array([0.0, 0.0, 1.5]), atol=1e-12)
