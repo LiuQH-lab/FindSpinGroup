@@ -297,6 +297,20 @@ def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypa
     assert payload["acc_primitive_ssg_ops_oriented"]
     assert payload["acc_primitive_ssg_seitz_oriented"]
     assert payload["acc_primitive_ssg_seitz_latex_oriented"]
+    assert sorted(payload["operation_views"]) == [
+        "magnetic_primitive_cartesian",
+        "magnetic_primitive_oriented",
+    ]
+    cartesian_views = payload["operation_views"]["magnetic_primitive_cartesian"]["views"]
+    assert cartesian_views["all"]["ops"] == payload["acc_primitive_ssg_ops_cartesian"]
+    assert len(cartesian_views["all"]["seitz_latex"]) == len(
+        payload["acc_primitive_ssg_ops_cartesian"]
+    )
+    assert "ops" not in cartesian_views["pure_translations"]
+    assert cartesian_views["pure_translations"]["indices"]
+    assert max(cartesian_views["pure_translations"]["indices"]) <= len(
+        cartesian_views["all"]["ops"]
+    )
     assert payload["acc_primitive_poscar_spin_frame_ssg_operation_matrices"]
     assert payload["acc_primitive_spin_only_direction_cartesian"] == "1/2,sqrt(3)/2,0"
     assert payload["acc_primitive_spin_only_direction_poscar_spin_frame"] == "1/2,sqrt(3)/2,0"
@@ -4325,6 +4339,35 @@ def test_mag_symmetry_result_exposes_core_group_identifiers():
     assert payload["SSPG_symbol_hm"] == "∞/mm"
     assert payload["SSPG_symbol_s"] == "D∞h"
     assert payload["input_space_group_number"] == 194
+
+
+def test_mag_symmetry_result_exposes_compact_operation_views():
+    result = find_spin_group("examples/0.800_MnTe.mcif")
+
+    assert sorted(result.operation_views) == [
+        "convention_cartesian",
+        "convention_oriented",
+        "input_cartesian",
+        "input_oriented",
+        "magnetic_primitive_cartesian",
+        "magnetic_primitive_oriented",
+    ]
+    convention_all = result.operation_views["convention_oriented"]["views"]["all"]
+    assert len(convention_all["ops"]) == len(convention_all["seitz_latex"])
+    assert convention_all["indices"] == list(range(1, len(convention_all["ops"]) + 1))
+
+    collinear_view = result.operation_views["convention_oriented"]["views"]["nssg_collinear"]
+    assert "ops" not in collinear_view
+    assert "seitz_latex" not in collinear_view
+    assert collinear_view["indices"]
+    assert collinear_view["note"]["type"] == "collinear"
+    assert max(collinear_view["indices"]) <= len(convention_all["ops"])
+
+    spin_translations = result.operation_views["magnetic_primitive_cartesian"]["views"][
+        "spin_translations"
+    ]
+    assert "ops" not in spin_translations
+    assert spin_translations["indices"]
 
 
 def test_mag_symmetry_result_exposes_structured_output_contract():

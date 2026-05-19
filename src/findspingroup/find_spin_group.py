@@ -1329,6 +1329,7 @@ class MagSymmetryResult:
         self.convention_nssg_ops = symmetry.get('convention_nssg_ops', None)
         self.convention_nssg_seitz = symmetry.get('convention_nssg_seitz', None)
         self.convention_nssg_seitz_latex = symmetry.get('convention_nssg_seitz_latex', None)
+        self.operation_views = symmetry.get('operation_views', None)
         self.convention_ssg_international_linear = symmetry.get(
             'convention_ssg_international_linear',
             None,
@@ -2310,6 +2311,185 @@ def _serialize_ssg_operation_matrices(
         }
         for idx, op in enumerate(ops)
     ]
+
+
+def _operation_view_index_rows(indices: list[int], *, label: str, note=None) -> dict:
+    return {
+        "label": label,
+        "indices": [int(index) for index in indices],
+        "operation_count": len(indices),
+        "note": note,
+    }
+
+
+def _operation_view_all_row(
+    ops_payload: list[dict],
+    seitz_latex: list[str],
+    *,
+    label: str = "All operations",
+) -> dict:
+    operation_count = len(ops_payload)
+    return {
+        "label": label,
+        "indices": list(range(1, operation_count + 1)),
+        "ops": ops_payload,
+        "seitz_latex": list(seitz_latex),
+        "operation_count": operation_count,
+        "note": None,
+    }
+
+
+def _operation_view_indices_from_ops(
+    all_ops: list[SpinSpaceGroupOperation],
+    selected_ops,
+    *,
+    tol: float,
+    view_key: str,
+) -> list[int]:
+    index_by_id = {id(op): idx + 1 for idx, op in enumerate(all_ops)}
+    indices: list[int] = []
+    for selected_op in selected_ops:
+        selected_index = index_by_id.get(id(selected_op))
+        if selected_index is None:
+            for candidate_index, candidate_op in enumerate(all_ops, start=1):
+                if candidate_op.is_same_with(selected_op, atol=tol):
+                    selected_index = candidate_index
+                    break
+        if selected_index is None:
+            raise ValueError(
+                f"operation_views.{view_key}: selected operation is not present in all view"
+            )
+        indices.append(int(selected_index))
+    return indices
+
+
+def _operation_view_indices_from_predicate(all_ops, predicate) -> list[int]:
+    return [
+        idx + 1
+        for idx, op in enumerate(all_ops)
+        if predicate(op)
+    ]
+
+
+def _operation_view_collinear_note(ssg: SpinSpaceGroup, *, spin_frame: str) -> dict:
+    spin_only_symbol = ssg.gspg_spin_only_symbol
+    return {
+        "type": "collinear",
+        "text": "This operation list shows the convention nSSG for the collinear case.",
+        "nssg_point_part_hm": ssg.n_spin_part_point_group_symbol_hm,
+        "nssg_point_part_s": ssg.n_spin_part_point_group_symbol_s,
+        "spin_only_symbol_hm": spin_only_symbol.get("hm"),
+        "spin_only_symbol_s": spin_only_symbol.get("s"),
+        "spin_only_direction": _format_spin_only_direction(ssg.sog_direction),
+        "spin_frame": spin_frame,
+    }
+
+
+def _build_operation_view_set(
+    ssg: SpinSpaceGroup,
+    *,
+    ops_payload: list[dict],
+    seitz_latex: list[str],
+    setting_label: str,
+    spin_frame: str,
+) -> dict:
+    all_ops = list(ssg.ops)
+    if len(ops_payload) != len(all_ops):
+        raise ValueError(
+            f"operation_views.{setting_label}: ops payload length does not match SSG ops"
+        )
+    if len(seitz_latex) != len(all_ops):
+        raise ValueError(
+            f"operation_views.{setting_label}: Seitz list length does not match SSG ops"
+        )
+
+    identity = np.eye(3)
+    views = {
+        "all": _operation_view_all_row(ops_payload, seitz_latex),
+    }
+
+    pure_translation_indices = _operation_view_indices_from_predicate(
+        all_ops,
+        lambda op: (
+            np.allclose(op.spin_rotation, identity, atol=ssg.tol, rtol=0)
+            and np.allclose(op.rotation, identity, atol=ssg.tol, rtol=0)
+        ),
+    )
+    if pure_translation_indices:
+        views["pure_translations"] = _operation_view_index_rows(
+            pure_translation_indices,
+            label="Pure translations",
+        )
+
+    spin_translation_indices = _operation_view_indices_from_predicate(
+        all_ops,
+        lambda op: np.allclose(op.rotation, identity, atol=ssg.tol, rtol=0),
+    )
+    if spin_translation_indices:
+        views["spin_translations"] = _operation_view_index_rows(
+            spin_translation_indices,
+            label="Spin translations",
+        )
+
+    l0_ops = [
+        op
+        for op in ssg.nssg
+        if np.allclose(op.spin_rotation, identity, atol=ssg.tol, rtol=0)
+    ]
+    if l0_ops:
+        views["l0_operations"] = _operation_view_index_rows(
+            _operation_view_indices_from_ops(
+                all_ops,
+                l0_ops,
+                tol=ssg.tol,
+                view_key="l0_operations",
+            ),
+            label="L0 operations",
+        )
+
+    if ssg.conf == "Collinear":
+        nssg_indices = _operation_view_indices_from_ops(
+            all_ops,
+            ssg.nssg,
+            tol=ssg.tol,
+            view_key="nssg_collinear",
+        )
+        if nssg_indices:
+            views["nssg_collinear"] = _operation_view_index_rows(
+                nssg_indices,
+                label="Collinear nSSG operations",
+                note=_operation_view_collinear_note(ssg, spin_frame=spin_frame),
+            )
+
+    return {
+        "default_view": "all",
+        "setting_label": setting_label,
+        "spin_frame": spin_frame,
+        "view_contract": "all view stores serialized operations; other views store 1-based indices into all",
+        "views": views,
+    }
+
+
+def _build_operation_views(operation_sources: dict[str, dict]) -> dict:
+    operation_views = {}
+    for setting_key, source in operation_sources.items():
+        ssg = source.get("ssg")
+        if ssg is None:
+            continue
+        ops_payload = source.get("ops_payload")
+        if ops_payload is None:
+            ops_payload = _serialize_ssg_operation_matrices(list(ssg.ops))
+        seitz_latex = source.get("seitz_latex")
+        if seitz_latex is None:
+            seitz_latex = ssg.seitz_symbols_latex
+        operation_views[setting_key] = _build_operation_view_set(
+            ssg,
+            ops_payload=ops_payload,
+            seitz_latex=seitz_latex,
+            setting_label=source.get("setting_label", setting_key),
+            spin_frame=source.get("spin_frame", "cartesian"),
+        )
+    return operation_views
 
 
 def _serialize_msg_operation_matrices(
@@ -6535,6 +6715,87 @@ def _find_spin_group_from_parsed(
         input_oriented_seitz_latex,
     ) = _seitz_symbols_from_descriptions(input_oriented_seitz_descriptions)
 
+    public_convention_oriented_ssg = public_ossg_ssg
+    if (
+        len(public_convention_ssg_ops) != len(public_ossg_ssg.ops)
+        or any(
+            not public_op.is_same_with(ossg_op, atol=public_ossg_ssg.tol)
+            for public_op, ossg_op in zip(public_convention_ssg_ops, public_ossg_ssg.ops)
+        )
+    ):
+        public_convention_oriented_ssg = SpinSpaceGroup(
+            list(public_convention_ssg_ops),
+            tol=public_ossg_ssg.tol,
+            real_space_metric=public_ossg_ssg.real_space_metric,
+        )
+    public_convention_cartesian_ssg = public_convention_oriented_ssg.transform_spin(
+        _lattice_column_matrix(convention_cell)
+    )
+    acc_primitive_cartesian_ops_payload = _serialize_ssg_operation_matrices(
+        list(acc_primitive_output_ssg.ops)
+    )
+    acc_primitive_oriented_ops_payload = _serialize_ssg_operation_matrices(
+        list(acc_primitive_ossg.ops)
+    )
+    input_cartesian_ops_payload = _serialize_ssg_operation_matrices(
+        list(input_setting_ssg.ops)
+    )
+    input_oriented_ops_payload = _serialize_ssg_operation_matrices(
+        list(input_setting_ossg.ops)
+    )
+    convention_oriented_ops_payload = _serialize_ssg_operation_matrices(
+        list(public_convention_oriented_ssg.ops)
+    )
+    convention_cartesian_ops_payload = _serialize_ssg_operation_matrices(
+        list(public_convention_cartesian_ssg.ops)
+    )
+    operation_views = _build_operation_views(
+        {
+            "convention_cartesian": {
+                "ssg": public_convention_cartesian_ssg,
+                "ops_payload": convention_cartesian_ops_payload,
+                "seitz_latex": public_convention_cartesian_ssg.seitz_symbols_latex,
+                "setting_label": convention_setting,
+                "spin_frame": "cartesian",
+            },
+            "convention_oriented": {
+                "ssg": public_convention_oriented_ssg,
+                "ops_payload": convention_oriented_ops_payload,
+                "seitz_latex": public_convention_oriented_ssg.seitz_symbols_latex,
+                "setting_label": convention_setting,
+                "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+            },
+            "magnetic_primitive_cartesian": {
+                "ssg": acc_primitive_output_ssg,
+                "ops_payload": acc_primitive_cartesian_ops_payload,
+                "seitz_latex": acc_primitive_output_ssg.seitz_symbols_latex,
+                "setting_label": ACC_PRIMITIVE_SETTING,
+                "spin_frame": "cartesian",
+            },
+            "magnetic_primitive_oriented": {
+                "ssg": acc_primitive_ossg,
+                "ops_payload": acc_primitive_oriented_ops_payload,
+                "seitz_latex": acc_primitive_oriented_seitz_latex,
+                "setting_label": ACC_PRIMITIVE_SETTING,
+                "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+            },
+            "input_cartesian": {
+                "ssg": input_setting_ssg,
+                "ops_payload": input_cartesian_ops_payload,
+                "seitz_latex": input_setting_ssg.seitz_symbols_latex,
+                "setting_label": "input",
+                "spin_frame": "cartesian",
+            },
+            "input_oriented": {
+                "ssg": input_setting_ossg,
+                "ops_payload": input_oriented_ops_payload,
+                "seitz_latex": input_oriented_seitz_latex,
+                "setting_label": "input",
+                "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+            },
+        }
+    )
+
     scif_export_targets = _build_scif_export_targets(
         input_cell=input_cell_cartesian,
         acc_magnetic_primitive_cell=acc_magnetic_primitive_cell,
@@ -6793,6 +7054,7 @@ def _find_spin_group_from_parsed(
                 'KPOINTS_real_space_setting': ACC_PRIMITIVE_SETTING,
                 'quasi_2d': quasi_2d_diagnostics,
                 'ferroelectric_switching': ferroelectric_switching,
+                'operation_views': operation_views,
                 'input_magnetic_primitive_ssg_ops': ssg_primitive.ops,
                 'input_magnetic_primitive_ssg_setting': INPUT_MAGNETIC_PRIMITIVE_SETTING,
                 'input_magnetic_primitive_ssg_seitz': ssg_primitive.seitz_symbols,
@@ -6835,14 +7097,10 @@ def _find_spin_group_from_parsed(
                 'acc_primitive_ssg_international_linear': acc_primitive_output_ssg.international_symbol_linear,
                 'acc_primitive_ssg_international_latex': acc_primitive_output_ssg.international_symbol_latex,
                 'acc_primitive_ssg_symbol_calibration_tol': acc_primitive_output_ssg.symbol_calibration_tol,
-                'acc_primitive_ssg_ops_cartesian': _serialize_ssg_operation_matrices(
-                    list(acc_primitive_output_ssg.ops)
-                ),
+                'acc_primitive_ssg_ops_cartesian': acc_primitive_cartesian_ops_payload,
                 'acc_primitive_ssg_seitz_cartesian': acc_primitive_output_ssg.seitz_symbols,
                 'acc_primitive_ssg_seitz_latex_cartesian': acc_primitive_output_ssg.seitz_symbols_latex,
-                'acc_primitive_ssg_ops_oriented': _serialize_ssg_operation_matrices(
-                    list(acc_primitive_ossg.ops)
-                ),
+                'acc_primitive_ssg_ops_oriented': acc_primitive_oriented_ops_payload,
                 'acc_primitive_ssg_seitz_oriented': acc_primitive_oriented_seitz,
                 'acc_primitive_ssg_seitz_latex_oriented': acc_primitive_oriented_seitz_latex,
                 'acc_primitive_spin_only_direction_cartesian': _format_spin_only_direction(
@@ -6851,13 +7109,9 @@ def _find_spin_group_from_parsed(
                 'acc_primitive_spin_only_direction_poscar_spin_frame': _format_spin_only_direction(
                     acc_primitive_output_ssg_in_poscar_spin_frame.sog_direction
                 ),
-                'input_ssg_ops_spin_cartesian': _serialize_ssg_operation_matrices(
-                    list(input_setting_ssg.ops)
-                ),
+                'input_ssg_ops_spin_cartesian': input_cartesian_ops_payload,
                 'input_ssg_seitz_latex_spin_cartesian': input_setting_ssg.seitz_symbols_latex,
-                'input_ssg_ops_spin_oriented': _serialize_ssg_operation_matrices(
-                    list(input_setting_ossg.ops)
-                ),
+                'input_ssg_ops_spin_oriented': input_oriented_ops_payload,
                 'input_ssg_seitz_latex_spin_oriented': input_oriented_seitz_latex,
                 'input_spin_only_direction_spin_cartesian': _format_spin_only_direction(
                     input_setting_ssg.sog_direction
@@ -7686,6 +7940,30 @@ def _find_spin_group_acc_primitive_from_parsed(
         acc_primitive_oriented_seitz,
         acc_primitive_oriented_seitz_latex,
     ) = _seitz_symbols_from_descriptions(acc_primitive_oriented_seitz_descriptions)
+    acc_primitive_cartesian_ops_payload = _serialize_ssg_operation_matrices(
+        list(acc_primitive_ssg.ops)
+    )
+    acc_primitive_oriented_ops_payload = _serialize_ssg_operation_matrices(
+        list(acc_primitive_ossg.ops)
+    )
+    operation_views = _build_operation_views(
+        {
+            "magnetic_primitive_cartesian": {
+                "ssg": acc_primitive_ssg,
+                "ops_payload": acc_primitive_cartesian_ops_payload,
+                "seitz_latex": acc_primitive_ssg.seitz_symbols_latex,
+                "setting_label": ACC_PRIMITIVE_SETTING,
+                "spin_frame": "cartesian",
+            },
+            "magnetic_primitive_oriented": {
+                "ssg": acc_primitive_ossg,
+                "ops_payload": acc_primitive_oriented_ops_payload,
+                "seitz_latex": acc_primitive_oriented_seitz_latex,
+                "setting_label": ACC_PRIMITIVE_SETTING,
+                "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+            },
+        }
+    )
 
     return {
         "index": identify_info,
@@ -7693,6 +7971,7 @@ def _find_spin_group_acc_primitive_from_parsed(
         "acc_symbol": ssg_primitive.acc,
         "conf": ssg_primitive.conf,
         "quasi_2d": None,
+        "operation_views": operation_views,
         "acc_primitive_resolution_audit": acc_primitive_resolution_audit,
         "acc_primitive_standard_setting": selected_standard_setting,
         "acc_primitive_cell_setting": ACC_PRIMITIVE_SETTING,
@@ -7703,17 +7982,11 @@ def _find_spin_group_acc_primitive_from_parsed(
         "acc_primitive_poscar": acc_primitive_poscar,
         "acc_primitive_ssg_setting": ACC_PRIMITIVE_SETTING,
         "acc_primitive_ssg_international_linear": acc_primitive_ssg.international_symbol_linear,
-        "acc_primitive_ssg_operation_matrices": _serialize_ssg_operation_matrices(
-            list(acc_primitive_ssg.ops)
-        ),
-        "acc_primitive_ssg_ops_cartesian": _serialize_ssg_operation_matrices(
-            list(acc_primitive_ssg.ops)
-        ),
+        "acc_primitive_ssg_operation_matrices": acc_primitive_cartesian_ops_payload,
+        "acc_primitive_ssg_ops_cartesian": acc_primitive_cartesian_ops_payload,
         "acc_primitive_ssg_seitz_cartesian": acc_primitive_ssg.seitz_symbols,
         "acc_primitive_ssg_seitz_latex_cartesian": acc_primitive_ssg.seitz_symbols_latex,
-        "acc_primitive_ssg_ops_oriented": _serialize_ssg_operation_matrices(
-            list(acc_primitive_ossg.ops)
-        ),
+        "acc_primitive_ssg_ops_oriented": acc_primitive_oriented_ops_payload,
         "acc_primitive_ssg_seitz_oriented": acc_primitive_oriented_seitz,
         "acc_primitive_ssg_seitz_latex_oriented": acc_primitive_oriented_seitz_latex,
         "acc_primitive_poscar_spin_frame_setting": ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING,
