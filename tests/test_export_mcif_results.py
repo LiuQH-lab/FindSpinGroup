@@ -1,6 +1,8 @@
 import importlib.util
 from pathlib import Path
 
+from openpyxl import load_workbook
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -28,6 +30,50 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
                 "conf": "Collinear",
                 "phase": "AFM",
                 "acc": "4/mmmP",
+                "spinsplitting_w_soc": "spin splitting",
+                "spinsplitting_wo_soc": "spin splitting",
+                "ahc_w_soc": "No",
+                "ahc_wo_soc": "No",
+                "is_alter": "(Altermagnet)",
+                "is_spin_orbit_magnet": "",
+                "magnetic_site_summary": {
+                    "status": "ok",
+                    "setting": "G0_standard",
+                    "SG": {"number": 164, "symbol": "P-3m1"},
+                    "cell_expansion": 4,
+                    "ssg_index": "12.2.2.1.P3",
+                    "magnetic_atom_count": 8,
+                    "n_magnetic_orbits_sg": 1,
+                    "n_magnetic_orbits_ssg": 1,
+                    "n_magnetic_orbits_msg": 1,
+                    "max_magnetic_site_dof_ssg": 2,
+                    "max_magnetic_site_dof_msg": 3,
+                    "total_magnetic_site_dof_ssg": 2,
+                    "total_magnetic_site_dof_msg": 3,
+                    "magnetic_wp_dof_rows": [
+                        {
+                            "element": "Fe",
+                            "site_count": 4,
+                            "site_indices": [0, 1, 2, 3],
+                            "sg_wyckoff": "12f",
+                            "sg_wyckoff_index": 1,
+                            "ssg_wyckoff": "4d",
+                            "ssg_wyckoff_with_dof": "4d(2)",
+                            "ssg_wyckoff_index": 3,
+                            "ssg_site_dof": 2,
+                            "ssg_orbit_total_dof": 2,
+                            "ssg_constraints": ["Sx", "Sy", "0"],
+                            "ssg_representative_index": 0,
+                            "msg_wyckoff": "4d",
+                            "msg_wyckoff_with_dof": "4d(3)",
+                            "msg_wyckoff_index": 3,
+                            "msg_site_dof": 3,
+                            "msg_orbit_total_dof": 3,
+                            "msg_constraints": ["Sx", "Sy", "Sz"],
+                            "msg_representative_index": 0,
+                        }
+                    ],
+                },
                 "quasi_2d": {
                     "calculation_mode": "quasi2d",
                     "dimension": "2d",
@@ -93,8 +139,8 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
         }
     )
 
-    assert row["calculation_mode"] == "quasi2d"
-    assert row["dimension"] == "2d"
+    assert "calculation_mode" not in row
+    assert "dimension" not in row
     assert row["quasi2d_status"] == "heuristic"
     assert row["quasi2d_source"] == "heuristic"
     assert row["vacuum_axis_input"] == "c"
@@ -105,13 +151,9 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
     assert row["quasi2d_gp_label"] == "GP"
     assert row["quasi2d_gp_symbol"] == "GP:(0.237,0.371,0)"
     assert row["quasi2d_gp_spin_splitting"] == "spin splitting"
-    assert row["quasi2d_3d_gp_symbol"] == "GP:(0.417,0.237,0.371)"
-    assert row["quasi2d_3d_gp_k_input"] == [0.417, 0.237, 0.371]
-    assert row["quasi2d_2d_gp_symbol"] == "GP:(0.237,0.371,0)"
-    assert row["quasi2d_2d_gp_k_input"] == [0.237, 0.371, 0.0]
-    assert row["quasi2d_gp_k_input_changed"] is True
-    assert row["quasi2d_gp_spin_splitting_changed"] is True
-    assert row["quasi2d_gp_comparison_summary"] == "k_changed_spin_splitting_changed"
+    assert "quasi2d_3d_gp_symbol" not in row
+    assert "quasi2d_2d_gp_symbol" not in row
+    assert "quasi2d_gp_spin_splitting_changed" not in row
     assert row["quasi2d_kpoint_projection_summary"]["by_plane_count"]["mixed"] == 1
     assert row["quasi2d_kpoints"] == [
         {
@@ -121,3 +163,90 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
             "spin_splitting": "no spin splitting",
         }
     ]
+    assert row["spin_splitting_with_soc"] == "spin splitting"
+    assert row["spin_splitting_without_soc"] == "spin splitting"
+    assert row["ahc_with_soc"] == "No"
+    assert row["ahc_without_soc"] == "No"
+    assert row["is_altermagnet"] == "(Altermagnet)"
+    assert row["is_spin_orbit_magnet"] == ""
+    assert row["magnetic_site_status"] == "ok"
+    assert row["magnetic_site_sg_primitive_to_magnetic_primitive_cell_expansion"] == 4
+    assert "magnetic_site_cell_expansion" not in row
+    assert "magnetic_site_nonmagnetic_sg_num" not in row
+    assert "magnetic_site_nonmagnetic_sg_symbol" not in row
+    assert "magnetic_site_ssg_index" not in row
+    assert row["number_of_magnetic_orbits_sg"] == 1
+    assert row["max_magnetic_site_dof_ssg"] == 2
+    assert row["total_magnetic_site_dof_ssg"] == 2
+    assert row["total_magnetic_site_dof_msg"] == 3
+    assert row["magnetic_wyckoff_dof_summary"] == "Fe:12f->4d(2)->4d(3) n=4"
+    assert "_magnetic_site_orbit_rows" in row
+    assert row["_magnetic_site_orbit_rows"][0]["ssg_site_dof"] == 2
+
+
+def test_excel_export_schema_is_shared_and_error_rows_are_complete(tmp_path):
+    exporter = _load_export_mcif_results_module()
+
+    assert exporter.COLUMNS == list(exporter.EXPORT_ROW_COLUMNS)
+    assert exporter.MAGNETIC_ORBIT_COLUMNS == list(exporter.MAGNETIC_ORBIT_EXPORT_COLUMNS)
+    assert exporter.QUASI2D_COLUMNS == list(exporter.QUASI2D_EXPORT_COLUMNS)
+    assert len(exporter.COLUMNS) == len(set(exporter.COLUMNS))
+    assert len(exporter.MAGNETIC_ORBIT_COLUMNS) == len(set(exporter.MAGNETIC_ORBIT_COLUMNS))
+    assert "calculation_mode" not in exporter.COLUMNS
+    assert "dimension" not in exporter.COLUMNS
+    assert "quasi2d_3d_gp_symbol" not in exporter.COLUMNS
+    assert "quasi2d_status" not in exporter.COLUMNS
+    assert "quasi2d_status" in exporter.QUASI2D_COLUMNS
+
+    row = exporter._row_from_error(tmp_path / "broken.mcif", RuntimeError("boom"))
+
+    for column in exporter.COLUMNS:
+        assert column in row
+    assert row["status"] == "error"
+    assert row["error_type"] == "RuntimeError"
+    assert row["error_message"] == "boom"
+    assert "quasi2d_magnetic_phase" not in row
+    assert "quasi2d_gp_symbol" not in row
+
+
+def test_workbook_appends_quasi2d_fields_to_records_only_when_present(tmp_path):
+    exporter = _load_export_mcif_results_module()
+
+    base_row = exporter.complete_export_row(
+        {
+            "case_id": "bulk",
+            "file_name": "bulk.mcif",
+            "status": "ok",
+            "index": "1.1.1.1.P1",
+        }
+    )
+    bulk_xlsx = tmp_path / "bulk.xlsx"
+    exporter._write_workbook([base_row], bulk_xlsx)
+    bulk_wb = load_workbook(bulk_xlsx)
+
+    assert "records" in bulk_wb.sheetnames
+    assert "magnetic_site_orbits" in bulk_wb.sheetnames
+    assert "quasi2d" not in bulk_wb.sheetnames
+    records_header = [cell.value for cell in bulk_wb["records"][1]]
+    assert "quasi2d_status" not in records_header
+    assert "calculation_mode" not in records_header
+
+    quasi_row = dict(base_row)
+    quasi_row.update(
+        {
+            "case_id": "layer",
+            "file_name": "layer.mcif",
+            "quasi2d_status": "heuristic",
+            "quasi2d_gp_symbol": "GP:(u,v,0)",
+        }
+    )
+    quasi_xlsx = tmp_path / "quasi.xlsx"
+    exporter._write_workbook([quasi_row], quasi_xlsx)
+    quasi_wb = load_workbook(quasi_xlsx)
+
+    assert "quasi2d" not in quasi_wb.sheetnames
+    quasi_header = [cell.value for cell in quasi_wb["records"][1]]
+    assert "index" in quasi_header
+    assert quasi_header.index("quasi2d_status") > quasi_header.index("error_message")
+    assert "quasi2d_gp_symbol" in quasi_header
+    assert "quasi2d_3d_gp_symbol" not in quasi_header

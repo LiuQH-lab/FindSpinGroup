@@ -286,12 +286,15 @@ def _axis_parameter_subscript(
     *,
     latex: bool = False,
     zero_tol: float = 1e-8,
+    parameter_index: int | None = None,
 ) -> str:
-    labels = (
-        (r"\alpha", r"\beta", r"\gamma")
-        if latex
-        else ("alpha", "beta", "gamma")
-    )
+    base_labels = (r"\alpha", r"\beta", r"\gamma") if latex else ("alpha", "beta", "gamma")
+    if parameter_index is None:
+        labels = base_labels
+    elif latex:
+        labels = tuple(rf"{label}_{{{parameter_index}}}" for label in base_labels)
+    else:
+        labels = tuple(f"{label}{parameter_index}" for label in base_labels)
     if axis_parameter_values is None:
         return ",".join(labels)
 

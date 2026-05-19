@@ -8,6 +8,12 @@ from typing import Any
 
 from findspingroup import batch_mcif
 from findspingroup.find_spin_group import find_spin_group
+from findspingroup.output_schema import (
+    EXPORT_ROW_COLUMNS,
+    MAGNETIC_ORBIT_EXPORT_COLUMNS,
+    QUASI2D_EXPORT_COLUMNS,
+    complete_export_row,
+)
 from findspingroup.structure.group import SpinSpaceGroup
 from findspingroup.version import __version__ as FSG_VERSION
 
@@ -24,10 +30,8 @@ def _compact_wp_chain(wp_chain: Any, *, limit: int = 24) -> str | None:
     items: list[str] = []
     for row in wp_chain[:limit]:
         try:
-            element, wp_sg, idx_sg, wp_ssg, idx_ssg, wp_msg, idx_msg = row
-            items.append(
-                f"{element}:{wp_sg}[{idx_sg}]->{wp_ssg}[{idx_ssg}]->{wp_msg}[{idx_msg}]"
-            )
+            element, wp_sg, _idx_sg, wp_ssg, _idx_ssg, wp_msg, _idx_msg = row
+            items.append(f"{element}:{wp_sg}->{wp_ssg}->{wp_msg}")
         except Exception:
             items.append(str(row))
     if len(wp_chain) > limit:
@@ -35,18 +39,56 @@ def _compact_wp_chain(wp_chain: Any, *, limit: int = 24) -> str | None:
     return " | ".join(items)
 
 
+def _compact_magnetic_wp_dof_rows(rows: Any, *, limit: int = 16) -> str | None:
+    if not rows:
+        return None
+    items: list[str] = []
+    for row in list(rows)[:limit]:
+        if not isinstance(row, dict):
+            items.append(str(row))
+            continue
+        element = row.get("element")
+        sg_wp = row.get("sg_wyckoff")
+        ssg_wp = row.get("ssg_wyckoff_with_dof") or row.get("ssg_wyckoff")
+        msg_wp = row.get("msg_wyckoff_with_dof") or row.get("msg_wyckoff")
+        site_count = row.get("site_count")
+        items.append(f"{element}:{sg_wp}->{ssg_wp}->{msg_wp} n={site_count}")
+    if len(rows) > limit:
+        items.append(f"...(+{len(rows) - limit} more)")
+    return " | ".join(items)
+
+
+def _magnetic_site_export_values(summary: Any) -> dict[str, Any]:
+    payload = summary if isinstance(summary, dict) else {}
+    magnetic_wp_dof_rows = payload.get("magnetic_wp_dof_rows")
+    return {
+        "magnetic_site_status": payload.get("status"),
+        "magnetic_site_setting": payload.get("setting"),
+        "magnetic_site_sg_primitive_to_magnetic_primitive_cell_expansion": (
+            payload.get("cell_expansion")
+        ),
+        "magnetic_atom_count": payload.get("magnetic_atom_count"),
+        "number_of_magnetic_orbits_sg": payload.get("n_magnetic_orbits_sg"),
+        "number_of_magnetic_orbits_ssg": payload.get("n_magnetic_orbits_ssg"),
+        "number_of_magnetic_orbits_msg": payload.get("n_magnetic_orbits_msg"),
+        "max_magnetic_site_dof_ssg": payload.get("max_magnetic_site_dof_ssg"),
+        "max_magnetic_site_dof_msg": payload.get("max_magnetic_site_dof_msg"),
+        "total_magnetic_site_dof_ssg": payload.get("total_magnetic_site_dof_ssg"),
+        "total_magnetic_site_dof_msg": payload.get("total_magnetic_site_dof_msg"),
+        "magnetic_wyckoff_dof_summary": _compact_magnetic_wp_dof_rows(magnetic_wp_dof_rows),
+        "_magnetic_site_orbit_rows": magnetic_wp_dof_rows,
+    }
+
+
 def _quasi2d_export_values(quasi_2d: Any) -> dict[str, Any]:
-    payload = quasi_2d if isinstance(quasi_2d, dict) else {}
+    if not isinstance(quasi_2d, dict):
+        return {}
+    payload = quasi_2d
     diagnostic_points = payload.get("diagnostic_points") or []
     generated_point = diagnostic_points[0] if diagnostic_points else {}
     kpoints = payload.get("kpoints") or []
     projection_summary = payload.get("kpoint_projection_summary") or {}
-    gp_comparison = payload.get("generic_point_comparison") or {}
-    gp_3d = gp_comparison.get("gp_3d") or {}
-    gp_2d = gp_comparison.get("gp_2d") or {}
     return {
-        "calculation_mode": payload.get("calculation_mode"),
-        "dimension": payload.get("dimension"),
         "quasi2d_status": payload.get("status"),
         "quasi2d_source": payload.get("source"),
         "vacuum_axis_input": payload.get("vacuum_axis_input"),
@@ -61,24 +103,6 @@ def _quasi2d_export_values(quasi_2d: Any) -> dict[str, Any]:
         "quasi2d_gp_spin_splitting": generated_point.get("spin_splitting"),
         "quasi2d_gp_spin_polarizations": generated_point.get("spin_polarizations"),
         "quasi2d_kpoint_projection_summary": projection_summary,
-        "quasi2d_3d_gp_symbol": gp_3d.get("k_symbol_2d"),
-        "quasi2d_3d_gp_k_input": gp_3d.get("k_input_reciprocal"),
-        "quasi2d_3d_gp_k_acc": gp_3d.get("k_acc_primitive"),
-        "quasi2d_3d_gp_plane": gp_3d.get("plane_classification"),
-        "quasi2d_3d_gp_spin_splitting": gp_3d.get("spin_splitting"),
-        "quasi2d_3d_gp_spin_polarizations": gp_3d.get("spin_polarizations"),
-        "quasi2d_2d_gp_symbol": gp_2d.get("k_symbol_2d"),
-        "quasi2d_2d_gp_k_input": gp_2d.get("k_input_reciprocal"),
-        "quasi2d_2d_gp_k_acc": gp_2d.get("k_acc_primitive"),
-        "quasi2d_2d_gp_plane": gp_2d.get("plane_classification"),
-        "quasi2d_2d_gp_spin_splitting": gp_2d.get("spin_splitting"),
-        "quasi2d_2d_gp_spin_polarizations": gp_2d.get("spin_polarizations"),
-        "quasi2d_gp_k_input_delta": gp_comparison.get("k_input_delta_wrapped"),
-        "quasi2d_gp_k_acc_delta": gp_comparison.get("k_acc_delta_wrapped"),
-        "quasi2d_gp_k_input_changed": gp_comparison.get("k_input_changed"),
-        "quasi2d_gp_spin_splitting_changed": gp_comparison.get("spin_splitting_changed"),
-        "quasi2d_gp_spin_polarization_changed": gp_comparison.get("spin_polarization_changed"),
-        "quasi2d_gp_comparison_summary": gp_comparison.get("summary"),
         "quasi2d_kpoints": [
             {
                 "label": row.get("label"),
@@ -89,6 +113,13 @@ def _quasi2d_export_values(quasi_2d: Any) -> dict[str, Any]:
             for row in kpoints
         ],
     }
+
+
+def _serialized_property(payload: dict[str, Any], payload_key: str, property_key: str) -> Any:
+    properties = payload.get("properties") if isinstance(payload.get("properties"), dict) else {}
+    if payload_key in payload:
+        return payload.get(payload_key)
+    return properties.get(property_key)
 
 
 def _row_from_result(file_path: Path, result, *, duration_seconds: float | None = None) -> dict[str, Any]:
@@ -119,11 +150,11 @@ def _row_from_result(file_path: Path, result, *, duration_seconds: float | None 
         "primitive_ssg_symbol": result.primitive_magnetic_cell_ssg_international_linear,
         "sg_symbol": result.input_space_group_symbol,
         "sg_num": result.input_space_group_number,
-        "sg_has_real_space_inversion": result.sg_has_real_space_inversion,
+        "sg_is_centrosymmetric": result.sg_is_centrosymmetric,
         "sg_is_polar": result.sg_is_polar,
         "sg_is_chiral": result.sg_is_chiral,
         "ossg_space_group_number": result.ossg_space_group_number,
-        "ossg_has_real_space_inversion": result.ossg_has_real_space_inversion,
+        "ossg_is_centrosymmetric": result.ossg_is_centrosymmetric,
         "ossg_is_polar": result.ossg_is_polar,
         "ossg_is_chiral": result.ossg_is_chiral,
         "msg_symbol": result.msg_symbol,
@@ -132,13 +163,21 @@ def _row_from_result(file_path: Path, result, *, duration_seconds: float | None 
         "msg_bns_number": result.msg_bns_number,
         "msg_og_number": result.msg_og_number,
         "msg_parent_space_group_number": result.msg_parent_space_group_number,
-        "msg_has_real_space_inversion": result.msg_has_real_space_inversion,
+        "msg_is_centrosymmetric": result.msg_is_centrosymmetric,
         "msg_is_polar": result.msg_is_polar,
         "msg_is_chiral": result.msg_is_chiral,
+        "spin_splitting_with_soc": result.spinsplitting_w_soc,
+        "spin_splitting_without_soc": result.spinsplitting_wo_soc,
+        "ahc_with_soc": result.ahc_w_soc,
+        "ahc_without_soc": result.ahc_wo_soc,
+        "is_altermagnet": result.is_alter,
+        "is_spin_orbit_magnet": result.is_spin_orbit_magnet,
         "wyckoff_split": _compact_wp_chain(result.wp_chain),
+        "acc_primitive_wyckoff_split": _compact_wp_chain(result.acc_primitive_wp_chain),
     }
+    row.update(_magnetic_site_export_values(getattr(result, "magnetic_site_summary", None)))
     row.update(_quasi2d_export_values(getattr(result, "quasi_2d", None)))
-    return row
+    return complete_export_row(row)
 
 
 def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]:
@@ -175,11 +214,11 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "primitive_ssg_symbol": payload.get("primitive_magnetic_cell_ssg_international_linear"),
         "sg_symbol": payload.get("input_space_group_symbol"),
         "sg_num": payload.get("input_space_group_number"),
-        "sg_has_real_space_inversion": payload.get("sg_has_real_space_inversion"),
+        "sg_is_centrosymmetric": payload.get("sg_is_centrosymmetric"),
         "sg_is_polar": payload.get("sg_is_polar"),
         "sg_is_chiral": payload.get("sg_is_chiral"),
         "ossg_space_group_number": payload.get("ossg_space_group_number"),
-        "ossg_has_real_space_inversion": payload.get("ossg_has_real_space_inversion"),
+        "ossg_is_centrosymmetric": payload.get("ossg_is_centrosymmetric"),
         "ossg_is_polar": payload.get("ossg_is_polar"),
         "ossg_is_chiral": payload.get("ossg_is_chiral"),
         "msg_symbol": payload.get("msg_symbol"),
@@ -188,15 +227,29 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "msg_bns_number": payload.get("msg_bns_number"),
         "msg_og_number": payload.get("msg_og_number"),
         "msg_parent_space_group_number": payload.get("msg_parent_space_group_number"),
-        "msg_has_real_space_inversion": payload.get("msg_has_real_space_inversion"),
+        "msg_is_centrosymmetric": payload.get("msg_is_centrosymmetric"),
         "msg_is_polar": payload.get("msg_is_polar"),
         "msg_is_chiral": payload.get("msg_is_chiral"),
+        "spin_splitting_with_soc": _serialized_property(payload, "spinsplitting_w_soc", "ss_w_soc"),
+        "spin_splitting_without_soc": _serialized_property(payload, "spinsplitting_wo_soc", "ss_wo_soc"),
+        "ahc_with_soc": _serialized_property(payload, "ahc_w_soc", "ahc_w_soc"),
+        "ahc_without_soc": _serialized_property(payload, "ahc_wo_soc", "ahc_wo_soc"),
+        "is_altermagnet": _serialized_property(payload, "is_alter", "is_alter"),
+        "is_spin_orbit_magnet": _serialized_property(
+            payload,
+            "is_spin_orbit_magnet",
+            "is_spin_orbit_magnet",
+        ),
         "wyckoff_split": _compact_wp_chain(payload.get("wp_chain")),
+        "acc_primitive_wyckoff_split": _compact_wp_chain(
+            payload.get("acc_primitive_wp_chain")
+        ),
         "error_type": record.get("error", {}).get("type"),
         "error_message": record.get("error", {}).get("message"),
     }
+    row.update(_magnetic_site_export_values(payload.get("magnetic_site_summary")))
     row.update(_quasi2d_export_values(payload.get("quasi_2d")))
-    return row
+    return complete_export_row(row)
 
 
 def _row_from_error(
@@ -205,81 +258,14 @@ def _row_from_error(
     *,
     duration_seconds: float | None = None,
 ) -> dict[str, Any]:
-    return {
+    return complete_export_row({
         "case_id": batch_mcif._normalize_case_id(file_path),
         "file_name": file_path.name,
         "status": "error",
         "duration_seconds": duration_seconds,
-        "index": None,
-        "conf": None,
-        "phase": None,
-        "acc": None,
-        "msg_acc": None,
-        "G0_id": None,
-        "L0_id": None,
-        "t_index": None,
-        "k_index": None,
-        "nsspg_hm": None,
-        "nsspg_symbol": None,
-        "sspg_hm": None,
-        "sspg_symbol": None,
-        "ssg_type": None,
-        "spin_only_direction": None,
-        "ossg_symbol": None,
-        "primitive_ssg_symbol": None,
-        "sg_symbol": None,
-        "sg_num": None,
-        "sg_has_real_space_inversion": None,
-        "sg_is_polar": None,
-        "sg_is_chiral": None,
-        "ossg_space_group_number": None,
-        "ossg_has_real_space_inversion": None,
-        "ossg_is_polar": None,
-        "ossg_is_chiral": None,
-        "msg_symbol": None,
-        "msg_num": None,
-        "msg_type": None,
-        "msg_bns_number": None,
-        "msg_og_number": None,
-        "msg_parent_space_group_number": None,
-        "msg_has_real_space_inversion": None,
-        "msg_is_polar": None,
-        "msg_is_chiral": None,
-        "wyckoff_split": None,
-        "calculation_mode": None,
-        "dimension": None,
-        "quasi2d_status": None,
-        "quasi2d_source": None,
-        "vacuum_axis_input": None,
-        "spin_splitting_2d": None,
-        "spin_splitting_2d_interpretation": None,
-        "is_alter_2d": None,
-        "quasi2d_gp_label": None,
-        "quasi2d_gp_k_input": None,
-        "quasi2d_gp_k_acc": None,
-        "quasi2d_gp_spin_splitting": None,
-        "quasi2d_gp_spin_polarizations": None,
-        "quasi2d_kpoint_projection_summary": None,
-        "quasi2d_3d_gp_k_input": None,
-        "quasi2d_3d_gp_k_acc": None,
-        "quasi2d_3d_gp_plane": None,
-        "quasi2d_3d_gp_spin_splitting": None,
-        "quasi2d_3d_gp_spin_polarizations": None,
-        "quasi2d_2d_gp_k_input": None,
-        "quasi2d_2d_gp_k_acc": None,
-        "quasi2d_2d_gp_plane": None,
-        "quasi2d_2d_gp_spin_splitting": None,
-        "quasi2d_2d_gp_spin_polarizations": None,
-        "quasi2d_gp_k_input_delta": None,
-        "quasi2d_gp_k_acc_delta": None,
-        "quasi2d_gp_k_input_changed": None,
-        "quasi2d_gp_spin_splitting_changed": None,
-        "quasi2d_gp_spin_polarization_changed": None,
-        "quasi2d_gp_comparison_summary": None,
-        "quasi2d_kpoints": None,
         "error_type": type(exc).__name__,
         "error_message": str(exc),
-    }
+    })
 
 
 def _runtime_export_metadata(runtime_jsonl: Path | None) -> dict[str, Any]:
@@ -318,87 +304,28 @@ def _apply_export_metadata(rows: list[dict[str, Any]], metadata: dict[str, Any])
         row["source_route"] = metadata.get("source_route")
 
 
-COLUMNS = [
-    "source_fsg_version",
-    "source_run_tag",
-    "source_route",
-    "case_id",
-    "file_name",
-    "status",
-    "duration_seconds",
-    "index",
-    "conf",
-    "phase",
-    "acc",
-    "msg_acc",
-    "G0_id",
-    "L0_id",
-    "t_index",
-    "k_index",
-    "nsspg_hm",
-    "nsspg_symbol",
-    "sspg_hm",
-    "sspg_symbol",
-    "ssg_type",
-    "spin_only_direction",
-    "ossg_symbol",
-    "primitive_ssg_symbol",
-    "sg_symbol",
-    "sg_num",
-    "sg_has_real_space_inversion",
-    "sg_is_polar",
-    "sg_is_chiral",
-    "ossg_space_group_number",
-    "ossg_has_real_space_inversion",
-    "ossg_is_polar",
-    "ossg_is_chiral",
-    "msg_symbol",
-    "msg_num",
-    "msg_type",
-    "msg_bns_number",
-    "msg_og_number",
-    "msg_parent_space_group_number",
-    "msg_has_real_space_inversion",
-    "msg_is_polar",
-    "msg_is_chiral",
-    "wyckoff_split",
-    "calculation_mode",
-    "dimension",
-    "quasi2d_status",
-    "quasi2d_source",
-    "vacuum_axis_input",
-    "spin_splitting_2d",
-    "spin_splitting_2d_interpretation",
-    "is_alter_2d",
-    "quasi2d_gp_label",
-    "quasi2d_gp_symbol",
-    "quasi2d_gp_k_input",
-    "quasi2d_gp_k_acc",
-    "quasi2d_gp_spin_splitting",
-    "quasi2d_gp_spin_polarizations",
-    "quasi2d_kpoint_projection_summary",
-    "quasi2d_3d_gp_symbol",
-    "quasi2d_3d_gp_k_input",
-    "quasi2d_3d_gp_k_acc",
-    "quasi2d_3d_gp_plane",
-    "quasi2d_3d_gp_spin_splitting",
-    "quasi2d_3d_gp_spin_polarizations",
-    "quasi2d_2d_gp_symbol",
-    "quasi2d_2d_gp_k_input",
-    "quasi2d_2d_gp_k_acc",
-    "quasi2d_2d_gp_plane",
-    "quasi2d_2d_gp_spin_splitting",
-    "quasi2d_2d_gp_spin_polarizations",
-    "quasi2d_gp_k_input_delta",
-    "quasi2d_gp_k_acc_delta",
-    "quasi2d_gp_k_input_changed",
-    "quasi2d_gp_spin_splitting_changed",
-    "quasi2d_gp_spin_polarization_changed",
-    "quasi2d_gp_comparison_summary",
-    "quasi2d_kpoints",
-    "error_type",
-    "error_message",
+COLUMNS = list(EXPORT_ROW_COLUMNS)
+
+
+MAGNETIC_ORBIT_COLUMNS = list(MAGNETIC_ORBIT_EXPORT_COLUMNS)
+
+
+QUASI2D_COLUMNS = list(QUASI2D_EXPORT_COLUMNS)
+
+
+QUASI2D_RECORD_COLUMNS = [
+    column for column in QUASI2D_COLUMNS if column not in COLUMNS
 ]
+
+
+def _has_quasi2d_values(row: dict[str, Any]) -> bool:
+    return any(row.get(column) is not None for column in QUASI2D_RECORD_COLUMNS)
+
+
+def _record_columns_for_rows(rows: list[dict[str, Any]]) -> list[str]:
+    if any(_has_quasi2d_values(row) for row in rows):
+        return [*COLUMNS, *QUASI2D_RECORD_COLUMNS]
+    return COLUMNS
 
 
 def _write_workbook(rows: list[dict[str, Any]], output_xlsx: Path) -> None:
@@ -409,16 +336,17 @@ def _write_workbook(rows: list[dict[str, Any]], output_xlsx: Path) -> None:
     wb = Workbook()
     ws = wb.active
     ws.title = "records"
-    ws.append(COLUMNS)
+    record_columns = _record_columns_for_rows(rows)
+    ws.append(record_columns)
     for cell in ws[1]:
         cell.font = Font(bold=True)
     for row in rows:
-        ws.append([_stringify(row.get(column)) for column in COLUMNS])
+        ws.append([_stringify(row.get(column)) for column in record_columns])
 
     ws.freeze_panes = "A2"
     ws.auto_filter.ref = ws.dimensions
 
-    for index, column in enumerate(COLUMNS, start=1):
+    for index, column in enumerate(record_columns, start=1):
         max_len = len(column)
         for row in ws.iter_rows(min_row=2, min_col=index, max_col=index):
             value = row[0].value
@@ -426,6 +354,35 @@ def _write_workbook(rows: list[dict[str, Any]], output_xlsx: Path) -> None:
                 continue
             max_len = max(max_len, len(str(value)))
         ws.column_dimensions[get_column_letter(index)].width = min(max_len + 2, 60)
+
+    orbit_ws = wb.create_sheet("magnetic_site_orbits")
+    orbit_ws.append(MAGNETIC_ORBIT_COLUMNS)
+    for cell in orbit_ws[1]:
+        cell.font = Font(bold=True)
+    for row in rows:
+        for orbit in row.get("_magnetic_site_orbit_rows") or []:
+            if not isinstance(orbit, dict):
+                continue
+            orbit_row = {
+                "case_id": row.get("case_id"),
+                "file_name": row.get("file_name"),
+                "index": row.get("index"),
+                **orbit,
+            }
+            orbit_ws.append(
+                [_stringify(orbit_row.get(column)) for column in MAGNETIC_ORBIT_COLUMNS]
+            )
+
+    orbit_ws.freeze_panes = "A2"
+    orbit_ws.auto_filter.ref = orbit_ws.dimensions
+    for index, column in enumerate(MAGNETIC_ORBIT_COLUMNS, start=1):
+        max_len = len(column)
+        for row in orbit_ws.iter_rows(min_row=2, min_col=index, max_col=index):
+            value = row[0].value
+            if value is None:
+                continue
+            max_len = max(max_len, len(str(value)))
+        orbit_ws.column_dimensions[get_column_letter(index)].width = min(max_len + 2, 60)
 
     output_xlsx.parent.mkdir(parents=True, exist_ok=True)
     wb.save(output_xlsx)
@@ -435,7 +392,8 @@ def _write_jsonl(rows: list[dict[str, Any]], output_jsonl: Path) -> None:
     output_jsonl.parent.mkdir(parents=True, exist_ok=True)
     with output_jsonl.open("w", encoding="utf-8") as handle:
         for row in rows:
-            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+            public_row = {key: value for key, value in row.items() if not key.startswith("_")}
+            handle.write(json.dumps(public_row, ensure_ascii=False) + "\n")
 
 
 def main() -> None:

@@ -472,9 +472,9 @@ def test_run_mcif_batch_writes_baseline_meta_and_export_txt(tmp_path):
     assert "group_identifiers" in summary_record
     assert summary_record["group_identifiers"]["msg_bns_number"] == "63.457"
     assert summary_record["group_identifiers"]["msg_og_number"] == "63.1.511"
-    assert "sg_has_real_space_inversion" in summary_record["group_identifiers"]
-    assert "ossg_has_real_space_inversion" in summary_record["group_identifiers"]
-    assert "msg_has_real_space_inversion" in summary_record["group_identifiers"]
+    assert "sg_is_centrosymmetric" in summary_record["group_identifiers"]
+    assert "ossg_is_centrosymmetric" in summary_record["group_identifiers"]
+    assert "msg_is_centrosymmetric" in summary_record["group_identifiers"]
     assert full_record["result"]["msg_bns_number"] == "63.457"
     assert full_record["result"]["msg_og_number"] == "63.1.511"
     assert summary["full_results_jsonl"].endswith("full_results.jsonl")
