@@ -4872,6 +4872,33 @@ def test_wp_chain_uses_crystallographic_orbits_for_sg_multiplicity():
     } == {"4f(3)"}
 
 
+def test_magnetic_site_summary_handles_close_same_element_sites():
+    expected = {
+        "tests/testset/mcif_241130_no2186/0.1002_SrZn2Fe16O27.mcif": {
+            "index": "194.2.1.2",
+            "orbits": 7,
+            "total_dof": 9,
+        },
+        "tests/testset/mcif_241130_no2186/0.1003_SrCo2Fe16O27.mcif": {
+            "index": "63.2.1.10",
+            "orbits": 17,
+            "total_dof": 38,
+        },
+    }
+
+    for path, case_expected in expected.items():
+        result = find_spin_group(path)
+        summary = result.magnetic_site_summary
+
+        assert result.index == case_expected["index"]
+        assert summary["status"] == "ok"
+        assert summary["n_magnetic_orbits_ssg"] == case_expected["orbits"]
+        assert summary["n_magnetic_orbits_msg"] == case_expected["orbits"]
+        assert summary["total_magnetic_site_dof_ssg"] == case_expected["total_dof"]
+        assert summary["total_magnetic_site_dof_msg"] == case_expected["total_dof"]
+        assert summary["magnetic_wp_dof_rows"]
+
+
 def test_spin_space_group_exposes_class_level_msg_ops_for_0200_mn3sn():
     result = find_spin_group("tests/testset/mcif_241130_no2186/0.200_Mn3Sn.mcif")
 
