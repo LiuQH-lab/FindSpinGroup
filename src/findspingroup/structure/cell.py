@@ -704,6 +704,7 @@ class CrystalCell:
     magnetic_atom_indices: Optional[List[int]] = field(init=False)
 
     def __post_init__(self):
+        self.net_moment = None
 
         lat = Lattice(self.lattice)
         self.lattice_matrix = lat.matrix_row

@@ -12,7 +12,7 @@ from findspingroup.utils.matrix_utils import (
 )
 from findspingroup.utils.space_group_flags import (
     format_polar_axis_vector,
-    space_group_has_real_space_inversion,
+    space_group_is_centrosymmetric,
     space_group_is_polar,
     space_group_polar_axis_basis,
 )
@@ -61,7 +61,7 @@ def _space_group_payload(
         "space_group_number": space_group_number,
         "space_group_symbol": space_group_symbol,
         "is_polar": space_group_is_polar(space_group_number),
-        "has_real_space_inversion": space_group_has_real_space_inversion(space_group_number),
+        "is_centrosymmetric": space_group_is_centrosymmetric(space_group_number),
         "allowed_polar_axes": (
             [] if space_group_number is None else _polar_axis_payload(
                 space_group_number,
@@ -1561,12 +1561,12 @@ def build_ferroelectric_switching_payload(
 
     source_parent_number = None
     source_parent_name = None
-    source_parent_has_inversion = None
+    source_parent_is_centrosymmetric = None
     source_parent_is_polar = None
     if source_parent_space_group is not None:
         source_parent_number = _as_int_or_none(source_parent_space_group.get("IT_number"))
         source_parent_name = source_parent_space_group.get("name_H_M_alt")
-        source_parent_has_inversion = space_group_has_real_space_inversion(source_parent_number)
+        source_parent_is_centrosymmetric = space_group_is_centrosymmetric(source_parent_number)
         source_parent_is_polar = space_group_is_polar(source_parent_number)
 
     structural_parent = _space_group_payload(
@@ -1817,7 +1817,7 @@ def build_ferroelectric_switching_payload(
             "space_group_number": source_parent_number,
             "space_group_symbol": source_parent_name,
             "is_polar": source_parent_is_polar,
-            "has_real_space_inversion": source_parent_has_inversion,
+            "is_centrosymmetric": source_parent_is_centrosymmetric,
         },
         "required_inputs_for_switching_claim": required_inputs,
         "special_coset": {

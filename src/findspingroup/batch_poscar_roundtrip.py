@@ -43,6 +43,9 @@ COMPARE_MODE_CHOICES = (
     COMPARE_MODE_BASIC,
     COMPARE_MODE_FULL,
 )
+# Both modes re-identify the roundtripped POSCAR with the full route.  The
+# mode controls only the comparison contract: compact public summary versus
+# normalized source-independent full payload.
 
 BASIC_COMPARE_ATTRS = (
     ("index", "index"),
@@ -82,7 +85,7 @@ FULL_COMPARE_SOURCE_DEPENDENT_FIELDS = frozenset(
         "input_space_group_number",
         "input_space_group_symbol",
         "input_space_group_basis_or_setting",
-        "sg_has_real_space_inversion",
+        "sg_is_centrosymmetric",
         "sg_is_polar",
         "sg_is_chiral",
         "source_structure_metadata",
@@ -704,7 +707,8 @@ def _parse_args() -> argparse.Namespace:
         default=COMPARE_MODE_BASIC,
         help=(
             "Comparison scope. basic compares final group identifiers and physical summary "
-            "fields. full compares normalized source-independent MagSymmetryResult fields."
+            "fields. full compares normalized source-independent MagSymmetryResult fields. "
+            "Both modes run the full re-identification route; basic is not a shortcut."
         ),
     )
     parser.add_argument(

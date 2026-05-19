@@ -134,11 +134,65 @@ def _real_generator_tokens(sg_num: int, named_count: int) -> list[str]:
 
 
 def _to_latex_token(token: str) -> str:
+    token = re.sub(r"alpha(\d+)", r"\\alpha_{\1}", token)
+    token = re.sub(r"beta(\d+)", r"\\beta_{\1}", token)
+    token = re.sub(r"gamma(\d+)", r"\\gamma_{\1}", token)
     token = token.replace("alpha", r"\alpha")
     token = token.replace("beta", r"\beta")
     token = token.replace("gamma", r"\gamma")
     token = re.sub(r"-(\d+)", r"\\bar{\1}", token)
     return token
+
+
+def _canonical_parameter_axis_key(info: dict, tol: float = 1e-8) -> tuple[float, float, float] | None:
+    values = info.get("axis_parameter_values")
+    if values is None:
+        axis_vector = info.get("axis_vector")
+        if axis_vector is None:
+            return None
+        values = axis_vector
+
+    axis = np.asarray(values, dtype=float)
+    norm = float(np.linalg.norm(axis))
+    if norm < tol:
+        return None
+    axis = axis / norm
+    for value in axis:
+        if abs(float(value)) > tol:
+            if value < 0:
+                axis = -axis
+            break
+    axis[np.abs(axis) < tol] = 0.0
+    return tuple(float(v) for v in np.round(axis, 8))
+
+
+class _SymbolParameterAxisNamer:
+    """Assign stable alpha/beta/gamma suffixes to distinct free directions in one symbol."""
+
+    def __init__(self) -> None:
+        self._keys: list[tuple[float, float, float]] = []
+        self._index_by_key: dict[tuple[float, float, float], int] = {}
+
+    def add(self, info: dict | None) -> None:
+        if info is None or info.get("axis_kind") != "parameter":
+            return
+        key = _canonical_parameter_axis_key(info)
+        if key is None or key in self._index_by_key:
+            return
+        self._index_by_key[key] = len(self._keys) + 1
+        self._keys.append(key)
+
+    @property
+    def uses_numbered_labels(self) -> bool:
+        return len(self._keys) > 1
+
+    def parameter_index(self, info: dict) -> int | None:
+        if not self.uses_numbered_labels:
+            return None
+        key = _canonical_parameter_axis_key(info)
+        if key is None:
+            return None
+        return self._index_by_key.get(key)
 
 
 def _point_group_token_from_real_token(token: str) -> str:
@@ -380,10 +434,10 @@ def _transform_to_l0_basis(ssg: "SpinSpaceGroup") -> "SpinSpaceGroup":
     return ssg_l0.transform_spin(np.linalg.inv(ssg.n_spin_part_std_transformation))
 
 
-def _canonical_spin_symbol_map(ssg: "SpinSpaceGroup") -> dict[int, str]:
+def _canonical_spin_info_map(ssg: "SpinSpaceGroup") -> dict[int, dict]:
     # Use canonicalized Seitz descriptions so axis direction is consistent in one group.
     descriptions = ssg.seitz_descriptions
-    return {id(op): desc["spin"]["symbol"] for op, desc in zip(ssg.ops, descriptions)}
+    return {id(op): desc["spin"] for op, desc in zip(ssg.ops, descriptions)}
 
 
 def _default_centering_vectors(bravais: str) -> list[tuple[str, np.ndarray]]:
@@ -492,22 +546,67 @@ def _direction_subscript(direction: tuple[int, int, int]) -> str:
     return f"{direction[0]}{direction[1]}{direction[2]}"
 
 
-def _axis_subscript_from_info(info: dict, *, latex: bool = False) -> str:
+def _axis_subscript_from_info(
+    info: dict,
+    *,
+    latex: bool = False,
+    parameter_namer: _SymbolParameterAxisNamer | None = None,
+) -> str:
     axis_kind = info.get("axis_kind")
     if axis_kind == "direction" and info.get("axis_direction") is not None:
         direction = tuple(int(v) for v in info["axis_direction"])
         return _direction_subscript(direction)
     if axis_kind == "parameter":
-        return _axis_parameter_subscript(info.get("axis_parameter_values"), latex=latex)
+        parameter_index = None if parameter_namer is None else parameter_namer.parameter_index(info)
+        return _axis_parameter_subscript(
+            info.get("axis_parameter_values"),
+            latex=latex,
+            parameter_index=parameter_index,
+        )
+    if axis_kind == "symbolic":
+        # International-symbol LaTeX historically keeps compact symbolic axis
+        # components as text-like tokens (e.g. sqrt(3)/2) instead of expanding
+        # them into full fractions. Keep that contract; parameter placeholders
+        # are the only axis labels rewritten here.
+        key = "axis_subscript_linear"
+        if info.get(key):
+            return str(info[key])
     return _axis_parameter_subscript(None, latex=latex)
 
 
-def _spin_only_suffix(
+def _point_token_from_info(
+    info: dict | None,
+    *,
+    latex: bool = False,
+    parameter_namer: _SymbolParameterAxisNamer | None = None,
+) -> str:
+    if info is None:
+        return "1"
+    if info.get("unresolved"):
+        return "?"
+
+    token = _to_latex_token(str(info.get("hm_symbol", "?"))) if latex else str(info.get("hm_symbol", "?"))
+    rotation_power = info.get("rotation_power")
+    if rotation_power is not None:
+        token += f"^{{{int(rotation_power)}}}"
+
+    axis_kind = info.get("axis_kind")
+    if axis_kind in {"direction", "parameter", "symbolic"}:
+        subscript = _axis_subscript_from_info(
+            info,
+            latex=latex,
+            parameter_namer=parameter_namer,
+        )
+        token += f"_{{{subscript}}}"
+    return token
+
+
+def _spin_only_suffix_point_info(
     ssg_basis: "SpinSpaceGroup", *, tol: float = 1e-6, max_axis_denom: int = 12
-) -> tuple[str, str]:
+) -> tuple[str, dict] | None:
     symbol_tol = calibrated_symbol_tol(tol)
     if ssg_basis.conf == "Noncoplanar":
-        return "", ""
+        return None
 
     if ssg_basis.conf == "Collinear":
         candidate = None
@@ -518,13 +617,11 @@ def _spin_only_suffix(
                 candidate = op
                 break
         if candidate is None:
-            return "", ""
+            return None
         info = describe_point_operation(
             candidate.spin_rotation, tol=symbol_tol, max_order=120, max_axis_denom=max_axis_denom
         )
-        sub_linear = _axis_subscript_from_info(info, latex=False)
-        sub_latex = _axis_subscript_from_info(info, latex=True)
-        return f"∞_{{{sub_linear}}}m|1", rf"^{{\infty_{{{sub_latex}}}m}}1"
+        return "infinity_m", info
 
     # Coplanar: use mirror normal direction in spin space.
     candidate = None
@@ -535,7 +632,7 @@ def _spin_only_suffix(
             candidate = op
             break
     if candidate is None:
-        return "", ""
+        return None
 
     info = describe_point_operation(
         candidate.spin_rotation,
@@ -543,8 +640,22 @@ def _spin_only_suffix(
         max_order=120,
         max_axis_denom=max_axis_denom,
     )
-    sub_linear = _axis_subscript_from_info(info, latex=False)
-    sub_latex = _axis_subscript_from_info(info, latex=True)
+    return "mirror", info
+
+
+def _format_spin_only_suffix(
+    suffix_info: tuple[str, dict] | None,
+    *,
+    parameter_namer: _SymbolParameterAxisNamer | None = None,
+) -> tuple[str, str]:
+    if suffix_info is None:
+        return "", ""
+
+    kind, info = suffix_info
+    sub_linear = _axis_subscript_from_info(info, latex=False, parameter_namer=parameter_namer)
+    sub_latex = _axis_subscript_from_info(info, latex=True, parameter_namer=parameter_namer)
+    if kind == "infinity_m":
+        return f"∞_{{{sub_linear}}}m|1", rf"^{{\infty_{{{sub_latex}}}m}}1"
     return f"m_{{{sub_linear}}}|1", rf"^{{m_{{{sub_latex}}}}}1"
 
 
@@ -606,39 +717,111 @@ def build_international_symbol(
         )
     real_tokens = _real_generator_tokens(sg_num, len(named_ops))
 
-    spin_map = _canonical_spin_symbol_map(ssg_basis)
+    spin_info_map = _canonical_spin_info_map(ssg_basis)
     identity_real_ops = ssg_basis.identity_real_nssg_ops
+
+    named_pair_data: list[tuple[dict | None, str]] = []
+    sg1_token: str | None = None
+    if named_ops:
+        for (rot, trans), real_tok in zip(named_ops, real_tokens):
+            if ssg_type == "k":
+                spin_info = None
+            else:
+                matched = _find_real_operation(ssg_basis.nssg, rot, trans, tol=tol)
+                spin_info = spin_info_map.get(id(matched)) if matched is not None else None
+            named_pair_data.append((spin_info, real_tok))
+    else:
+        # SG #1 has no non-identity named generator; keep trailing "1" for readability.
+        if len(SGdisc[sg_num]) > 1:
+            sg1_token = SGdisc[sg_num][1]
+
+    k_translation_data: list[tuple["SpinSpaceGroupOperation", dict | None, str, str]] = []
+    primitive_translation_data: list[tuple[str, np.ndarray, dict | None]] = []
+    centering_translation_data: list[tuple[str, np.ndarray, dict | None]] = []
+
+    if ssg_type == "k":
+        # Nontrivial spin translations with real-space identity.
+        # Only keep a minimal generator set in the symbol.
+        selected_generators = _minimal_k_translation_generators(ssg_basis.n_spin_translation_group)
+        for op in selected_generators:
+            spin_info = spin_info_map.get(id(op))
+            k_translation_data.append(
+                (
+                    op,
+                    spin_info,
+                    _format_vector_linear(op.translation),
+                    _format_vector_latex(op.translation),
+                )
+            )
+
+    elif ssg_type == "g":
+        primitive_targets: list[tuple[str, np.ndarray]] = [
+            ("t_a", np.array([1.0, 0.0, 0.0])),
+            ("t_b", np.array([0.0, 1.0, 0.0])),
+            ("t_c", np.array([0.0, 0.0, 1.0])),
+        ]
+
+        if centering_trans:
+            centering_targets = [(f"b_{i+1}", vec) for i, vec in enumerate(centering_trans)]
+        else:
+            centering_targets = _default_centering_vectors(bravais)
+
+        for axis_index, (label, target) in enumerate(primitive_targets):
+            matched = _select_preferred_primitive_translation_match(
+                ssg_basis.nssg,
+                axis_index,
+                tol=tol,
+                identity_real_ops=identity_real_ops,
+            )
+            vector = np.asarray(matched.translation if matched is not None else target, dtype=float)
+            spin_info = spin_info_map.get(id(matched)) if matched is not None else None
+            primitive_translation_data.append((label, vector, spin_info))
+
+        for label, target in centering_targets:
+            matched = _select_preferred_translation_match(
+                ssg_basis.nssg,
+                target,
+                tol=tol,
+                identity_real_ops=identity_real_ops,
+            )
+            vector = np.asarray(matched.translation if matched is not None else target, dtype=float)
+            spin_info = spin_info_map.get(id(matched)) if matched is not None else None
+            centering_translation_data.append((label, vector, spin_info))
+
+    # The spin-only suffix should describe the current SpinSpaceGroup frame,
+    # not the intermediate standardized basis used to label the real-space part.
+    suffix_info = _spin_only_suffix_point_info(ssg, tol=calibrated_symbol_tol(tol))
+
+    parameter_namer = _SymbolParameterAxisNamer()
+    for spin_info, _real_tok in named_pair_data:
+        parameter_namer.add(spin_info)
+    for _op, spin_info, _tau_linear, _tau_latex in k_translation_data:
+        parameter_namer.add(spin_info)
+    for _label, _vector, spin_info in primitive_translation_data + centering_translation_data:
+        parameter_namer.add(spin_info)
+    if suffix_info is not None:
+        parameter_namer.add(suffix_info[1])
 
     pair_linear_terms: list[str] = []
     pair_latex_terms: list[str] = []
     point_pair_linear_terms: list[str] = []
     point_pair_latex_terms: list[str] = []
 
-    if named_ops:
-        for idx, ((rot, trans), real_tok) in enumerate(zip(named_ops, real_tokens)):
-            if ssg_type == "k":
-                spin_tok = "1"
-                matched = None
-            else:
-                matched = _find_real_operation(ssg_basis.nssg, rot, trans, tol=tol)
-                spin_tok = spin_map.get(id(matched), "1") if matched is not None else "1"
-
+    if named_pair_data:
+        for spin_info, real_tok in named_pair_data:
+            spin_tok = _point_token_from_info(spin_info, parameter_namer=parameter_namer)
+            spin_tok_latex = _point_token_from_info(spin_info, latex=True, parameter_namer=parameter_namer)
             pair_linear_terms.append(f"{spin_tok}|{real_tok}")
-            pair_latex_terms.append(rf"^{{{_to_latex_token(spin_tok)}}}{_to_latex_token(real_tok)}")
+            pair_latex_terms.append(rf"^{{{spin_tok_latex}}}{_to_latex_token(real_tok)}")
 
             point_real_tok = _point_group_token_from_real_token(real_tok)
             point_pair_linear_terms.append(f"{spin_tok}|{point_real_tok}")
-            point_pair_latex_terms.append(
-                rf"^{{{_to_latex_token(spin_tok)}}}{_to_latex_token(point_real_tok)}"
-            )
-    else:
-        # SG #1 has no non-identity named generator; keep trailing "1" for readability.
-        if len(SGdisc[sg_num]) > 1:
-            token = SGdisc[sg_num][1]
-            pair_linear_terms.append(token)
-            pair_latex_terms.append(_to_latex_token(token))
-            point_pair_linear_terms.append(token)
-            point_pair_latex_terms.append(_to_latex_token(token))
+            point_pair_latex_terms.append(rf"^{{{spin_tok_latex}}}{_to_latex_token(point_real_tok)}")
+    elif sg1_token is not None:
+        pair_linear_terms.append(sg1_token)
+        pair_latex_terms.append(_to_latex_token(sg1_token))
+        point_pair_linear_terms.append(sg1_token)
+        point_pair_latex_terms.append(_to_latex_token(sg1_token))
 
     point_part_linear = " ".join(point_pair_linear_terms).strip()
     point_part_latex = " ".join(point_pair_latex_terms).strip()
@@ -651,15 +834,11 @@ def build_international_symbol(
     translation_details: list[dict] = []
 
     if ssg_type == "k":
-        # Nontrivial spin translations with real-space identity.
-        # Only keep a minimal generator set in the symbol.
-        selected_generators = _minimal_k_translation_generators(ssg_basis.n_spin_translation_group)
-        for op in selected_generators:
-            spin_tok = spin_map.get(id(op), "1")
-            tau_linear = _format_vector_linear(op.translation)
-            tau_latex = _format_vector_latex(op.translation)
+        for op, spin_info, tau_linear, tau_latex in k_translation_data:
+            spin_tok = _point_token_from_info(spin_info, parameter_namer=parameter_namer)
+            spin_tok_latex = _point_token_from_info(spin_info, latex=True, parameter_namer=parameter_namer)
             translation_linear_terms.append(f"{spin_tok}|{tau_linear}")
-            translation_latex_terms.append(rf"^{{{_to_latex_token(spin_tok)}}}{tau_latex}")
+            translation_latex_terms.append(rf"^{{{spin_tok_latex}}}{tau_latex}")
             translation_details.append(
                 {
                     "label": "tau",
@@ -669,60 +848,42 @@ def build_international_symbol(
             )
 
     elif ssg_type == "g":
-        primitive_targets: list[tuple[str, np.ndarray]] = [
-            ("t_a", np.array([1.0, 0.0, 0.0])),
-            ("t_b", np.array([0.0, 1.0, 0.0])),
-            ("t_c", np.array([0.0, 0.0, 1.0])),
-        ]
-        centering_targets: list[tuple[str, np.ndarray]]
-
-        if centering_trans:
-            centering_targets = [(f"b_{i+1}", vec) for i, vec in enumerate(centering_trans)]
-        else:
-            centering_targets = _default_centering_vectors(bravais)
-
         primitive_spin_symbols: list[str] = []
+        primitive_spin_symbols_latex: list[str] = []
         centering_spin_symbols: list[str] = []
+        centering_spin_symbols_latex: list[str] = []
 
-        for axis_index, (label, target) in enumerate(primitive_targets):
-            matched = _select_preferred_primitive_translation_match(
-                ssg_basis.nssg,
-                axis_index,
-                tol=tol,
-                identity_real_ops=identity_real_ops,
-            )
-            spin_tok = spin_map.get(id(matched), "1") if matched is not None else "1"
+        for label, vector, spin_info in primitive_translation_data:
+            spin_tok = _point_token_from_info(spin_info, parameter_namer=parameter_namer)
+            spin_tok_latex = _point_token_from_info(spin_info, latex=True, parameter_namer=parameter_namer)
             primitive_spin_symbols.append(spin_tok)
+            primitive_spin_symbols_latex.append(spin_tok_latex)
             translation_details.append(
                 {
                     "label": label,
-                    "vector": tuple(float(v) for v in (matched.translation if matched is not None else target)),
+                    "vector": tuple(float(v) for v in vector),
                     "spin_symbol": spin_tok,
                 }
             )
 
-        for label, target in centering_targets:
-            matched = _select_preferred_translation_match(
-                ssg_basis.nssg,
-                target,
-                tol=tol,
-                identity_real_ops=identity_real_ops,
-            )
-            spin_tok = spin_map.get(id(matched), "1") if matched is not None else "1"
+        for label, vector, spin_info in centering_translation_data:
+            spin_tok = _point_token_from_info(spin_info, parameter_namer=parameter_namer)
+            spin_tok_latex = _point_token_from_info(spin_info, latex=True, parameter_namer=parameter_namer)
             centering_spin_symbols.append(spin_tok)
+            centering_spin_symbols_latex.append(spin_tok_latex)
             translation_details.append(
                 {
                     "label": label,
-                    "vector": tuple(float(v) for v in (matched.translation if matched is not None else target)),
+                    "vector": tuple(float(v) for v in vector),
                     "spin_symbol": spin_tok,
                 }
             )
 
         primitive_linear = ",".join(primitive_spin_symbols)
-        primitive_latex = ",".join(_to_latex_token(tok) for tok in primitive_spin_symbols)
+        primitive_latex = ",".join(primitive_spin_symbols_latex)
         if centering_spin_symbols:
             center_linear = ",".join(centering_spin_symbols)
-            center_latex = ",".join(_to_latex_token(tok) for tok in centering_spin_symbols)
+            center_latex = ",".join(centering_spin_symbols_latex)
             translation_linear_terms.append(f"({primitive_linear};{center_linear})")
             translation_latex_terms.append(f"({primitive_latex};{center_latex})")
         else:
@@ -736,9 +897,7 @@ def build_international_symbol(
         linear = base_linear
         latex = base_latex
 
-    # The spin-only suffix should describe the current SpinSpaceGroup frame,
-    # not the intermediate standardized basis used to label the real-space part.
-    suffix_linear, suffix_latex = _spin_only_suffix(ssg, tol=calibrated_symbol_tol(tol))
+    suffix_linear, suffix_latex = _format_spin_only_suffix(suffix_info, parameter_namer=parameter_namer)
     if suffix_linear:
         linear = f"{linear} {suffix_linear}"
         latex = f"{latex} {suffix_latex}"

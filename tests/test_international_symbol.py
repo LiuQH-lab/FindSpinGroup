@@ -114,6 +114,15 @@ def test_convention_and_gspg_share_parameter_placeholder_direction_for_ndga():
     assert result.gspg_symbol_linear.endswith("∞_{alpha,0,gamma}m|1")
 
 
+def test_ossg_symbol_numbers_distinct_free_axis_placeholders():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.1002_SrZn2Fe16O27.mcif")
+
+    assert "m_{alpha1,beta1,0}|m" in result.convention_ssg_international_linear
+    assert "m_{alpha2,beta2,0}|c" in result.convention_ssg_international_linear
+    assert r"m_{\alpha_{1},\beta_{1},0}" in result.convention_ssg_international_latex
+    assert r"m_{\alpha_{2},\beta_{2},0}" in result.convention_ssg_international_latex
+
+
 def test_symbol_calibration_tol_is_coupled_to_user_matrix_tolerance():
     result = find_spin_group("tests/testset/0.200_Mn3Sn.mcif")
     tight = SpinSpaceGroup(result.primitive_magnetic_cell_ssg_ops, tol=1e-8)

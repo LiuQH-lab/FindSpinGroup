@@ -25,7 +25,7 @@ def _hall_number_for_space_group(space_group_number: int) -> int:
 
 
 @lru_cache(maxsize=None)
-def space_group_has_real_space_inversion(space_group_number: int | None) -> bool | None:
+def space_group_is_centrosymmetric(space_group_number: int | None) -> bool | None:
     if space_group_number is None:
         return None
 
@@ -34,6 +34,10 @@ def space_group_has_real_space_inversion(space_group_number: int | None) -> bool
     rotations = np.asarray(dataset["rotations"], dtype=int)
     minus_identity = -np.eye(3, dtype=int)
     return bool(any(np.array_equal(rotation, minus_identity) for rotation in rotations))
+
+
+def space_group_has_real_space_inversion(space_group_number: int | None) -> bool | None:
+    return space_group_is_centrosymmetric(space_group_number)
 
 
 @lru_cache(maxsize=None)
@@ -122,7 +126,7 @@ def msg_parent_space_group_info(msg_num: int | None) -> dict[str, int | str | bo
             "og_number": None,
             "bns_parent_space_group_number": None,
             "og_parent_space_group_number": None,
-            "has_real_space_inversion": None,
+            "is_centrosymmetric": None,
             "is_polar": None,
             "is_chiral": None,
         }
@@ -131,8 +135,8 @@ def msg_parent_space_group_info(msg_num: int | None) -> dict[str, int | str | bo
     og_number = MSGMPG_DB.BNS_TO_OG_NUM[bns_number]
     bns_parent = int(str(bns_number).split(".")[0])
     og_parent = int(str(og_number).split(".")[0])
-    bns_flag = space_group_has_real_space_inversion(bns_parent)
-    og_flag = space_group_has_real_space_inversion(og_parent)
+    bns_flag = space_group_is_centrosymmetric(bns_parent)
+    og_flag = space_group_is_centrosymmetric(og_parent)
     bns_polar = space_group_is_polar(bns_parent)
     og_polar = space_group_is_polar(og_parent)
     bns_chiral = space_group_is_chiral(bns_parent)
@@ -159,7 +163,7 @@ def msg_parent_space_group_info(msg_num: int | None) -> dict[str, int | str | bo
         "og_number": og_number,
         "bns_parent_space_group_number": bns_parent,
         "og_parent_space_group_number": og_parent,
-        "has_real_space_inversion": bns_flag,
+        "is_centrosymmetric": bns_flag,
         "is_polar": bns_polar,
         "is_chiral": bns_chiral,
     }

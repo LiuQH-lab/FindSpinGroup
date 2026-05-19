@@ -48,14 +48,18 @@ from findspingroup.structure.cell import (
     calculate_vector_coordinates_from_latticefactors,
 )
 from findspingroup.data.PG_SYMBOL import PG_IF_HEX_MAPPING, SG_HALL_MAPPING
-from findspingroup.utils.matrix_utils import rref_with_tolerance, normalize_vector_to_zero
+from findspingroup.utils.matrix_utils import (
+    general_positions_to_matrix,
+    rref_with_tolerance,
+    normalize_vector_to_zero,
+)
 from findspingroup.utils.symbolic_format import (
     format_symbolic_scalar,
     symbolize_numeric_tokens_in_string,
 )
 from findspingroup.utils.space_group_flags import (
     msg_parent_space_group_info,
-    space_group_has_real_space_inversion,
+    space_group_is_centrosymmetric,
     space_group_is_chiral,
     space_group_is_polar,
 )
@@ -876,7 +880,7 @@ class MagSymmetryResult:
         self.SSPG_symbol_s = symmetry.get('SSPG_symbol_s', None)
         self.input_space_group_number = symmetry.get('input_space_group_number', None)
         self.input_space_group_symbol = symmetry.get('input_space_group_symbol', None)
-        self.sg_has_real_space_inversion = symmetry.get('sg_has_real_space_inversion', None)
+        self.sg_is_centrosymmetric = symmetry.get('sg_is_centrosymmetric', None)
         self.sg_is_polar = symmetry.get('sg_is_polar', None)
         self.sg_is_chiral = symmetry.get('sg_is_chiral', None)
         self.input_space_group_basis_or_setting = symmetry.get(
@@ -886,6 +890,7 @@ class MagSymmetryResult:
         self.source_structure_metadata = symmetry.get('source_structure_metadata', None)
         self.source_parent_space_group = symmetry.get('source_parent_space_group', None)
         self.source_cell_parameter_strings = symmetry.get('source_cell_parameter_strings', None)
+        self.magnetic_site_summary = symmetry.get('magnetic_site_summary', None)
         self.input_cell_detail = cell.get('input_cell_detail', None)
 
         self.input_magnetic_primitive_cell = cell.get('input_magnetic_primitive_cell', None)
@@ -1029,12 +1034,6 @@ class MagSymmetryResult:
             ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING,
         )
         self.quasi_2d = symmetry.get('quasi_2d', None)
-        self.spin_splitting_2d_interpretation = symmetry.get(
-            'spin_splitting_2d_interpretation',
-            None,
-        )
-        self.spin_splitting_2d = symmetry.get('spin_splitting_2d', None)
-        self.is_alter_2d = symmetry.get('is_alter_2d', None)
         self.ferroelectric_switching = symmetry.get('ferroelectric_switching', None)
 
 
@@ -1261,7 +1260,7 @@ class MagSymmetryResult:
         self.msg_bns_number = symmetry.get('msg_bns_number', None)
         self.msg_og_number = symmetry.get('msg_og_number', None)
         self.msg_parent_space_group_number = symmetry.get('msg_parent_space_group_number', None)
-        self.msg_has_real_space_inversion = symmetry.get('msg_has_real_space_inversion', None)
+        self.msg_is_centrosymmetric = symmetry.get('msg_is_centrosymmetric', None)
         self.msg_is_polar = symmetry.get('msg_is_polar', None)
         self.msg_is_chiral = symmetry.get('msg_is_chiral', None)
         self.tolerances = symmetry.get('tolerances', None)
@@ -1313,7 +1312,7 @@ class MagSymmetryResult:
             None,
         )
         self.ossg_space_group_number = symmetry.get('ossg_space_group_number', None)
-        self.ossg_has_real_space_inversion = symmetry.get('ossg_has_real_space_inversion', None)
+        self.ossg_is_centrosymmetric = symmetry.get('ossg_is_centrosymmetric', None)
         self.ossg_is_polar = symmetry.get('ossg_is_polar', None)
         self.ossg_is_chiral = symmetry.get('ossg_is_chiral', None)
         self.convention_spin_only_direction = symmetry.get('convention_spin_only_direction', "")
@@ -1549,6 +1548,314 @@ class MagSymmetryResult:
             'properties': self.properties_summary(),
             'gspg': self.gspg_summary(),
             'ferroelectric_switching': self.ferroelectric_switching,
+        }
+
+    def _structured_ssg_payload(
+        self,
+        *,
+        setting,
+        spin_frame_setting=None,
+        ops=None,
+        seitz=None,
+        seitz_latex=None,
+        seitz_descriptions=None,
+        international_linear=None,
+        international_latex=None,
+        symbol_calibration_tol=None,
+        ssg_type=None,
+    ):
+        return {
+            'setting': setting,
+            'spin_frame_setting': spin_frame_setting,
+            'ops': ops,
+            'seitz': seitz,
+            'seitz_latex': seitz_latex,
+            'seitz_descriptions': seitz_descriptions,
+            'international_linear': international_linear,
+            'international_latex': international_latex,
+            'symbol_calibration_tol': symbol_calibration_tol,
+            'type': ssg_type,
+        }
+
+    def to_structured_dict(self):
+        """Return a structured view of the full result without recomputation.
+
+        ``to_dict()`` remains the compatibility surface for existing callers.
+        This method groups the same data by semantic layer so newer consumers do
+        not need to reverse-engineer meaning from flat field prefixes.
+        """
+        legacy = dict(self.__dict__)
+        selected_database_standard_cell = (
+            self.g0_standard_cell
+            if self.selected_standard_setting == G0_STANDARD_SETTING
+            else self.l0_standard_cell
+        )
+
+        return {
+            'summary': {
+                'index': self.index,
+                'conf': self.conf,
+                'phase': self.magnetic_phase,
+                'phase_base': self.magnetic_phase_base,
+                'phase_modifier': self.magnetic_phase_modifier,
+                'acc': self.acc,
+                'msg_acc': self.msg_acc,
+                'is_alter': self.is_alter,
+                'is_spin_orbit_magnet': self.is_spin_orbit_magnet,
+                'tolerances': self.tolerances,
+                'source': {
+                    'metadata': self.source_structure_metadata,
+                    'parent_space_group': self.source_parent_space_group,
+                    'cell_parameter_strings': self.source_cell_parameter_strings,
+                },
+            },
+            'groups': {
+                'input_space_group': {
+                    'number': self.input_space_group_number,
+                    'symbol': self.input_space_group_symbol,
+                    'basis_or_setting': self.input_space_group_basis_or_setting,
+                    'is_centrosymmetric': self.sg_is_centrosymmetric,
+                    'is_polar': self.sg_is_polar,
+                    'is_chiral': self.sg_is_chiral,
+                },
+                'G0': {
+                    'number': self.G0_num,
+                    'symbol': self.G0_symbol,
+                },
+                'L0': {
+                    'number': self.L0_num,
+                    'symbol': self.L0_symbol,
+                    't_index': self.it,
+                    'k_index': self.ik,
+                },
+                'spin_point_group': {
+                    'hm': self.SSPG_symbol_hm,
+                    'symbol': self.SSPG_symbol_s,
+                    'full_hm': self.spin_part_point_group,
+                },
+                'gspg': self.gspg_summary(),
+                'ossg': {
+                    'space_group_number': self.ossg_space_group_number,
+                    'symbol_linear': self.convention_ssg_international_linear,
+                    'symbol_latex': self.convention_ssg_international_latex,
+                    'is_centrosymmetric': self.ossg_is_centrosymmetric,
+                    'is_polar': self.ossg_is_polar,
+                    'is_chiral': self.ossg_is_chiral,
+                    'real_space_setting': self.convention_ssg_setting,
+                    'spin_frame_setting': self.convention_ssg_spin_frame_setting,
+                    'spin_only_direction': self.convention_spin_only_direction,
+                    'spin_only_direction_cartesian': self.convention_spin_only_direction_cartesian,
+                },
+                'msg': {
+                    'num': self.msg_num,
+                    'type': self.msg_type,
+                    'symbol': self.msg_symbol,
+                    'bns_number': self.msg_bns_number,
+                    'og_number': self.msg_og_number,
+                    'parent_space_group_number': self.msg_parent_space_group_number,
+                    'is_centrosymmetric': self.msg_is_centrosymmetric,
+                    'is_polar': self.msg_is_polar,
+                    'is_chiral': self.msg_is_chiral,
+                },
+                'ssg_by_cell': {
+                    'input_magnetic_primitive': self._structured_ssg_payload(
+                        setting=self.input_magnetic_primitive_ssg_setting,
+                        ops=self.input_magnetic_primitive_ssg_ops,
+                        seitz=self.input_magnetic_primitive_ssg_seitz,
+                        seitz_latex=self.input_magnetic_primitive_ssg_seitz_latex,
+                        seitz_descriptions=self.input_magnetic_primitive_ssg_seitz_descriptions,
+                        international_linear=self.input_magnetic_primitive_ssg_international_linear,
+                        international_latex=self.input_magnetic_primitive_ssg_international_latex,
+                        symbol_calibration_tol=self.input_magnetic_primitive_ssg_symbol_calibration_tol,
+                        ssg_type=self.input_magnetic_primitive_ssg_type,
+                    ),
+                    'acc_primitive': self._structured_ssg_payload(
+                        setting=self.acc_primitive_ssg_setting,
+                        ops=self.acc_primitive_ssg_ops,
+                        seitz=self.acc_primitive_ssg_seitz,
+                        seitz_latex=self.acc_primitive_ssg_seitz_latex,
+                        seitz_descriptions=self.acc_primitive_ssg_seitz_descriptions,
+                        international_linear=self.acc_primitive_ssg_international_linear,
+                        international_latex=self.acc_primitive_ssg_international_latex,
+                        symbol_calibration_tol=self.acc_primitive_ssg_symbol_calibration_tol,
+                        ssg_type=self.primitive_magnetic_cell_ssg_type,
+                    ),
+                    'acc_conventional': self._structured_ssg_payload(
+                        setting=self.acc_conventional_ssg_setting,
+                        ops=self.acc_conventional_ssg_ops,
+                        seitz=self.acc_conventional_ssg_seitz,
+                        seitz_latex=self.acc_conventional_ssg_seitz_latex,
+                        seitz_descriptions=self.acc_conventional_ssg_seitz_descriptions,
+                        international_linear=self.acc_conventional_ssg_international_linear,
+                        international_latex=self.acc_conventional_ssg_international_latex,
+                        symbol_calibration_tol=self.acc_conventional_ssg_symbol_calibration_tol,
+                    ),
+                    'convention': self._structured_ssg_payload(
+                        setting=self.convention_ssg_setting,
+                        spin_frame_setting=self.convention_ssg_spin_frame_setting,
+                        ops=self.convention_ssg_ops,
+                        seitz=self.convention_ssg_seitz,
+                        seitz_latex=self.convention_ssg_seitz_latex,
+                        seitz_descriptions=self.convention_ssg_seitz_descriptions,
+                        international_linear=self.convention_ssg_international_linear,
+                        international_latex=self.convention_ssg_international_latex,
+                        symbol_calibration_tol=self.convention_ssg_symbol_calibration_tol,
+                    ),
+                    'g0_standard': self._structured_ssg_payload(
+                        setting=G0_STANDARD_SETTING,
+                        ops=self.g0_standard_ssg_ops,
+                        seitz=self.g0_standard_ssg_seitz,
+                        seitz_latex=self.g0_standard_ssg_seitz_latex,
+                        seitz_descriptions=self.g0_standard_ssg_seitz_descriptions,
+                    ),
+                    'l0_standard': self._structured_ssg_payload(
+                        setting=L0_STANDARD_SETTING,
+                        ops=self.l0_standard_ssg_ops,
+                        seitz=self.l0_standard_ssg_seitz,
+                        seitz_latex=self.l0_standard_ssg_seitz_latex,
+                        seitz_descriptions=self.l0_standard_ssg_seitz_descriptions,
+                    ),
+                },
+                'msg_by_cell': {
+                    'acc_primitive': {
+                        'setting': self.acc_primitive_msg_ops_setting,
+                        'spin_frame_setting': self.acc_primitive_msg_ops_spin_frame_setting,
+                        'ops': self.acc_primitive_msg_ops,
+                    },
+                    'magnetic_primitive': {
+                        'setting': self.magnetic_primitive_msg_ops_setting,
+                        'spin_frame_setting': self.magnetic_primitive_msg_ops_spin_frame_setting,
+                        'ops': self.magnetic_primitive_msg_ops,
+                    },
+                },
+                'little_groups': {
+                    'ssg_ops': self.ssg_little_group_ops,
+                    'ssg_seitz_latex': self.ssg_little_group_seitz_latex,
+                    'msg_ops': self.msg_little_group_ops,
+                    'msg_seitz_latex': self.msg_little_group_seitz_latex,
+                    'msg_symbols': self.msg_little_group_symbols,
+                    'msg_spin_polarizations': {
+                        'values': self.msg_spin_polarizations,
+                        'setting': self.msg_spin_polarizations_setting,
+                        'real_space_setting': self.msg_spin_polarizations_real_space_setting,
+                        'spin_frame': self.msg_spin_polarizations_spin_frame,
+                        'acc_cartesian': self.msg_spin_polarizations_acc_cartesian,
+                        'acc_poscar_spin_frame': self.msg_spin_polarizations_acc_poscar_spin_frame,
+                    },
+                },
+            },
+            'cells': {
+                'input': {
+                    'detail': self.input_cell_detail,
+                    'wp_chain': self.input_wp_chain,
+                },
+                'input_magnetic_primitive': {
+                    'setting': self.input_magnetic_primitive_cell_setting,
+                    'cell': self.input_magnetic_primitive_cell,
+                    'detail': self.input_magnetic_primitive_cell_detail,
+                },
+                'database_standard': {
+                    'selected': self.selected_standard_setting,
+                    'cell': selected_database_standard_cell,
+                    'g0_standard': self.g0_standard_cell,
+                    'l0_standard': self.l0_standard_cell,
+                    'wp_chain': self.wp_chain,
+                },
+                'convention': {
+                    'setting': self.convention_cell_setting,
+                    'cell': self.convention_cell,
+                    'detail': self.convention_cell_detail,
+                },
+                'acc_primitive': {
+                    'setting': self.acc_primitive_magnetic_cell_setting,
+                    'cell': self.acc_primitive_magnetic_cell,
+                    'detail': self.acc_primitive_magnetic_cell_detail,
+                    'wp_chain': self.acc_primitive_wp_chain,
+                },
+                'acc_conventional': {
+                    'setting': self.acc_conventional_cell_setting,
+                    'cell': self.acc_conventional_cell,
+                    'detail': self.acc_conventional_cell_detail,
+                },
+            },
+            'transforms': {
+                'input_to_input_magnetic_primitive': self.T_input_to_input_magnetic_primitive,
+                'input_to_acc_primitive': self.T_input_to_acc_primitive,
+                'input_to_G0std': self.T_input_to_G0std,
+                'input_to_L0std': self.T_input_to_L0std,
+                'input_to_convention': self.T_input_to_convention,
+                'G0std_to_acc_primitive': self.T_G0std_to_acc_primitive,
+                'L0std_to_acc_primitive': self.T_L0std_to_acc_primitive,
+                'acc_primitive_to_G0std': self.T_acc_primitive_to_G0std,
+                'acc_primitive_to_L0std': self.T_acc_primitive_to_L0std,
+                'acc_primitive_to_input': self.T_acc_primitive_to_input,
+                'convention_to_input': self.T_convention_to_input,
+                'convention_to_acc_primitive': self.T_convention_to_acc_primitive,
+                'convention_to_acc_conventional': self.T_convention_to_acc_conventional,
+                'selected_standard_to_acc_conventional': self.T_selected_standard_to_acc_conventional,
+                'raw': {
+                    'input_to_G0std': self.raw_T_input_to_G0std,
+                    'input_to_L0std': self.raw_T_input_to_L0std,
+                },
+                'audit': {
+                    'acc_primitive_resolution': self.acc_primitive_resolution_audit,
+                    'g0std_axis_collapse': self.g0std_axis_collapse_audit,
+                    'convention_to_acc_conventional': self.T_convention_to_acc_conventional_audit,
+                    'selected_standard_to_acc_conventional': (
+                        self.T_selected_standard_to_acc_conventional_audit
+                    ),
+                },
+            },
+            'properties': {
+                'magnetic_phase': {
+                    'phase': self.magnetic_phase,
+                    'base': self.magnetic_phase_base,
+                    'modifier': self.magnetic_phase_modifier,
+                    'spin_orbit_magnet_tag': self.magnetic_phase_spin_orbit_magnet,
+                    'details': self.magnetic_phase_details,
+                },
+                'spin_splitting': {
+                    'with_soc': self.spinsplitting_w_soc,
+                    'without_soc': self.spinsplitting_wo_soc,
+                    'is_alter': self.is_alter,
+                    'is_spin_orbit_magnet': self.is_spin_orbit_magnet,
+                    'spin_polarizations': {
+                        'values': self.spin_polarizations,
+                        'setting': self.spin_polarizations_setting,
+                        'real_space_setting': self.spin_polarizations_real_space_setting,
+                        'spin_frame': self.spin_polarizations_spin_frame,
+                        'acc_cartesian': self.spin_polarizations_acc_cartesian,
+                        'acc_poscar_spin_frame': self.spin_polarizations_acc_poscar_spin_frame,
+                    },
+                },
+                'ahc': {
+                    'with_soc': self.ahc_w_soc,
+                    'without_soc': self.ahc_wo_soc,
+                },
+                'tensors': self.tensor_outputs,
+                'magnetic_site': self.magnetic_site_summary,
+                'quasi_2d': self.quasi_2d,
+                'ferroelectric_switching': self.ferroelectric_switching,
+            },
+            'artifacts': {
+                'poscar': {
+                    'input_magnetic_primitive': self.input_magnetic_primitive_cell_poscar,
+                    'acc_primitive': self.acc_primitive_magnetic_cell_poscar,
+                },
+                'scif': {
+                    'default': self.scif,
+                    'by_mode': self.scif_outputs,
+                    'modes': self.scif_cell_modes,
+                },
+                'kpoints': {
+                    'acc_primitive': {
+                        'text': self.KPOINTS,
+                        'setting': self.KPOINTS_setting,
+                        'real_space_setting': self.KPOINTS_real_space_setting,
+                    },
+                },
+            },
+            'legacy': legacy,
         }
 
     def to_dict(self):
@@ -4324,15 +4631,32 @@ def _build_quasi2d_little_group_payload(
     }
 
 
-def _make_wp_chain_and_site_order(wp_sg, wp_ssg, wp_msg, cell, atom_types_dict):
+def _format_wp_with_site_dof(wp_symbol, dof):
+    if dof is None:
+        return wp_symbol
+    return f"{wp_symbol}({int(dof)})"
+
+
+def _make_wp_chain_and_site_order(
+    wp_sg,
+    wp_ssg,
+    wp_msg,
+    cell,
+    atom_types_dict,
+    *,
+    ssg_dof_by_site=None,
+    msg_dof_by_site=None,
+):
+    ssg_dof_by_site = {} if ssg_dof_by_site is None else ssg_dof_by_site
+    msg_dof_by_site = {} if msg_dof_by_site is None else msg_dof_by_site
     chain = tuple(
         (
             atom_types_dict[int(cell[2][i])],
             wp_sg[i][0],
             wp_sg[i][1],
-            wp_ssg[i][0],
+            _format_wp_with_site_dof(wp_ssg[i][0], ssg_dof_by_site.get(i)),
             wp_ssg[i][1],
-            wp_msg[i][0],
+            _format_wp_with_site_dof(wp_msg[i][0], msg_dof_by_site.get(i)),
             wp_msg[i][1],
         )
         for i in range(min(len(wp_sg), len(wp_ssg), len(wp_msg)))
@@ -4501,6 +4825,16 @@ def get_magnetic_phase(
             mpg_identifier=mpg,
             is_ss_gp='spin splitting',
         )['base_phase']
+
+    return classify_magnetic_phase(
+        conf=conf,
+        full_spin_part_point_group_hm=full_spin_part_point_group_hm,
+        full_spin_part_point_group_s=full_spin_part_point_group_s,
+        net_moment=net_moment,
+        net_moment_tol=net_moment_tol,
+        mpg_identifier=mpg,
+        is_ss_gp=is_ss_gp,
+    )['base_phase']
 
 
 
@@ -4703,6 +5037,300 @@ def get_spin_wyckoff(ssg_cell : CrystalCell, ssg_ops , atol =  0.001) -> (list, 
         constraints.append(constraint)
 
     return magnetic_index, equivalence_classes, magnetic_representative_dof,equivalence_classes_spin,constraints
+
+
+def _parse_parent_child_expansion(child_transform: str | None):
+    if child_transform is None:
+        return None
+    text = str(child_transform).strip().strip("'\"")
+    if not text or text == ".":
+        return None
+    expr = text.split(";", 1)[0]
+    matrices, _time_reversals = general_positions_to_matrix(
+        [f"{expr},+1"],
+        variables=("a", "b", "c"),
+    )
+    basis_rows, _shift = matrices[0]
+    basis_change = np.asarray(basis_rows, dtype=float).T
+    determinant = abs(float(np.linalg.det(basis_change)))
+    rounded = int(round(determinant))
+    if np.isclose(determinant, rounded, atol=1e-8, rtol=0.0):
+        return rounded
+    return determinant
+
+
+def _magnetic_orbit_count_from_dataset(dataset, magnetic_indices: list[int]) -> int:
+    if not magnetic_indices:
+        return 0
+    orbit_labels = _dataset_wyckoff_orbits(dataset)
+    return len({int(orbit_labels[index]) for index in magnetic_indices})
+
+
+def _site_dof_rows(equivalence_classes_spin, dof_by_representative, constraints):
+    rows = []
+    for info, constraint in zip(equivalence_classes_spin, constraints):
+        representative = int(info["representative_index"])
+        rows.append(
+            {
+                "representative_index": representative,
+                "class_indices": [int(index) for index in info["class_indices"]],
+                "dof": int(dof_by_representative[representative]),
+                "constraints": list(constraint),
+            }
+        )
+    return rows
+
+
+def _max_site_dof(dof_rows):
+    if not dof_rows:
+        return None
+    return max(int(row["dof"]) for row in dof_rows)
+
+
+def _cell_lattice_volume(cell: CrystalCell) -> float:
+    lattice, _positions, _types = cell.to_spglib(mag=False)
+    return abs(float(np.linalg.det(np.asarray(lattice, dtype=float))))
+
+
+def _magnetic_to_nonmagnetic_primitive_cell_expansion(cell: CrystalCell):
+    nonmagnetic_primitive_cell, _transform = cell.get_primitive_structure(magnetic=False)
+    magnetic_volume = _cell_lattice_volume(cell)
+    nonmagnetic_volume = _cell_lattice_volume(nonmagnetic_primitive_cell)
+    if nonmagnetic_volume < 1e-12:
+        return None
+    ratio = magnetic_volume / nonmagnetic_volume
+    rounded = int(round(ratio))
+    if np.isclose(ratio, rounded, atol=1e-8, rtol=0.0):
+        return rounded
+    return ratio
+
+
+def _total_site_dof(magnetic_wp_dof_rows, key):
+    total = 0
+    has_value = False
+    for row in magnetic_wp_dof_rows:
+        value = row.get(key)
+        if value is None:
+            continue
+        total += int(value)
+        has_value = True
+    return total if has_value else None
+
+
+def _site_dof_maps(dof_rows):
+    dof_by_site = {}
+    constraints_by_site = {}
+    representative_by_site = {}
+    for row in dof_rows:
+        representative = int(row["representative_index"])
+        constraints = list(row.get("constraints") or [])
+        for index in row.get("class_indices") or []:
+            site_index = int(index)
+            dof_by_site[site_index] = int(row["dof"])
+            constraints_by_site[site_index] = constraints
+            representative_by_site[site_index] = representative
+    return dof_by_site, constraints_by_site, representative_by_site
+
+
+def _build_magnetic_wp_dof_rows(
+    wp_sg,
+    wp_ssg,
+    wp_msg,
+    cell,
+    atom_types_dict,
+    magnetic_indices,
+    *,
+    ssg_dof_by_site,
+    ssg_constraints_by_site,
+    ssg_representative_by_site,
+    msg_dof_by_site,
+    msg_constraints_by_site,
+    msg_representative_by_site,
+):
+    rows_by_key = {}
+    for index in sorted(int(value) for value in magnetic_indices):
+        if index >= min(len(wp_sg), len(wp_ssg), len(wp_msg), len(cell[2])):
+            continue
+        element = atom_types_dict[int(cell[2][index])]
+        ssg_dof = ssg_dof_by_site.get(index)
+        msg_dof = msg_dof_by_site.get(index)
+        ssg_constraints = tuple(ssg_constraints_by_site.get(index) or ())
+        msg_constraints = tuple(msg_constraints_by_site.get(index) or ())
+        key = (
+            element,
+            wp_sg[index][0],
+            int(wp_sg[index][1]),
+            wp_ssg[index][0],
+            int(wp_ssg[index][1]),
+            ssg_dof,
+            ssg_constraints,
+            wp_msg[index][0],
+            int(wp_msg[index][1]),
+            msg_dof,
+            msg_constraints,
+        )
+        if key not in rows_by_key:
+            rows_by_key[key] = {
+                "element": element,
+                "site_indices": [],
+                "site_count": 0,
+                "sg_wyckoff": wp_sg[index][0],
+                "sg_wyckoff_index": int(wp_sg[index][1]),
+                "ssg_wyckoff": wp_ssg[index][0],
+                "ssg_wyckoff_with_dof": _format_wp_with_site_dof(
+                    wp_ssg[index][0],
+                    ssg_dof,
+                ),
+                "ssg_wyckoff_index": int(wp_ssg[index][1]),
+                "ssg_site_dof": None if ssg_dof is None else int(ssg_dof),
+                "ssg_orbit_total_dof": None if ssg_dof is None else int(ssg_dof),
+                "ssg_constraints": list(ssg_constraints),
+                "ssg_representative_index": ssg_representative_by_site.get(index),
+                "msg_wyckoff": wp_msg[index][0],
+                "msg_wyckoff_with_dof": _format_wp_with_site_dof(
+                    wp_msg[index][0],
+                    msg_dof,
+                ),
+                "msg_wyckoff_index": int(wp_msg[index][1]),
+                "msg_site_dof": None if msg_dof is None else int(msg_dof),
+                "msg_orbit_total_dof": None if msg_dof is None else int(msg_dof),
+                "msg_constraints": list(msg_constraints),
+                "msg_representative_index": msg_representative_by_site.get(index),
+            }
+        rows_by_key[key]["site_indices"].append(index)
+
+    rows = list(rows_by_key.values())
+    for row in rows:
+        row["site_indices"].sort()
+        row["site_count"] = len(row["site_indices"])
+    rows.sort(
+        key=lambda row: (
+            str(row["element"]),
+            row["sg_wyckoff"],
+            row["ssg_wyckoff"],
+            row["msg_wyckoff"],
+            row["site_indices"],
+        )
+    )
+    return rows
+
+
+def _build_magnetic_site_summary(
+    cell: CrystalCell,
+    ssg: SpinSpaceGroup,
+    identify_info: str,
+    tol_cfg: Tolerances,
+    *,
+    setting: str,
+):
+    magnetic_indices = [] if cell.magnetic_atom_indices is None else list(cell.magnetic_atom_indices)
+    sg_dataset = get_symmetry_dataset(cell.to_spglib(), symprec=tol_cfg.space)
+    ssg_dataset = get_G0_dataset_for_cell(
+        ssg.G0_ops,
+        cell.to_spglib(mag=True),
+        tol_cfg.space,
+    )
+    oriented_ssg = _ossg_oriented_spin_frame_ssg(ssg, cell)
+    msg_ops = list(oriented_ssg.msg_ops)
+
+    msg_dataset = None
+    if msg_ops:
+        msg_dataset = get_G0_dataset_for_cell(
+            [[op[1], op[2]] for op in msg_ops],
+            cell.to_spglib(mag=True),
+            tol_cfg.space,
+        )
+
+    _ssg_magnetic_indices, _ssg_classes, ssg_dof, ssg_spin_classes, ssg_constraints = (
+        get_spin_wyckoff(cell, ssg.ops, atol=tol_cfg.m_matrix_tol)
+    )
+    ssg_dof_rows = _site_dof_rows(ssg_spin_classes, ssg_dof, ssg_constraints)
+    (
+        ssg_dof_by_site,
+        ssg_constraints_by_site,
+        ssg_representative_by_site,
+    ) = _site_dof_maps(ssg_dof_rows)
+
+    msg_dof_rows = []
+    msg_dof_by_site = {}
+    msg_constraints_by_site = {}
+    msg_representative_by_site = {}
+    if msg_ops:
+        _msg_magnetic_indices, _msg_classes, msg_dof, msg_spin_classes, msg_constraints = (
+            get_spin_wyckoff(cell, msg_ops, atol=tol_cfg.m_matrix_tol)
+        )
+        msg_dof_rows = _site_dof_rows(msg_spin_classes, msg_dof, msg_constraints)
+        (
+            msg_dof_by_site,
+            msg_constraints_by_site,
+            msg_representative_by_site,
+        ) = _site_dof_maps(msg_dof_rows)
+
+    site_count = len(cell.to_spglib(mag=True)[1])
+    wp_extended_sg = get_wp_from_dataset(sg_dataset, max=False)
+    wp_extended_ssg = _get_wp_for_original_sites(ssg_dataset, site_count)
+    wp_extended_msg = [] if msg_dataset is None else _get_wp_for_original_sites(msg_dataset, site_count)
+    cell_spglib = cell.to_spglib(mag=True)
+    if wp_extended_msg:
+        magnetic_wp_dof_rows = _build_magnetic_wp_dof_rows(
+            wp_extended_sg,
+            wp_extended_ssg,
+            wp_extended_msg,
+            cell_spglib,
+            cell.atom_types_to_symbol,
+            magnetic_indices,
+            ssg_dof_by_site=ssg_dof_by_site,
+            ssg_constraints_by_site=ssg_constraints_by_site,
+            ssg_representative_by_site=ssg_representative_by_site,
+            msg_dof_by_site=msg_dof_by_site,
+            msg_constraints_by_site=msg_constraints_by_site,
+            msg_representative_by_site=msg_representative_by_site,
+        )
+    else:
+        magnetic_wp_dof_rows = []
+
+    cell_expansion = _magnetic_to_nonmagnetic_primitive_cell_expansion(cell)
+
+    magnetic_orbits_msg = (
+        None
+        if msg_dataset is None
+        else _magnetic_orbit_count_from_dataset(msg_dataset, magnetic_indices)
+    )
+
+    return {
+        "status": "ok",
+        "setting": setting,
+        "SG": {
+            "number": int(sg_dataset.number),
+            "symbol": str(sg_dataset.international),
+            "hall_number": int(sg_dataset.hall_number),
+            "choice": getattr(sg_dataset, "choice", None),
+        },
+        "cell_expansion": cell_expansion,
+        "cell_expansion_source": "magnetic_primitive_volume/nonmagnetic_primitive_volume",
+        "cell_expansion_transform": None,
+        "ssg_index": identify_info,
+        "magnetic_atom_count": len(magnetic_indices),
+        "magnetic_atom_indices": [int(index) for index in magnetic_indices],
+        "n_magnetic_orbits_sg": _magnetic_orbit_count_from_dataset(sg_dataset, magnetic_indices),
+        "n_magnetic_orbits_ssg": _magnetic_orbit_count_from_dataset(ssg_dataset, magnetic_indices),
+        "n_magnetic_orbits_msg": magnetic_orbits_msg,
+        "max_magnetic_site_dof_ssg": _max_site_dof(ssg_dof_rows),
+        "max_magnetic_site_dof_msg": _max_site_dof(msg_dof_rows),
+        "total_magnetic_site_dof_ssg": _total_site_dof(
+            magnetic_wp_dof_rows,
+            "ssg_orbit_total_dof",
+        ),
+        "total_magnetic_site_dof_msg": _total_site_dof(
+            magnetic_wp_dof_rows,
+            "msg_orbit_total_dof",
+        ),
+        "ssg_magnetic_site_dofs": ssg_dof_rows,
+        "msg_magnetic_site_dofs": msg_dof_rows,
+        "magnetic_wp_dof_rows": magnetic_wp_dof_rows,
+        "msg_operation_count": len(msg_ops),
+        "msg_available": bool(msg_ops),
+    }
 
 
 def _identify_ssg_index_details(file_name,ssg_primitive:SpinSpaceGroup,tol = 0.001):
@@ -5249,12 +5877,19 @@ def get_G0_dataset_for_cell(space_group_operations, cell, symprec):
 
 #------------------
 # Wyckoff
+def _dataset_wyckoff_orbits(dataset):
+    crystallographic_orbits = getattr(dataset, "crystallographic_orbits", None)
+    if crystallographic_orbits is not None:
+        return crystallographic_orbits
+    return dataset.equivalent_atoms
+
+
 def get_wp_from_dataset(dataset,max=True):
     temp_eq = {}
     first_index = {}
     last_index = 0
-    wp_temp=[]
-    for ind, eq_label in enumerate(dataset.equivalent_atoms):
+    orbit_labels = _dataset_wyckoff_orbits(dataset)
+    for ind, eq_label in enumerate(orbit_labels):
         if eq_label not in temp_eq:
             temp_eq[eq_label] = 1
             first_index[eq_label] = ind
@@ -5264,26 +5899,10 @@ def get_wp_from_dataset(dataset,max=True):
     di = {key:str(value)+ dataset.wyckoffs[first_index[key]]for key,value in temp_eq.items()}
 
     if max:
-        wp = [(di[i],i) for i in dataset.equivalent_atoms[:last_index]]
+        wp = [(di[i],i) for i in orbit_labels[:last_index]]
     else:
-        wp = [(di[i],i) for i in dataset.equivalent_atoms]
+        wp = [(di[i],i) for i in orbit_labels]
     return wp
-
-
-def wyckoff_analysis(ssg_cell: CrystalCell, ssg: SpinSpaceGroup, rtol=0.02):
-    from spglib import get_symmetry_dataset,get_magnetic_symmetry_dataset
-    sg_dataset = get_symmetry_dataset(ssg_cell.to_spglib())
-    msg_dataset_magnetic = get_magnetic_symmetry_dataset(ssg_cell.to_spglib(mag=True),symprec=rtol)
-    if msg_dataset_magnetic is None:
-        raise ValueError("Magnetic symmetry dataset could not be determined during wyckoff analysis.")
-    msg_dataset = get_G0_dataset_for_cell(ssg_cell.to_spglib(),[i for i in zip(msg_dataset_magnetic.rotations,msg_dataset_magnetic.translations)])
-    ssg_dataset = get_G0_dataset_for_cell(ssg.G0_ops,ssg_cell.to_spglib(mag=True),rtol)
-    if ssg_dataset.number != ssg.G0_num:
-        raise ValueError(f"Warning: Wyckoff analysis found different space group number!From cell: {ssg_dataset.number}, From SSG: {ssg.G0_num}")
-    wp_extended_sg = get_wp_from_dataset(sg_dataset,max=False)
-    wp_extended_ssg =get_wp_from_dataset(ssg_dataset,max=True)
-    wp_extended_msg = get_wp_from_dataset(msg_dataset,max=True)
-#--------------------
 
 def get_msg_from_ossg(ossg_ops,tol=0.01):
     """
@@ -5441,23 +6060,40 @@ def _find_spin_group_from_parsed(
         legacy_transformation_primitive_to_acc_primitive[0],
         legacy_transformation_primitive_to_acc_primitive[1],
     )
-    (
-        selected_standard_setting,
-        selected_transformation_primitive_to_standard,
-        standard_transform_selection_audit,
-    ) = _select_standard_transform_for_acc_alignment(
-        ssg_primitive,
-        magnetic_primitive_cell,
-        {
-            G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
-            L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
-        },
-        legacy_transformation_primitive_to_acc_primitive,
-        legacy_acc_magnetic_primitive_cell,
-        identify_info=identify_info,
-        identify_index_details=identify_index_details,
-        tol=tol_cfg,
-    )
+    if identify_index_details is None:
+        selected_standard_setting = G0_STANDARD_SETTING
+        selected_transformation_primitive_to_standard = raw_transformation_primitive_to_G0std
+        standard_transform_selection_audit = {
+            "strategy": "identify_index_unavailable",
+            "status": "skipped",
+            "standard_setting": selected_standard_setting,
+            "selected_strategy": "raw_G0std_without_identify_index",
+            "selected_matrix": np.asarray(
+                selected_transformation_primitive_to_standard[0], dtype=float
+            ).tolist(),
+            "selected_origin_shift": np.asarray(
+                selected_transformation_primitive_to_standard[1], dtype=float
+            ).tolist(),
+            "identify_index": identify_info,
+        }
+    else:
+        (
+            selected_standard_setting,
+            selected_transformation_primitive_to_standard,
+            standard_transform_selection_audit,
+        ) = _select_standard_transform_for_acc_alignment(
+            ssg_primitive,
+            magnetic_primitive_cell,
+            {
+                G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
+                L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
+            },
+            legacy_transformation_primitive_to_acc_primitive,
+            legacy_acc_magnetic_primitive_cell,
+            identify_info=identify_info,
+            identify_index_details=identify_index_details,
+            tol=tol_cfg,
+        )
     if selected_standard_setting == G0_STANDARD_SETTING:
         raw_transformation_primitive_to_G0std = selected_transformation_primitive_to_standard
     else:
@@ -5522,24 +6158,47 @@ def _find_spin_group_from_parsed(
         transformation_input_to_selected_standard = transformation_input_to_L0std
         transformation_input_to_database_standard = raw_transformation_input_to_L0std
 
-    (
-        acc_magnetic_primitive_cell,
-        acc_magnetic_primitive_ssg,
-        transformation_input_to_acc_primitive,
-        transformation_selected_standard_to_acc_primitive,
-        acc_primitive_resolution_audit,
-    ) = _resolve_acc_primitive_from_selected_standard(
-        selected_standard_cell,
-        magnetic_primitive_cell,
-        ssg_primitive,
-        transformation_input_to_primitive,
-        transformation_input_to_selected_standard,
-        transformation_input_to_database_standard,
-        legacy_acc_magnetic_primitive_cell,
-        legacy_transformation_input_to_acc_primitive,
-        identify_info=identify_info,
-        tol=tol_cfg,
-    )
+    if identify_index_details is None:
+        acc_magnetic_primitive_cell = legacy_acc_magnetic_primitive_cell
+        acc_magnetic_primitive_ssg = ssg_primitive.transform(
+            *legacy_transformation_primitive_to_acc_primitive
+        )
+        transformation_input_to_acc_primitive = legacy_transformation_input_to_acc_primitive
+        transformation_selected_standard_to_acc_primitive = _compose_setting_transform(
+            transformation_input_to_selected_standard[0],
+            transformation_input_to_selected_standard[1],
+            transformation_input_to_acc_primitive[0],
+            transformation_input_to_acc_primitive[1],
+        )
+        acc_primitive_resolution_audit = {
+            "strategy": "legacy_acc_transform_without_identify_index",
+            "status": "identify_index_unavailable",
+            "identify_index": identify_info,
+            "selected_standard_setting": selected_standard_setting,
+            "note": (
+                "identify-index database details are unavailable, so ACC P-table "
+                "validation is skipped; non-ACC symmetry outputs remain available."
+            ),
+        }
+    else:
+        (
+            acc_magnetic_primitive_cell,
+            acc_magnetic_primitive_ssg,
+            transformation_input_to_acc_primitive,
+            transformation_selected_standard_to_acc_primitive,
+            acc_primitive_resolution_audit,
+        ) = _resolve_acc_primitive_from_selected_standard(
+            selected_standard_cell,
+            magnetic_primitive_cell,
+            ssg_primitive,
+            transformation_input_to_primitive,
+            transformation_input_to_selected_standard,
+            transformation_input_to_database_standard,
+            legacy_acc_magnetic_primitive_cell,
+            legacy_transformation_input_to_acc_primitive,
+            identify_info=identify_info,
+            tol=tol_cfg,
+        )
     acc_primitive_resolution_audit["standard_transform_selection"] = standard_transform_selection_audit
     if selected_standard_setting == G0_STANDARD_SETTING:
         acc_primitive_resolution_audit["G0std_transform_selection"] = standard_transform_selection_audit
@@ -5924,6 +6583,24 @@ def _find_spin_group_from_parsed(
         )
     else:
         input_wp_chain = None
+    try:
+        magnetic_site_summary = _build_magnetic_site_summary(
+            acc_primitive_output_cell,
+            acc_primitive_output_ssg,
+            identify_info,
+            tol_cfg,
+            setting=ACC_PRIMITIVE_SETTING,
+        )
+    except Exception as exc:
+        magnetic_site_summary = {
+            "status": "error",
+            "setting": ACC_PRIMITIVE_SETTING,
+            "ssg_index": identify_info,
+            "error": {
+                "type": type(exc).__name__,
+                "message": str(exc),
+            },
+        }
 
     canonical_scif_target = scif_export_targets[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]
     actual_chen_linear_name = _build_chen_linear_name(
@@ -6093,7 +6770,7 @@ def _find_spin_group_from_parsed(
                 'SSPG_symbol_s': ssg_primitive.spin_part_point_group_symbol_s,
                 'input_space_group_number': input_space_group_number,
                 'input_space_group_symbol': input_space_group_symbol,
-                'sg_has_real_space_inversion': space_group_has_real_space_inversion(input_space_group_number),
+                'sg_is_centrosymmetric': space_group_is_centrosymmetric(input_space_group_number),
                 'sg_is_polar': space_group_is_polar(input_space_group_number),
                 'sg_is_chiral': space_group_is_chiral(input_space_group_number),
                 'input_space_group_basis_or_setting': input_space_group_basis_or_setting,
@@ -6104,20 +6781,12 @@ def _find_spin_group_from_parsed(
                 'source_cell_parameter_strings': (
                     None if source_metadata is None else source_metadata.get('cell_parameter_strings')
                 ),
+                'magnetic_site_summary': magnetic_site_summary,
                 'KPOINTS':KPOINTS,
                 'KPOINTS_setting': ACC_PRIMITIVE_SETTING,
                 'KPOINTS_real_space_setting': ACC_PRIMITIVE_SETTING,
                 'quasi_2d': quasi_2d_diagnostics,
                 'ferroelectric_switching': ferroelectric_switching,
-                'spin_splitting_2d_interpretation': (
-                    None if quasi_2d_diagnostics is None else quasi_2d_diagnostics.get('interpretation')
-                ),
-                'spin_splitting_2d': (
-                    None if quasi_2d_diagnostics is None else quasi_2d_diagnostics.get('spin_splitting_2d')
-                ),
-                'is_alter_2d': (
-                    None if quasi_2d_diagnostics is None else quasi_2d_diagnostics.get('is_alter_2d')
-                ),
                 'input_magnetic_primitive_ssg_ops': ssg_primitive.ops,
                 'input_magnetic_primitive_ssg_setting': INPUT_MAGNETIC_PRIMITIVE_SETTING,
                 'input_magnetic_primitive_ssg_seitz': ssg_primitive.seitz_symbols,
@@ -6224,7 +6893,7 @@ def _find_spin_group_from_parsed(
                 'convention_ssg_setting': convention_setting,
                 'convention_ssg_spin_frame_setting': OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 'ossg_space_group_number': ossg_space_group_number,
-                'ossg_has_real_space_inversion': space_group_has_real_space_inversion(ossg_space_group_number),
+                'ossg_is_centrosymmetric': space_group_is_centrosymmetric(ossg_space_group_number),
                 'ossg_is_polar': space_group_is_polar(ossg_space_group_number),
                 'ossg_is_chiral': space_group_is_chiral(ossg_space_group_number),
                 'convention_spin_only_direction': _format_spin_only_direction(public_ossg_ssg.sog_direction),
@@ -6406,7 +7075,7 @@ def _find_spin_group_from_parsed(
                 'msg_bns_number': msg_parent_info['bns_number'],
                 'msg_og_number': msg_parent_info['og_number'],
                 'msg_parent_space_group_number': msg_parent_info['bns_parent_space_group_number'],
-                'msg_has_real_space_inversion': msg_parent_info['has_real_space_inversion'],
+                'msg_is_centrosymmetric': msg_parent_info['is_centrosymmetric'],
                 'msg_is_polar': msg_parent_info['is_polar'],
                 'msg_is_chiral': msg_parent_info['is_chiral'],
                 'tolerances': {
@@ -6554,23 +7223,40 @@ def _find_spin_group_basic_from_parsed(
         np.asarray(ssg_primitive.transformation_to_L0std, dtype=float),
         np.asarray(ssg_primitive.origin_shift_to_L0std, dtype=float),
     )
-    (
-        selected_standard_setting,
-        selected_transformation_primitive_to_standard,
-        standard_transform_selection_audit,
-    ) = _select_standard_transform_for_acc_alignment(
-        ssg_primitive,
-        magnetic_primitive_cell,
-        {
-            G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
-            L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
-        },
-        legacy_transformation_primitive_to_acc_primitive,
-        legacy_acc_magnetic_primitive_cell,
-        identify_info=identify_info,
-        identify_index_details=identify_index_details,
-        tol=tol_cfg,
-    )
+    if identify_index_details is None:
+        selected_standard_setting = G0_STANDARD_SETTING
+        selected_transformation_primitive_to_standard = raw_transformation_primitive_to_G0std
+        standard_transform_selection_audit = {
+            "strategy": "identify_index_unavailable",
+            "status": "skipped",
+            "standard_setting": selected_standard_setting,
+            "selected_strategy": "raw_G0std_without_identify_index",
+            "selected_matrix": np.asarray(
+                selected_transformation_primitive_to_standard[0], dtype=float
+            ).tolist(),
+            "selected_origin_shift": np.asarray(
+                selected_transformation_primitive_to_standard[1], dtype=float
+            ).tolist(),
+            "identify_index": identify_info,
+        }
+    else:
+        (
+            selected_standard_setting,
+            selected_transformation_primitive_to_standard,
+            standard_transform_selection_audit,
+        ) = _select_standard_transform_for_acc_alignment(
+            ssg_primitive,
+            magnetic_primitive_cell,
+            {
+                G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
+                L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
+            },
+            legacy_transformation_primitive_to_acc_primitive,
+            legacy_acc_magnetic_primitive_cell,
+            identify_info=identify_info,
+            identify_index_details=identify_index_details,
+            tol=tol_cfg,
+        )
     if selected_standard_setting == G0_STANDARD_SETTING:
         raw_transformation_primitive_to_G0std = selected_transformation_primitive_to_standard
     else:
@@ -6600,24 +7286,47 @@ def _find_spin_group_basic_from_parsed(
     selected_standard_cell = magnetic_primitive_cell.transform(
         *selected_transformation_primitive_to_standard
     )
-    (
-        acc_magnetic_primitive_cell,
-        acc_magnetic_primitive_ssg,
-        transformation_input_to_acc_primitive,
-        transformation_selected_standard_to_acc_primitive,
-        acc_primitive_resolution_audit,
-    ) = _resolve_acc_primitive_from_selected_standard(
-        selected_standard_cell,
-        magnetic_primitive_cell,
-        ssg_primitive,
-        transformation_input_to_primitive_setting,
-        transformation_input_to_selected_standard,
-        transformation_input_to_selected_standard,
-        legacy_acc_magnetic_primitive_cell,
-        legacy_transformation_input_to_acc_primitive,
-        identify_info=identify_info,
-        tol=tol_cfg,
-    )
+    if identify_index_details is None:
+        acc_magnetic_primitive_cell = legacy_acc_magnetic_primitive_cell
+        acc_magnetic_primitive_ssg = ssg_primitive.transform(
+            *legacy_transformation_primitive_to_acc_primitive
+        )
+        transformation_input_to_acc_primitive = legacy_transformation_input_to_acc_primitive
+        transformation_selected_standard_to_acc_primitive = _compose_setting_transform(
+            transformation_input_to_selected_standard[0],
+            transformation_input_to_selected_standard[1],
+            transformation_input_to_acc_primitive[0],
+            transformation_input_to_acc_primitive[1],
+        )
+        acc_primitive_resolution_audit = {
+            "strategy": "legacy_acc_transform_without_identify_index",
+            "status": "identify_index_unavailable",
+            "identify_index": identify_info,
+            "selected_standard_setting": selected_standard_setting,
+            "note": (
+                "identify-index database details are unavailable, so ACC P-table "
+                "validation is skipped; non-ACC symmetry outputs remain available."
+            ),
+        }
+    else:
+        (
+            acc_magnetic_primitive_cell,
+            acc_magnetic_primitive_ssg,
+            transformation_input_to_acc_primitive,
+            transformation_selected_standard_to_acc_primitive,
+            acc_primitive_resolution_audit,
+        ) = _resolve_acc_primitive_from_selected_standard(
+            selected_standard_cell,
+            magnetic_primitive_cell,
+            ssg_primitive,
+            transformation_input_to_primitive_setting,
+            transformation_input_to_selected_standard,
+            transformation_input_to_selected_standard,
+            legacy_acc_magnetic_primitive_cell,
+            legacy_transformation_input_to_acc_primitive,
+            identify_info=identify_info,
+            tol=tol_cfg,
+        )
     acc_primitive_resolution_audit["standard_transform_selection"] = standard_transform_selection_audit
     if selected_standard_setting == G0_STANDARD_SETTING:
         acc_primitive_resolution_audit["G0std_transform_selection"] = standard_transform_selection_audit
@@ -6630,7 +7339,9 @@ def _find_spin_group_basic_from_parsed(
     internal_msg_info = acc_primitive_ossg.msg_info
     msg_num = None if internal_msg_info is None else internal_msg_info.get("msg_int_num")
     msg_symbol = None if internal_msg_info is None else internal_msg_info.get("msg_bns_symbol")
+    msg_type = None if internal_msg_info is None else internal_msg_info.get("msg_type")
     msg_parent_info = msg_parent_space_group_info(msg_num)
+    magnetic_phase_details = magnetic_phase_payload["details"]
 
     ssg_space_group_number = int(ssg_primitive.G0_num)
     ferroelectric_switching = build_ferroelectric_switching_payload(
@@ -6651,6 +7362,7 @@ def _find_spin_group_basic_from_parsed(
 
     return {
         "index": identify_info,
+        "identify_index_details": identify_index_details,
         "g0_symbol": ssg_primitive.G0_symbol,
         "g0_number": int(ssg_primitive.G0_num),
         "l0_symbol": ssg_primitive.L0_symbol,
@@ -6661,7 +7373,6 @@ def _find_spin_group_basic_from_parsed(
         "sspg": ssg_primitive.spin_part_point_group_symbol_hm,
         "acc_symbol": ssg_primitive.acc,
         "acc_primitive_resolution_audit": acc_primitive_resolution_audit,
-        "acc_primitive_standard_setting": selected_standard_setting,
         "T_input_to_acc_primitive": (
             np.asarray(transformation_input_to_acc_primitive[0], dtype=float).tolist(),
             np.asarray(transformation_input_to_acc_primitive[1], dtype=float).tolist(),
@@ -6673,6 +7384,7 @@ def _find_spin_group_basic_from_parsed(
         "space_group_symbol": input_space_group_symbol,
         "space_group_number": input_space_group_number,
         "msg_symbol": msg_symbol,
+        "msg_type": msg_type,
         "msg_bns_number": msg_parent_info["bns_number"],
         "msg_og_number": msg_parent_info["og_number"],
         "empg": ssg_primitive.gspg.empg_symbol,
@@ -6681,7 +7393,9 @@ def _find_spin_group_basic_from_parsed(
         "magnetic_phase": magnetic_phase_payload["phase"],
         "magnetic_phase_base": magnetic_phase_payload["base_phase"],
         "magnetic_phase_modifier": magnetic_phase_payload["modifier"],
-        "magnetic_phase_details": magnetic_phase_payload["details"],
+        "magnetic_phase_details": magnetic_phase_details,
+        "net_moment": magnetic_phase_details["net_moment"],
+        "zero_net_moment_tol": magnetic_phase_details["zero_net_moment_tol"],
         "properties": {
             "ss_w_soc": ss_w_soc,
             "ss_wo_soc": ss_wo_soc,
@@ -6700,6 +7414,7 @@ def _find_spin_group_basic_from_parsed(
         "ssg_is_chiral": space_group_is_chiral(ssg_space_group_number),
         "msg_is_polar": msg_parent_info["is_polar"],
         "msg_is_chiral": msg_parent_info["is_chiral"],
+        "quasi_2d": None,
         "ferroelectric_switching": ferroelectric_switching,
         "tolerances": {
             "space_tol": float(tol_cfg.space),
@@ -6789,23 +7504,40 @@ def _find_spin_group_acc_primitive_from_parsed(
         np.asarray(ssg_primitive.transformation_to_L0std, dtype=float),
         np.asarray(ssg_primitive.origin_shift_to_L0std, dtype=float),
     )
-    (
-        selected_standard_setting,
-        selected_transformation_primitive_to_standard,
-        standard_transform_selection_audit,
-    ) = _select_standard_transform_for_acc_alignment(
-        ssg_primitive,
-        magnetic_primitive_cell,
-        {
-            G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
-            L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
-        },
-        legacy_transformation_primitive_to_acc_primitive,
-        legacy_acc_primitive_cell,
-        identify_info=identify_info,
-        identify_index_details=identify_index_details,
-        tol=tol_cfg,
-    )
+    if identify_index_details is None:
+        selected_standard_setting = G0_STANDARD_SETTING
+        selected_transformation_primitive_to_standard = raw_transformation_primitive_to_G0std
+        standard_transform_selection_audit = {
+            "strategy": "identify_index_unavailable",
+            "status": "skipped",
+            "standard_setting": selected_standard_setting,
+            "selected_strategy": "raw_G0std_without_identify_index",
+            "selected_matrix": np.asarray(
+                selected_transformation_primitive_to_standard[0], dtype=float
+            ).tolist(),
+            "selected_origin_shift": np.asarray(
+                selected_transformation_primitive_to_standard[1], dtype=float
+            ).tolist(),
+            "identify_index": identify_info,
+        }
+    else:
+        (
+            selected_standard_setting,
+            selected_transformation_primitive_to_standard,
+            standard_transform_selection_audit,
+        ) = _select_standard_transform_for_acc_alignment(
+            ssg_primitive,
+            magnetic_primitive_cell,
+            {
+                G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
+                L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
+            },
+            legacy_transformation_primitive_to_acc_primitive,
+            legacy_acc_primitive_cell,
+            identify_info=identify_info,
+            identify_index_details=identify_index_details,
+            tol=tol_cfg,
+        )
     if selected_standard_setting == G0_STANDARD_SETTING:
         raw_transformation_primitive_to_G0std = selected_transformation_primitive_to_standard
     else:
@@ -6857,24 +7589,47 @@ def _find_spin_group_acc_primitive_from_parsed(
         transformation_input_to_selected_standard = transformation_input_to_L0std
         transformation_input_to_database_standard = raw_transformation_input_to_L0std
 
-    (
-        acc_primitive_cell,
-        acc_primitive_ssg,
-        transformation_input_to_acc_primitive,
-        transformation_convention_to_acc_primitive,
-        acc_primitive_resolution_audit,
-    ) = _resolve_acc_primitive_from_selected_standard(
-        selected_standard_cell,
-        magnetic_primitive_cell,
-        ssg_primitive,
-        transformation_input_to_primitive,
-        transformation_input_to_selected_standard,
-        transformation_input_to_database_standard,
-        legacy_acc_primitive_cell,
-        legacy_transformation_input_to_acc_primitive,
-        identify_info=identify_info,
-        tol=tol_cfg,
-    )
+    if identify_index_details is None:
+        acc_primitive_cell = legacy_acc_primitive_cell
+        acc_primitive_ssg = ssg_primitive.transform(
+            *legacy_transformation_primitive_to_acc_primitive
+        )
+        transformation_input_to_acc_primitive = legacy_transformation_input_to_acc_primitive
+        transformation_convention_to_acc_primitive = _compose_setting_transform(
+            transformation_input_to_selected_standard[0],
+            transformation_input_to_selected_standard[1],
+            transformation_input_to_acc_primitive[0],
+            transformation_input_to_acc_primitive[1],
+        )
+        acc_primitive_resolution_audit = {
+            "strategy": "legacy_acc_transform_without_identify_index",
+            "status": "identify_index_unavailable",
+            "identify_index": identify_info,
+            "selected_standard_setting": selected_standard_setting,
+            "note": (
+                "identify-index database details are unavailable, so ACC P-table "
+                "validation is skipped; non-ACC symmetry outputs remain available."
+            ),
+        }
+    else:
+        (
+            acc_primitive_cell,
+            acc_primitive_ssg,
+            transformation_input_to_acc_primitive,
+            transformation_convention_to_acc_primitive,
+            acc_primitive_resolution_audit,
+        ) = _resolve_acc_primitive_from_selected_standard(
+            selected_standard_cell,
+            magnetic_primitive_cell,
+            ssg_primitive,
+            transformation_input_to_primitive,
+            transformation_input_to_selected_standard,
+            transformation_input_to_database_standard,
+            legacy_acc_primitive_cell,
+            legacy_transformation_input_to_acc_primitive,
+            identify_info=identify_info,
+            tol=tol_cfg,
+        )
     acc_primitive_resolution_audit["standard_transform_selection"] = standard_transform_selection_audit
     if selected_standard_setting == G0_STANDARD_SETTING:
         acc_primitive_resolution_audit["G0std_transform_selection"] = standard_transform_selection_audit
@@ -6928,8 +7683,12 @@ def _find_spin_group_acc_primitive_from_parsed(
 
     return {
         "index": identify_info,
+        "identify_index_details": identify_index_details,
         "acc_symbol": ssg_primitive.acc,
         "conf": ssg_primitive.conf,
+        "quasi_2d": None,
+        "acc_primitive_resolution_audit": acc_primitive_resolution_audit,
+        "acc_primitive_standard_setting": selected_standard_setting,
         "acc_primitive_cell_setting": ACC_PRIMITIVE_SETTING,
         "acc_primitive_cell_detail": _serialize_cell_snapshot(
             acc_primitive_cell,
@@ -7242,6 +8001,7 @@ def _find_spin_group_input_ssg_from_parsed(
             "T_input_to_input_magnetic_primitive": primitive_transform.tolist(),
             "determinant": primitive_det,
         },
+        "quasi_2d": None,
         "input_poscar": input_poscar,
         "magnetic_primitive_poscar": magnetic_primitive_poscar,
     }
@@ -7256,6 +8016,8 @@ def find_spin_group(
     parser_atol=0.02,
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
+    poscar_allow_incar_magmom: bool = False,
+    poscar_prefer_incar_magmom: bool = False,
 ) -> MagSymmetryResult:
     """
     Find the spin space group of a crystal structure given in a CIF file.
@@ -7273,7 +8035,13 @@ def find_spin_group(
     """
 
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
-    parsed, source_metadata = parse_structure_file(cif, atol=parser_atol, return_metadata=True)
+    parsed, source_metadata = parse_structure_file(
+        cif,
+        atol=parser_atol,
+        return_metadata=True,
+        poscar_allow_incar_magmom=poscar_allow_incar_magmom,
+        poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,
+    )
     lattice_factors,positions, elements, occupancies, labels, moments = parsed
     input_spin_setting = (
         "in_lattice" if source_metadata is None else source_metadata.get("spin_setting", "in_lattice")
@@ -7301,9 +8069,17 @@ def find_spin_group_basic(
     meigtol=0.00002,
     matrix_tol=0.01,
     parser_atol=0.02,
+    poscar_allow_incar_magmom: bool = False,
+    poscar_prefer_incar_magmom: bool = False,
 ) -> dict:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
-    parsed, _source_metadata = parse_structure_file(cif, atol=parser_atol, return_metadata=True)
+    parsed, _source_metadata = parse_structure_file(
+        cif,
+        atol=parser_atol,
+        return_metadata=True,
+        poscar_allow_incar_magmom=poscar_allow_incar_magmom,
+        poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,
+    )
     lattice_factors, positions, elements, occupancies, labels, moments = parsed
     input_spin_setting = (
         "in_lattice" if _source_metadata is None else _source_metadata.get("spin_setting", "in_lattice")
@@ -7327,9 +8103,17 @@ def find_spin_group_acc_primitive(
     meigtol=0.00002,
     matrix_tol=0.01,
     parser_atol=0.02,
+    poscar_allow_incar_magmom: bool = False,
+    poscar_prefer_incar_magmom: bool = False,
 ) -> dict:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
-    parsed, _source_metadata = parse_structure_file(cif, atol=parser_atol, return_metadata=True)
+    parsed, _source_metadata = parse_structure_file(
+        cif,
+        atol=parser_atol,
+        return_metadata=True,
+        poscar_allow_incar_magmom=poscar_allow_incar_magmom,
+        poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,
+    )
     lattice_factors, positions, elements, occupancies, labels, moments = parsed
     input_spin_setting = (
         "in_lattice" if _source_metadata is None else _source_metadata.get("spin_setting", "in_lattice")
@@ -7352,6 +8136,8 @@ def find_spin_group_input_ssg(
     mtol=0.02,
     meigtol=0.00002,
     matrix_tol=0.01,
+    poscar_allow_incar_magmom: bool = False,
+    poscar_prefer_incar_magmom: bool = False,
 ) -> dict:
     """
     Identify the spin-space-group operations in the input cell setting.
@@ -7369,11 +8155,12 @@ def find_spin_group_input_ssg(
     primitive-side identifiers and a warning, so callers can distinguish the
     input-cell answer from the magnetic-primitive reference.
 
-    POSCAR inputs must contain an embedded ``MAGMOM`` payload; this route does
-    not read INCAR. CIF, mCIF, and SCIF inputs must contain explicit magnetic
-    moments. POSCAR moments are treated as Cartesian, while CIF/mCIF/SCIF
-    moments are converted into the route's Cartesian input-cell frame before
-    identification and export.
+    POSCAR inputs must contain an embedded ``MAGMOM`` payload by default.
+    Callers may opt into reading a sibling INCAR by setting
+    ``poscar_allow_incar_magmom=True``. CIF, mCIF, and SCIF inputs must contain
+    explicit magnetic moments. POSCAR moments are treated as Cartesian, while
+    CIF/mCIF/SCIF moments are converted into the route's Cartesian input-cell
+    frame before identification and export.
     """
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     path = Path(structure_file)
@@ -7382,8 +8169,9 @@ def find_spin_group_input_ssg(
     if suffix in {".vasp", ".poscar"} or basename in {"poscar", "contcar"}:
         lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
             structure_file,
-            allow_incar_magmom=False,
-            require_embedded_magmom=True,
+            allow_incar_magmom=poscar_allow_incar_magmom,
+            prefer_incar_magmom=poscar_prefer_incar_magmom,
+            require_embedded_magmom=not poscar_allow_incar_magmom,
         )
         source_format = "poscar"
         input_spin_setting = "cartesian"
@@ -7416,6 +8204,8 @@ def find_spin_group_poscar_ssg(
     mtol=0.02,
     meigtol=0.00002,
     matrix_tol=0.01,
+    poscar_allow_incar_magmom: bool = False,
+    poscar_prefer_incar_magmom: bool = False,
 ) -> dict:
     return find_spin_group_input_ssg(
         poscar,
@@ -7423,6 +8213,8 @@ def find_spin_group_poscar_ssg(
         mtol=mtol,
         meigtol=meigtol,
         matrix_tol=matrix_tol,
+        poscar_allow_incar_magmom=poscar_allow_incar_magmom,
+        poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,
     )
 
 
