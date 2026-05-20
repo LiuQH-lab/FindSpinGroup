@@ -68,6 +68,9 @@ def _magnetic_site_export_values(summary: Any) -> dict[str, Any]:
             payload.get("cell_expansion")
         ),
         "magnetic_atom_count": payload.get("magnetic_atom_count"),
+        "nonzero_moment_atom_count": payload.get("nonzero_moment_atom_count"),
+        "zero_moment_magnetic_atom_count": payload.get("zero_moment_magnetic_atom_count"),
+        "magnetic_atom_selection_mode": payload.get("magnetic_atom_selection_mode"),
         "number_of_magnetic_orbits_sg": payload.get("n_magnetic_orbits_sg"),
         "number_of_magnetic_orbits_ssg": payload.get("n_magnetic_orbits_ssg"),
         "number_of_magnetic_orbits_msg": payload.get("n_magnetic_orbits_msg"),

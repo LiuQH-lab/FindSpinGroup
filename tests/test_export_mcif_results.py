@@ -43,6 +43,9 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
                     "cell_expansion": 4,
                     "ssg_index": "12.2.2.1.P3",
                     "magnetic_atom_count": 8,
+                    "nonzero_moment_atom_count": 6,
+                    "zero_moment_magnetic_atom_count": 2,
+                    "magnetic_atom_selection_mode": "sg_orbit_closure_of_nonzero_moment_sites",
                     "n_magnetic_orbits_sg": 1,
                     "n_magnetic_orbits_ssg": 1,
                     "n_magnetic_orbits_msg": 1,
@@ -171,6 +174,10 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
     assert row["is_spin_orbit_magnet"] == ""
     assert row["magnetic_site_status"] == "ok"
     assert row["magnetic_site_sg_primitive_to_magnetic_primitive_cell_expansion"] == 4
+    assert row["magnetic_atom_count"] == 8
+    assert row["nonzero_moment_atom_count"] == 6
+    assert row["zero_moment_magnetic_atom_count"] == 2
+    assert row["magnetic_atom_selection_mode"] == "sg_orbit_closure_of_nonzero_moment_sites"
     assert "magnetic_site_cell_expansion" not in row
     assert "magnetic_site_nonmagnetic_sg_num" not in row
     assert "magnetic_site_nonmagnetic_sg_symbol" not in row

@@ -20,6 +20,7 @@ from findspingroup import (
     write_poscar_ssg_symmetry_dat,
     write_ssg_operation_matrices,
 )
+from findspingroup.find_spin_group import _expand_magnetic_indices_by_sg_orbit
 from findspingroup.core.identify_index.functions import (
     find_stand_gen_maps,
     is_matrix_equal,
@@ -4896,23 +4897,46 @@ def test_wp_chain_uses_crystallographic_orbits_for_sg_multiplicity():
     assert result.magnetic_site_summary["status"] == "ok"
     assert result.magnetic_site_summary["setting"] == "acc_primitive"
     assert result.magnetic_site_summary["cell_expansion"] == 2
+    assert result.magnetic_site_summary["magnetic_atom_count"] == 6
+    assert result.magnetic_site_summary["nonzero_moment_atom_count"] == 4
+    assert result.magnetic_site_summary["zero_moment_magnetic_atom_count"] == 2
+    assert result.magnetic_site_summary["zero_moment_magnetic_atom_indices"] == [6, 7]
     assert result.magnetic_site_summary["n_magnetic_orbits_sg"] == 1
-    assert result.magnetic_site_summary["n_magnetic_orbits_ssg"] == 1
-    assert result.magnetic_site_summary["n_magnetic_orbits_msg"] == 1
+    assert result.magnetic_site_summary["n_magnetic_orbits_ssg"] == 2
+    assert result.magnetic_site_summary["n_magnetic_orbits_msg"] == 2
     assert result.magnetic_site_summary["max_magnetic_site_dof_ssg"] == 2
     assert result.magnetic_site_summary["max_magnetic_site_dof_msg"] == 3
     assert result.magnetic_site_summary["total_magnetic_site_dof_ssg"] == 2
     assert result.magnetic_site_summary["total_magnetic_site_dof_msg"] == 3
     magnetic_wp_rows = result.magnetic_site_summary["magnetic_wp_dof_rows"]
     assert magnetic_wp_rows
-    assert {row["ssg_site_dof"] for row in magnetic_wp_rows} == {2}
-    assert {row["msg_site_dof"] for row in magnetic_wp_rows} == {3}
+    assert {row["ssg_site_dof"] for row in magnetic_wp_rows} == {0, 2}
+    assert {row["msg_site_dof"] for row in magnetic_wp_rows} == {0, 3}
     assert {
         row["ssg_wyckoff_with_dof"] for row in magnetic_wp_rows
-    } == {"4f(2)"}
+    } == {"2d(0)", "4f(2)"}
     assert {
         row["msg_wyckoff_with_dof"] for row in magnetic_wp_rows
-    } == {"4f(3)"}
+    } == {"2d(0)", "4f(3)"}
+
+
+def test_magnetic_site_selection_expands_to_parent_sg_orbit():
+    class Dataset:
+        crystallographic_orbits = [0, 0, 1, 1, 1, 2]
+
+    expanded, audit = _expand_magnetic_indices_by_sg_orbit(
+        Dataset(),
+        magnetic_indices=[1, 4],
+        site_count=6,
+    )
+
+    assert expanded == [0, 1, 2, 3, 4]
+    assert audit == {
+        "mode": "sg_orbit_closure_of_nonzero_moment_sites",
+        "source_nonzero_moment_indices": [1, 4],
+        "included_zero_moment_indices": [0, 2, 3],
+        "parent_sg_orbit_labels": [0, 1],
+    }
 
 
 def test_magnetic_site_summary_handles_close_same_element_sites():

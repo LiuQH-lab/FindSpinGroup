@@ -5107,7 +5107,12 @@ def calculate_freedom_degree(matrices : list[np.ndarray],tol=0.01):
     constraints = combine_parametric_solutions(rref_with_tolerance(stack_matrices))
     return 3 - np.linalg.matrix_rank(stack_matrices,tol=tol), constraints
 
-def get_spin_wyckoff(ssg_cell : CrystalCell, ssg_ops , atol =  0.001) -> (list, list):
+def get_spin_wyckoff(
+    ssg_cell: CrystalCell,
+    ssg_ops,
+    atol=0.001,
+    magnetic_indices: list[int] | None = None,
+) -> (list, list):
     """
     Calculate spin Wyckoff positions information.
 
@@ -5155,7 +5160,11 @@ def get_spin_wyckoff(ssg_cell : CrystalCell, ssg_ops , atol =  0.001) -> (list, 
 
     # Get indices of magnetic atoms and initialization
 
-    magnetic_index = ssg_cell.magnetic_atom_indices
+    if magnetic_indices is None:
+        magnetic_index = [] if ssg_cell.magnetic_atom_indices is None else list(ssg_cell.magnetic_atom_indices)
+    else:
+        magnetic_index = sorted({int(index) for index in magnetic_indices})
+    magnetic_index_set = set(magnetic_index)
 
     num_atoms = len(coords)
     assigned = [False] * num_atoms
@@ -5204,7 +5213,7 @@ def get_spin_wyckoff(ssg_cell : CrystalCell, ssg_ops , atol =  0.001) -> (list, 
             "class_indices": class_i,
             "site_symmetry_ops": site_symmetry_ops
         })
-        if i in magnetic_index:
+        if magnetic_index_set.intersection(class_i):
             equivalence_classes_spin.append({
                 "representative_index": i,
                 "class_indices": class_i,
@@ -5250,6 +5259,45 @@ def _magnetic_orbit_count_from_dataset(dataset, magnetic_indices: list[int]) -> 
         return 0
     orbit_labels = _dataset_wyckoff_orbits(dataset)
     return len({int(orbit_labels[index]) for index in magnetic_indices})
+
+
+def _expand_magnetic_indices_by_sg_orbit(
+    dataset,
+    magnetic_indices: list[int],
+    site_count: int,
+) -> tuple[list[int], dict]:
+    """Include zero-moment sites split from the same SG orbit as magnetic sites."""
+    source_indices = sorted(
+        {int(index) for index in magnetic_indices if 0 <= int(index) < site_count}
+    )
+    if not source_indices:
+        return [], {
+            "mode": "sg_orbit_closure_of_nonzero_moment_sites",
+            "source_nonzero_moment_indices": [],
+            "included_zero_moment_indices": [],
+            "parent_sg_orbit_labels": [],
+        }
+
+    orbit_labels = _dataset_wyckoff_orbits(dataset)
+    parent_orbit_labels = sorted({int(orbit_labels[index]) for index in source_indices})
+    parent_orbit_label_set = set(parent_orbit_labels)
+    expanded_indices = [
+        int(index)
+        for index, orbit_label in enumerate(orbit_labels[:site_count])
+        if int(orbit_label) in parent_orbit_label_set
+    ]
+    source_index_set = set(source_indices)
+    included_zero_moment_indices = [
+        int(index)
+        for index in expanded_indices
+        if index not in source_index_set
+    ]
+    return expanded_indices, {
+        "mode": "sg_orbit_closure_of_nonzero_moment_sites",
+        "source_nonzero_moment_indices": source_indices,
+        "included_zero_moment_indices": included_zero_moment_indices,
+        "parent_sg_orbit_labels": parent_orbit_labels,
+    }
 
 
 def _site_dof_rows(equivalence_classes_spin, dof_by_representative, constraints):
@@ -5409,8 +5457,14 @@ def _build_magnetic_site_summary(
     *,
     setting: str,
 ):
-    magnetic_indices = [] if cell.magnetic_atom_indices is None else list(cell.magnetic_atom_indices)
     sg_dataset = get_symmetry_dataset(cell.to_spglib(), symprec=tol_cfg.space)
+    site_count = len(cell.to_spglib(mag=True)[1])
+    nonzero_moment_indices = [] if cell.magnetic_atom_indices is None else list(cell.magnetic_atom_indices)
+    magnetic_indices, magnetic_atom_selection = _expand_magnetic_indices_by_sg_orbit(
+        sg_dataset,
+        nonzero_moment_indices,
+        site_count,
+    )
     ssg_dataset = get_G0_dataset_for_cell(
         ssg.G0_ops,
         cell.to_spglib(mag=True),
@@ -5428,7 +5482,12 @@ def _build_magnetic_site_summary(
         )
 
     _ssg_magnetic_indices, _ssg_classes, ssg_dof, ssg_spin_classes, ssg_constraints = (
-        get_spin_wyckoff(cell, ssg.ops, atol=tol_cfg.m_matrix_tol)
+        get_spin_wyckoff(
+            cell,
+            ssg.ops,
+            atol=tol_cfg.m_matrix_tol,
+            magnetic_indices=magnetic_indices,
+        )
     )
     ssg_dof_rows = _site_dof_rows(ssg_spin_classes, ssg_dof, ssg_constraints)
     (
@@ -5443,7 +5502,12 @@ def _build_magnetic_site_summary(
     msg_representative_by_site = {}
     if msg_ops:
         _msg_magnetic_indices, _msg_classes, msg_dof, msg_spin_classes, msg_constraints = (
-            get_spin_wyckoff(cell, msg_ops, atol=tol_cfg.m_matrix_tol)
+            get_spin_wyckoff(
+                cell,
+                msg_ops,
+                atol=tol_cfg.m_matrix_tol,
+                magnetic_indices=magnetic_indices,
+            )
         )
         msg_dof_rows = _site_dof_rows(msg_spin_classes, msg_dof, msg_constraints)
         (
@@ -5452,7 +5516,6 @@ def _build_magnetic_site_summary(
             msg_representative_by_site,
         ) = _site_dof_maps(msg_dof_rows)
 
-    site_count = len(cell.to_spglib(mag=True)[1])
     wp_extended_sg = get_wp_from_dataset(sg_dataset, max=False)
     wp_extended_ssg = _get_wp_for_original_sites(ssg_dataset, site_count)
     wp_extended_msg = [] if msg_dataset is None else _get_wp_for_original_sites(msg_dataset, site_count)
@@ -5498,6 +5561,14 @@ def _build_magnetic_site_summary(
         "ssg_index": identify_info,
         "magnetic_atom_count": len(magnetic_indices),
         "magnetic_atom_indices": [int(index) for index in magnetic_indices],
+        "magnetic_atom_selection": magnetic_atom_selection,
+        "magnetic_atom_selection_mode": magnetic_atom_selection["mode"],
+        "nonzero_moment_atom_count": len(nonzero_moment_indices),
+        "nonzero_moment_atom_indices": [int(index) for index in nonzero_moment_indices],
+        "zero_moment_magnetic_atom_count": len(
+            magnetic_atom_selection["included_zero_moment_indices"]
+        ),
+        "zero_moment_magnetic_atom_indices": magnetic_atom_selection["included_zero_moment_indices"],
         "n_magnetic_orbits_sg": _magnetic_orbit_count_from_dataset(sg_dataset, magnetic_indices),
         "n_magnetic_orbits_ssg": _magnetic_orbit_count_from_dataset(ssg_dataset, magnetic_indices),
         "n_magnetic_orbits_msg": magnetic_orbits_msg,
