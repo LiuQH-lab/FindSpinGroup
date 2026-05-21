@@ -45,6 +45,7 @@ EXPORT_ROWS_XLSX_NAME="${EXPORT_ROWS_XLSX_NAME:-export_rows.xlsx}"
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}"
 SHARD_INDEX="${SHARD_INDEX:-0}"
 SHARD_COUNT="${SHARD_COUNT:-1}"
+BATCH_WORKERS="${BATCH_WORKERS:-${SLURM_CPUS_PER_TASK:-1}}"
 LIMIT="${LIMIT:-}"
 
 if [[ ! -d "$INPUT_DIR" ]]; then
@@ -101,6 +102,8 @@ CMD=(
   "$SHARD_INDEX"
   --shard-count
   "$SHARD_COUNT"
+  --workers
+  "$BATCH_WORKERS"
 )
 
 if [[ -n "$LIMIT" ]]; then
@@ -170,6 +173,7 @@ else
   echo "Vacuum axis : <auto>"
 fi
 echo "Shard       : $SHARD_INDEX / $SHARD_COUNT"
+echo "Workers     : $BATCH_WORKERS"
 if [[ -n "$LIMIT" ]]; then
   echo "Limit       : $LIMIT"
 else

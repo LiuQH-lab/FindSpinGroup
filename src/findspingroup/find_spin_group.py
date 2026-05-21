@@ -2520,6 +2520,20 @@ def _build_operation_view_set(
             label="Spin translations",
         )
 
+    nssg_indices = _deduplicate_operation_view_indices(
+        _operation_view_indices_from_ops(
+            all_ops,
+            ssg.nssg,
+            tol=ssg.tol,
+            view_key="nssg",
+        )
+    )
+    if nssg_indices:
+        views["nssg"] = _operation_view_index_rows(
+            nssg_indices,
+            label="nSSG operations",
+        )
+
     l0_ops = [
         op
         for op in ssg.nssg
