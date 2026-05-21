@@ -321,6 +321,35 @@ def _runtime_export_metadata(runtime_jsonl: Path | None) -> dict[str, Any]:
     return metadata
 
 
+def _runtime_export_metadata_from_paths(runtime_jsonls: list[Path]) -> dict[str, Any]:
+    if not runtime_jsonls:
+        return {
+            "source_fsg_version": FSG_VERSION,
+            "source_run_tag": None,
+            "source_route": "full",
+        }
+    metadata = _runtime_export_metadata(runtime_jsonls[0])
+    run_tags = []
+    routes = set()
+    versions = set()
+    for runtime_jsonl in runtime_jsonls:
+        item = _runtime_export_metadata(runtime_jsonl)
+        if item.get("source_run_tag"):
+            run_tags.append(item["source_run_tag"])
+        if item.get("source_route"):
+            routes.add(item["source_route"])
+        if item.get("source_fsg_version"):
+            versions.add(item["source_fsg_version"])
+    if len(runtime_jsonls) > 1:
+        parent = runtime_jsonls[0].parent.parent
+        metadata["source_run_tag"] = parent.name if parent.name else "sharded_runtime"
+    if len(routes) == 1:
+        metadata["source_route"] = next(iter(routes))
+    if len(versions) == 1:
+        metadata["source_fsg_version"] = next(iter(versions))
+    return metadata
+
+
 def _apply_export_metadata(rows: list[dict[str, Any]], metadata: dict[str, Any]) -> None:
     for row in rows:
         row["source_fsg_version"] = metadata.get("source_fsg_version")
@@ -455,10 +484,87 @@ def _write_jsonl(rows: list[dict[str, Any]], output_jsonl: Path) -> None:
             handle.write(json.dumps(public_row, ensure_ascii=False) + "\n")
 
 
+def _discover_runtime_jsonls(
+    runtime_jsonls: list[Path] | None,
+    *,
+    shard_root: Path | None,
+    shard_glob: str,
+) -> list[Path]:
+    paths = list(runtime_jsonls or [])
+    if shard_root is not None:
+        shard_dirs = [
+            path
+            for path in shard_root.glob(shard_glob)
+            if path.is_dir() and (path / "full_results.jsonl").exists()
+        ]
+
+        def sort_key(path: Path) -> tuple[int, str]:
+            try:
+                return (int(path.name.rsplit("_", 1)[1]), path.name)
+            except (IndexError, ValueError):
+                return (10**9, path.name)
+
+        paths.extend(path / "full_results.jsonl" for path in sorted(shard_dirs, key=sort_key))
+    seen: set[Path] = set()
+    unique_paths: list[Path] = []
+    for path in paths:
+        resolved = path.resolve()
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        unique_paths.append(path)
+    return unique_paths
+
+
+def _rows_from_runtime_jsonls(
+    runtime_jsonls: list[Path],
+    *,
+    limit: int | None = None,
+    sort_rows: bool = False,
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    count = 0
+    total = limit if limit is not None else "?"
+    for runtime_jsonl in runtime_jsonls:
+        with runtime_jsonl.open(encoding="utf-8") as handle:
+            for line in handle:
+                if not line.strip():
+                    continue
+                if limit is not None and count >= limit:
+                    break
+                record = json.loads(line)
+                count += 1
+                rows.append(_row_from_serialized_result_record(record))
+                print(
+                    f"[{count}/{total}] {record.get('status', 'ok').upper():5} "
+                    f"{record.get('file_name')} ({runtime_jsonl.parent.name})"
+                )
+        if limit is not None and count >= limit:
+            break
+    if sort_rows:
+        rows.sort(key=lambda row: (str(row.get("case_id") or ""), str(row.get("file_name") or "")))
+    return rows
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run find_spin_group over mcif files and export compact Excel rows.")
     parser.add_argument("inputs", nargs="*", help="Input .mcif files or directories")
-    parser.add_argument("--runtime-jsonl", type=Path, help="Read rows from batch full_results.jsonl instead of re-running.")
+    parser.add_argument(
+        "--runtime-jsonl",
+        type=Path,
+        nargs="+",
+        help="Read rows from one or more batch full_results.jsonl files instead of re-running.",
+    )
+    parser.add_argument(
+        "--shard-root",
+        type=Path,
+        help="Read shard_*/full_results.jsonl files from a parallel batch output root.",
+    )
+    parser.add_argument(
+        "--shard-glob",
+        default="shard_*",
+        help="Glob used under --shard-root to discover shard directories.",
+    )
     parser.add_argument("--output-xlsx", type=Path)
     parser.add_argument("--output-jsonl", type=Path)
     parser.add_argument("--limit", type=int)
@@ -471,19 +577,23 @@ def main() -> None:
     if args.output_xlsx is None and args.output_jsonl is None:
         raise ValueError("Provide at least one of --output-xlsx or --output-jsonl.")
     rows: list[dict[str, Any]] = []
-    export_metadata = _runtime_export_metadata(args.runtime_jsonl)
-    if args.runtime_jsonl is not None:
-        with args.runtime_jsonl.open(encoding="utf-8") as handle:
-            records_iter = (json.loads(line) for line in handle if line.strip())
-            if args.limit is not None:
-                records_iter = (record for index, record in enumerate(records_iter) if index < args.limit)
-            total = args.limit if args.limit is not None else "?"
-            for index, record in enumerate(records_iter, start=1):
-                rows.append(_row_from_serialized_result_record(record))
-                print(f"[{index}/{total}] {record.get('status', 'ok').upper():5} {record.get('file_name')}")
+    runtime_jsonls = _discover_runtime_jsonls(
+        args.runtime_jsonl,
+        shard_root=args.shard_root,
+        shard_glob=args.shard_glob,
+    )
+    export_metadata = _runtime_export_metadata_from_paths(runtime_jsonls)
+    if runtime_jsonls:
+        rows = _rows_from_runtime_jsonls(
+            runtime_jsonls,
+            limit=args.limit,
+            sort_rows=args.shard_root is not None or len(runtime_jsonls) > 1,
+        )
     else:
         if not args.inputs:
-            raise ValueError("Provide input files/directories unless --runtime-jsonl is used.")
+            raise ValueError(
+                "Provide input files/directories unless --runtime-jsonl or --shard-root is used."
+            )
         files = batch_mcif._discover_mcif_files(args.inputs, recursive=not args.non_recursive)
         files = batch_mcif._dedupe_sorted(files)
         if args.limit is not None:

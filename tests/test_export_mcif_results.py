@@ -335,3 +335,52 @@ def test_workbook_writes_dotted_group_numbers_as_text(tmp_path):
     orbit_index_cell = orbit_ws.cell(row=2, column=orbit_header.index("index") + 1)
     assert orbit_index_cell.value == "12.2.2.1.P3"
     assert orbit_index_cell.number_format == "@"
+
+
+def test_export_can_read_parallel_shard_root(tmp_path):
+    exporter = _load_export_mcif_results_module()
+    root = tmp_path / "parallel"
+    shard_1 = root / "shard_1"
+    shard_0 = root / "shard_0"
+    shard_1.mkdir(parents=True)
+    shard_0.mkdir(parents=True)
+    for shard in (shard_0, shard_1):
+        (shard / "summary.json").write_text(
+            '{"package_version":"0.test","route":"full"}',
+            encoding="utf-8",
+        )
+
+    record_b = {
+        "case_id": "cases/b.mcif",
+        "file_name": "b.mcif",
+        "status": "ok",
+        "result": {"index": "2.2.2.2.P1"},
+    }
+    record_a = {
+        "case_id": "cases/a.mcif",
+        "file_name": "a.mcif",
+        "status": "ok",
+        "result": {"index": "1.1.1.1.P1"},
+    }
+    (shard_1 / "full_results.jsonl").write_text(
+        exporter.json.dumps(record_b) + "\n",
+        encoding="utf-8",
+    )
+    (shard_0 / "full_results.jsonl").write_text(
+        exporter.json.dumps(record_a) + "\n",
+        encoding="utf-8",
+    )
+
+    runtime_paths = exporter._discover_runtime_jsonls(
+        None,
+        shard_root=root,
+        shard_glob="shard_*",
+    )
+    rows = exporter._rows_from_runtime_jsonls(runtime_paths, sort_rows=True)
+    metadata = exporter._runtime_export_metadata_from_paths(runtime_paths)
+
+    assert [path.parent.name for path in runtime_paths] == ["shard_0", "shard_1"]
+    assert [row["case_id"] for row in rows] == ["cases/a.mcif", "cases/b.mcif"]
+    assert metadata["source_run_tag"] == "parallel"
+    assert metadata["source_route"] == "full"
+    assert metadata["source_fsg_version"] == "0.test"
