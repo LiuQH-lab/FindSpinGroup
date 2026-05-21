@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 import datetime as dt
 import hashlib
 import json
@@ -723,6 +724,178 @@ def _merge_auto_baseline_cases(
     return merged_cases
 
 
+def _run_mcif_batch_case(
+    index: int,
+    total_cases: int,
+    file_path: Path,
+    *,
+    route: str,
+    space_tol: float,
+    mtol: float,
+    meigtol: float,
+    matrix_tol: float,
+    export_fields: list[str] | None,
+    include_g0_self_audit: bool,
+    calculation_mode: str | None,
+    vacuum_axis: str | None,
+) -> dict:
+    case_id = _normalize_case_id(file_path)
+    case_start = time.perf_counter()
+    try:
+        if route == "basic":
+            result = find_spin_group_basic(
+                str(file_path),
+                space_tol=space_tol,
+                mtol=mtol,
+                meigtol=meigtol,
+                matrix_tol=matrix_tol,
+            )
+            snapshot = dict(result)
+        else:
+            result = find_spin_group(
+                str(file_path),
+                space_tol=space_tol,
+                mtol=mtol,
+                meigtol=meigtol,
+                matrix_tol=matrix_tol,
+                calculation_mode=calculation_mode,
+                vacuum_axis=vacuum_axis,
+            )
+            snapshot = result.to_summary_dict()
+        duration = round(time.perf_counter() - case_start, 6)
+        runtime_record = {
+            "case_id": case_id,
+            "file_name": file_path.name,
+            "source_path": file_path.resolve().as_posix(),
+            "status": "ok",
+            "duration_seconds": duration,
+            "result": snapshot,
+        }
+        full_runtime_record = {
+            "case_id": case_id,
+            "file_name": file_path.name,
+            "source_path": file_path.resolve().as_posix(),
+            "status": "ok",
+            "duration_seconds": duration,
+            "result": _build_export_root(result),
+        }
+        if route == "full":
+            runtime_record["group_identifiers"] = _build_group_identifier_payload(result)
+            tensor_summary = _build_tensor_summary(result)
+            runtime_record["tensor_summary"] = tensor_summary
+            full_runtime_record["tensor_summary"] = tensor_summary
+        if route == "full" and include_g0_self_audit:
+            g0_self_audit = _build_g0_self_audit(result)
+            runtime_record["g0_self_audit"] = g0_self_audit
+            full_runtime_record["g0_self_audit"] = g0_self_audit
+        export_content = _build_export_content(result, export_fields) if export_fields else None
+        progress_message = (
+            f"[{index}/{total_cases}] OK    {case_id} -> "
+            f"{snapshot['index']} ({duration:.3f}s)"
+        )
+    except Exception as exc:
+        duration = round(time.perf_counter() - case_start, 6)
+        runtime_record = {
+            "case_id": case_id,
+            "file_name": file_path.name,
+            "source_path": file_path.resolve().as_posix(),
+            "status": "error",
+            "duration_seconds": duration,
+            "error": {
+                "type": type(exc).__name__,
+                "message": str(exc),
+                "traceback": traceback.format_exc().splitlines(),
+            },
+        }
+        full_runtime_record = dict(runtime_record)
+        export_content = f"ERROR[{type(exc).__name__}] {exc}" if export_fields else None
+        progress_message = (
+            f"[{index}/{total_cases}] ERROR {case_id} -> "
+            f"{type(exc).__name__}: {exc}"
+        )
+
+    return {
+        "index": index,
+        "case_id": case_id,
+        "file_name": file_path.name,
+        "source_path": file_path.resolve().as_posix(),
+        "status": runtime_record["status"],
+        "duration_seconds": runtime_record["duration_seconds"],
+        "runtime_record": runtime_record,
+        "full_runtime_record": full_runtime_record,
+        "stable_record": _stable_record(case_id, file_path.name, runtime_record),
+        "export_content": export_content,
+        "error_by_file": (
+            {
+                "type": runtime_record["error"]["type"],
+                "message": runtime_record["error"]["message"],
+            }
+            if runtime_record["status"] == "error"
+            else None
+        ),
+        "progress_message": progress_message,
+    }
+
+
+def _iter_mcif_batch_case_results(
+    files: list[Path],
+    *,
+    workers: int,
+    route: str,
+    space_tol: float,
+    mtol: float,
+    meigtol: float,
+    matrix_tol: float,
+    export_fields: list[str] | None,
+    include_g0_self_audit: bool,
+    calculation_mode: str | None,
+    vacuum_axis: str | None,
+):
+    total_cases = len(files)
+    case_kwargs = {
+        "route": route,
+        "space_tol": space_tol,
+        "mtol": mtol,
+        "meigtol": meigtol,
+        "matrix_tol": matrix_tol,
+        "export_fields": export_fields,
+        "include_g0_self_audit": include_g0_self_audit,
+        "calculation_mode": calculation_mode,
+        "vacuum_axis": vacuum_axis,
+    }
+    if workers == 1:
+        for index, file_path in enumerate(files, start=1):
+            yield _run_mcif_batch_case(index, total_cases, file_path, **case_kwargs)
+        return
+
+    next_index = 1
+    next_yield_index = 1
+    pending = set()
+    completed: dict[int, dict] = {}
+    max_pending = max(workers, workers * 2)
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        while next_index <= total_cases or pending:
+            while next_index <= total_cases and len(pending) < max_pending:
+                file_path = files[next_index - 1]
+                pending.add(
+                    executor.submit(
+                        _run_mcif_batch_case,
+                        next_index,
+                        total_cases,
+                        file_path,
+                        **case_kwargs,
+                    )
+                )
+                next_index += 1
+            done, pending = wait(pending, return_when=FIRST_COMPLETED)
+            for future in done:
+                result = future.result()
+                completed[int(result["index"])] = result
+            while next_yield_index in completed:
+                yield completed.pop(next_yield_index)
+                next_yield_index += 1
+
+
 def run_mcif_batch(
     files: list[Path],
     output_dir: Path,
@@ -742,11 +915,16 @@ def run_mcif_batch(
     include_g0_self_audit: bool = False,
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
+    workers: int = 1,
 ) -> dict:
     if route not in {"full", "basic"}:
         raise ValueError(f"Unsupported batch route: {route}")
     if route != "full" and include_g0_self_audit:
         raise ValueError("--include-g0-self-audit is only supported for route='full'.")
+    if workers < 1:
+        raise ValueError("workers must be at least 1.")
+    if workers > 1 and stop_on_error:
+        raise ValueError("stop_on_error is only supported when workers=1.")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     records_path = output_dir / "records.jsonl"
@@ -766,104 +944,44 @@ def run_mcif_batch(
     run_tag = _run_tag_from_isoformat(started_at)
     total_start = time.perf_counter()
 
-    for index, file_path in enumerate(files, start=1):
-        case_id = _normalize_case_id(file_path)
-        case_start = time.perf_counter()
-        try:
-            if route == "basic":
-                result = find_spin_group_basic(
-                    str(file_path),
-                    space_tol=space_tol,
-                    mtol=mtol,
-                    meigtol=meigtol,
-                    matrix_tol=matrix_tol,
-                )
-                snapshot = dict(result)
-            else:
-                result = find_spin_group(
-                    str(file_path),
-                    space_tol=space_tol,
-                    mtol=mtol,
-                    meigtol=meigtol,
-                    matrix_tol=matrix_tol,
-                    calculation_mode=calculation_mode,
-                    vacuum_axis=vacuum_axis,
-                )
-                snapshot = result.to_summary_dict()
-            duration = round(time.perf_counter() - case_start, 6)
-            runtime_record = {
-                "case_id": case_id,
-                "file_name": file_path.name,
-                "source_path": file_path.resolve().as_posix(),
-                "status": "ok",
-                "duration_seconds": duration,
-                "result": snapshot,
-            }
-            full_runtime_record = {
-                "case_id": case_id,
-                "file_name": file_path.name,
-                "source_path": file_path.resolve().as_posix(),
-                "status": "ok",
-                "duration_seconds": duration,
-                "result": _build_export_root(result),
-            }
-            if route == "full":
-                runtime_record["group_identifiers"] = _build_group_identifier_payload(result)
-                tensor_summary = _build_tensor_summary(result)
-                runtime_record["tensor_summary"] = tensor_summary
-                full_runtime_record["tensor_summary"] = tensor_summary
-            if route == "full" and include_g0_self_audit:
-                g0_self_audit = _build_g0_self_audit(result)
-                runtime_record["g0_self_audit"] = g0_self_audit
-                full_runtime_record["g0_self_audit"] = g0_self_audit
-            if export_fields and export_txt_path is not None:
-                export_content = _build_export_content(result, export_fields)
-                _append_export_line(export_txt_path, file_path.name, export_content)
-            success_count += 1
-            if not quiet:
-                print(
-                    f"[{index}/{len(files)}] OK    {case_id} -> "
-                    f"{snapshot['index']} ({duration:.3f}s)"
-                )
-        except Exception as exc:
-            duration = round(time.perf_counter() - case_start, 6)
-            runtime_record = {
-                "case_id": case_id,
-                "file_name": file_path.name,
-                "source_path": file_path.resolve().as_posix(),
-                "status": "error",
-                "duration_seconds": duration,
-                "error": {
-                    "type": type(exc).__name__,
-                    "message": str(exc),
-                    "traceback": traceback.format_exc().splitlines(),
-                },
-            }
-            full_runtime_record = dict(runtime_record)
-            error_count += 1
-            errors_by_file[case_id] = {
-                "type": type(exc).__name__,
-                "message": str(exc),
-            }
-            if export_fields and export_txt_path is not None:
-                _append_export_line(
-                    export_txt_path,
-                    file_path.name,
-                    f"ERROR[{type(exc).__name__}] {exc}",
-                )
-            if not quiet:
-                print(
-                    f"[{index}/{len(files)}] ERROR {case_id} -> "
-                    f"{type(exc).__name__}: {exc}"
-                )
+    for case_result in _iter_mcif_batch_case_results(
+        files,
+        workers=workers,
+        route=route,
+        space_tol=space_tol,
+        mtol=mtol,
+        meigtol=meigtol,
+        matrix_tol=matrix_tol,
+        export_fields=export_fields,
+        include_g0_self_audit=include_g0_self_audit,
+        calculation_mode=calculation_mode,
+        vacuum_axis=vacuum_axis,
+    ):
+        case_id = case_result["case_id"]
+        file_path = Path(case_result["source_path"])
+        file_name = case_result["file_name"]
+        runtime_record = case_result["runtime_record"]
+        full_runtime_record = case_result["full_runtime_record"]
+        stable_record = case_result["stable_record"]
 
-        stable_record = _stable_record(case_id, file_path.name, runtime_record)
+        if runtime_record["status"] == "ok":
+            if export_fields and export_txt_path is not None:
+                _append_export_line(export_txt_path, file_name, case_result["export_content"])
+            success_count += 1
+        else:
+            error_count += 1
+            errors_by_file[case_id] = case_result["error_by_file"]
+            if export_fields and export_txt_path is not None:
+                _append_export_line(export_txt_path, file_name, case_result["export_content"])
+        if not quiet:
+            print(case_result["progress_message"])
+
         stable_cases[case_id] = stable_record
         _append_jsonl(records_path, runtime_record)
         _append_jsonl(full_results_path, full_runtime_record)
         if runtime_record["status"] == "error":
-            _write_json(_error_json_path(output_dir, file_path.name, run_tag, case_id=case_id), runtime_record)
-            error_set_path = _error_set_path(output_dir, file_path.name, run_tag, case_id=case_id)
+            _write_json(_error_json_path(output_dir, file_name, run_tag, case_id=case_id), runtime_record)
+            error_set_path = _error_set_path(output_dir, file_name, run_tag, case_id=case_id)
             error_set_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(file_path, error_set_path)
 
@@ -904,6 +1022,7 @@ def run_mcif_batch(
         "baseline_path": baseline_path.resolve().as_posix() if baseline_path else None,
         "calculation_mode": calculation_mode or "3d",
         "vacuum_axis": vacuum_axis or "c",
+        "workers": workers,
         "comparison": baseline_compare,
     }
     _write_json(output_dir / "summary.json", summary)
@@ -937,6 +1056,7 @@ def run_mcif_batch_with_auto_baseline(
     include_g0_self_audit: bool = False,
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
+    workers: int = 1,
 ) -> dict:
     auto_paths = _resolve_auto_baseline_paths(
         baseline_root=baseline_root,
@@ -980,6 +1100,7 @@ def run_mcif_batch_with_auto_baseline(
         include_g0_self_audit=include_g0_self_audit,
         calculation_mode=calculation_mode,
         vacuum_axis=vacuum_axis,
+        workers=workers,
     )
 
     run_baseline = _load_json(output_dir / "baseline.json")
@@ -1117,6 +1238,17 @@ def _parse_args() -> argparse.Namespace:
         type=int,
         default=1,
         help="Total shard count. Use 1 for a normal local run.",
+    )
+    parser.add_argument(
+        "--workers",
+        "--parallel-cores",
+        dest="workers",
+        type=int,
+        default=1,
+        help=(
+            "Number of local worker processes used within this batch invocation. "
+            "Use with Slurm --cpus-per-task or local CPU cores; default is 1."
+        ),
     )
     parser.add_argument(
         "--non-recursive",
@@ -1264,6 +1396,7 @@ def main() -> None:
         "limit": args.limit,
         "shard_index": args.shard_index,
         "shard_count": args.shard_count,
+        "workers": args.workers,
         "non_recursive": args.non_recursive,
         "auto_baseline": args.auto_baseline,
         "baseline": args.baseline.resolve().as_posix() if args.baseline else None,
@@ -1298,6 +1431,7 @@ def main() -> None:
             include_g0_self_audit=args.include_g0_self_audit,
             calculation_mode=args.calculation_mode,
             vacuum_axis=args.vacuum_axis,
+            workers=args.workers,
         )
     else:
         summary = run_mcif_batch(
@@ -1318,6 +1452,7 @@ def main() -> None:
             include_g0_self_audit=args.include_g0_self_audit,
             calculation_mode=args.calculation_mode,
             vacuum_axis=args.vacuum_axis,
+            workers=args.workers,
         )
     raise SystemExit(summary["exit_code"])
 

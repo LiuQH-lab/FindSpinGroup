@@ -1,4 +1,5 @@
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -246,6 +247,42 @@ def test_run_mcif_batch_matches_smoke_baseline(tmp_path):
     assert summary["comparison"]["mismatch_count"] == 0
     assert summary["comparison"]["tensor_summary_backfill_count"] == 0
     assert summary["exit_code"] == 0
+
+
+def test_run_mcif_batch_supports_parallel_workers(monkeypatch, tmp_path):
+    files = [(PROJECT_ROOT / relative_path).resolve() for relative_path in MANIFEST_ENTRIES[:2]]
+    monkeypatch.setattr(batch_mcif, "ProcessPoolExecutor", ThreadPoolExecutor)
+
+    summary = run_mcif_batch(
+        files,
+        tmp_path,
+        route="basic",
+        quiet=True,
+        workers=2,
+    )
+
+    assert summary["workers"] == 2
+    assert summary["processed_cases"] == len(files)
+    assert summary["success_count"] == len(files)
+    assert summary["error_count"] == 0
+    records = (tmp_path / "records.jsonl").read_text(encoding="utf-8").splitlines()
+    full_records = (tmp_path / "full_results.jsonl").read_text(encoding="utf-8").splitlines()
+    assert len(records) == len(files)
+    assert len(full_records) == len(files)
+
+
+def test_run_mcif_batch_rejects_stop_on_error_with_parallel_workers(tmp_path):
+    files = [(PROJECT_ROOT / MANIFEST_ENTRIES[0]).resolve()]
+
+    with pytest.raises(ValueError, match="stop_on_error"):
+        run_mcif_batch(
+            files,
+            tmp_path,
+            route="basic",
+            stop_on_error=True,
+            workers=2,
+            quiet=True,
+        )
 
 
 def test_run_scif_roundtrip_batch_smoke_manifest(tmp_path):

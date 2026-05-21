@@ -30,6 +30,7 @@ Environment overrides:
   INCLUDE_G0_SELF_AUDIT current: ${INCLUDE_G0_SELF_AUDIT:-0}
   SHARD_INDEX    current: ${SHARD_INDEX:-0}
   SHARD_COUNT    current: ${SHARD_COUNT:-1}
+  BATCH_WORKERS  current: ${BATCH_WORKERS:-1}
   LIMIT          current: ${LIMIT:-<none>}
   SBATCH_BIN     current: ${SBATCH_BIN:-sbatch}
 
@@ -57,6 +58,7 @@ CALCULATION_MODE="${CALCULATION_MODE:-auto}"
 VACUUM_AXIS="${VACUUM_AXIS:-}"
 SHARD_INDEX="${SHARD_INDEX:-0}"
 SHARD_COUNT="${SHARD_COUNT:-1}"
+BATCH_WORKERS="${BATCH_WORKERS:-1}"
 LIMIT="${LIMIT:-}"
 
 EXPORT_TXT="${EXPORT_TXT:-selected.txt}"
@@ -115,10 +117,19 @@ echo "Export txt     : ${EXPORT_TXT:-<none>}"
 echo "Export fields  : ${EXPORT_FIELDS:-<none>}"
 echo "G0 self audit  : ${INCLUDE_G0_SELF_AUDIT:-0}"
 echo "Shard          : $SHARD_INDEX / $SHARD_COUNT"
+echo "Workers        : $BATCH_WORKERS"
 echo "Limit          : ${LIMIT:-<none>}"
 
 CMD=(
   "$SBATCH_BIN"
+)
+if [[ "$BATCH_WORKERS" != "1" ]]; then
+  CMD+=(
+    --cpus-per-task
+    "$BATCH_WORKERS"
+  )
+fi
+CMD+=(
   "$SLURM_SCRIPT"
   "$INPUT_DIR"
   "$OUTPUT_ROOT"
@@ -142,6 +153,7 @@ EXPORT_FIELDS="$EXPORT_FIELDS" \
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}" \
 SHARD_INDEX="$SHARD_INDEX" \
 SHARD_COUNT="$SHARD_COUNT" \
+BATCH_WORKERS="$BATCH_WORKERS" \
 LIMIT="$LIMIT" \
 FSG_REPO_ROOT="$REPO_ROOT" \
 "${CMD[@]}"

@@ -4389,6 +4389,12 @@ def test_mag_symmetry_result_exposes_compact_operation_views():
     assert collinear_view["note"]["type"] == "collinear"
     assert max(collinear_view["indices"]) <= len(convention_all["ops"])
 
+    nssg_view = result.operation_views["convention_oriented"]["views"]["nssg"]
+    assert "ops" not in nssg_view
+    assert "seitz_latex" not in nssg_view
+    assert nssg_view["indices"] == collinear_view["indices"]
+    assert nssg_view["operation_count"] == len(SpinSpaceGroup(result.convention_ssg_ops).nssg)
+
     spin_translations = result.operation_views["magnetic_primitive_cartesian"]["views"][
         "spin_translations"
     ]
@@ -4813,6 +4819,11 @@ def test_find_spin_group_exposes_convention_nssg_views():
     assert _serialize_ssg_ops(result.convention_nssg_ops) == _serialize_ssg_ops(expected_nssg.ops)
     assert result.convention_nssg_seitz == expected_nssg.seitz_symbols
     assert result.convention_nssg_seitz_latex == expected_nssg.seitz_symbols_latex
+
+    all_ops = list(public_ossg.ops)
+    nssg_indices = result.operation_views["convention_oriented"]["views"]["nssg"]["indices"]
+    nssg_ops_from_view = [all_ops[index - 1] for index in nssg_indices]
+    assert _serialize_ssg_ops(nssg_ops_from_view) == _serialize_ssg_ops(expected_nssg.ops)
 
 
 @pytest.mark.parametrize(
