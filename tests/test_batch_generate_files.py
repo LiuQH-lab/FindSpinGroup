@@ -356,6 +356,8 @@ def test_merge_batch_shards_recomputes_comparison_and_preserves_order(tmp_path):
     summary = merge_batch_shards(root, tmp_path / "merged", baseline_path=baseline_path)
 
     assert summary["shard_count"] == 2
+    assert summary["full_results_mode"] == "stream"
+    assert summary["full_results_jsonl"] is not None
     assert summary["processed_cases"] == 3
     assert summary["success_count"] == 2
     assert summary["error_count"] == 1
@@ -370,8 +372,60 @@ def test_merge_batch_shards_recomputes_comparison_and_preserves_order(tmp_path):
         "cases/b.mcif",
         "cases/c.mcif",
     ]
+    merged_full_records = [
+        json.loads(line)
+        for line in (tmp_path / "merged" / "full_results.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert [record["case_id"] for record in merged_full_records] == [
+        "cases/a.mcif",
+        "cases/b.mcif",
+        "cases/c.mcif",
+    ]
     merged_errors = json.loads((tmp_path / "merged" / "errors_by_file.json").read_text())
     assert merged_errors == {record_c["case_id"]: record_c["error"]}
+
+
+def test_merge_batch_shards_can_skip_full_results_and_compare_by_file_name(tmp_path):
+    merge_batch_shards = _load_merge_batch_shards_module().merge_batch_shards
+    root = tmp_path / "parallel"
+    shard = root / "shard_0"
+    shard.mkdir(parents=True)
+
+    record = {
+        "case_id": "/new/root/cases/a.mcif",
+        "file_name": "a.mcif",
+        "status": "ok",
+        "result": _fake_summary("1.1.1.1"),
+    }
+
+    def write_json(path: Path, payload):
+        path.write_text(json.dumps(payload), encoding="utf-8")
+
+    (shard / "records.jsonl").write_text(json.dumps(record) + "\n", encoding="utf-8")
+    (shard / "full_results.jsonl").write_text(json.dumps(record) + "\n", encoding="utf-8")
+    write_json(shard / "summary.json", {"duration_seconds": 1.0})
+    write_json(shard / "baseline.json", {record["case_id"]: record})
+    write_json(shard / "errors_by_file.json", {})
+
+    old_record = dict(record)
+    old_record["case_id"] = "/old/root/cases/a.mcif"
+    baseline_path = tmp_path / "baseline.json"
+    write_json(baseline_path, {old_record["case_id"]: old_record})
+
+    summary = merge_batch_shards(
+        root,
+        tmp_path / "merged_skip",
+        baseline_path=baseline_path,
+        full_results_mode="skip",
+        comparison_key="file_name",
+    )
+
+    assert summary["full_results_mode"] == "skip"
+    assert summary["full_results_jsonl"] is None
+    assert not (tmp_path / "merged_skip" / "full_results.jsonl").exists()
+    assert summary["comparison_key"] == "file_name"
+    assert summary["comparison"]["missing_in_baseline_count"] == 0
+    assert summary["comparison"]["mismatch_count"] == 0
 
 
 def test_run_scif_roundtrip_batch_smoke_manifest(tmp_path):
