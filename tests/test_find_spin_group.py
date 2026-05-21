@@ -307,6 +307,11 @@ def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypa
     assert len(cartesian_views["all"]["seitz_latex"]) == len(
         payload["acc_primitive_ssg_ops_cartesian"]
     )
+    assert "ops" not in cartesian_views["generators"]
+    assert cartesian_views["generators"]["indices"]
+    assert max(cartesian_views["generators"]["indices"]) <= len(
+        cartesian_views["all"]["ops"]
+    )
     assert "ops" not in cartesian_views["pure_translations"]
     assert cartesian_views["pure_translations"]["indices"]
     assert max(cartesian_views["pure_translations"]["indices"]) <= len(
@@ -4356,6 +4361,26 @@ def test_mag_symmetry_result_exposes_compact_operation_views():
     convention_all = result.operation_views["convention_oriented"]["views"]["all"]
     assert len(convention_all["ops"]) == len(convention_all["seitz_latex"])
     assert convention_all["indices"] == list(range(1, len(convention_all["ops"]) + 1))
+
+    for setting_key in (
+        "convention_oriented",
+        "magnetic_primitive_oriented",
+        "input_oriented",
+    ):
+        all_view = result.operation_views[setting_key]["views"]["all"]
+        generator_view = result.operation_views[setting_key]["views"]["generators"]
+        assert "ops" not in generator_view
+        assert "seitz_latex" not in generator_view
+        assert generator_view["indices"]
+        assert len(generator_view["indices"]) == len(set(generator_view["indices"]))
+        assert max(generator_view["indices"]) <= len(all_view["ops"])
+
+    convention_ssg = SpinSpaceGroup(result.convention_ssg_ops)
+    symbol_payload = convention_ssg.get_international_symbol(basis_mode="current")
+    assert symbol_payload["generator_operations"]
+    assert len(symbol_payload["generator_operations"]) == len(
+        result.operation_views["convention_oriented"]["views"]["generators"]["indices"]
+    )
 
     collinear_view = result.operation_views["convention_oriented"]["views"]["nssg_collinear"]
     assert "ops" not in collinear_view

@@ -279,3 +279,59 @@ def test_workbook_appends_quasi2d_fields_to_records_only_when_present(tmp_path):
     assert quasi_header.index("quasi2d_status") > quasi_header.index("error_message")
     assert "quasi2d_gp_symbol" in quasi_header
     assert "quasi2d_3d_gp_symbol" not in quasi_header
+
+
+def test_workbook_writes_dotted_group_numbers_as_text(tmp_path):
+    exporter = _load_export_mcif_results_module()
+
+    row = exporter.complete_export_row(
+        {
+            "case_id": "msg",
+            "file_name": "msg.mcif",
+            "status": "ok",
+            "index": "12.2.2.1.P3",
+            "msg_num": 1234,
+            "msg_bns_number": 12.34,
+            "msg_og_number": "12.34.5",
+            "_magnetic_site_orbit_rows": [
+                {
+                    "element": "Fe",
+                    "site_count": 1,
+                    "site_indices": [0],
+                    "sg_wyckoff": "1a",
+                    "sg_wyckoff_index": 0,
+                    "ssg_wyckoff": "1a",
+                    "ssg_wyckoff_with_dof": "1a(3)",
+                    "ssg_wyckoff_index": 0,
+                    "ssg_site_dof": 3,
+                    "ssg_orbit_total_dof": 3,
+                    "msg_wyckoff": "1a",
+                    "msg_wyckoff_with_dof": "1a(3)",
+                    "msg_wyckoff_index": 0,
+                    "msg_site_dof": 3,
+                    "msg_orbit_total_dof": 3,
+                }
+            ],
+        }
+    )
+    xlsx = tmp_path / "msg_text.xlsx"
+    exporter._write_workbook([row], xlsx)
+
+    wb = load_workbook(xlsx)
+    records = wb["records"]
+    records_header = [cell.value for cell in records[1]]
+    for column, expected in {
+        "index": "12.2.2.1.P3",
+        "msg_num": "1234",
+        "msg_bns_number": "12.34",
+        "msg_og_number": "12.34.5",
+    }.items():
+        cell = records.cell(row=2, column=records_header.index(column) + 1)
+        assert cell.value == expected
+        assert cell.number_format == "@"
+
+    orbit_ws = wb["magnetic_site_orbits"]
+    orbit_header = [cell.value for cell in orbit_ws[1]]
+    orbit_index_cell = orbit_ws.cell(row=2, column=orbit_header.index("index") + 1)
+    assert orbit_index_cell.value == "12.2.2.1.P3"
+    assert orbit_index_cell.number_format == "@"

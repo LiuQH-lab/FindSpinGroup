@@ -462,6 +462,56 @@ def _op_key(op: "SpinSpaceGroupOperation", ndigits: int = 6) -> tuple:
     )
 
 
+def _is_identity_operation(op: "SpinSpaceGroupOperation", tol: float = 1e-8) -> bool:
+    identity = np.eye(3)
+    return (
+        np.allclose(op.spin_rotation, identity, atol=tol, rtol=0)
+        and np.allclose(op.rotation, identity, atol=tol, rtol=0)
+        and np.allclose(_normalize_mod1(op.translation, tol=tol), np.zeros(3), atol=tol, rtol=0)
+    )
+
+
+def _serialized_generator_operation(
+    op: "SpinSpaceGroupOperation | None",
+    *,
+    source: str,
+    label: str,
+    tol: float,
+) -> dict | None:
+    if op is None or _is_identity_operation(op, tol=tol):
+        return None
+    return {
+        "source": source,
+        "label": label,
+        "spin_rotation": np.asarray(op.spin_rotation, dtype=float).tolist(),
+        "real_rotation": np.asarray(op.rotation, dtype=float).tolist(),
+        "translation": [float(v) for v in _normalize_mod1(op.translation, tol=tol)],
+    }
+
+
+def _append_generator_operation(
+    rows: list[dict],
+    seen: set[tuple],
+    op: "SpinSpaceGroupOperation | None",
+    *,
+    source: str,
+    label: str,
+    tol: float,
+) -> None:
+    row = _serialized_generator_operation(op, source=source, label=label, tol=tol)
+    if row is None:
+        return
+    key = (
+        tuple(np.round(np.asarray(row["spin_rotation"], dtype=float).flatten(), 6)),
+        tuple(np.round(np.asarray(row["real_rotation"], dtype=float).flatten(), 6)),
+        tuple(np.round(np.asarray(row["translation"], dtype=float), 6)),
+    )
+    if key in seen:
+        return
+    seen.add(key)
+    rows.append(row)
+
+
 def _closure_from_generators(
     generators: list["SpinSpaceGroupOperation"], max_size: int = 4096
 ) -> set[tuple]:
@@ -518,6 +568,32 @@ def _minimal_k_translation_generators(
     ops: list["SpinSpaceGroupOperation"],
 ) -> list["SpinSpaceGroupOperation"]:
     candidates = [op for op in ops if not np.allclose(op.spin_rotation, np.eye(3), atol=1e-4)]
+    if not candidates:
+        return []
+
+    candidates = sorted(candidates, key=_k_generator_sort_key)
+
+    target_keys = {_op_key(op) for op in candidates}
+    selected: list["SpinSpaceGroupOperation"] = []
+    closure: set[tuple] = set()
+
+    for op in candidates:
+        if _op_key(op) in closure:
+            continue
+        selected.append(op)
+        closure = _closure_from_generators(selected)
+        if target_keys.issubset(closure):
+            break
+
+    if not target_keys.issubset(closure):
+        return candidates
+    return sorted(selected, key=_k_generator_sort_key)
+
+
+def _minimal_spin_translation_generators(
+    ops: list["SpinSpaceGroupOperation"],
+) -> list["SpinSpaceGroupOperation"]:
+    candidates = [op for op in ops if not _is_identity_operation(op, tol=1e-6)]
     if not candidates:
         return []
 
@@ -720,24 +796,25 @@ def build_international_symbol(
     spin_info_map = _canonical_spin_info_map(ssg_basis)
     identity_real_ops = ssg_basis.identity_real_nssg_ops
 
-    named_pair_data: list[tuple[dict | None, str]] = []
+    named_pair_data: list[tuple[dict | None, str, "SpinSpaceGroupOperation | None"]] = []
     sg1_token: str | None = None
     if named_ops:
         for (rot, trans), real_tok in zip(named_ops, real_tokens):
+            matched = _find_real_operation(ssg_basis.nssg, rot, trans, tol=tol)
             if ssg_type == "k":
                 spin_info = None
             else:
-                matched = _find_real_operation(ssg_basis.nssg, rot, trans, tol=tol)
                 spin_info = spin_info_map.get(id(matched)) if matched is not None else None
-            named_pair_data.append((spin_info, real_tok))
+            named_pair_data.append((spin_info, real_tok, matched))
     else:
         # SG #1 has no non-identity named generator; keep trailing "1" for readability.
         if len(SGdisc[sg_num]) > 1:
             sg1_token = SGdisc[sg_num][1]
 
     k_translation_data: list[tuple["SpinSpaceGroupOperation", dict | None, str, str]] = []
-    primitive_translation_data: list[tuple[str, np.ndarray, dict | None]] = []
-    centering_translation_data: list[tuple[str, np.ndarray, dict | None]] = []
+    primitive_translation_data: list[tuple[str, np.ndarray, dict | None, "SpinSpaceGroupOperation | None"]] = []
+    centering_translation_data: list[tuple[str, np.ndarray, dict | None, "SpinSpaceGroupOperation | None"]] = []
+    spin_translation_generator_ops = _minimal_spin_translation_generators(ssg_basis.spin_translation_group)
 
     if ssg_type == "k":
         # Nontrivial spin translations with real-space identity.
@@ -775,7 +852,7 @@ def build_international_symbol(
             )
             vector = np.asarray(matched.translation if matched is not None else target, dtype=float)
             spin_info = spin_info_map.get(id(matched)) if matched is not None else None
-            primitive_translation_data.append((label, vector, spin_info))
+            primitive_translation_data.append((label, vector, spin_info, matched))
 
         for label, target in centering_targets:
             matched = _select_preferred_translation_match(
@@ -786,18 +863,18 @@ def build_international_symbol(
             )
             vector = np.asarray(matched.translation if matched is not None else target, dtype=float)
             spin_info = spin_info_map.get(id(matched)) if matched is not None else None
-            centering_translation_data.append((label, vector, spin_info))
+            centering_translation_data.append((label, vector, spin_info, matched))
 
     # The spin-only suffix should describe the current SpinSpaceGroup frame,
     # not the intermediate standardized basis used to label the real-space part.
     suffix_info = _spin_only_suffix_point_info(ssg, tol=calibrated_symbol_tol(tol))
 
     parameter_namer = _SymbolParameterAxisNamer()
-    for spin_info, _real_tok in named_pair_data:
+    for spin_info, _real_tok, _matched in named_pair_data:
         parameter_namer.add(spin_info)
     for _op, spin_info, _tau_linear, _tau_latex in k_translation_data:
         parameter_namer.add(spin_info)
-    for _label, _vector, spin_info in primitive_translation_data + centering_translation_data:
+    for _label, _vector, spin_info, _matched in primitive_translation_data + centering_translation_data:
         parameter_namer.add(spin_info)
     if suffix_info is not None:
         parameter_namer.add(suffix_info[1])
@@ -808,7 +885,7 @@ def build_international_symbol(
     point_pair_latex_terms: list[str] = []
 
     if named_pair_data:
-        for spin_info, real_tok in named_pair_data:
+        for spin_info, real_tok, _matched in named_pair_data:
             spin_tok = _point_token_from_info(spin_info, parameter_namer=parameter_namer)
             spin_tok_latex = _point_token_from_info(spin_info, latex=True, parameter_namer=parameter_namer)
             pair_linear_terms.append(f"{spin_tok}|{real_tok}")
@@ -853,7 +930,7 @@ def build_international_symbol(
         centering_spin_symbols: list[str] = []
         centering_spin_symbols_latex: list[str] = []
 
-        for label, vector, spin_info in primitive_translation_data:
+        for label, vector, spin_info, _matched in primitive_translation_data:
             spin_tok = _point_token_from_info(spin_info, parameter_namer=parameter_namer)
             spin_tok_latex = _point_token_from_info(spin_info, latex=True, parameter_namer=parameter_namer)
             primitive_spin_symbols.append(spin_tok)
@@ -866,7 +943,7 @@ def build_international_symbol(
                 }
             )
 
-        for label, vector, spin_info in centering_translation_data:
+        for label, vector, spin_info, _matched in centering_translation_data:
             spin_tok = _point_token_from_info(spin_info, parameter_namer=parameter_namer)
             spin_tok_latex = _point_token_from_info(spin_info, latex=True, parameter_namer=parameter_namer)
             centering_spin_symbols.append(spin_tok)
@@ -902,6 +979,54 @@ def build_international_symbol(
         linear = f"{linear} {suffix_linear}"
         latex = f"{latex} {suffix_latex}"
 
+    generator_operations: list[dict] = []
+    generator_operation_keys: set[tuple] = set()
+    for _spin_info, real_tok, matched in named_pair_data:
+        _append_generator_operation(
+            generator_operations,
+            generator_operation_keys,
+            matched,
+            source="real_generator",
+            label=real_tok,
+            tol=tol,
+        )
+    for op, _spin_info, _tau_linear, _tau_latex in k_translation_data:
+        _append_generator_operation(
+            generator_operations,
+            generator_operation_keys,
+            op,
+            source="spin_translation_generator",
+            label="tau",
+            tol=tol,
+        )
+    for op in spin_translation_generator_ops:
+        _append_generator_operation(
+            generator_operations,
+            generator_operation_keys,
+            op,
+            source="spin_translation_generator",
+            label="spin",
+            tol=tol,
+        )
+    for label, _vector, _spin_info, matched in primitive_translation_data:
+        _append_generator_operation(
+            generator_operations,
+            generator_operation_keys,
+            matched,
+            source="primitive_translation_generator",
+            label=label,
+            tol=tol,
+        )
+    for label, _vector, _spin_info, matched in centering_translation_data:
+        _append_generator_operation(
+            generator_operations,
+            generator_operation_keys,
+            matched,
+            source="centering_translation_generator",
+            label=label,
+            tol=tol,
+        )
+
     return {
         "type": ssg_type,
         "basis": basis_name,
@@ -920,4 +1045,5 @@ def build_international_symbol(
         "translation_terms_linear": translation_linear_terms,
         "translation_terms_latex": translation_latex_terms,
         "translation_details": translation_details,
+        "generator_operations": generator_operations,
     }

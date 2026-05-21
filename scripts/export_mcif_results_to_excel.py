@@ -341,6 +341,36 @@ QUASI2D_RECORD_COLUMNS = [
     column for column in QUASI2D_COLUMNS if column not in COLUMNS
 ]
 
+TEXT_FORMAT_COLUMNS = {
+    "index",
+    "msg_num",
+    "msg_bns_number",
+    "msg_og_number",
+}
+
+
+def _xlsx_cell_value(column: str, value: Any) -> Any:
+    if value is None:
+        return None
+    if column in TEXT_FORMAT_COLUMNS:
+        return str(value)
+    return _stringify(value)
+
+
+def _format_text_columns(ws, columns: list[str]) -> None:
+    text_column_indices = [
+        column_index
+        for column_index, column in enumerate(columns, start=1)
+        if column in TEXT_FORMAT_COLUMNS
+    ]
+    for column_index in text_column_indices:
+        for row in ws.iter_rows(min_row=2, min_col=column_index, max_col=column_index):
+            cell = row[0]
+            if cell.value is None:
+                continue
+            cell.value = str(cell.value)
+            cell.number_format = "@"
+
 
 def _has_quasi2d_values(row: dict[str, Any]) -> bool:
     return any(row.get(column) is not None for column in QUASI2D_RECORD_COLUMNS)
@@ -365,7 +395,8 @@ def _write_workbook(rows: list[dict[str, Any]], output_xlsx: Path) -> None:
     for cell in ws[1]:
         cell.font = Font(bold=True)
     for row in rows:
-        ws.append([_stringify(row.get(column)) for column in record_columns])
+        ws.append([_xlsx_cell_value(column, row.get(column)) for column in record_columns])
+    _format_text_columns(ws, record_columns)
 
     ws.freeze_panes = "A2"
     ws.auto_filter.ref = ws.dimensions
@@ -394,8 +425,12 @@ def _write_workbook(rows: list[dict[str, Any]], output_xlsx: Path) -> None:
                 **orbit,
             }
             orbit_ws.append(
-                [_stringify(orbit_row.get(column)) for column in MAGNETIC_ORBIT_COLUMNS]
+                [
+                    _xlsx_cell_value(column, orbit_row.get(column))
+                    for column in MAGNETIC_ORBIT_COLUMNS
+                ]
             )
+    _format_text_columns(orbit_ws, MAGNETIC_ORBIT_COLUMNS)
 
     orbit_ws.freeze_panes = "A2"
     orbit_ws.auto_filter.ref = orbit_ws.dimensions

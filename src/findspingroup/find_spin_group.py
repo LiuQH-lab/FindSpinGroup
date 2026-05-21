@@ -2345,6 +2345,7 @@ def _operation_view_indices_from_ops(
     *,
     tol: float,
     view_key: str,
+    strict: bool = True,
 ) -> list[int]:
     index_by_id = {id(op): idx + 1 for idx, op in enumerate(all_ops)}
     indices: list[int] = []
@@ -2355,11 +2356,12 @@ def _operation_view_indices_from_ops(
                 if candidate_op.is_same_with(selected_op, atol=tol):
                     selected_index = candidate_index
                     break
-        if selected_index is None:
+        if selected_index is None and strict:
             raise ValueError(
                 f"operation_views.{view_key}: selected operation is not present in all view"
             )
-        indices.append(int(selected_index))
+        if selected_index is not None:
+            indices.append(int(selected_index))
     return indices
 
 
@@ -2368,6 +2370,72 @@ def _operation_view_indices_from_predicate(all_ops, predicate) -> list[int]:
         idx + 1
         for idx, op in enumerate(all_ops)
         if predicate(op)
+    ]
+
+
+def _deduplicate_operation_view_indices(indices: list[int]) -> list[int]:
+    deduplicated: list[int] = []
+    seen: set[int] = set()
+    for index in indices:
+        index = int(index)
+        if index in seen:
+            continue
+        seen.add(index)
+        deduplicated.append(index)
+    return deduplicated
+
+
+def _symbol_generator_ops_for_current_basis(ssg: SpinSpaceGroup) -> list[SpinSpaceGroupOperation]:
+    symbol_payload = ssg.get_international_symbol(
+        tol=ssg.symbol_calibration_tol,
+        basis_mode="current",
+    )
+    generator_payloads = symbol_payload.get("generator_operations") or []
+    return [
+        SpinSpaceGroupOperation(
+            payload["spin_rotation"],
+            payload["real_rotation"],
+            payload["translation"],
+        )
+        for payload in generator_payloads
+        if isinstance(payload, dict)
+    ]
+
+
+def _transform_operation_generators(
+    generator_ops: list[SpinSpaceGroupOperation],
+    transform: np.ndarray,
+    shift: np.ndarray,
+    *,
+    tol: float,
+    real_space_metric=None,
+) -> list[SpinSpaceGroupOperation]:
+    if not generator_ops:
+        return []
+    return list(
+        SpinSpaceGroup(
+            generator_ops,
+            tol=tol,
+            real_space_metric=real_space_metric,
+        ).transform(transform, shift, frac=True).ops
+    )
+
+
+def _transform_spin_generators(
+    generator_ops: list[SpinSpaceGroupOperation],
+    spin_transform: np.ndarray,
+) -> list[SpinSpaceGroupOperation]:
+    if not generator_ops:
+        return []
+    spin_transform = np.asarray(spin_transform, dtype=float)
+    spin_transform_inv = np.linalg.inv(spin_transform)
+    return [
+        SpinSpaceGroupOperation(
+            spin_transform @ op.spin_rotation @ spin_transform_inv,
+            op.rotation,
+            op.translation,
+        )
+        for op in generator_ops
     ]
 
 
@@ -2392,6 +2460,7 @@ def _build_operation_view_set(
     seitz_latex: list[str],
     setting_label: str,
     spin_frame: str,
+    generator_ops: list[SpinSpaceGroupOperation] | None = None,
 ) -> dict:
     all_ops = list(ssg.ops)
     if len(ops_payload) != len(all_ops):
@@ -2407,6 +2476,26 @@ def _build_operation_view_set(
     views = {
         "all": _operation_view_all_row(ops_payload, seitz_latex),
     }
+
+    if generator_ops is None:
+        generator_ops = _symbol_generator_ops_for_current_basis(ssg)
+    else:
+        generator_ops = list(generator_ops) + _symbol_generator_ops_for_current_basis(ssg)
+    if generator_ops:
+        generator_indices = _deduplicate_operation_view_indices(
+            _operation_view_indices_from_ops(
+                all_ops,
+                generator_ops,
+                tol=ssg.tol,
+                view_key="generators",
+                strict=False,
+            )
+        )
+        if generator_indices:
+            views["generators"] = _operation_view_index_rows(
+                generator_indices,
+                label="Symbol generators",
+            )
 
     pure_translation_indices = _operation_view_indices_from_predicate(
         all_ops,
@@ -2488,6 +2577,7 @@ def _build_operation_views(operation_sources: dict[str, dict]) -> dict:
             seitz_latex=seitz_latex,
             setting_label=source.get("setting_label", setting_key),
             spin_frame=source.get("spin_frame", "cartesian"),
+            generator_ops=source.get("generator_ops"),
         )
     return operation_views
 
@@ -6820,6 +6910,53 @@ def _find_spin_group_from_parsed(
     convention_cartesian_ops_payload = _serialize_ssg_operation_matrices(
         list(public_convention_cartesian_ssg.ops)
     )
+
+    convention_oriented_generator_ops = _symbol_generator_ops_for_current_basis(
+        public_convention_oriented_ssg
+    )
+    transformation_convention_to_acc_primitive_output = _compose_setting_transform(
+        transformation_input_to_convention[0],
+        transformation_input_to_convention[1],
+        transformation_input_to_acc_primitive_output[0],
+        transformation_input_to_acc_primitive_output[1],
+    )
+    convention_lattice_col = _lattice_column_matrix(convention_cell)
+    acc_primitive_lattice_col = _lattice_column_matrix(acc_primitive_output_cell)
+    input_lattice_col = _lattice_column_matrix(input_cell_cartesian)
+    acc_primitive_setting_generator_ops = _transform_operation_generators(
+        convention_oriented_generator_ops,
+        transformation_convention_to_acc_primitive_output[0],
+        transformation_convention_to_acc_primitive_output[1],
+        tol=acc_primitive_ossg.tol,
+        real_space_metric=acc_primitive_ossg.real_space_metric,
+    )
+    input_setting_generator_ops = _transform_operation_generators(
+        convention_oriented_generator_ops,
+        transformation_convention_to_input[0],
+        transformation_convention_to_input[1],
+        tol=input_setting_ossg.tol,
+        real_space_metric=input_setting_ossg.real_space_metric,
+    )
+    acc_primitive_oriented_generator_ops = _transform_spin_generators(
+        acc_primitive_setting_generator_ops,
+        np.linalg.inv(acc_primitive_lattice_col) @ convention_lattice_col,
+    )
+    input_oriented_generator_ops = _transform_spin_generators(
+        input_setting_generator_ops,
+        np.linalg.inv(input_lattice_col) @ convention_lattice_col,
+    )
+    convention_cartesian_generator_ops = _transform_spin_generators(
+        convention_oriented_generator_ops,
+        convention_lattice_col,
+    )
+    acc_primitive_cartesian_generator_ops = _transform_spin_generators(
+        acc_primitive_oriented_generator_ops,
+        acc_primitive_lattice_col,
+    )
+    input_cartesian_generator_ops = _transform_spin_generators(
+        input_oriented_generator_ops,
+        input_lattice_col,
+    )
     operation_views = _build_operation_views(
         {
             "convention_cartesian": {
@@ -6828,6 +6965,7 @@ def _find_spin_group_from_parsed(
                 "seitz_latex": public_convention_cartesian_ssg.seitz_symbols_latex,
                 "setting_label": convention_setting,
                 "spin_frame": "cartesian",
+                "generator_ops": convention_cartesian_generator_ops,
             },
             "convention_oriented": {
                 "ssg": public_convention_oriented_ssg,
@@ -6835,6 +6973,7 @@ def _find_spin_group_from_parsed(
                 "seitz_latex": public_convention_oriented_ssg.seitz_symbols_latex,
                 "setting_label": convention_setting,
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+                "generator_ops": convention_oriented_generator_ops,
             },
             "magnetic_primitive_cartesian": {
                 "ssg": acc_primitive_output_ssg,
@@ -6842,6 +6981,7 @@ def _find_spin_group_from_parsed(
                 "seitz_latex": acc_primitive_output_ssg.seitz_symbols_latex,
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": "cartesian",
+                "generator_ops": acc_primitive_cartesian_generator_ops,
             },
             "magnetic_primitive_oriented": {
                 "ssg": acc_primitive_ossg,
@@ -6849,6 +6989,7 @@ def _find_spin_group_from_parsed(
                 "seitz_latex": acc_primitive_oriented_seitz_latex,
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+                "generator_ops": acc_primitive_oriented_generator_ops,
             },
             "input_cartesian": {
                 "ssg": input_setting_ssg,
@@ -6856,6 +6997,7 @@ def _find_spin_group_from_parsed(
                 "seitz_latex": input_setting_ssg.seitz_symbols_latex,
                 "setting_label": "input",
                 "spin_frame": "cartesian",
+                "generator_ops": input_cartesian_generator_ops,
             },
             "input_oriented": {
                 "ssg": input_setting_ossg,
@@ -6863,6 +7005,7 @@ def _find_spin_group_from_parsed(
                 "seitz_latex": input_oriented_seitz_latex,
                 "setting_label": "input",
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+                "generator_ops": input_oriented_generator_ops,
             },
         }
     )
