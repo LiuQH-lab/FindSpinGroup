@@ -212,6 +212,8 @@ mcif_241231_no2104
 temp_cif_file
 upload_files
 output_files
+output/
+datasets/
 .playwright-mcp/
 .skill-staging/
 ~$*.pptx

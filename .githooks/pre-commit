@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+
+python3 scripts/check_privacy_leaks.py --staged
