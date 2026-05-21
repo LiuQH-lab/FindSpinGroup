@@ -33,6 +33,7 @@ EXPORT_TXT="${EXPORT_TXT:-selected.txt}"
 EXPORT_FIELDS="${EXPORT_FIELDS:-index,phase,properties.ss_w_soc}"
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}"
 BATCH_WORKERS="${BATCH_WORKERS:-1}"
+LIMIT="${LIMIT:-}"
 SBATCH_BIN="${SBATCH_BIN:-sbatch}"
 
 usage() {
@@ -53,6 +54,7 @@ Defaults:
   REMOTE_TMP_DIR       ${REMOTE_TMP_DIR:-<auto under output root>}
   BASELINE_SUITE       $BASELINE_SUITE
   BATCH_WORKERS        $BATCH_WORKERS
+  LIMIT                ${LIMIT:-<none>}
 EOF
 }
 
@@ -130,6 +132,7 @@ ssh "$SERVER_ALIAS" "
   EXPORT_FIELDS='$EXPORT_FIELDS' \
   INCLUDE_G0_SELF_AUDIT='$INCLUDE_G0_SELF_AUDIT' \
   BATCH_WORKERS='$BATCH_WORKERS' \
+  LIMIT='$LIMIT' \
   SBATCH_BIN='$SBATCH_BIN' \
   bash scripts/submit_batch_mcif.sh \
     '$REMOTE_INPUT_DIR' \

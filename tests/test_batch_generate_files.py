@@ -1,4 +1,5 @@
 import json
+import importlib.util
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -19,6 +20,7 @@ from findspingroup.version import __version__
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = PROJECT_ROOT / "batch_smoke_manifest.txt"
 BASELINE_PATH = PROJECT_ROOT / "tests" / "baselines" / "mcif_batch_smoke_baseline.json"
+MERGE_SHARDS_SCRIPT = PROJECT_ROOT / "scripts" / "merge_batch_shards.py"
 
 
 def _load_manifest_entries() -> list[str]:
@@ -36,6 +38,14 @@ def _baseline_cases() -> dict[str, dict]:
 
 
 MANIFEST_ENTRIES = _load_manifest_entries()
+
+
+def _load_merge_batch_shards_module():
+    spec = importlib.util.spec_from_file_location("merge_batch_shards", MERGE_SHARDS_SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
 
 
 class _FakeResult:
@@ -283,6 +293,85 @@ def test_run_mcif_batch_rejects_stop_on_error_with_parallel_workers(tmp_path):
             workers=2,
             quiet=True,
         )
+
+
+def test_merge_batch_shards_recomputes_comparison_and_preserves_order(tmp_path):
+    merge_batch_shards = _load_merge_batch_shards_module().merge_batch_shards
+    root = tmp_path / "parallel"
+    shard_0 = root / "shard_000"
+    shard_1 = root / "shard_001"
+    shard_0.mkdir(parents=True)
+    shard_1.mkdir(parents=True)
+
+    def write_json(path: Path, payload):
+        path.write_text(json.dumps(payload), encoding="utf-8")
+
+    def write_jsonl(path: Path, rows):
+        path.write_text(
+            "".join(json.dumps(row) + "\n" for row in rows),
+            encoding="utf-8",
+        )
+
+    record_a = {
+        "case_id": "cases/a.mcif",
+        "file_name": "a.mcif",
+        "status": "ok",
+        "result": _fake_summary("1.1.1.1"),
+    }
+    record_b = {
+        "case_id": "cases/b.mcif",
+        "file_name": "b.mcif",
+        "status": "ok",
+        "result": _fake_summary("2.2.2.2"),
+    }
+    record_c = {
+        "case_id": "cases/c.mcif",
+        "file_name": "c.mcif",
+        "status": "error",
+        "error": {"type": "ValueError", "message": "bad input"},
+    }
+    write_json(shard_0 / "summary.json", {"duration_seconds": 2.0})
+    write_json(shard_1 / "summary.json", {"duration_seconds": 3.0})
+    write_jsonl(shard_0 / "records.jsonl", [record_b])
+    write_jsonl(shard_1 / "records.jsonl", [record_c, record_a])
+    write_jsonl(shard_0 / "full_results.jsonl", [record_b])
+    write_jsonl(shard_1 / "full_results.jsonl", [record_c, record_a])
+    write_json(shard_0 / "baseline.json", {record_b["case_id"]: record_b})
+    write_json(
+        shard_1 / "baseline.json",
+        {record_a["case_id"]: record_a, record_c["case_id"]: record_c},
+    )
+    write_json(shard_0 / "errors_by_file.json", {})
+    write_json(shard_1 / "errors_by_file.json", {record_c["case_id"]: record_c["error"]})
+    baseline_path = tmp_path / "baseline.json"
+    write_json(
+        baseline_path,
+        {
+            record_a["case_id"]: record_a,
+            record_b["case_id"]: record_b,
+            record_c["case_id"]: record_c,
+        },
+    )
+
+    summary = merge_batch_shards(root, tmp_path / "merged", baseline_path=baseline_path)
+
+    assert summary["shard_count"] == 2
+    assert summary["processed_cases"] == 3
+    assert summary["success_count"] == 2
+    assert summary["error_count"] == 1
+    assert summary["comparison"]["mismatch_count"] == 0
+    assert summary["comparison"]["missing_in_baseline_count"] == 0
+    merged_records = [
+        json.loads(line)
+        for line in (tmp_path / "merged" / "records.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert [record["case_id"] for record in merged_records] == [
+        "cases/a.mcif",
+        "cases/b.mcif",
+        "cases/c.mcif",
+    ]
+    merged_errors = json.loads((tmp_path / "merged" / "errors_by_file.json").read_text())
+    assert merged_errors == {record_c["case_id"]: record_c["error"]}
 
 
 def test_run_scif_roundtrip_batch_smoke_manifest(tmp_path):
