@@ -14,7 +14,7 @@ requires-python = ">=3.11"
 dependencies = [
     "numpy>=1.26.0",
     "packaging>=26.0",
-    "seekpath>=2.1.0",
+    "seekpath>=2.1.0,<2.2.0",
     "spglib>=2.6.0",
     "spintensor",
 ]
