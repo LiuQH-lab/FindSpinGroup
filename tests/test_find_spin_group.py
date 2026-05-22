@@ -302,11 +302,24 @@ def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypa
         "magnetic_primitive_cartesian",
         "magnetic_primitive_oriented",
     ]
+    assert payload["operation_views"]["magnetic_primitive_cartesian"]["default_view"] == "nssg"
     cartesian_views = payload["operation_views"]["magnetic_primitive_cartesian"]["views"]
-    assert cartesian_views["all"]["ops"] == payload["acc_primitive_ssg_ops_cartesian"]
-    assert len(cartesian_views["all"]["seitz_latex"]) == len(
-        payload["acc_primitive_ssg_ops_cartesian"]
+    assert cartesian_views["all"]["ops"] == cartesian_views["nssg"]["ops"]
+    assert cartesian_views["all"]["seitz_latex"] == cartesian_views["nssg"]["seitz_latex"]
+    assert cartesian_views["nssg"]["note"]["spin_only_symbol_hm"] == "∞m"
+    assert cartesian_views["nssg"]["note"]["spin_only_symbol_s"] == "C∞v"
+    acc_primitive_full_ops = [
+        [
+            op["spin_rotation"],
+            op["real_rotation"],
+            op["translation"],
+        ]
+        for op in payload["acc_primitive_ssg_ops_cartesian"]
+    ]
+    assert len(cartesian_views["all"]["ops"]) == len(
+        SpinSpaceGroup(acc_primitive_full_ops).nssg
     )
+    assert len(cartesian_views["all"]["seitz_latex"]) == len(cartesian_views["all"]["ops"])
     assert "ops" not in cartesian_views["generators"]
     assert cartesian_views["generators"]["indices"]
     assert max(cartesian_views["generators"]["indices"]) <= len(
@@ -4375,24 +4388,23 @@ def test_mag_symmetry_result_exposes_compact_operation_views():
         assert len(generator_view["indices"]) == len(set(generator_view["indices"]))
         assert max(generator_view["indices"]) <= len(all_view["ops"])
 
-    convention_ssg = SpinSpaceGroup(result.convention_ssg_ops)
-    symbol_payload = convention_ssg.get_international_symbol(basis_mode="current")
+    convention_nssg = SpinSpaceGroup(result.convention_nssg_ops)
+    symbol_payload = convention_nssg.get_international_symbol(basis_mode="current")
     assert symbol_payload["generator_operations"]
     assert len(symbol_payload["generator_operations"]) == len(
         result.operation_views["convention_oriented"]["views"]["generators"]["indices"]
     )
 
-    collinear_view = result.operation_views["convention_oriented"]["views"]["nssg_collinear"]
-    assert "ops" not in collinear_view
-    assert "seitz_latex" not in collinear_view
-    assert collinear_view["indices"]
-    assert collinear_view["note"]["type"] == "collinear"
-    assert max(collinear_view["indices"]) <= len(convention_all["ops"])
-
+    assert result.operation_views["convention_oriented"]["default_view"] == "nssg"
+    assert "nssg_collinear" not in result.operation_views["convention_oriented"]["views"]
     nssg_view = result.operation_views["convention_oriented"]["views"]["nssg"]
-    assert "ops" not in nssg_view
-    assert "seitz_latex" not in nssg_view
-    assert nssg_view["indices"] == collinear_view["indices"]
+    assert nssg_view["ops"] == convention_all["ops"]
+    assert nssg_view["seitz_latex"] == convention_all["seitz_latex"]
+    assert nssg_view["indices"] == convention_all["indices"]
+    assert nssg_view["note"]["type"] == "collinear"
+    assert nssg_view["note"]["spin_only_symbol_hm"] == "∞m"
+    assert nssg_view["note"]["spin_only_symbol_s"] == "C∞v"
+    assert nssg_view["note"]["spin_frame"] == "oriented"
     assert nssg_view["operation_count"] == len(SpinSpaceGroup(result.convention_ssg_ops).nssg)
 
     spin_translations = result.operation_views["magnetic_primitive_cartesian"]["views"][
@@ -4820,10 +4832,28 @@ def test_find_spin_group_exposes_convention_nssg_views():
     assert result.convention_nssg_seitz == expected_nssg.seitz_symbols
     assert result.convention_nssg_seitz_latex == expected_nssg.seitz_symbols_latex
 
-    all_ops = list(public_ossg.ops)
-    nssg_indices = result.operation_views["convention_oriented"]["views"]["nssg"]["indices"]
-    nssg_ops_from_view = [all_ops[index - 1] for index in nssg_indices]
-    assert _serialize_ssg_ops(nssg_ops_from_view) == _serialize_ssg_ops(expected_nssg.ops)
+    nssg_view = result.operation_views["convention_oriented"]["views"]["nssg"]
+    if "ops" in nssg_view:
+        assert nssg_view["ops"] == result.operation_views["convention_oriented"]["views"]["all"]["ops"]
+        nssg_ops_from_view = [
+            [
+                op["spin_rotation"],
+                op["real_rotation"],
+                op["translation"],
+            ]
+            for op in nssg_view["ops"]
+        ]
+    else:
+        all_ops = list(public_ossg.ops)
+        nssg_ops_from_view = [
+            [
+                np.asarray(op[0], dtype=float).tolist(),
+                np.asarray(op[1], dtype=float).tolist(),
+                np.asarray(op[2], dtype=float).tolist(),
+            ]
+            for op in (all_ops[index - 1] for index in nssg_view["indices"])
+        ]
+    assert nssg_ops_from_view == _serialize_ssg_ops(expected_nssg.ops)
 
 
 @pytest.mark.parametrize(

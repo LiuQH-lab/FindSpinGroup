@@ -2440,16 +2440,16 @@ def _transform_spin_generators(
 
 
 def _operation_view_collinear_note(ssg: SpinSpaceGroup, *, spin_frame: str) -> dict:
-    spin_only_symbol = ssg.gspg_spin_only_symbol
+    public_spin_frame = "oriented" if spin_frame == OSSG_ORIENTED_SPIN_FRAME_SETTING else spin_frame
     return {
         "type": "collinear",
         "text": "This operation list shows the convention nSSG for the collinear case.",
         "nssg_point_part_hm": ssg.n_spin_part_point_group_symbol_hm,
         "nssg_point_part_s": ssg.n_spin_part_point_group_symbol_s,
-        "spin_only_symbol_hm": spin_only_symbol.get("hm"),
-        "spin_only_symbol_s": spin_only_symbol.get("s"),
+        "spin_only_symbol_hm": "∞m",
+        "spin_only_symbol_s": "C∞v",
         "spin_only_direction": _format_spin_only_direction(ssg.sog_direction),
-        "spin_frame": spin_frame,
+        "spin_frame": public_spin_frame,
     }
 
 
@@ -2472,14 +2472,43 @@ def _build_operation_view_set(
             f"operation_views.{setting_label}: Seitz list length does not match SSG ops"
         )
 
+    is_collinear = ssg.conf == "Collinear"
+    collinear_note = None
+    if is_collinear:
+        nssg_indices_in_source = _deduplicate_operation_view_indices(
+            _operation_view_indices_from_ops(
+                all_ops,
+                ssg.nssg,
+                tol=ssg.tol,
+                view_key="nssg",
+            )
+        )
+        all_ops = [all_ops[index - 1] for index in nssg_indices_in_source]
+        ops_payload = _serialize_ssg_operation_matrices(all_ops)
+        seitz_latex = [seitz_latex[index - 1] for index in nssg_indices_in_source]
+        view_ssg = SpinSpaceGroup(
+            all_ops,
+            tol=ssg.tol,
+            real_space_metric=ssg.real_space_metric,
+        )
+        generator_ops = _symbol_generator_ops_for_current_basis(view_ssg)
+        collinear_note = _operation_view_collinear_note(ssg, spin_frame=spin_frame)
+
     identity = np.eye(3)
     views = {
         "all": _operation_view_all_row(ops_payload, seitz_latex),
     }
+    if is_collinear:
+        views["nssg"] = _operation_view_all_row(
+            ops_payload,
+            seitz_latex,
+            label="nSSG operations",
+        )
+        views["nssg"]["note"] = collinear_note
 
     if generator_ops is None:
         generator_ops = _symbol_generator_ops_for_current_basis(ssg)
-    else:
+    elif not is_collinear:
         generator_ops = list(generator_ops) + _symbol_generator_ops_for_current_basis(ssg)
     if generator_ops:
         generator_indices = _deduplicate_operation_view_indices(
@@ -2520,23 +2549,24 @@ def _build_operation_view_set(
             label="Spin translations",
         )
 
-    nssg_indices = _deduplicate_operation_view_indices(
-        _operation_view_indices_from_ops(
-            all_ops,
-            ssg.nssg,
-            tol=ssg.tol,
-            view_key="nssg",
+    if not is_collinear:
+        nssg_indices = _deduplicate_operation_view_indices(
+            _operation_view_indices_from_ops(
+                all_ops,
+                ssg.nssg,
+                tol=ssg.tol,
+                view_key="nssg",
+            )
         )
-    )
-    if nssg_indices:
-        views["nssg"] = _operation_view_index_rows(
-            nssg_indices,
-            label="nSSG operations",
-        )
+        if nssg_indices:
+            views["nssg"] = _operation_view_index_rows(
+                nssg_indices,
+                label="nSSG operations",
+            )
 
     l0_ops = [
         op
-        for op in ssg.nssg
+        for op in (all_ops if is_collinear else ssg.nssg)
         if np.allclose(op.spin_rotation, identity, atol=ssg.tol, rtol=0)
     ]
     if l0_ops:
@@ -2550,25 +2580,11 @@ def _build_operation_view_set(
             label="L0 operations",
         )
 
-    if ssg.conf == "Collinear":
-        nssg_indices = _operation_view_indices_from_ops(
-            all_ops,
-            ssg.nssg,
-            tol=ssg.tol,
-            view_key="nssg_collinear",
-        )
-        if nssg_indices:
-            views["nssg_collinear"] = _operation_view_index_rows(
-                nssg_indices,
-                label="Collinear nSSG operations",
-                note=_operation_view_collinear_note(ssg, spin_frame=spin_frame),
-            )
-
     return {
-        "default_view": "all",
+        "default_view": "nssg" if is_collinear else "all",
         "setting_label": setting_label,
         "spin_frame": spin_frame,
-        "view_contract": "all view stores serialized operations; other views store 1-based indices into all",
+        "view_contract": "views with ops store serialized operations; index-only views store 1-based indices into all",
         "views": views,
     }
 
