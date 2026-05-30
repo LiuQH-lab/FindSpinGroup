@@ -197,7 +197,7 @@ class _SymbolParameterAxisNamer:
 
 def _point_group_token_from_real_token(token: str) -> str:
     """Drop glide/screw translational decoration while preserving HM structure."""
-    point_token = re.sub(r"([1-6])_\d+", r"\1", token)
+    point_token = re.sub(r"([1-6])_(?:\d+|\{\d+\})", r"\1", token)
     if point_token in {"a", "b", "c", "d", "n"}:
         return "m"
     return point_token

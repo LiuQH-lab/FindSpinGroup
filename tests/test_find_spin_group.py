@@ -62,6 +62,7 @@ from findspingroup.core.pg_analyzer import SymmOp, generate_full_symmops
 from findspingroup.ferroelectric import (
     build_domain_reversal_coset_analysis,
     build_ferroelectric_switching_payload,
+    build_parent_standard_supercell_domain_coset_analysis,
 )
 from findspingroup.find_spin_group import (
     SCIF_CELL_MODE_INPUT_IDENTIFIED,
@@ -1277,6 +1278,81 @@ def test_generated_parent_standard_supercell_domain_coset_analysis_keeps_1048_fu
     } == {"msg_compatible", "exchange_only"}
     assert payload["deduplicated_reversal_domains"][0]["soc_allowed_exists"] is True
     assert payload["deduplicated_reversal_domains"][0]["exchange_only_exists"] is True
+    top_level_payload = result.ferroelectric_switching
+    rows = top_level_payload["domain_relation_rows"]
+    soc_rows = top_level_payload["soc_domain_relation_rows"]
+    assert payload["domain_relation_representative_count"] == 36
+    assert len(rows) == 36
+    assert len(soc_rows) == 36
+    assert top_level_payload["analysis_level"] == (
+        "symmetry_only_parent_ordered_and_soc_msg_cosets_screened"
+    )
+    assert rows[0]["coset_index"] == first_candidate["coset_index"]
+    assert rows[0]["coset_operation"].startswith("{+1 || -x,-y+1/6,-z,+1}")
+    assert rows[0]["reverses_S"] is False
+    assert rows[0]["reverses_P"] is True
+    assert rows[1]["coset_operation"].startswith("{-1 || -x,-y+1/6,-z,-1}")
+    assert rows[1]["reverses_S"] is True
+    assert rows[1]["reverses_P"] is True
+    assert any(row["reverses_P"] is False for row in rows)
+    assert top_level_payload["domain_relation_text"].splitlines()[:4] == [
+        "domain relations:",
+        "No. xyzt uvw reverses_S reverses_P",
+        "1 -x,-y+1/6,-z,+1 u,v,w N Y",
+        "2 -x,-y+1/6,-z,-1 -u,-v,-w Y Y",
+    ]
+    assert top_level_payload["soc_domain_relation_text"].splitlines()[:4] == [
+        "domain relations:",
+        "No. xyzt uvw reverses_S reverses_P",
+        "1 -x,-y+1/6,-z,+1 u,v,w N Y",
+        "2 -x,-y+1/6,-z,-1 -u,-v,-w Y Y",
+    ]
+
+
+def test_soc_polar_branch_uses_full_msg_time_branch_cosets():
+    soc_coset_payload = build_parent_standard_supercell_domain_coset_analysis(
+        parent_space_group_number=2,
+        parent_space_group_symbol="P-1",
+        parent_hall_number=2,
+        child_basis_in_parent=np.eye(3),
+        child_origin_in_parent=np.zeros(3),
+        ordered_magnetic_ops=[
+            (np.eye(3), np.zeros(3), 1),
+            (np.eye(3), np.zeros(3), -1),
+        ],
+        ordered_space_group_number=1,
+        basis_setting="G0std",
+        ordered_subgroup_source="soc_magnetic_space_group",
+        relation_layer="soc_magnetic",
+        subgroup_time_branch_scope="full",
+    )
+
+    assert soc_coset_payload["ordered_time_branch_scope"] == "full"
+    assert soc_coset_payload["relation_layer"] == "soc_magnetic"
+    assert soc_coset_payload["left_coset_count"] == 2
+    assert soc_coset_payload["candidate_reversal_domain_count"] == 1
+
+    payload = build_ferroelectric_switching_payload(
+        input_space_group_number=2,
+        input_space_group_symbol="P-1",
+        ssg_space_group_number=2,
+        ossg_space_group_number=2,
+        msg_parent_space_group_number=1,
+        magnetic_configuration="Collinear",
+        soc_domain_reversal_coset_analysis=soc_coset_payload,
+    )
+
+    assert payload["polarity_status"] == "ordered_symmetry_nonpolar"
+    assert payload["domain_relation_text"] is None
+    assert (
+        payload["soc_domain_reversal_symmetry_screening"]["status"]
+        == "candidate_reversal_domains_found"
+    )
+    assert payload["soc_domain_relation_text"].splitlines()[:3] == [
+        "domain relations:",
+        "No. xyzt uvw reverses_S reverses_P",
+        "1 -x,-y,-z,+1 u,v,w N Y",
+    ]
 
 
 def test_find_spin_group_exposes_conservative_ferroelectric_switching_payload():
@@ -4478,6 +4554,7 @@ def test_find_spin_group_exposes_explicit_gspg_payload_for_coplanar_case():
     assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.raw_ops)
     assert result.gspg_symbol_linear == "1|m 2_{001}|m 2_{001}|2 m|1"
     assert result.gspg_collinear_axis is None
+    assert "spin only:\n1 x,y,z,+1 u,v,w\n2 x,y,z,-1 -u,v,w" in result.gspg_text
 
 
 def test_find_spin_group_reports_collinear_gspg_as_nssg_times_spin_only():
@@ -4494,7 +4571,7 @@ def test_find_spin_group_reports_collinear_gspg_as_nssg_times_spin_only():
     assert result.gspg_ops == _serialize_gspg_pairs(expected_nssg_point_ops)
     assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.raw_ops)
     assert len(result.gspg_ops) < len(oriented_ssg.gspg.raw_ops)
-    assert result.gspg_symbol_linear == "-1|6_{3}/ -1|m 1|m -1|m ∞_{110}m|1"
+    assert result.gspg_symbol_linear == "-1|6/ -1|m 1|m -1|m ∞_{110}m|1"
     assert result.gspg_collinear_axis == pytest.approx(oriented_ssg.gspg.collinear_axis.tolist())
 
 
@@ -4516,22 +4593,78 @@ def test_find_spin_group_exposes_gspg_xyz_uvw_and_spin_only_exports_for_collinea
 def test_find_spin_group_exposes_gspg_text_payload_from_public_ossg():
     result = find_spin_group("examples/0.800_MnTe.mcif")
     summary_gspg = result.to_summary_dict()["gspg"]
+    expected_direction = find_spin_group_module._format_spin_only_direction(
+        result.gspg_collinear_axis
+    )
 
-    assert result.gspg_text["symbol_linear"] == result.gspg_symbol_linear
-    assert result.gspg_text["effective_mpg_symbol"] == result.gspg_effective_mpg_symbol
-    assert result.gspg_text["npg_symbol_s"] == result.gspg_npg_symbol_s
-    assert result.gspg_text["real_space_setting"] == result.convention_ssg_setting
-    assert result.gspg_text["spin_frame_setting"] == "ossg_oriented_spin_frame"
-    assert result.gspg_text["output_mode"] == result.gspg_output_mode
-    assert result.gspg_text["operation_count"] == len(result.gspg_ops)
-    assert result.gspg_text["raw_operation_count"] == len(result.gspg_raw_ops)
-    assert result.gspg_text["spin_only_operation_count"] == len(result.gspg_spin_only_ops)
-    assert result.gspg_text["operations"]
-    assert result.gspg_text["operations"][0].startswith("1: xyzt=")
-    assert "; uvw=" in result.gspg_text["operations"][0]
-    assert result.gspg_text["raw_operations"][0].startswith("1: xyzt=")
-    assert result.gspg_text["spin_only_operations"][0].startswith("1: xyzt=")
+    assert isinstance(result.gspg_text, str)
+    assert result.gspg_text.splitlines()[:5] == [
+        f"GSPG linear symbol: {result.gspg_symbol_linear}",
+        f"Spin-space point group symbol: {result.SSPG_symbol_hm} ({result.SSPG_symbol_s})",
+        f"Effective MPG: {result.gspg_effective_mpg_symbol}",
+        f"Real-space setting: {result.convention_ssg_setting}",
+        "Spin-frame setting: ossg_oriented_spin_frame",
+    ]
+    assert summary_gspg["spin_space_point_group_symbol_hm"] == result.SSPG_symbol_hm
+    assert summary_gspg["spin_space_point_group_symbol_s"] == result.SSPG_symbol_s
+    assert "Spin-only component:" not in result.gspg_text
+    assert "nPG symbol:" not in result.gspg_text
+    assert "\ngenerators (excluding spin-only):\n" in result.gspg_text
+    assert result.gspg_generator_indices
+    assert len(result.gspg_generator_ops) == len(result.gspg_generator_ops_xyz_uvw)
+    assert len(result.gspg_generator_ops) == len(result.gspg_generator_indices)
+    assert "\noperations:\n1 x,y,z,+1 u,v,w" in result.gspg_text
+    assert "xyzt=" not in result.gspg_text
+    assert f"\nspin only:\nCollinear direction: {expected_direction}" in result.gspg_text
     assert summary_gspg["text"] == result.gspg_text
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "examples/0.800_MnTe.mcif",
+        "tests/testset/mcif_241130_no2186/0.26_TmAgGe.mcif",
+        "tests/testset/mcif_241130_no2186/0.1005_Mn3RhGe.mcif",
+    ],
+)
+def test_find_spin_group_gspg_generators_generate_public_gspg(path):
+    result = find_spin_group(path)
+
+    target_keys = {
+        find_spin_group_module._gspg_pair_key(op)
+        for op in result.gspg_ops
+    }
+    assert all(
+        not np.allclose(op[1], np.eye(3), atol=0.02, rtol=0)
+        for op in result.gspg_generator_ops
+    )
+    closure_keys = find_spin_group_module._gspg_pair_closure(
+        result.gspg_generator_ops + result.gspg_spin_only_ops,
+        tol=0.02,
+        limit=4096,
+    )
+    generator_lines = result.gspg_text.split("\ngenerators (excluding spin-only):\n", 1)[1].split(
+        "\n\noperations:",
+        1,
+    )[0].splitlines()
+
+    assert result.gspg_generator_indices
+    assert target_keys.issubset(closure_keys)
+    assert len(generator_lines) == len(result.gspg_generator_indices)
+    assert all(
+        result.gspg_ops_xyz_uvw[index - 1]["index"] == index
+        for index in result.gspg_generator_indices
+    )
+
+
+def test_find_spin_group_gspg_text_uses_identity_spin_only_for_noncoplanar_case():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.1005_Mn3RhGe.mcif")
+
+    assert result.conf == "Noncoplanar"
+    assert result.gspg_spin_only_component_symbol_s == "C1"
+    assert result.gspg_text.rsplit("spin only:\n", 1)[1].splitlines() == [
+        "1 x,y,z,+1 u,v,w"
+    ]
 
 
 @pytest.mark.parametrize(

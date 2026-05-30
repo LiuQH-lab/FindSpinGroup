@@ -1272,6 +1272,9 @@ class MagSymmetryResult:
         self.gspg_raw_ops = symmetry.get('gspg_raw_ops', None)
         self.gspg_ops_xyz_uvw = symmetry.get('gspg_ops_xyz_uvw', None)
         self.gspg_raw_ops_xyz_uvw = symmetry.get('gspg_raw_ops_xyz_uvw', None)
+        self.gspg_generator_indices = symmetry.get('gspg_generator_indices', None)
+        self.gspg_generator_ops = symmetry.get('gspg_generator_ops', None)
+        self.gspg_generator_ops_xyz_uvw = symmetry.get('gspg_generator_ops_xyz_uvw', None)
         self.gspg_spin_only_ops = symmetry.get('gspg_spin_only_ops', None)
         self.gspg_spin_only_ops_xyz_uvw = symmetry.get('gspg_spin_only_ops_xyz_uvw', None)
         self.gspg_text = symmetry.get('gspg_text', None)
@@ -1534,6 +1537,8 @@ class MagSymmetryResult:
             'spin_frame_setting': self.gspg_spin_frame_setting,
             'spin_only_component_symbol_s': self.gspg_spin_only_component_symbol_s,
             'spin_only_part_linear': self.gspg_spin_only_part_linear,
+            'spin_space_point_group_symbol_hm': self.SSPG_symbol_hm,
+            'spin_space_point_group_symbol_s': self.SSPG_symbol_s,
             'symbol_linear': self.gspg_symbol_linear,
             'symbol_mode': self.gspg_symbol_mode,
             'tentative_symbol_s': self.gspg_tentative_symbol_s,
@@ -2165,11 +2170,15 @@ def _cell_to_poscar_in_snapshot_order(
     )
 
 
-def _build_g0std_domain_reversal_coset_analysis(
+def _build_g0std_parent_coset_analysis(
     *,
     g0std_cell: CrystalCell,
     g0std_ssg: SpinSpaceGroup,
+    ordered_magnetic_ops: list[tuple[np.ndarray, np.ndarray, int]],
     ordered_space_group_number: int | None,
+    ordered_subgroup_source: str,
+    relation_layer: str,
+    subgroup_time_branch_scope: str,
     tol_cfg: Tolerances,
 ) -> dict:
     dataset = get_symmetry_dataset(
@@ -2182,18 +2191,6 @@ def _build_g0std_domain_reversal_coset_analysis(
             "basis_setting": G0_STANDARD_SETTING,
             "candidate_reversal_domains": [],
         }
-
-    # The domain quotient is SG(parent supercell) / OSSG_real, not
-    # SG(parent supercell) / MSG.  MSG compatibility is a later classification
-    # layer for a representative, not the ordered-domain stabilizer.
-    ordered_magnetic_ops = [
-        (
-            np.asarray(rotation, dtype=float),
-            np.asarray(translation, dtype=float),
-            1,
-        )
-        for rotation, translation in g0std_ssg.G0_ops
-    ]
 
     # spglib's transformation_matrix is the direct coordinate transform from
     # the current G0std supercell to the detected parent standard setting.  Do
@@ -2210,9 +2207,74 @@ def _build_g0std_domain_reversal_coset_analysis(
         ordered_magnetic_ops=ordered_magnetic_ops,
         ordered_space_group_number=ordered_space_group_number,
         basis_setting=G0_STANDARD_SETTING,
+        ordered_subgroup_source=ordered_subgroup_source,
+        relation_layer=relation_layer,
+        subgroup_time_branch_scope=subgroup_time_branch_scope,
         ordered_cell=g0std_cell,
         collinear_axis=g0std_ssg.collinear_axis,
         tol=tol_cfg.m_matrix_tol,
+    )
+
+
+def _build_g0std_domain_reversal_coset_analysis(
+    *,
+    g0std_cell: CrystalCell,
+    g0std_ssg: SpinSpaceGroup,
+    ordered_space_group_number: int | None,
+    tol_cfg: Tolerances,
+) -> dict:
+    # The exchange-limit domain quotient is SG(parent supercell) / OSSG_real,
+    # not SG(parent supercell) / MSG. MSG compatibility is a later
+    # classification layer for a representative, not the ordered-domain
+    # stabilizer.
+    ordered_magnetic_ops = [
+        (
+            np.asarray(rotation, dtype=float),
+            np.asarray(translation, dtype=float),
+            1,
+        )
+        for rotation, translation in g0std_ssg.G0_ops
+    ]
+    return _build_g0std_parent_coset_analysis(
+        g0std_cell=g0std_cell,
+        g0std_ssg=g0std_ssg,
+        ordered_magnetic_ops=ordered_magnetic_ops,
+        ordered_space_group_number=ordered_space_group_number,
+        ordered_subgroup_source="ordered_spin_space_real_space_projection",
+        relation_layer="exchange_spin_space",
+        subgroup_time_branch_scope="unit",
+        tol_cfg=tol_cfg,
+    )
+
+
+def _build_g0std_soc_domain_reversal_coset_analysis(
+    *,
+    g0std_cell: CrystalCell,
+    g0std_ssg: SpinSpaceGroup,
+    msg_parent_space_group_number: int | None,
+    tol_cfg: Tolerances,
+) -> dict:
+    ordered_magnetic_ops = []
+    for op in g0std_ssg.msg_ops:
+        time_reversal = g0std_ssg.classify_magnetic_operation(op)
+        if time_reversal is None:
+            continue
+        ordered_magnetic_ops.append(
+            (
+                np.asarray(op[1], dtype=float),
+                np.asarray(op[2], dtype=float),
+                int(time_reversal),
+            )
+        )
+    return _build_g0std_parent_coset_analysis(
+        g0std_cell=g0std_cell,
+        g0std_ssg=g0std_ssg,
+        ordered_magnetic_ops=ordered_magnetic_ops,
+        ordered_space_group_number=msg_parent_space_group_number,
+        ordered_subgroup_source="soc_magnetic_space_group",
+        relation_layer="soc_magnetic",
+        subgroup_time_branch_scope="full",
+        tol_cfg=tol_cfg,
     )
 
 
@@ -2282,9 +2344,172 @@ def _serialize_gspg_xyz_uvw_ops(
 
 def _format_gspg_xyz_uvw_text(rows: list[dict]) -> list[str]:
     return [
-        f"{row['index']}: xyzt={row['xyzt']}; uvw={row['uvw']}"
+        f"{row['index']} {row['xyzt']} {row['uvw']}"
         for row in rows
     ]
+
+
+def _gspg_pair_key(pair, *, decimals: int = 8) -> tuple:
+    spin_rotation, real_rotation = pair
+    return (
+        tuple(np.round(np.asarray(spin_rotation, dtype=float).flatten(), decimals)),
+        tuple(np.round(np.asarray(real_rotation, dtype=float).flatten(), decimals)),
+    )
+
+
+def _gspg_pair_multiply(left, right) -> list[np.ndarray]:
+    return [
+        np.asarray(left[0], dtype=float) @ np.asarray(right[0], dtype=float),
+        np.asarray(left[1], dtype=float) @ np.asarray(right[1], dtype=float),
+    ]
+
+
+def _gspg_pair_inverse(pair) -> list[np.ndarray]:
+    return [
+        np.linalg.inv(np.asarray(pair[0], dtype=float)),
+        np.linalg.inv(np.asarray(pair[1], dtype=float)),
+    ]
+
+
+def _gspg_pair_closure(generators, *, tol: float, limit: int) -> set[tuple]:
+    identity = [np.eye(3), np.eye(3)]
+    generator_words = deduplicate_matrix_pairs(
+        [
+            [np.asarray(item[0], dtype=float), np.asarray(item[1], dtype=float)]
+            for generator in generators
+            for item in (generator, _gspg_pair_inverse(generator))
+        ],
+        tol=tol,
+    )
+    seen = {_gspg_pair_key(identity)}
+    queue = [identity]
+    while queue:
+        current = queue.pop(0)
+        for generator in generator_words:
+            next_pair = _gspg_pair_multiply(current, generator)
+            next_key = _gspg_pair_key(next_pair)
+            if next_key in seen:
+                continue
+            seen.add(next_key)
+            if len(seen) > limit:
+                raise RuntimeError("GSPG generator closure exceeded limit")
+            queue.append(next_pair)
+    return seen
+
+
+def _select_gspg_generator_ops(ops, *, tol: float) -> list:
+    operations = deduplicate_matrix_pairs(
+        [[np.asarray(op[0], dtype=float), np.asarray(op[1], dtype=float)] for op in ops],
+        tol=tol,
+    )
+    if not operations:
+        return []
+
+    identity_key = _gspg_pair_key([np.eye(3), np.eye(3)])
+    target_keys = {_gspg_pair_key(op) for op in operations}
+    if target_keys == {identity_key}:
+        return [operations[0]]
+
+    candidates = [op for op in operations if _gspg_pair_key(op) != identity_key]
+    selected = []
+    closure = {identity_key}
+    limit = max(4096, len(target_keys) * 8)
+    for candidate in candidates:
+        if _gspg_pair_key(candidate) in closure:
+            continue
+        selected.append(candidate)
+        try:
+            closure = _gspg_pair_closure(selected, tol=tol, limit=limit)
+        except RuntimeError:
+            return candidates
+        if target_keys.issubset(closure):
+            return selected
+    return selected if target_keys.issubset(closure) else candidates
+
+
+def _gspg_pair_is_spin_only(pair, *, tol: float) -> bool:
+    return np.allclose(np.asarray(pair[1], dtype=float), np.eye(3), atol=tol, rtol=0)
+
+
+def _gspg_operation_indices_from_pairs(all_ops, selected_ops, *, tol: float) -> list[int]:
+    indices = []
+    for selected in selected_ops:
+        for idx, candidate in enumerate(all_ops, start=1):
+            if (
+                np.allclose(candidate[0], selected[0], atol=tol, rtol=0)
+                and np.allclose(candidate[1], selected[1], atol=tol, rtol=0)
+            ):
+                indices.append(idx)
+                break
+    return _deduplicate_operation_view_indices(indices)
+
+
+def _gspg_text_rows_for_indices(rows: list[dict], indices: list[int]) -> list[str]:
+    selected_rows = [
+        rows[index - 1]
+        for index in indices
+        if 1 <= index <= len(rows)
+    ]
+    return _format_gspg_xyz_uvw_text(selected_rows)
+
+
+def _format_gspg_spin_only_text(
+    *,
+    conf: str,
+    spin_only_xyz_uvw: list[dict],
+    collinear_axis,
+    tol: float,
+) -> list[str]:
+    if conf == "Collinear":
+        direction = _format_spin_only_direction(collinear_axis)
+        if direction:
+            return [f"Collinear direction: {direction}"]
+        return ["Collinear direction:"]
+    if conf == "Noncoplanar":
+        identity_row = _serialize_gspg_xyz_uvw_ops(
+            [[np.eye(3), np.eye(3)]],
+            tol=tol,
+        )
+        return _format_gspg_xyz_uvw_text(identity_row)
+    return _format_gspg_xyz_uvw_text(spin_only_xyz_uvw)
+
+
+def _build_gspg_text(
+    *,
+    symbol_linear: str,
+    spin_space_point_group_symbol_hm: str | None,
+    spin_space_point_group_symbol_s: str | None,
+    effective_mpg_symbol: str,
+    real_space_setting: str,
+    spin_frame_setting: str,
+    generator_rows: list[str],
+    operation_rows: list[str],
+    spin_only_rows: list[str],
+) -> str:
+    spin_space_point_group_symbol = spin_space_point_group_symbol_hm or ""
+    if spin_space_point_group_symbol_s:
+        spin_space_point_group_symbol = (
+            f"{spin_space_point_group_symbol} ({spin_space_point_group_symbol_s})"
+            if spin_space_point_group_symbol
+            else spin_space_point_group_symbol_s
+        )
+    lines = [
+        f"GSPG linear symbol: {symbol_linear}",
+        f"Spin-space point group symbol: {spin_space_point_group_symbol}",
+        f"Effective MPG: {effective_mpg_symbol}",
+        f"Real-space setting: {real_space_setting}",
+        f"Spin-frame setting: {spin_frame_setting}",
+        "",
+        "generators (excluding spin-only):",
+        *generator_rows,
+        "",
+        "operations:",
+        *operation_rows,
+        "",
+        "spin only:",
+        *spin_only_rows,
+    ]
+    return "\n".join(lines)
 
 
 def _gspg_public_operation_sets(ssg: SpinSpaceGroup):
@@ -2848,28 +3073,43 @@ def _build_gspg_payload(
 
     presented_xyz_uvw = _serialize_gspg_xyz_uvw_ops(presented_ops, tol=ssg.tol)
     raw_xyz_uvw = _serialize_gspg_xyz_uvw_ops(raw_ops, tol=ssg.tol)
+    generator_source_ops = [
+        op for op in presented_ops
+        if not _gspg_pair_is_spin_only(op, tol=ssg.tol)
+    ]
+    generator_ops = _select_gspg_generator_ops(generator_source_ops, tol=ssg.tol)
+    generator_indices = _gspg_operation_indices_from_pairs(
+        presented_ops,
+        generator_ops,
+        tol=ssg.tol,
+    )
+    generator_xyz_uvw = _serialize_gspg_xyz_uvw_ops(generator_ops, tol=ssg.tol)
     spin_only_xyz_uvw = _serialize_gspg_xyz_uvw_ops(spin_only_ops, tol=ssg.tol)
-    text_payload = {
-        "symbol_linear": symbol_linear,
-        "effective_mpg_symbol": empg_symbol,
-        "npg_symbol_s": npg_symbol_s,
-        "spin_only_component_symbol_s": spin_only_component_symbol_s,
-        "real_space_setting": real_space_setting,
-        "spin_frame_setting": spin_frame_setting,
-        "output_mode": output_mode,
-        "operation_count": len(presented_ops),
-        "raw_operation_count": len(raw_ops),
-        "spin_only_operation_count": len(spin_only_ops),
-        "operations": _format_gspg_xyz_uvw_text(presented_xyz_uvw),
-        "raw_operations": _format_gspg_xyz_uvw_text(raw_xyz_uvw),
-        "spin_only_operations": _format_gspg_xyz_uvw_text(spin_only_xyz_uvw),
-    }
+    text_payload = _build_gspg_text(
+        symbol_linear=symbol_linear,
+        spin_space_point_group_symbol_hm=ssg.spin_part_point_group_symbol_hm,
+        spin_space_point_group_symbol_s=ssg.spin_part_point_group_symbol_s,
+        effective_mpg_symbol=empg_symbol,
+        real_space_setting=real_space_setting,
+        spin_frame_setting=spin_frame_setting,
+        generator_rows=_gspg_text_rows_for_indices(presented_xyz_uvw, generator_indices),
+        operation_rows=_format_gspg_xyz_uvw_text(presented_xyz_uvw),
+        spin_only_rows=_format_gspg_spin_only_text(
+            conf=ssg.conf,
+            spin_only_xyz_uvw=spin_only_xyz_uvw,
+            collinear_axis=collinear_axis,
+            tol=ssg.tol,
+        ),
+    )
 
     return {
         "gspg_ops": _serialize_gspg_ops(presented_ops),
         "gspg_raw_ops": _serialize_gspg_ops(raw_ops),
         "gspg_ops_xyz_uvw": presented_xyz_uvw,
         "gspg_raw_ops_xyz_uvw": raw_xyz_uvw,
+        "gspg_generator_indices": generator_indices,
+        "gspg_generator_ops": _serialize_gspg_ops(generator_ops),
+        "gspg_generator_ops_xyz_uvw": generator_xyz_uvw,
         "gspg_spin_only_ops": _serialize_gspg_ops(spin_only_ops),
         "gspg_spin_only_ops_xyz_uvw": spin_only_xyz_uvw,
         "gspg_text": text_payload,
@@ -6759,6 +6999,7 @@ def _find_spin_group_from_parsed(
         None if source_metadata is None else source_metadata.get("parent_space_group")
     )
     domain_reversal_coset_analysis = None
+    soc_domain_reversal_coset_analysis = None
     if ssg_primitive.conf == "Collinear":
         try:
             domain_reversal_coset_analysis = _build_domain_reversal_coset_analysis(
@@ -6778,6 +7019,28 @@ def _find_spin_group_from_parsed(
                 },
                 "candidate_reversal_domains": [],
             }
+        if msg_parent_info["is_polar"] is True:
+            try:
+                soc_domain_reversal_coset_analysis = (
+                    _build_g0std_soc_domain_reversal_coset_analysis(
+                        g0std_cell=G0std_cell,
+                        g0std_ssg=G0std_ssg,
+                        msg_parent_space_group_number=msg_parent_info[
+                            "bns_parent_space_group_number"
+                        ],
+                        tol_cfg=tol_cfg,
+                    )
+                )
+            except Exception as exc:
+                soc_domain_reversal_coset_analysis = {
+                    "status": "not_evaluated_soc_parent_msg_coset_construction_failed",
+                    "basis_setting": G0_STANDARD_SETTING,
+                    "error": {
+                        "type": type(exc).__name__,
+                        "message": str(exc),
+                    },
+                    "candidate_reversal_domains": [],
+                }
     ferroelectric_switching = build_ferroelectric_switching_payload(
         input_space_group_number=input_space_group_number,
         input_space_group_symbol=input_space_group_symbol,
@@ -6793,6 +7056,7 @@ def _find_spin_group_from_parsed(
         spin_splitting_without_soc=ss_wo_soc,
         is_altermagnet=alter,
         domain_reversal_coset_analysis=domain_reversal_coset_analysis,
+        soc_domain_reversal_coset_analysis=soc_domain_reversal_coset_analysis,
     )
     acc_output_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_primitive_output_cell)
     poscar_spin_frame_to_acc_output_real_cartesian = np.linalg.inv(
