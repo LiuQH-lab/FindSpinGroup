@@ -10,10 +10,14 @@ set -euo pipefail
 ulimit -s unlimited
 ulimit -l unlimited
 
-module load anaconda
-set +u
-source activate base
-set -u
+if command -v module >/dev/null 2>&1; then
+  module load anaconda || true
+fi
+if command -v conda >/dev/null 2>&1; then
+  set +u
+  source activate base || true
+  set -u
+fi
 
 export OMP_NUM_THREADS=1
 export OPENBLAS_NUM_THREADS=1
@@ -42,6 +46,11 @@ VACUUM_AXIS="${VACUUM_AXIS:-}"
 EXPORT_RUNTIME_ROWS="${EXPORT_RUNTIME_ROWS:-1}"
 EXPORT_ROWS_JSONL_NAME="${EXPORT_ROWS_JSONL_NAME:-export_rows.jsonl}"
 EXPORT_ROWS_XLSX_NAME="${EXPORT_ROWS_XLSX_NAME:-export_rows.xlsx}"
+EXPORT_FERROELECTRIC_SWITCHING_OPS="${EXPORT_FERROELECTRIC_SWITCHING_OPS:-0}"
+FERROELECTRIC_SWITCHING_OPS_JSONL_NAME="${FERROELECTRIC_SWITCHING_OPS_JSONL_NAME:-ferroelectric_switching_ops.jsonl}"
+FERROELECTRIC_SWITCHING_OPS_CSV_NAME="${FERROELECTRIC_SWITCHING_OPS_CSV_NAME:-ferroelectric_switching_ops.csv}"
+FERROELECTRIC_SWITCHING_OPS_XLSX_NAME="${FERROELECTRIC_SWITCHING_OPS_XLSX_NAME:-ferroelectric_switching_ops.xlsx}"
+FERROELECTRIC_SWITCHING_OPS_SUMMARY_NAME="${FERROELECTRIC_SWITCHING_OPS_SUMMARY_NAME:-ferroelectric_switching_ops_summary.json}"
 INCLUDE_G0_SELF_AUDIT="${INCLUDE_G0_SELF_AUDIT:-0}"
 SHARD_INDEX="${SHARD_INDEX:-0}"
 SHARD_COUNT="${SHARD_COUNT:-1}"
@@ -222,6 +231,33 @@ if [[ "$EXPORT_RUNTIME_ROWS" != "0" ]]; then
   fi
 fi
 
+if [[ "$EXPORT_FERROELECTRIC_SWITCHING_OPS" != "0" ]]; then
+  if [[ -f "$RUNTIME_JSONL" ]]; then
+    SWITCHING_EXPORT_CMD=(
+      "$PYTHON_BIN"
+      "$REPO_ROOT/scripts/export_ferroelectric_switching_ops.py"
+      --runtime-jsonl
+      "$RUNTIME_JSONL"
+      --output-jsonl
+      "$OUTPUT_DIR/$FERROELECTRIC_SWITCHING_OPS_JSONL_NAME"
+      --output-csv
+      "$OUTPUT_DIR/$FERROELECTRIC_SWITCHING_OPS_CSV_NAME"
+      --output-xlsx
+      "$OUTPUT_DIR/$FERROELECTRIC_SWITCHING_OPS_XLSX_NAME"
+      --output-summary
+      "$OUTPUT_DIR/$FERROELECTRIC_SWITCHING_OPS_SUMMARY_NAME"
+    )
+    echo "Ferroelectric switching operation export:"
+    printf '  %q' "${SWITCHING_EXPORT_CMD[@]}"
+    echo
+    if ! "${SWITCHING_EXPORT_CMD[@]}"; then
+      echo "WARNING: ferroelectric switching operation export failed; batch results remain in $OUTPUT_DIR" >&2
+    fi
+  else
+    echo "WARNING: ferroelectric switching export skipped because $RUNTIME_JSONL was not found" >&2
+  fi
+fi
+
 echo "Finished at : $(date '+%Y-%m-%d %H:%M:%S')"
 echo "Summary     : $OUTPUT_DIR/summary.json"
 if [[ -f "$EXPORT_ROWS_JSONL" ]]; then
@@ -229,4 +265,7 @@ if [[ -f "$EXPORT_ROWS_JSONL" ]]; then
 fi
 if [[ -f "$EXPORT_ROWS_XLSX" ]]; then
   echo "Export xlsx : $EXPORT_ROWS_XLSX"
+fi
+if [[ "$EXPORT_FERROELECTRIC_SWITCHING_OPS" != "0" ]]; then
+  echo "Switching ops: $OUTPUT_DIR/$FERROELECTRIC_SWITCHING_OPS_JSONL_NAME"
 fi

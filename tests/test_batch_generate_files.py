@@ -848,7 +848,7 @@ def test_run_mcif_batch_exports_new_setting_alias_fields(tmp_path):
         "msg_spin_polarizations_setting": "acc_primitive_poscar_spin_frame",
         "spin_polarizations_acc_poscar_spin_frame_setting": "acc_primitive_poscar_spin_frame",
         "msg_spin_polarizations_acc_poscar_spin_frame_setting": "acc_primitive_poscar_spin_frame",
-        "gspg_symbol_linear": "-1|6_{3}/ -1|m 1|m -1|m ∞_{110}m|1",
+        "gspg_symbol_linear": "-1|6/ -1|m 1|m -1|m ∞_{110}m|1",
     }
 
 

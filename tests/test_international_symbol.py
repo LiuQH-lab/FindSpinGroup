@@ -12,6 +12,7 @@ from findspingroup.utils.seitz_symbol import (
     format_point_seitz_symbol_latex,
     format_translation_tau_latex,
 )
+from findspingroup.utils.international_symbol import _point_group_token_from_real_token
 
 
 @pytest.mark.parametrize(
@@ -39,6 +40,12 @@ def test_find_spin_group_exposes_international_symbol_fields():
     assert isinstance(result.primitive_magnetic_cell_ssg_international_linear, str)
     assert isinstance(result.primitive_magnetic_cell_ssg_international_latex, str)
     assert result.primitive_magnetic_cell_ssg_type in {"t", "k", "g"}
+
+
+def test_point_group_token_drops_braced_screw_subscripts():
+    assert _point_group_token_from_real_token("6_{3}/") == "6/"
+    assert _point_group_token_from_real_token("4_1") == "4"
+    assert _point_group_token_from_real_token("c") == "m"
 
 
 def test_mag_symmetry_result_repr_uses_linear_symbol_by_default():

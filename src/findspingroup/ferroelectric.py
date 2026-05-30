@@ -257,12 +257,16 @@ def _parent_candidate_same_left_coset(
     subgroup_parent_ops: list[tuple[np.ndarray, np.ndarray, int]],
     child_basis_in_parent: np.ndarray,
     *,
+    subgroup_time_branch_scope: str,
     tol: float,
 ) -> bool:
     left_rotation, left_translation, left_time, _, _ = candidate_left
     right_rotation, right_translation, right_time, _, _ = candidate_right
-    if int(left_time) != int(right_time):
+    relative_time = int(left_time) * int(right_time)
+    if subgroup_time_branch_scope == "unit" and relative_time != 1:
         return False
+    if subgroup_time_branch_scope not in {"unit", "full"}:
+        raise ValueError(f"unknown subgroup_time_branch_scope={subgroup_time_branch_scope!r}")
 
     relative_rotation = np.linalg.inv(left_rotation) @ right_rotation
     relative_translation = np.linalg.inv(left_rotation) @ (
@@ -270,7 +274,7 @@ def _parent_candidate_same_left_coset(
         - np.asarray(left_translation, dtype=float)
     )
     for subgroup_rotation, subgroup_translation, subgroup_time in subgroup_parent_ops:
-        if int(subgroup_time) != 1:
+        if int(subgroup_time) != relative_time:
             continue
         if not np.allclose(relative_rotation, subgroup_rotation, atol=tol, rtol=0.0):
             continue
@@ -288,6 +292,7 @@ def _parent_left_coset_partition(
     subgroup_parent_ops: list[tuple[np.ndarray, np.ndarray, int]],
     child_basis_in_parent: np.ndarray,
     *,
+    subgroup_time_branch_scope: str = "unit",
     tol: float,
 ) -> list[list[tuple[np.ndarray, np.ndarray, int, np.ndarray, np.ndarray]]]:
     unused = list(range(len(parent_candidates)))
@@ -302,6 +307,7 @@ def _parent_left_coset_partition(
                 parent_candidates[index],
                 subgroup_parent_ops,
                 child_basis_in_parent,
+                subgroup_time_branch_scope=subgroup_time_branch_scope,
                 tol=tol,
             )
         ]
@@ -832,6 +838,9 @@ def build_parent_standard_supercell_domain_coset_analysis(
     ordered_magnetic_ops: list[tuple[np.ndarray, np.ndarray, int]],
     ordered_space_group_number: int | None,
     basis_setting: str,
+    ordered_subgroup_source: str = "ordered_spin_space_real_space_projection",
+    relation_layer: str = "exchange_spin_space",
+    subgroup_time_branch_scope: str = "unit",
     ordered_cell: Any | None = None,
     collinear_axis: Any | None = None,
     tol: float = 1e-6,
@@ -950,7 +959,8 @@ def build_parent_standard_supercell_domain_coset_analysis(
             "status": "not_evaluated_ordered_group_not_subset_of_generated_parent_grey_group",
             "basis_setting": basis_setting,
             "parent_group_source": "spglib_standard_parent_lifted_to_ordered_standard_supercell",
-            "ordered_subgroup_source": "ordered_spin_space_real_space_projection",
+            "ordered_subgroup_source": ordered_subgroup_source,
+            "relation_layer": relation_layer,
             "parent_space_group_number": parent_space_group_number,
             "parent_space_group_symbol": parent_space_group_symbol,
             "parent_hall_number": parent_hall_number,
@@ -961,6 +971,7 @@ def build_parent_standard_supercell_domain_coset_analysis(
             "parent_operation_count": len(parent_candidates) // 2,
             "parent_grey_operation_count": len(parent_candidates),
             "ordered_operation_count": len(ordered_magnetic_ops),
+            "ordered_time_branch_scope": subgroup_time_branch_scope,
             "ordered_subset_of_parent": False,
             "unmatched_ordered_operation_count": len(unmatched),
             "unmatched_ordered_operations": unmatched[:8],
@@ -971,10 +982,12 @@ def build_parent_standard_supercell_domain_coset_analysis(
         parent_candidates,
         ordered_parent_ops,
         child_to_parent,
+        subgroup_time_branch_scope=subgroup_time_branch_scope,
         tol=tol,
     )
     candidate_domains = []
     collinear_domain_relation_candidates = []
+    domain_relation_representatives = []
     dedup_reversal_domains: dict[tuple[str, str, str], dict[str, Any]] = {}
 
     def record_dedup_domain(
@@ -1022,15 +1035,30 @@ def build_parent_standard_supercell_domain_coset_analysis(
         if representative_class not in domain["representative_classes"]:
             domain["representative_classes"].append(representative_class)
 
+    def relation_entry_sort_key(entry: dict[str, Any]) -> tuple[int, int]:
+        p_relation = entry.get("p_relation")
+        branch_relations = entry.get("collinear_branch_relations") or []
+        reverses_spin = any(
+            branch.get("spin_branch_relation") == "S -> -S"
+            and branch.get("valid_domain_relation") is True
+            for branch in branch_relations
+        )
+        if p_relation == "P -> -P":
+            return (0, 0)
+        if p_relation == "P -> P" and reverses_spin:
+            return (1, 0)
+        if p_relation == "P -> P":
+            return (2, 0)
+        return (3, 0)
+
     for coset_index, coset in enumerate(cosets):
+        relation_entries = []
         reversal_representatives = []
         general_relation_representatives = []
         for op in coset:
             child_rotation = op[3]
             child_translation = op[4]
             p_relation, axis_labels = _axis_relation_payload(child_rotation, axes, tol=tol)
-            if p_relation == "P -> other":
-                continue
             representative_payload = _magnetic_operation_payload(
                 (
                     child_rotation,
@@ -1061,6 +1089,7 @@ def build_parent_standard_supercell_domain_coset_analysis(
                     branch["exchange_only"] for branch in branch_payloads
                 ),
             }
+            relation_entries.append(relation_entry)
             if p_relation == "P -> -P":
                 reversal_representatives.append(relation_entry)
                 for branch_payload in branch_payloads:
@@ -1074,6 +1103,41 @@ def build_parent_standard_supercell_domain_coset_analysis(
                 for branch in branch_payloads
             ):
                 general_relation_representatives.append(relation_entry)
+
+        if relation_entries:
+            selected_relation_entry = sorted(
+                relation_entries,
+                key=relation_entry_sort_key,
+            )[0]
+            selected_branch_payloads = selected_relation_entry["collinear_branch_relations"]
+            relation_priority = relation_entry_sort_key(selected_relation_entry)[0]
+            domain_relation_representatives.append(
+                {
+                    "coset_index": coset_index,
+                    "coset_size": len(coset),
+                    "relation_scope": (
+                        "P -> -P candidate"
+                        if selected_relation_entry["p_relation"] == "P -> -P"
+                        else "P -> P magnetic-order-reversal"
+                        if relation_priority == 1
+                        else "P -> P"
+                        if selected_relation_entry["p_relation"] == "P -> P"
+                        else "P -> other"
+                    ),
+                    "relation_sort_order": relation_priority,
+                    "representative": selected_relation_entry["representative"],
+                    "representative_count": len(relation_entries),
+                    "p_relation": selected_relation_entry["p_relation"],
+                    "axis_labels": selected_relation_entry["axis_labels"],
+                    "collinear_branch_relations": selected_branch_payloads,
+                    "soc_allowed_exists": any(
+                        branch["soc_allowed"] for branch in selected_branch_payloads
+                    ),
+                    "exchange_only_exists": any(
+                        branch["exchange_only"] for branch in selected_branch_payloads
+                    ),
+                }
+            )
 
         if general_relation_representatives:
             first_general = general_relation_representatives[0]
@@ -1158,11 +1222,15 @@ def build_parent_standard_supercell_domain_coset_analysis(
         if candidate_domains
         else "no_parent_ordered_coset_maps_p_to_minus_p"
     )
+    domain_relation_representatives.sort(
+        key=lambda entry: (entry["relation_sort_order"], entry["coset_index"])
+    )
     return {
         "status": status,
         "basis_setting": basis_setting,
         "parent_group_source": "spglib_standard_parent_lifted_to_ordered_standard_supercell",
-        "ordered_subgroup_source": "ordered_spin_space_real_space_projection",
+        "ordered_subgroup_source": ordered_subgroup_source,
+        "relation_layer": relation_layer,
         "parent_space_group_number": parent_space_group_number,
         "parent_space_group_symbol": parent_space_group_symbol,
         "parent_hall_number": parent_hall_number,
@@ -1182,6 +1250,7 @@ def build_parent_standard_supercell_domain_coset_analysis(
         "parent_operation_count": len(parent_candidates) // 2,
         "parent_grey_operation_count": len(parent_candidates),
         "ordered_operation_count": len(ordered_magnetic_ops),
+        "ordered_time_branch_scope": subgroup_time_branch_scope,
         "ordered_subset_of_parent": True,
         "translation_quotient_status": (
             "physical_domains_deduplicated_by_signed_collinear_pattern"
@@ -1201,6 +1270,8 @@ def build_parent_standard_supercell_domain_coset_analysis(
         ),
         "left_coset_count": len(cosets),
         "left_coset_sizes": [len(coset) for coset in cosets],
+        "domain_relation_representative_count": len(domain_relation_representatives),
+        "domain_relation_representatives": domain_relation_representatives,
         "candidate_reversal_domain_count": len(candidate_domains),
         "candidate_reversal_domains": candidate_domains,
         "physical_reversal_domain_count": len(dedup_reversal_domains),
@@ -1440,6 +1511,173 @@ def _domain_reversal_symmetry_screening_payload(
     return payload
 
 
+def _soc_domain_reversal_symmetry_screening_payload(
+    *,
+    msg_parent_number: int | None,
+    coset_analysis: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    msg_is_polar = space_group_is_polar(msg_parent_number)
+    if msg_is_polar is False:
+        status = "not_applicable_soc_magnetic_symmetry_nonpolar"
+    elif msg_is_polar is None:
+        status = "not_evaluated_missing_soc_magnetic_symmetry"
+    elif coset_analysis is not None:
+        status = coset_analysis.get("status", "soc_parent_msg_coset_screened")
+    else:
+        status = "requires_soc_parent_msg_coset_validation"
+
+    payload = {
+        "status": status,
+        "scope": "symmetry_only_soc_magnetic",
+        "primary_order_parameter": {
+            "name": "electric_polarization",
+            "symbol": "P",
+            "required_test": "real_space_part_maps_P_to_minus_P",
+        },
+        "ordered_stabilizer": "soc_magnetic_space_group",
+        "candidate_operation_tests": [
+            "construct_parent_msg_coset_representatives",
+            "test_real_space_part_maps_P_to_minus_P",
+            "deduplicate_transformed_magnetic_structures_by_equivalence",
+        ],
+        "candidate_reversal_domains": [],
+    }
+    if coset_analysis is not None:
+        payload.update(coset_analysis)
+    return payload
+
+
+def _coset_operation_text(
+    representative: dict[str, Any],
+    spin_space_operation: str,
+) -> str:
+    return f"{{{spin_space_operation} || {_coset_xyzt_text(representative)}}}"
+
+
+def _coset_xyzt_text(representative: dict[str, Any]) -> str:
+    xyzt = representative.get("xyzt", "")
+    time_reversal = representative.get("time_reversal")
+    if time_reversal is not None and xyzt:
+        return f"{xyzt},{int(time_reversal):+d}"
+    if time_reversal is not None:
+        return f"{int(time_reversal):+d}"
+    return str(xyzt)
+
+
+def _spin_branch_uvw_text(spin_space_operation: str) -> str:
+    return "-u,-v,-w" if str(spin_space_operation).strip() == "-1" else "u,v,w"
+
+
+def _ferroelectric_domain_relation_rows(
+    screening: dict[str, Any],
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+
+    def select_parent_grey_display_branch(
+        branch_payloads: list[dict[str, Any]],
+    ) -> dict[str, Any] | None:
+        for branch in branch_payloads:
+            if (
+                branch.get("msg_compatible") is True
+                and branch.get("valid_domain_relation") is True
+            ):
+                return branch
+        for branch in branch_payloads:
+            if branch.get("valid_domain_relation") is True:
+                return branch
+        return branch_payloads[0] if branch_payloads else None
+
+    def append_row(
+        *,
+        entry: dict[str, Any],
+        branch: dict[str, Any],
+        scope: str,
+    ) -> None:
+        representative = entry.get("representative") or {}
+        spin_space_operation = branch.get("spin_space_operation", "")
+        p_relation = branch.get("p_relation")
+        s_relation = branch.get("spin_branch_relation")
+        rows.append(
+            {
+                "row_index": len(rows) + 1,
+                "scope": scope,
+                "coset_index": entry.get("coset_index"),
+                "coset_operation": _coset_operation_text(
+                    representative,
+                    spin_space_operation,
+                ),
+                "xyzt": _coset_xyzt_text(representative),
+                "uvw": _spin_branch_uvw_text(spin_space_operation),
+                "representative": representative,
+                "spin_space_operation": spin_space_operation,
+                "reverses_S": s_relation == "S -> -S",
+                "S_relation": s_relation,
+                "reverses_P": p_relation == "P -> -P",
+                "P_relation": p_relation,
+                "representative_class": branch.get("representative_class"),
+                "soc_allowed": branch.get("soc_allowed"),
+                "exchange_only": branch.get("exchange_only"),
+                "valid_domain_relation": branch.get("valid_domain_relation"),
+                "magnetic_order_relation": branch.get("magnetic_order_relation"),
+                "pattern_status": branch.get("pattern_status"),
+            }
+        )
+
+    def append_rows(entries: list[dict[str, Any]], *, scope: str) -> None:
+        for entry in entries:
+            for branch in entry.get("collinear_branch_relations") or []:
+                append_row(entry=entry, branch=branch, scope=scope)
+
+    all_coset_representatives = screening.get("domain_relation_representatives") or []
+    if all_coset_representatives:
+        for entry in all_coset_representatives:
+            branch = select_parent_grey_display_branch(
+                entry.get("collinear_branch_relations") or []
+            )
+            if branch is None:
+                continue
+            append_row(
+                entry=entry,
+                branch=branch,
+                scope=entry.get("relation_scope", "coset representative"),
+            )
+        return rows
+
+    append_rows(
+        screening.get("candidate_reversal_domains") or [],
+        scope="P -> -P candidate",
+    )
+    append_rows(
+        screening.get("collinear_domain_relation_candidates") or [],
+        scope="P -> P magnetic-order-reversal",
+    )
+    return rows
+
+
+def _format_bool_text(value: Any) -> str:
+    if value is True:
+        return "Y"
+    if value is False:
+        return "N"
+    return "?"
+
+
+def _ferroelectric_domain_relation_text(rows: list[dict[str, Any]]) -> str | None:
+    if not rows:
+        return None
+    lines = [
+        "domain relations:",
+        "No. xyzt uvw reverses_S reverses_P",
+    ]
+    for row in rows:
+        lines.append(
+            f"{row['row_index']} {row['xyzt']} {row['uvw']} "
+            f"{_format_bool_text(row.get('reverses_S'))} "
+            f"{_format_bool_text(row.get('reverses_P'))}"
+        )
+    return "\n".join(lines)
+
+
 def _post_fsg_path_validation_requirements_payload() -> dict[str, Any]:
     return {
         "status": "not_evaluated_by_findspingroup",
@@ -1499,6 +1737,7 @@ def build_ferroelectric_switching_payload(
     spin_splitting_without_soc: str | None = None,
     is_altermagnet: Any = None,
     domain_reversal_coset_analysis: dict[str, Any] | None = None,
+    soc_domain_reversal_coset_analysis: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a conservative symmetry-only ferroelectric switching payload.
 
@@ -1605,10 +1844,29 @@ def build_ferroelectric_switching_payload(
         domain_status=domain_status,
         coset_analysis=domain_reversal_coset_analysis,
     )
+    soc_domain_reversal_symmetry_screening = _soc_domain_reversal_symmetry_screening_payload(
+        msg_parent_number=msg_parent_number,
+        coset_analysis=soc_domain_reversal_coset_analysis,
+    )
     coset_domains = domain_reversal_symmetry_screening.get("candidate_reversal_domains", [])
+    domain_relation_rows = _ferroelectric_domain_relation_rows(
+        domain_reversal_symmetry_screening
+    )
+    domain_relation_text = _ferroelectric_domain_relation_text(domain_relation_rows)
+    soc_domain_relation_rows = _ferroelectric_domain_relation_rows(
+        soc_domain_reversal_symmetry_screening
+    )
+    soc_domain_relation_text = _ferroelectric_domain_relation_text(soc_domain_relation_rows)
     analysis_level = (
-        "symmetry_only_parent_ordered_coset_screened"
+        "symmetry_only_parent_ordered_and_soc_msg_cosets_screened"
+        if (
+            domain_reversal_coset_analysis is not None
+            and soc_domain_reversal_coset_analysis is not None
+        )
+        else "symmetry_only_parent_ordered_coset_screened"
         if domain_reversal_coset_analysis is not None
+        else "symmetry_only_soc_parent_msg_coset_screened"
+        if soc_domain_reversal_coset_analysis is not None
         else "symmetry_only_collinear_switching_not_evaluated"
         if collinear_only_status is not None
         else "symmetry_only_parent_ordered_coset_pending"
@@ -1656,6 +1914,11 @@ def build_ferroelectric_switching_payload(
         "ordered_allowed_polar_axes": ordered_spin_space["allowed_polar_axes"],
         "soc_allowed_polar_axes": soc_magnetic["allowed_polar_axes"],
         "domain_reversal_symmetry_screening": domain_reversal_symmetry_screening,
+        "domain_relation_rows": domain_relation_rows,
+        "domain_relation_text": domain_relation_text,
+        "soc_domain_reversal_symmetry_screening": soc_domain_reversal_symmetry_screening,
+        "soc_domain_relation_rows": soc_domain_relation_rows,
+        "soc_domain_relation_text": soc_domain_relation_text,
         "polarization_test_contract": {
             "mode": "polar_axis_basis_only",
             "claim": (
