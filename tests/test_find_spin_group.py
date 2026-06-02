@@ -1219,12 +1219,32 @@ def test_ferroelectric_switching_payload_classifies_parent_ordered_routes():
 
 def test_domain_reversal_coset_analysis_finds_parent_operation_flipping_polar_axis():
     identity = np.eye(3)
+    mirror_x = np.diag([-1.0, 1.0, 1.0])
+    mirror_y = np.diag([1.0, -1.0, 1.0])
+    twofold_z = np.diag([-1.0, -1.0, 1.0])
     mirror_z = np.diag([1.0, 1.0, -1.0])
+    inversion = -np.eye(3)
+    twofold_y = np.diag([-1.0, 1.0, -1.0])
+    twofold_x = np.diag([1.0, -1.0, -1.0])
     zero = np.zeros(3)
 
     analysis = build_domain_reversal_coset_analysis(
-        parent_ops=[[identity, zero], [mirror_z, zero]],
-        ordered_ops=[[identity, zero]],
+        parent_ops=[
+            [identity, zero],
+            [mirror_x, zero],
+            [mirror_y, zero],
+            [twofold_z, zero],
+            [mirror_z, zero],
+            [twofold_y, zero],
+            [twofold_x, zero],
+            [inversion, zero],
+        ],
+        ordered_ops=[
+            [identity, zero],
+            [mirror_x, zero],
+            [mirror_y, zero],
+            [twofold_z, zero],
+        ],
         ordered_space_group_number=33,
         parent_space_group_number=47,
         parent_space_group_symbol="Pmmm",
@@ -1361,6 +1381,17 @@ def test_find_spin_group_exposes_conservative_ferroelectric_switching_payload():
     induced = find_spin_group("tests/testset/mcif_241130_no2186/0.1000_Fe4O5.mcif")
 
     polar_payload = polar.ferroelectric_switching
+    assert set(polar.polar_axes_by_symmetry) == {"sg", "ossg", "msg"}
+    assert (
+        polar.polar_axes_by_symmetry["ossg"]["allowed_polar_axes"]
+        == polar_payload["allowed_polar_axes"]
+    )
+    assert polar.polar_axes_by_symmetry["sg"]["allowed_polar_axes_setting"] == "G0std"
+    assert (
+        polar.polar_axes_by_symmetry["sg"]["allowed_polar_axes_source"]
+        == "space_group_standard_basis_transformed_to_ssg_convention"
+    )
+    assert polar.to_summary_dict()["polar_axes_by_symmetry"] == polar.polar_axes_by_symmetry
     assert polar_payload["analysis_level"] == "symmetry_only_collinear_switching_not_evaluated"
     assert polar_payload["polarity_status"] == "parent_polar_axis_preserved"
     assert polar_payload["status"].endswith("_collinear_only")
@@ -1368,12 +1399,17 @@ def test_find_spin_group_exposes_conservative_ferroelectric_switching_payload():
     assert polar_payload["governing_symmetry"]["source"] == "ossg_real_space_projection"
     assert polar_payload["governing_symmetry"]["space_group_number"] == 33
     assert polar_payload["allowed_polar_axes"] == [
-        {
-            "label": "c",
-            "components": [0.0, 0.0, 1.0],
-            "setting": "ossg_real_space_projection_space_group_standard_direct_basis",
-        }
-    ]
+            {
+                "label": "c",
+                "components": [0.0, 0.0, 1.0],
+                "setting": "G0std",
+            }
+        ]
+    assert polar_payload["allowed_polar_axes_source"] == "real_space_operations"
+    assert (
+        polar.polar_axes_by_symmetry["msg"]["allowed_polar_axes_source"]
+        == "real_space_operations"
+    )
     assert polar_payload["special_coset"]["status"] == "not_promoted_to_switching_claim"
     assert (
         polar_payload["domain_reversal_symmetry_screening"]["status"]
@@ -1436,10 +1472,20 @@ def test_find_spin_group_basic_exposes_ferroelectric_switching_payload():
     result = find_spin_group_basic("tests/testset/mcif_241130_no2186/0.425_Na2CoP2O7.mcif")
 
     payload = result["ferroelectric_switching"]
+    assert set(result["polar_axes_by_symmetry"]) == {"sg", "ossg", "msg"}
+    assert (
+        result["polar_axes_by_symmetry"]["ossg"]["allowed_polar_axes"]
+        == payload["allowed_polar_axes"]
+    )
+    assert (
+        result["polar_axes_by_symmetry"]["sg"]["allowed_polar_axes_setting"]
+        == "acc_primitive"
+    )
     assert payload["polarity_status"] == "parent_polar_axis_preserved"
     assert payload["comparison_symmetry"]["ssg_space_group_number"] == 33
     assert payload["comparison_symmetry"]["ossg_space_group_number"] is None
     assert payload["ordered_spin_space_symmetry"]["source"] == "ssg_g0_real_space_projection"
+    assert result["polar_axes_by_symmetry"]["ossg"]["source"] == "ssg_g0_real_space_projection"
     assert (
         payload["ferroelectric_altermagnet_screening"]["status"]
         == "candidate_k_dependent_spin_splitting_not_flagged_altermagnet"

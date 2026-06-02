@@ -214,6 +214,8 @@ upload_files
 output_files
 output/
 datasets/
+# Local derived artifacts: batch summaries, case-study tables, fetched cluster outputs.
+artifacts/
 .playwright-mcp/
 .skill-staging/
 ~$*.pptx

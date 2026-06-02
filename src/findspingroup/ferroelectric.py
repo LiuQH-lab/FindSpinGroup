@@ -28,11 +28,10 @@ def _as_int_or_none(value: Any) -> int | None:
 
 
 def _polar_axis_payload(
-    space_group_number: int | None,
+    basis: tuple[tuple[float, float, float], ...] | None,
     *,
     setting: str,
 ) -> list[dict[str, Any]] | None:
-    basis = space_group_polar_axis_basis(space_group_number)
     if basis is None:
         return None
     return [
@@ -45,6 +44,64 @@ def _polar_axis_payload(
     ]
 
 
+def _real_rotation_from_operation(op: Any) -> np.ndarray:
+    if len(op) < 2:
+        raise ValueError("operation must contain at least rotation and translation")
+    first = np.asarray(op[0], dtype=float)
+    second = np.asarray(op[1], dtype=float)
+    if first.shape == (3, 3) and second.shape == (3, 3):
+        return second
+    if first.shape == (3, 3):
+        return first
+    raise ValueError("operation does not contain a 3x3 real-space rotation")
+
+
+def _polar_axis_basis_from_real_ops(
+    ops: Any | None,
+    *,
+    tol: float = 1e-8,
+) -> tuple[tuple[float, float, float], ...] | None:
+    if ops is None:
+        return None
+
+    unique_rotations: list[np.ndarray] = []
+    for op in ops:
+        rotation = _real_rotation_from_operation(op)
+        if not any(
+            np.allclose(rotation, existing, atol=tol, rtol=0.0)
+            for existing in unique_rotations
+        ):
+            unique_rotations.append(rotation)
+
+    if not unique_rotations:
+        return None
+
+    constraint_matrix = np.concatenate(
+        [rotation - np.eye(3, dtype=float) for rotation in unique_rotations],
+        axis=0,
+    )
+    _, singular_values, vh = np.linalg.svd(constraint_matrix)
+    rank = int(np.sum(singular_values > max(tol, 1e-8)))
+    basis = vh[rank:]
+    if basis.size == 0:
+        return ()
+
+    normalized = []
+    for vector in basis:
+        vector = np.asarray(vector, dtype=float)
+        max_abs = float(np.max(np.abs(vector)))
+        if max_abs < 1e-12:
+            continue
+        vector = vector / max_abs
+        vector[np.abs(vector) < 1e-10] = 0.0
+        nonzero_indices = np.where(np.abs(vector) >= 1e-10)[0]
+        if nonzero_indices.size and vector[int(nonzero_indices[0])] < 0:
+            vector = -vector
+        vector[np.abs(vector) < 1e-10] = 0.0
+        normalized.append(tuple(float(round(component, 12)) for component in vector))
+    return tuple(normalized)
+
+
 def _space_group_payload(
     *,
     source: str,
@@ -52,8 +109,17 @@ def _space_group_payload(
     space_group_symbol: str | None = None,
     msg_num: int | None = None,
     msg_symbol: str | None = None,
+    real_space_ops: Any | None = None,
+    real_space_ops_setting: str | None = None,
+    tol: float = 1e-8,
 ) -> dict[str, Any]:
     standard_direct_basis = f"{source}_space_group_standard_direct_basis"
+    axes = _polar_axis_basis_from_real_ops(real_space_ops, tol=tol)
+    axes_source = "real_space_operations" if axes is not None else "space_group_number"
+    axes_setting = real_space_ops_setting or standard_direct_basis
+    if axes is None:
+        axes = space_group_polar_axis_basis(space_group_number)
+        axes_setting = standard_direct_basis
     return {
         "source": source,
         "msg_num": msg_num,
@@ -63,13 +129,72 @@ def _space_group_payload(
         "is_polar": space_group_is_polar(space_group_number),
         "is_centrosymmetric": space_group_is_centrosymmetric(space_group_number),
         "allowed_polar_axes": (
-            [] if space_group_number is None else _polar_axis_payload(
-                space_group_number,
-                setting=standard_direct_basis,
-            )
+            [] if axes is None else _polar_axis_payload(axes, setting=axes_setting)
         ),
-        "allowed_polar_axes_setting": standard_direct_basis,
+        "allowed_polar_axes_setting": axes_setting,
+        "allowed_polar_axes_source": axes_source,
     }
+
+
+def _polar_axes_symmetry_payload(
+    payload: dict[str, Any] | None,
+    *,
+    role: str,
+) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    return {
+        "role": role,
+        "source": payload.get("source"),
+        "space_group_number": payload.get("space_group_number"),
+        "space_group_symbol": payload.get("space_group_symbol"),
+        "msg_num": payload.get("msg_num"),
+        "msg_symbol": payload.get("msg_symbol"),
+        "is_polar": payload.get("is_polar"),
+        "is_centrosymmetric": payload.get("is_centrosymmetric"),
+        "allowed_polar_axes": payload.get("allowed_polar_axes"),
+        "allowed_polar_axes_setting": payload.get("allowed_polar_axes_setting"),
+        "allowed_polar_axes_source": payload.get("allowed_polar_axes_source"),
+    }
+
+
+def build_polar_axes_by_symmetry_payload(
+    *,
+    sg_symmetry: dict[str, Any] | None = None,
+    sg_space_group_number: int | None,
+    sg_space_group_symbol: str | None = None,
+    sg_real_space_ops: Any | None = None,
+    sg_real_space_ops_setting: str | None = None,
+    ossg_symmetry: dict[str, Any] | None = None,
+    msg_symmetry: dict[str, Any] | None = None,
+    tol: float = 1e-8,
+) -> dict[str, Any] | None:
+    if sg_symmetry is None:
+        sg_symmetry = _space_group_payload(
+            source="nonmagnetic_space_group_in_ssg_convention",
+            space_group_number=sg_space_group_number,
+            space_group_symbol=sg_space_group_symbol,
+            real_space_ops=sg_real_space_ops,
+            real_space_ops_setting=sg_real_space_ops_setting,
+            tol=tol,
+        )
+    payload = {
+        "sg": _polar_axes_symmetry_payload(
+            sg_symmetry,
+            role="nonmagnetic_space_group_in_ssg_convention",
+        ),
+        "ossg": _polar_axes_symmetry_payload(
+            ossg_symmetry,
+            role="ordered_spin_space_real_space_projection",
+        ),
+        "msg": _polar_axes_symmetry_payload(
+            msg_symmetry,
+            role="soc_magnetic_space_group_parent",
+        ),
+    }
+    if all(entry is None for entry in payload.values()):
+        return None
+    return payload
 
 
 def _axis_labels(space_group_number: int | None) -> tuple[str, ...] | None:
@@ -443,8 +568,11 @@ def _match_transformed_sites(
     translation: np.ndarray,
     *,
     tol: float,
+    site_lookup: dict[tuple[int, tuple[int, int, int]], list[int]] | None = None,
+    site_lookup_bins: int | None = None,
 ) -> list[int] | None:
-    lookup, bins = _site_lookup(positions, atom_types, tol=tol)
+    if site_lookup is None or site_lookup_bins is None:
+        site_lookup, site_lookup_bins = _site_lookup(positions, atom_types, tol=tol)
     mapping = [-1] * len(positions)
     used: set[int] = set()
     for source_index, (position, atom_type) in enumerate(zip(positions, atom_types)):
@@ -453,10 +581,10 @@ def _match_transformed_sites(
             + np.asarray(translation, dtype=float),
             atol=tol,
         ) % 1.0
-        bucket_key = _position_bucket_key(target_position, bins)
+        bucket_key = _position_bucket_key(target_position, site_lookup_bins)
         matched_index = None
-        for neighbor_key in _position_neighbor_keys(bucket_key, bins):
-            for candidate_index in lookup.get((int(atom_type), neighbor_key), ()):
+        for neighbor_key in _position_neighbor_keys(bucket_key, site_lookup_bins):
+            for candidate_index in site_lookup.get((int(atom_type), neighbor_key), ()):
                 if candidate_index in used:
                     continue
                 if _periodic_norm_inf(target_position - positions[candidate_index]) < tol:
@@ -496,9 +624,12 @@ def _collinear_pattern_context(
     if not np.any(signed_pattern):
         return None
     lattice = np.asarray(getattr(ordered_cell, "lattice_matrix"), dtype=float)
+    site_lookup, site_lookup_bins = _site_lookup(positions, atom_types, tol=tol)
     return {
         "positions": positions,
         "atom_types": atom_types,
+        "site_lookup": site_lookup,
+        "site_lookup_bins": site_lookup_bins,
         "axis": axis,
         "signed_pattern": signed_pattern,
         "lattice": lattice,
@@ -521,6 +652,8 @@ def _transformed_collinear_pattern(
         rotation,
         translation,
         tol=tol,
+        site_lookup=context.get("site_lookup"),
+        site_lookup_bins=context.get("site_lookup_bins"),
     )
     if mapping is None:
         return None, "not_evaluated_site_mapping_failed"
@@ -697,7 +830,10 @@ def build_domain_reversal_coset_analysis(
     barrier checks remain downstream.
     """
 
-    axes = space_group_polar_axis_basis(ordered_space_group_number)
+    ordered_real_ops = _dedupe_real_ops(ordered_ops, tol=tol)
+    axes = _polar_axis_basis_from_real_ops(ordered_real_ops, tol=tol)
+    if axes is None:
+        axes = space_group_polar_axis_basis(ordered_space_group_number)
     if axes is None:
         return {
             "status": "not_evaluated_missing_ordered_space_group",
@@ -712,7 +848,6 @@ def build_domain_reversal_coset_analysis(
         }
 
     parent_real_ops = _dedupe_real_ops(parent_ops, tol=tol)
-    ordered_real_ops = _dedupe_real_ops(ordered_ops, tol=tol)
     msg_real_ops = [] if msg_ops is None else _dedupe_real_ops(msg_ops, tol=tol)
     ordered_subset = all(
         _contains_real_op(parent_real_ops, ordered_op, tol=tol)
@@ -856,7 +991,17 @@ def build_parent_standard_supercell_domain_coset_analysis(
     if parent_space_group_number is None or parent_hall_number is None:
         return None
 
-    axes = space_group_polar_axis_basis(ordered_space_group_number)
+    axes = None
+    if relation_layer != "soc_magnetic":
+        ordered_real_ops_for_axes = [
+            (np.asarray(op[0], dtype=float), np.asarray(op[1], dtype=float))
+            for op in ordered_magnetic_ops
+        ]
+        axes = _polar_axis_basis_from_real_ops(ordered_real_ops_for_axes, tol=tol)
+    if axes is None:
+        # The SOC branch can be time-branch scoped, so its operation list is not
+        # always a complete polar-axis constraint set.
+        axes = space_group_polar_axis_basis(ordered_space_group_number)
     if axes is None:
         return {
             "status": "not_evaluated_missing_ordered_space_group",
@@ -1738,6 +1883,11 @@ def build_ferroelectric_switching_payload(
     is_altermagnet: Any = None,
     domain_reversal_coset_analysis: dict[str, Any] | None = None,
     soc_domain_reversal_coset_analysis: dict[str, Any] | None = None,
+    ordered_real_space_ops: Any | None = None,
+    ordered_real_space_ops_setting: str | None = None,
+    soc_real_space_ops: Any | None = None,
+    soc_real_space_ops_setting: str | None = None,
+    tol: float = 1e-8,
 ) -> dict[str, Any]:
     """Build a conservative symmetry-only ferroelectric switching payload.
 
@@ -1821,12 +1971,18 @@ def build_ferroelectric_switching_payload(
     ordered_spin_space = _space_group_payload(
         source=ordered_source,
         space_group_number=ordered_space_group_number,
+        real_space_ops=ordered_real_space_ops,
+        real_space_ops_setting=ordered_real_space_ops_setting,
+        tol=tol,
     )
     soc_magnetic = _space_group_payload(
         source="msg_parent_space_group",
         space_group_number=msg_parent_number,
         msg_num=msg_num,
         msg_symbol=msg_symbol,
+        real_space_ops=soc_real_space_ops,
+        real_space_ops_setting=soc_real_space_ops_setting,
+        tol=tol,
     )
     ferroelectric_altermagnet_screening = _ferroelectric_altermagnet_screening_payload(
         ordered_space_group_number=ordered_space_group_number,
@@ -1910,6 +2066,7 @@ def build_ferroelectric_switching_payload(
         },
         "allowed_polar_axes": ordered_spin_space["allowed_polar_axes"],
         "allowed_polar_axes_setting": ordered_spin_space["allowed_polar_axes_setting"],
+        "allowed_polar_axes_source": ordered_spin_space["allowed_polar_axes_source"],
         "parent_allowed_polar_axes": structural_parent["allowed_polar_axes"],
         "ordered_allowed_polar_axes": ordered_spin_space["allowed_polar_axes"],
         "soc_allowed_polar_axes": soc_magnetic["allowed_polar_axes"],

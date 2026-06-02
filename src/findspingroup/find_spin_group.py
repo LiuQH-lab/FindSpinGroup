@@ -30,6 +30,7 @@ from findspingroup.data.acc_aligned_p_index_loader import (
 )
 from findspingroup.ferroelectric import (
     build_ferroelectric_switching_payload,
+    build_polar_axes_by_symmetry_payload,
     build_parent_standard_supercell_domain_coset_analysis,
 )
 from findspingroup.io import parse_poscar_file, parse_structure_file
@@ -58,11 +59,15 @@ from findspingroup.utils.symbolic_format import (
     symbolize_numeric_tokens_in_string,
 )
 from findspingroup.utils.space_group_flags import (
+    format_polar_axis_vector,
     msg_parent_space_group_info,
     space_group_is_centrosymmetric,
     space_group_is_chiral,
     space_group_is_polar,
+    space_group_polar_axis_basis,
 )
+
+
 from findspingroup.utils.seitz_symbol import (
     calibrated_symbol_tol,
     canonicalize_group_seitz_descriptions,
@@ -1035,6 +1040,7 @@ class MagSymmetryResult:
         )
         self.quasi_2d = symmetry.get('quasi_2d', None)
         self.ferroelectric_switching = symmetry.get('ferroelectric_switching', None)
+        self.polar_axes_by_symmetry = symmetry.get('polar_axes_by_symmetry', None)
 
 
         self.input_magnetic_primitive_ssg_ops = symmetry.get('input_magnetic_primitive_ssg_ops', None)
@@ -1553,6 +1559,7 @@ class MagSymmetryResult:
             'acc': self.acc,
             'properties': self.properties_summary(),
             'gspg': self.gspg_summary(),
+            'polar_axes_by_symmetry': self.polar_axes_by_symmetry,
             'ferroelectric_switching': self.ferroelectric_switching,
         }
 
@@ -1841,6 +1848,7 @@ class MagSymmetryResult:
                 'tensors': self.tensor_outputs,
                 'magnetic_site': self.magnetic_site_summary,
                 'quasi_2d': self.quasi_2d,
+                'polar_axes_by_symmetry': self.polar_axes_by_symmetry,
                 'ferroelectric_switching': self.ferroelectric_switching,
             },
             'artifacts': {
@@ -2168,6 +2176,92 @@ def _cell_to_poscar_in_snapshot_order(
             magmom,
         ]
     )
+
+
+def _normalise_polar_axis_vector(vector) -> tuple[float, float, float]:
+    vector = np.asarray(vector, dtype=float)
+    max_abs = float(np.max(np.abs(vector))) if vector.size else 0.0
+    if max_abs < 1e-12:
+        return (0.0, 0.0, 0.0)
+    vector = vector / max_abs
+    vector[np.abs(vector) < 1e-10] = 0.0
+    nonzero_indices = np.where(np.abs(vector) >= 1e-10)[0]
+    if nonzero_indices.size and vector[int(nonzero_indices[0])] < 0:
+        vector = -vector
+    vector[np.abs(vector) < 1e-10] = 0.0
+    return tuple(float(round(component, 12)) for component in vector)
+
+
+def _polar_axis_payload_from_basis(
+    basis,
+    *,
+    setting: str,
+) -> list[dict]:
+    if basis is None:
+        return None
+    return [
+        {
+            "label": format_polar_axis_vector(vector),
+            "components": [float(component) for component in vector],
+            "setting": setting,
+        }
+        for vector in basis
+    ]
+
+
+def _nonmagnetic_space_group_polar_symmetry_in_cell_basis(
+    cell: CrystalCell,
+    *,
+    setting: str,
+    tol_cfg: Tolerances,
+) -> dict | None:
+    dataset = get_symmetry_dataset(
+        cell.to_spglib(mag=False),
+        symprec=tol_cfg.space,
+    )
+    if dataset is None:
+        return None
+
+    space_group_number = int(dataset.number)
+    axes_standard = space_group_polar_axis_basis(space_group_number)
+    if axes_standard is None:
+        allowed_polar_axes = None
+    else:
+        standard_to_current = np.linalg.inv(
+            np.asarray(dataset.transformation_matrix, dtype=float)
+        )
+        axes_current = tuple(
+            _normalise_polar_axis_vector(standard_to_current @ np.asarray(axis, dtype=float))
+            for axis in axes_standard
+        )
+        allowed_polar_axes = _polar_axis_payload_from_basis(
+            axes_current,
+            setting=setting,
+        )
+
+    return {
+        "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
+        "msg_num": None,
+        "msg_symbol": None,
+        "space_group_number": space_group_number,
+        "space_group_symbol": str(dataset.international),
+        "is_polar": space_group_is_polar(space_group_number),
+        "is_centrosymmetric": space_group_is_centrosymmetric(space_group_number),
+        "allowed_polar_axes": allowed_polar_axes,
+        "allowed_polar_axes_setting": setting,
+        "allowed_polar_axes_source": (
+            "space_group_standard_basis_transformed_to_ssg_convention"
+        ),
+        "standard_basis_transform": {
+            "current_to_standard": np.asarray(
+                dataset.transformation_matrix,
+                dtype=float,
+            ).tolist(),
+            "standard_to_current": standard_to_current.tolist()
+            if axes_standard is not None
+            else None,
+        },
+    }
 
 
 def _build_g0std_parent_coset_analysis(
@@ -2711,12 +2805,15 @@ def _build_operation_view_set(
         all_ops = [all_ops[index - 1] for index in nssg_indices_in_source]
         ops_payload = _serialize_ssg_operation_matrices(all_ops)
         seitz_latex = [seitz_latex[index - 1] for index in nssg_indices_in_source]
-        view_ssg = SpinSpaceGroup(
-            all_ops,
-            tol=ssg.tol,
-            real_space_metric=ssg.real_space_metric,
-        )
-        generator_ops = _symbol_generator_ops_for_current_basis(view_ssg)
+        if generator_ops is None:
+            view_ssg = SpinSpaceGroup(
+                all_ops,
+                tol=ssg.tol,
+                real_space_metric=ssg.real_space_metric,
+            )
+            generator_ops = _symbol_generator_ops_for_current_basis(view_ssg)
+        else:
+            generator_ops = list(generator_ops)
         collinear_note = _operation_view_collinear_note(ssg, spin_frame=spin_frame)
 
     identity = np.eye(3)
@@ -6627,7 +6724,6 @@ def _find_spin_group_from_parsed(
     ss_w_soc = spin_splitting_w_soc(ssg_primitive)
     ahc_w_soc = is_ahc(primitive_ossg_for_phase.mpg_num)
     ss_wo_soc = magnetic_phase_payload['spin_splitting_without_soc']
-    ahc_wo_soc = is_ahc(ssg_primitive.gspg.empg_symbol)
     alter = magnetic_phase_payload['is_alter']
 
 
@@ -6992,6 +7088,7 @@ def _find_spin_group_from_parsed(
         spin_frame_setting=OSSG_ORIENTED_SPIN_FRAME_SETTING,
         spin_analysis_transform=_lattice_column_matrix(convention_cell),
     )
+    ahc_wo_soc = is_ahc(gspg_payload["gspg_effective_mpg_symbol"])
     msg_parent_info = msg_parent_space_group_info(msg_num)
     ossg_space_group_number = None if identify_index_details is None else identify_index_details.get("G0_id")
     ssg_space_group_number = int(ssg_primitive.G0_num)
@@ -7057,6 +7154,29 @@ def _find_spin_group_from_parsed(
         is_altermagnet=alter,
         domain_reversal_coset_analysis=domain_reversal_coset_analysis,
         soc_domain_reversal_coset_analysis=soc_domain_reversal_coset_analysis,
+        ordered_real_space_ops=[
+            (np.asarray(op[1], dtype=float), np.asarray(op[2], dtype=float))
+            for op in public_convention_ssg_ops
+        ],
+        ordered_real_space_ops_setting=convention_setting,
+        soc_real_space_ops=[
+            (np.asarray(op[1], dtype=float), np.asarray(op[2], dtype=float))
+            for op in public_ossg_ssg.msg_ops
+        ],
+        soc_real_space_ops_setting=convention_setting,
+        tol=tol_cfg.m_matrix_tol,
+    )
+    convention_sg_symmetry = _nonmagnetic_space_group_polar_symmetry_in_cell_basis(
+        convention_cell,
+        setting=convention_setting,
+        tol_cfg=tol_cfg,
+    )
+    polar_axes_by_symmetry = build_polar_axes_by_symmetry_payload(
+        sg_symmetry=convention_sg_symmetry,
+        sg_space_group_number=None,
+        ossg_symmetry=ferroelectric_switching.get("ordered_spin_space_symmetry"),
+        msg_symmetry=ferroelectric_switching.get("soc_magnetic_symmetry"),
+        tol=tol_cfg.m_matrix_tol,
     )
     acc_output_real_cartesian_to_poscar_spin_frame = _poscar_spin_frame_rotation(acc_primitive_output_cell)
     poscar_spin_frame_to_acc_output_real_cartesian = np.linalg.inv(
@@ -7483,6 +7603,7 @@ def _find_spin_group_from_parsed(
         'msg_acc': msg_acc,
         'KPOINTS':KPOINTS,
         'quasi_2d': quasi_2d_diagnostics,
+        'polar_axes_by_symmetry': polar_axes_by_symmetry,
         'ferroelectric_switching': ferroelectric_switching,
     }
 
@@ -7561,6 +7682,7 @@ def _find_spin_group_from_parsed(
                 'KPOINTS_setting': ACC_PRIMITIVE_SETTING,
                 'KPOINTS_real_space_setting': ACC_PRIMITIVE_SETTING,
                 'quasi_2d': quasi_2d_diagnostics,
+                'polar_axes_by_symmetry': polar_axes_by_symmetry,
                 'ferroelectric_switching': ferroelectric_switching,
                 'operation_views': operation_views,
                 'input_magnetic_primitive_ssg_ops': ssg_primitive.ops,
@@ -7964,7 +8086,8 @@ def _find_spin_group_basic_from_parsed(
     ss_w_soc = spin_splitting_w_soc(ssg_primitive)
     ahc_w_soc = is_ahc(primitive_ossg_for_phase.mpg_num)
     ss_wo_soc = magnetic_phase_payload["spin_splitting_without_soc"]
-    ahc_wo_soc = is_ahc(ssg_primitive.gspg.empg_symbol)
+    empg_symbol = ssg_primitive.gspg.empg_symbol
+    ahc_wo_soc = is_ahc(empg_symbol)
 
     transformation_input_to_primitive_setting = (
         np.asarray(transformation_input_to_primitive, dtype=float),
@@ -8126,6 +8249,26 @@ def _find_spin_group_basic_from_parsed(
         magnetic_configuration=ssg_primitive.conf,
         spin_splitting_without_soc=ss_wo_soc,
         is_altermagnet=magnetic_phase_payload["is_alter"],
+        ordered_real_space_ops=acc_primitive_ossg.G0_ops,
+        ordered_real_space_ops_setting=ACC_PRIMITIVE_SETTING,
+        soc_real_space_ops=[
+            (np.asarray(op[1], dtype=float), np.asarray(op[2], dtype=float))
+            for op in acc_primitive_ossg.msg_ops
+        ],
+        soc_real_space_ops_setting=ACC_PRIMITIVE_SETTING,
+        tol=tol_cfg.m_matrix_tol,
+    )
+    acc_primitive_sg_symmetry = _nonmagnetic_space_group_polar_symmetry_in_cell_basis(
+        acc_magnetic_primitive_cell,
+        setting=ACC_PRIMITIVE_SETTING,
+        tol_cfg=tol_cfg,
+    )
+    polar_axes_by_symmetry = build_polar_axes_by_symmetry_payload(
+        sg_symmetry=acc_primitive_sg_symmetry,
+        sg_space_group_number=None,
+        ossg_symmetry=ferroelectric_switching.get("ordered_spin_space_symmetry"),
+        msg_symmetry=ferroelectric_switching.get("soc_magnetic_symmetry"),
+        tol=tol_cfg.m_matrix_tol,
     )
 
     return {
@@ -8155,7 +8298,7 @@ def _find_spin_group_basic_from_parsed(
         "msg_type": msg_type,
         "msg_bns_number": msg_parent_info["bns_number"],
         "msg_og_number": msg_parent_info["og_number"],
-        "empg": ssg_primitive.gspg.empg_symbol,
+        "empg": empg_symbol,
         "conf": ssg_primitive.conf,
         "phase": magnetic_phase_payload["phase"],
         "magnetic_phase": magnetic_phase_payload["phase"],
@@ -8183,6 +8326,7 @@ def _find_spin_group_basic_from_parsed(
         "msg_is_polar": msg_parent_info["is_polar"],
         "msg_is_chiral": msg_parent_info["is_chiral"],
         "quasi_2d": None,
+        "polar_axes_by_symmetry": polar_axes_by_symmetry,
         "ferroelectric_switching": ferroelectric_switching,
         "tolerances": {
             "space_tol": float(tol_cfg.space),
