@@ -7,11 +7,20 @@
       "conf": "Collinear",
       "ferroelectric_switching": {
         "allowed_polar_axes": [],
-        "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+        "allowed_polar_axes_setting": "G0std",
+        "allowed_polar_axes_source": "real_space_operations",
         "analysis_level": "symmetry_only_parent_ordered_coset_screened",
         "candidate_reversal_domain_status": "not_applicable_ordered_symmetry_nonpolar",
         "candidate_reversal_domains": [],
+        "claim_level_contract": {
+          "current_positive_level": "p_reversal_symmetry_candidate",
+          "final_level": "validated_switchable",
+          "next_level": "switchable_candidate_pending_secondary_descriptor_and_path"
+        },
         "comparison_symmetry": {
+          "current_ordered_exact_parent_is_polar": false,
+          "current_ordered_exact_parent_space_group_number": 194,
+          "current_ordered_exact_parent_space_group_symbol": "P6_3/mmc",
           "input_is_polar": false,
           "input_space_group_number": 194,
           "input_space_group_symbol": "P6_3/mmc",
@@ -22,12 +31,26 @@
           "ssg_is_polar": false,
           "ssg_space_group_number": 194
         },
+        "domain_deduplication_contract": {
+          "domain_level_output": "after magnetic-structure equivalence deduplication, aggregate soc_allowed_exists and exchange_only_exists for the domain",
+          "mode": "transformed_magnetic_structure_equivalence",
+          "representative_level_output": "keep each symmetry representative and its SOC/exchange class",
+          "status": "required_before_validated_switching_claim"
+        },
+        "domain_relation_output_contract": {
+          "candidate_reversal_domains_scope": "P -> -P candidates only",
+          "display_descriptor_note": "Neel vector L, magnetization M, or signed pattern labels are presentation choices; classification should use the signed collinear pattern.",
+          "general_collinear_domain_relation_scope": "record P/L relation classes including P -> P, L -> -L outside candidate_reversal_domains",
+          "internal_descriptor": "signed_collinear_magnetic_pattern"
+        },
+        "domain_relation_rows": [],
+        "domain_relation_text": null,
         "domain_reversal_symmetry_screening": {
           "basis_setting": "G0std",
           "candidate_operation_tests": [
             "construct_parent_ordered_coset_representatives",
             "test_real_space_part_maps_P_to_minus_P",
-            "deduplicate_equivalent_domains_mod_translation_origin_setting_and_sublattice_relabeling",
+            "deduplicate_transformed_magnetic_structures_by_equivalence",
             "test_optional_secondary_descriptor_transform_for_each_surviving_candidate",
             "classify_representative_as_msg_compatible_or_spin_space_only"
           ],
@@ -44,11 +67,12 @@
           "scope": "symmetry_only",
           "secondary_order_parameter": {
             "examples": [
+              "collinear_neel_vector",
               "spin_splitting_S",
               "weak_moment_M",
               "magnetic_order_parameter"
             ],
-            "name": "optional_descriptor",
+            "name": "pending_explicit_descriptor",
             "required_test": "transport_descriptor_under_same_representative_and_compare_to_requested_target"
           },
           "status": "not_applicable_ordered_symmetry_nonpolar"
@@ -57,7 +81,8 @@
           "barrier_note": "Representative class is a symmetry label, not a barrier estimate; energy barriers require a structural path calculation.",
           "exchange_allowed_if": "the representative is valid in spin-space symmetry but is not MSG-compatible",
           "ordered_subgroup": "ossg_real_space_projection",
-          "parent_group": "input_structure_parent",
+          "parent_group": "current_ordered_exact_parent",
+          "scope": "collinear_only",
           "soc_allowed_if": "the same representative is compatible with the MSG spin-real locking map",
           "status": "not_applicable_ordered_symmetry_nonpolar",
           "switching_test": "real_space_coset_representative_maps_P_to_minus_P"
@@ -72,7 +97,7 @@
           "required_inputs": [
             "initial_domain_structure",
             "target_domain_structure_or_generating_operation",
-            "polarization_vector_and_basis",
+            "polar_axis_basis_or_optional_polarization_vector",
             "candidate_structural_path_or_mode_decomposition",
             "dft_total_energy_or_neb_profile"
           ],
@@ -110,7 +135,8 @@
         },
         "governing_symmetry": {
           "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": true,
           "is_polar": false,
           "msg_num": null,
@@ -119,10 +145,29 @@
           "space_group_number": 194,
           "space_group_symbol": null
         },
+        "input_structure_parent_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "input_structure_exact_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_source": "space_group_number",
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "input_structure_exact_parent",
+          "space_group_number": 194,
+          "space_group_symbol": "P6_3/mmc"
+        },
+        "msg_compatibility_rule": {
+          "exchange_only_label": "valid_spin_space_operation_not_msg_compatible",
+          "oriented_spin_frame_condition": "For an oriented spin-space operation {S||R|t}, MSG compatibility requires S = theta * det(R_cart) * R_cart in the same spin Cartesian frame, where theta=+1/-1 is the unitary/time-reversal branch.",
+          "soc_label": "msg_compatible",
+          "status": "rule_recorded_classification_pending"
+        },
         "ordered_allowed_polar_axes": [],
         "ordered_spin_space_symmetry": {
           "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": true,
           "is_polar": false,
           "msg_num": null,
@@ -132,9 +177,65 @@
           "space_group_symbol": null
         },
         "parent_allowed_polar_axes": [],
+        "parent_selection": {
+          "default": "current_ordered_exact_parent",
+          "high_temperature_parent_status": "not_inferred_from_fsg_inputs",
+          "override_status": "not_enabled_in_current_draft",
+          "source": "input_structure_exact_parent"
+        },
         "polarity_status": "ordered_symmetry_nonpolar",
+        "polarization_coupling_contract": {
+          "collinear_relation_classes": [
+            {
+              "label": "p_and_magnetic_order_reversed",
+              "magnetic_order_relation": "L -> -L",
+              "polarization_relation": "P -> -P",
+              "traditional_magnetically_controlled": true
+            },
+            {
+              "label": "p_reversed_magnetic_order_preserved",
+              "magnetic_order_relation": "L -> L",
+              "polarization_relation": "P -> -P",
+              "traditional_magnetically_controlled": false
+            },
+            {
+              "label": "p_preserved_magnetic_order_reversed",
+              "magnetic_order_relation": "L -> -L",
+              "polarization_relation": "P -> P",
+              "traditional_magnetically_controlled": false
+            }
+          ],
+          "collinear_spin_space_branches": [
+            {
+              "meaning": "preserve the signed collinear order descriptor",
+              "spin_space_operation": "+1"
+            },
+            {
+              "meaning": "reverse the signed collinear order descriptor",
+              "spin_space_operation": "-1"
+            }
+          ],
+          "current_evaluation_status": "definitions_recorded_collinear_classification_pending",
+          "input_magnetic_configuration": "Collinear",
+          "magnetically_controlled_polarization": {
+            "definition": "A symmetry-allowed relation between polarization and the collinear magnetic order descriptor under a domain operation. Symmetry can classify possible relations, but the practical switching path remains case dependent.",
+            "fsg_reporting_contract": "report all three collinear symmetry possibilities without promoting them to validated switching claims",
+            "traditional_strong_condition": "both polarization and the magnetic order descriptor reverse"
+          },
+          "magnetically_induced_polarization": {
+            "current_status_field": "polarity_status",
+            "current_status_value": "magnetically_induced_polar_candidate",
+            "definition": "The exact nonmagnetic parent of the ordered structure is nonpolar, while the ordered spin-space real-space projection is polar."
+          },
+          "scope": "collinear_only"
+        },
+        "polarization_test_contract": {
+          "claim": "The current screen tests whether a representative reverses an allowed polar-axis direction; it does not use a computed Berry phase polarization vector.",
+          "mode": "polar_axis_basis_only"
+        },
         "post_fsg_path_validation_requirements": {
           "checks": [
+            "deduplicate_transformed_magnetic_structures_by_equivalence",
             "whether_polarization_reversal_is_structurally_switchable",
             "which_minus_p_domain_is_selected_by_the_practical_electric_field_path",
             "whether_the_practical_minus_p_domain_has_the_requested_secondary_descriptor_state",
@@ -145,10 +246,38 @@
           "status": "not_evaluated_by_findspingroup"
         },
         "required_inputs_for_switching_claim": [],
+        "secondary_order_parameter_contract": {
+          "default_for_collinear_discussion": "neel_vector",
+          "notes": [
+            "Gu-style S->-S is not claimed yet.",
+            "For collinear AFM cases the natural first descriptor is the Neel vector.",
+            "Other cases may need spin_splitting_S, weak_moment_M, or an explicit order parameter."
+          ],
+          "status": "pending_definition_and_transport"
+        },
         "soc_allowed_polar_axes": [],
+        "soc_domain_relation_rows": [],
+        "soc_domain_relation_text": null,
+        "soc_domain_reversal_symmetry_screening": {
+          "candidate_operation_tests": [
+            "construct_parent_msg_coset_representatives",
+            "test_real_space_part_maps_P_to_minus_P",
+            "deduplicate_transformed_magnetic_structures_by_equivalence"
+          ],
+          "candidate_reversal_domains": [],
+          "ordered_stabilizer": "soc_magnetic_space_group",
+          "primary_order_parameter": {
+            "name": "electric_polarization",
+            "required_test": "real_space_part_maps_P_to_minus_P",
+            "symbol": "P"
+          },
+          "scope": "symmetry_only_soc_magnetic",
+          "status": "not_applicable_soc_magnetic_symmetry_nonpolar"
+        },
         "soc_magnetic_symmetry": {
           "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "msg_parent_space_group_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": true,
           "is_polar": false,
           "msg_num": 555,
@@ -170,12 +299,13 @@
         "status": "ordered_symmetry_forbids_polarization",
         "structural_parent_symmetry": {
           "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "input_structure_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "current_ordered_exact_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_source": "space_group_number",
           "is_centrosymmetric": true,
           "is_polar": false,
           "msg_num": null,
           "msg_symbol": null,
-          "source": "input_structure_parent",
+          "source": "current_ordered_exact_parent",
           "space_group_number": 194,
           "space_group_symbol": "P6_3/mmc"
         },
@@ -192,165 +322,72 @@
           ],
           "status": "not_candidate_from_current_ferroelectric_altermagnet_screening"
         },
-        "switching_detected": false
+        "switching_detected": false,
+        "translation_quotient_contract": {
+          "implementation_target": "retain raw parent-grey cosets for diagnostics, then deduplicate physical domains by transformed signed collinear pattern",
+          "principle": "Translations introduced only to embed parent operations in a common supercell are gauge/redundant; translations outside the actual magnetic-cell translation breaking should not create additional physical domains.",
+          "status": "implemented_by_signed_pattern_dedup_for_collinear_output"
+        }
       },
       "gspg": {
         "effective_mpg_symbol": "6/mmm1'",
         "npg_symbol_s": "Ci",
         "output_mode": "reduced_point_part_with_spin_only_annotation",
-        "point_part_linear": "-1|6_{3}/ -1|m 1|m -1|m",
+        "point_part_linear": "-1|6/ -1|m 1|m -1|m",
         "real_space_setting": "G0std",
         "spin_frame_setting": "ossg_oriented_spin_frame",
         "spin_only_component_symbol_s": "C∞v",
         "spin_only_part_linear": "∞_{110}m|1",
-        "symbol_linear": "-1|6_{3}/ -1|m 1|m -1|m ∞_{110}m|1",
+        "spin_space_point_group_symbol_hm": "∞/mm",
+        "spin_space_point_group_symbol_s": "D∞h",
+        "symbol_linear": "-1|6/ -1|m 1|m -1|m ∞_{110}m|1",
         "symbol_mode": "npg_x_spin_only",
         "tentative_symbol_s": "Ci x C∞v",
-        "text": {
-          "effective_mpg_symbol": "6/mmm1'",
-          "npg_symbol_s": "Ci",
-          "operation_count": 24,
-          "operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x-y,x,z,-1; uvw=-u,-v,-w",
-            "3: xyzt=y,-x+y,z,-1; uvw=-u,-v,-w",
-            "4: xyzt=-y,-x,z,+1; uvw=u,v,w",
-            "5: xyzt=x,y,-z,-1; uvw=-u,-v,-w",
-            "6: xyzt=y,x,z,-1; uvw=-u,-v,-w",
-            "7: xyzt=x,x-y,z,+1; uvw=u,v,w",
-            "8: xyzt=-x+y,y,z,+1; uvw=u,v,w",
-            "9: xyzt=x-y,-y,z,-1; uvw=-u,-v,-w",
-            "10: xyzt=-x,-x+y,z,-1; uvw=-u,-v,-w",
-            "11: xyzt=x-y,x,-z,+1; uvw=u,v,w",
-            "12: xyzt=y,-x+y,-z,+1; uvw=u,v,w",
-            "13: xyzt=-y,x-y,z,+1; uvw=u,v,w",
-            "14: xyzt=-x+y,-x,z,+1; uvw=u,v,w",
-            "15: xyzt=y,x,-z,+1; uvw=u,v,w",
-            "16: xyzt=-x,-y,z,-1; uvw=-u,-v,-w",
-            "17: xyzt=-y,-x,-z,-1; uvw=-u,-v,-w",
-            "18: xyzt=x-y,-y,-z,+1; uvw=u,v,w",
-            "19: xyzt=-x,-x+y,-z,+1; uvw=u,v,w",
-            "20: xyzt=-x+y,y,-z,-1; uvw=-u,-v,-w",
-            "21: xyzt=x,x-y,-z,-1; uvw=-u,-v,-w",
-            "22: xyzt=-x+y,-x,-z,-1; uvw=-u,-v,-w",
-            "23: xyzt=-y,x-y,-z,-1; uvw=-u,-v,-w",
-            "24: xyzt=-x,-y,-z,+1; uvw=u,v,w"
-          ],
-          "output_mode": "reduced_point_part_with_spin_only_annotation",
-          "raw_operation_count": 96,
-          "raw_operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x,y,z,-1; uvw=u,v,-w",
-            "3: xyzt=x,y,z,-1; uvw=v,u,w",
-            "4: xyzt=x,y,z,+1; uvw=v,u,-w",
-            "5: xyzt=x-y,x,z,-1; uvw=-v,-u,w",
-            "6: xyzt=y,-x+y,z,-1; uvw=-v,-u,w",
-            "7: xyzt=x-y,x,z,+1; uvw=-v,-u,-w",
-            "8: xyzt=y,-x+y,z,+1; uvw=-v,-u,-w",
-            "9: xyzt=x-y,x,z,+1; uvw=-u,-v,w",
-            "10: xyzt=y,-x+y,z,+1; uvw=-u,-v,w",
-            "11: xyzt=x-y,x,z,-1; uvw=-u,-v,-w",
-            "12: xyzt=y,-x+y,z,-1; uvw=-u,-v,-w",
-            "13: xyzt=-y,-x,z,+1; uvw=u,v,w",
-            "14: xyzt=-y,-x,z,-1; uvw=u,v,-w",
-            "15: xyzt=-y,-x,z,-1; uvw=v,u,w",
-            "16: xyzt=-y,-x,z,+1; uvw=v,u,-w",
-            "17: xyzt=x,y,-z,-1; uvw=-v,-u,w",
-            "18: xyzt=y,x,z,-1; uvw=-v,-u,w",
-            "19: xyzt=x,y,-z,+1; uvw=-v,-u,-w",
-            "20: xyzt=y,x,z,+1; uvw=-v,-u,-w",
-            "21: xyzt=x,y,-z,+1; uvw=-u,-v,w",
-            "22: xyzt=y,x,z,+1; uvw=-u,-v,w",
-            "23: xyzt=x,y,-z,-1; uvw=-u,-v,-w",
-            "24: xyzt=y,x,z,-1; uvw=-u,-v,-w",
-            "25: xyzt=x,x-y,z,+1; uvw=u,v,w",
-            "26: xyzt=-x+y,y,z,+1; uvw=u,v,w",
-            "27: xyzt=x,x-y,z,-1; uvw=u,v,-w",
-            "28: xyzt=-x+y,y,z,-1; uvw=u,v,-w",
-            "29: xyzt=x,x-y,z,-1; uvw=v,u,w",
-            "30: xyzt=-x+y,y,z,-1; uvw=v,u,w",
-            "31: xyzt=x,x-y,z,+1; uvw=v,u,-w",
-            "32: xyzt=-x+y,y,z,+1; uvw=v,u,-w",
-            "33: xyzt=x-y,-y,z,-1; uvw=-v,-u,w",
-            "34: xyzt=-x,-x+y,z,-1; uvw=-v,-u,w",
-            "35: xyzt=x-y,-y,z,+1; uvw=-v,-u,-w",
-            "36: xyzt=-x,-x+y,z,+1; uvw=-v,-u,-w",
-            "37: xyzt=x-y,-y,z,+1; uvw=-u,-v,w",
-            "38: xyzt=-x,-x+y,z,+1; uvw=-u,-v,w",
-            "39: xyzt=x-y,-y,z,-1; uvw=-u,-v,-w",
-            "40: xyzt=-x,-x+y,z,-1; uvw=-u,-v,-w",
-            "41: xyzt=x-y,x,-z,+1; uvw=u,v,w",
-            "42: xyzt=y,-x+y,-z,+1; uvw=u,v,w",
-            "43: xyzt=-y,x-y,z,+1; uvw=u,v,w",
-            "44: xyzt=-x+y,-x,z,+1; uvw=u,v,w",
-            "45: xyzt=x-y,x,-z,-1; uvw=u,v,-w",
-            "46: xyzt=y,-x+y,-z,-1; uvw=u,v,-w",
-            "47: xyzt=-y,x-y,z,-1; uvw=u,v,-w",
-            "48: xyzt=-x+y,-x,z,-1; uvw=u,v,-w",
-            "49: xyzt=x-y,x,-z,-1; uvw=v,u,w",
-            "50: xyzt=y,-x+y,-z,-1; uvw=v,u,w",
-            "51: xyzt=-y,x-y,z,-1; uvw=v,u,w",
-            "52: xyzt=-x+y,-x,z,-1; uvw=v,u,w",
-            "53: xyzt=x-y,x,-z,+1; uvw=v,u,-w",
-            "54: xyzt=y,-x+y,-z,+1; uvw=v,u,-w",
-            "55: xyzt=-y,x-y,z,+1; uvw=v,u,-w",
-            "56: xyzt=-x+y,-x,z,+1; uvw=v,u,-w",
-            "57: xyzt=y,x,-z,+1; uvw=u,v,w",
-            "58: xyzt=y,x,-z,-1; uvw=u,v,-w",
-            "59: xyzt=y,x,-z,-1; uvw=v,u,w",
-            "60: xyzt=y,x,-z,+1; uvw=v,u,-w",
-            "61: xyzt=-x,-y,z,-1; uvw=-v,-u,w",
-            "62: xyzt=-y,-x,-z,-1; uvw=-v,-u,w",
-            "63: xyzt=-x,-y,z,+1; uvw=-v,-u,-w",
-            "64: xyzt=-y,-x,-z,+1; uvw=-v,-u,-w",
-            "65: xyzt=-x,-y,z,+1; uvw=-u,-v,w",
-            "66: xyzt=-y,-x,-z,+1; uvw=-u,-v,w",
-            "67: xyzt=-x,-y,z,-1; uvw=-u,-v,-w",
-            "68: xyzt=-y,-x,-z,-1; uvw=-u,-v,-w",
-            "69: xyzt=x-y,-y,-z,+1; uvw=u,v,w",
-            "70: xyzt=-x,-x+y,-z,+1; uvw=u,v,w",
-            "71: xyzt=x-y,-y,-z,-1; uvw=u,v,-w",
-            "72: xyzt=-x,-x+y,-z,-1; uvw=u,v,-w",
-            "73: xyzt=x-y,-y,-z,-1; uvw=v,u,w",
-            "74: xyzt=-x,-x+y,-z,-1; uvw=v,u,w",
-            "75: xyzt=x-y,-y,-z,+1; uvw=v,u,-w",
-            "76: xyzt=-x,-x+y,-z,+1; uvw=v,u,-w",
-            "77: xyzt=-x+y,y,-z,-1; uvw=-v,-u,w",
-            "78: xyzt=x,x-y,-z,-1; uvw=-v,-u,w",
-            "79: xyzt=-x+y,y,-z,+1; uvw=-v,-u,-w",
-            "80: xyzt=x,x-y,-z,+1; uvw=-v,-u,-w",
-            "81: xyzt=-x+y,y,-z,+1; uvw=-u,-v,w",
-            "82: xyzt=x,x-y,-z,+1; uvw=-u,-v,w",
-            "83: xyzt=-x+y,y,-z,-1; uvw=-u,-v,-w",
-            "84: xyzt=x,x-y,-z,-1; uvw=-u,-v,-w",
-            "85: xyzt=-x+y,-x,-z,-1; uvw=-v,-u,w",
-            "86: xyzt=-y,x-y,-z,-1; uvw=-v,-u,w",
-            "87: xyzt=-x+y,-x,-z,+1; uvw=-v,-u,-w",
-            "88: xyzt=-y,x-y,-z,+1; uvw=-v,-u,-w",
-            "89: xyzt=-x+y,-x,-z,+1; uvw=-u,-v,w",
-            "90: xyzt=-y,x-y,-z,+1; uvw=-u,-v,w",
-            "91: xyzt=-x+y,-x,-z,-1; uvw=-u,-v,-w",
-            "92: xyzt=-y,x-y,-z,-1; uvw=-u,-v,-w",
-            "93: xyzt=-x,-y,-z,+1; uvw=u,v,w",
-            "94: xyzt=-x,-y,-z,-1; uvw=u,v,-w",
-            "95: xyzt=-x,-y,-z,-1; uvw=v,u,w",
-            "96: xyzt=-x,-y,-z,+1; uvw=v,u,-w"
-          ],
-          "real_space_setting": "G0std",
-          "spin_frame_setting": "ossg_oriented_spin_frame",
-          "spin_only_component_symbol_s": "C∞v",
-          "spin_only_operation_count": 4,
-          "spin_only_operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x,y,z,-1; uvw=u,v,-w",
-            "3: xyzt=x,y,z,-1; uvw=v,u,w",
-            "4: xyzt=x,y,z,+1; uvw=v,u,-w"
-          ],
-          "symbol_linear": "-1|6_{3}/ -1|m 1|m -1|m ∞_{110}m|1"
-        }
+        "text": "GSPG linear symbol: -1|6/ -1|m 1|m -1|m ∞_{110}m|1\nSpin-space point group symbol: ∞/mm (D∞h)\nEffective MPG: 6/mmm1'\nReal-space setting: G0std\nSpin-frame setting: ossg_oriented_spin_frame\n\ngenerators (excluding spin-only):\n2 x-y,x,z,-1 -u,-v,-w\n4 -y,-x,z,+1 u,v,w\n5 x,y,-z,-1 -u,-v,-w\n\noperations:\n1 x,y,z,+1 u,v,w\n2 x-y,x,z,-1 -u,-v,-w\n3 y,-x+y,z,-1 -u,-v,-w\n4 -y,-x,z,+1 u,v,w\n5 x,y,-z,-1 -u,-v,-w\n6 y,x,z,-1 -u,-v,-w\n7 x,x-y,z,+1 u,v,w\n8 -x+y,y,z,+1 u,v,w\n9 x-y,-y,z,-1 -u,-v,-w\n10 -x,-x+y,z,-1 -u,-v,-w\n11 x-y,x,-z,+1 u,v,w\n12 y,-x+y,-z,+1 u,v,w\n13 -y,x-y,z,+1 u,v,w\n14 -x+y,-x,z,+1 u,v,w\n15 y,x,-z,+1 u,v,w\n16 -x,-y,z,-1 -u,-v,-w\n17 -y,-x,-z,-1 -u,-v,-w\n18 x-y,-y,-z,+1 u,v,w\n19 -x,-x+y,-z,+1 u,v,w\n20 -x+y,y,-z,-1 -u,-v,-w\n21 x,x-y,-z,-1 -u,-v,-w\n22 -x+y,-x,-z,-1 -u,-v,-w\n23 -y,x-y,-z,-1 -u,-v,-w\n24 -x,-y,-z,+1 u,v,w\n\nspin only:\nCollinear direction: sqrt(2)/2,sqrt(2)/2,0"
       },
       "index": "194.164.1.1.L",
       "phase": "AFM(Altermagnet)",
+      "polar_axes_by_symmetry": {
+        "msg": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": 555,
+          "msg_symbol": "Cmcm",
+          "role": "soc_magnetic_space_group_parent",
+          "source": "msg_parent_space_group",
+          "space_group_number": 63,
+          "space_group_symbol": null
+        },
+        "ossg": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "ordered_spin_space_real_space_projection",
+          "source": "ossg_real_space_projection",
+          "space_group_number": 194,
+          "space_group_symbol": null
+        },
+        "sg": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "nonmagnetic_space_group_in_ssg_convention",
+          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
+          "space_group_number": 194,
+          "space_group_symbol": "P6_3/mmc"
+        }
+      },
       "properties": {
         "ahc_w_soc": "No",
         "ahc_wo_soc": "No",
@@ -412,11 +449,20 @@
       "conf": "Noncoplanar",
       "ferroelectric_switching": {
         "allowed_polar_axes": [],
-        "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
-        "analysis_level": "symmetry_only_parent_ordered_coset_screened",
+        "allowed_polar_axes_setting": "G0std",
+        "allowed_polar_axes_source": "real_space_operations",
+        "analysis_level": "symmetry_only_collinear_switching_not_evaluated",
         "candidate_reversal_domain_status": "not_applicable_ordered_symmetry_nonpolar",
         "candidate_reversal_domains": [],
+        "claim_level_contract": {
+          "current_positive_level": "p_reversal_symmetry_candidate",
+          "final_level": "validated_switchable",
+          "next_level": "switchable_candidate_pending_secondary_descriptor_and_path"
+        },
         "comparison_symmetry": {
+          "current_ordered_exact_parent_is_polar": false,
+          "current_ordered_exact_parent_space_group_number": 194,
+          "current_ordered_exact_parent_space_group_symbol": "P6_3/mmc",
           "input_is_polar": false,
           "input_space_group_number": 194,
           "input_space_group_symbol": "P6_3/mmc",
@@ -427,12 +473,25 @@
           "ssg_is_polar": false,
           "ssg_space_group_number": 194
         },
+        "domain_deduplication_contract": {
+          "domain_level_output": "after magnetic-structure equivalence deduplication, aggregate soc_allowed_exists and exchange_only_exists for the domain",
+          "mode": "transformed_magnetic_structure_equivalence",
+          "representative_level_output": "keep each symmetry representative and its SOC/exchange class",
+          "status": "required_before_validated_switching_claim"
+        },
+        "domain_relation_output_contract": {
+          "candidate_reversal_domains_scope": "P -> -P candidates only",
+          "display_descriptor_note": "Neel vector L, magnetization M, or signed pattern labels are presentation choices; classification should use the signed collinear pattern.",
+          "general_collinear_domain_relation_scope": "record P/L relation classes including P -> P, L -> -L outside candidate_reversal_domains",
+          "internal_descriptor": "signed_collinear_magnetic_pattern"
+        },
+        "domain_relation_rows": [],
+        "domain_relation_text": null,
         "domain_reversal_symmetry_screening": {
-          "basis_setting": "G0std",
           "candidate_operation_tests": [
             "construct_parent_ordered_coset_representatives",
             "test_real_space_part_maps_P_to_minus_P",
-            "deduplicate_equivalent_domains_mod_translation_origin_setting_and_sublattice_relabeling",
+            "deduplicate_transformed_magnetic_structures_by_equivalence",
             "test_optional_secondary_descriptor_transform_for_each_surviving_candidate",
             "classify_representative_as_msg_compatible_or_spin_space_only"
           ],
@@ -449,11 +508,12 @@
           "scope": "symmetry_only",
           "secondary_order_parameter": {
             "examples": [
+              "collinear_neel_vector",
               "spin_splitting_S",
               "weak_moment_M",
               "magnetic_order_parameter"
             ],
-            "name": "optional_descriptor",
+            "name": "pending_explicit_descriptor",
             "required_test": "transport_descriptor_under_same_representative_and_compare_to_requested_target"
           },
           "status": "not_applicable_ordered_symmetry_nonpolar"
@@ -462,7 +522,8 @@
           "barrier_note": "Representative class is a symmetry label, not a barrier estimate; energy barriers require a structural path calculation.",
           "exchange_allowed_if": "the representative is valid in spin-space symmetry but is not MSG-compatible",
           "ordered_subgroup": "ossg_real_space_projection",
-          "parent_group": "input_structure_parent",
+          "parent_group": "current_ordered_exact_parent",
+          "scope": "collinear_only",
           "soc_allowed_if": "the same representative is compatible with the MSG spin-real locking map",
           "status": "not_applicable_ordered_symmetry_nonpolar",
           "switching_test": "real_space_coset_representative_maps_P_to_minus_P"
@@ -477,7 +538,7 @@
           "required_inputs": [
             "initial_domain_structure",
             "target_domain_structure_or_generating_operation",
-            "polarization_vector_and_basis",
+            "polar_axis_basis_or_optional_polarization_vector",
             "candidate_structural_path_or_mode_decomposition",
             "dft_total_energy_or_neb_profile"
           ],
@@ -515,7 +576,8 @@
         },
         "governing_symmetry": {
           "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": true,
           "is_polar": false,
           "msg_num": null,
@@ -524,10 +586,29 @@
           "space_group_number": 194,
           "space_group_symbol": null
         },
+        "input_structure_parent_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "input_structure_exact_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_source": "space_group_number",
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "input_structure_exact_parent",
+          "space_group_number": 194,
+          "space_group_symbol": "P6_3/mmc"
+        },
+        "msg_compatibility_rule": {
+          "exchange_only_label": "valid_spin_space_operation_not_msg_compatible",
+          "oriented_spin_frame_condition": "For an oriented spin-space operation {S||R|t}, MSG compatibility requires S = theta * det(R_cart) * R_cart in the same spin Cartesian frame, where theta=+1/-1 is the unitary/time-reversal branch.",
+          "soc_label": "msg_compatible",
+          "status": "rule_recorded_classification_pending"
+        },
         "ordered_allowed_polar_axes": [],
         "ordered_spin_space_symmetry": {
           "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": true,
           "is_polar": false,
           "msg_num": null,
@@ -537,9 +618,65 @@
           "space_group_symbol": null
         },
         "parent_allowed_polar_axes": [],
+        "parent_selection": {
+          "default": "current_ordered_exact_parent",
+          "high_temperature_parent_status": "not_inferred_from_fsg_inputs",
+          "override_status": "not_enabled_in_current_draft",
+          "source": "input_structure_exact_parent"
+        },
         "polarity_status": "ordered_symmetry_nonpolar",
+        "polarization_coupling_contract": {
+          "collinear_relation_classes": [
+            {
+              "label": "p_and_magnetic_order_reversed",
+              "magnetic_order_relation": "L -> -L",
+              "polarization_relation": "P -> -P",
+              "traditional_magnetically_controlled": true
+            },
+            {
+              "label": "p_reversed_magnetic_order_preserved",
+              "magnetic_order_relation": "L -> L",
+              "polarization_relation": "P -> -P",
+              "traditional_magnetically_controlled": false
+            },
+            {
+              "label": "p_preserved_magnetic_order_reversed",
+              "magnetic_order_relation": "L -> -L",
+              "polarization_relation": "P -> P",
+              "traditional_magnetically_controlled": false
+            }
+          ],
+          "collinear_spin_space_branches": [
+            {
+              "meaning": "preserve the signed collinear order descriptor",
+              "spin_space_operation": "+1"
+            },
+            {
+              "meaning": "reverse the signed collinear order descriptor",
+              "spin_space_operation": "-1"
+            }
+          ],
+          "current_evaluation_status": "not_evaluated_noncollinear_order_collinear_only",
+          "input_magnetic_configuration": "Noncoplanar",
+          "magnetically_controlled_polarization": {
+            "definition": "A symmetry-allowed relation between polarization and the collinear magnetic order descriptor under a domain operation. Symmetry can classify possible relations, but the practical switching path remains case dependent.",
+            "fsg_reporting_contract": "report all three collinear symmetry possibilities without promoting them to validated switching claims",
+            "traditional_strong_condition": "both polarization and the magnetic order descriptor reverse"
+          },
+          "magnetically_induced_polarization": {
+            "current_status_field": "polarity_status",
+            "current_status_value": "magnetically_induced_polar_candidate",
+            "definition": "The exact nonmagnetic parent of the ordered structure is nonpolar, while the ordered spin-space real-space projection is polar."
+          },
+          "scope": "collinear_only"
+        },
+        "polarization_test_contract": {
+          "claim": "The current screen tests whether a representative reverses an allowed polar-axis direction; it does not use a computed Berry phase polarization vector.",
+          "mode": "polar_axis_basis_only"
+        },
         "post_fsg_path_validation_requirements": {
           "checks": [
+            "deduplicate_transformed_magnetic_structures_by_equivalence",
             "whether_polarization_reversal_is_structurally_switchable",
             "which_minus_p_domain_is_selected_by_the_practical_electric_field_path",
             "whether_the_practical_minus_p_domain_has_the_requested_secondary_descriptor_state",
@@ -550,6 +687,15 @@
           "status": "not_evaluated_by_findspingroup"
         },
         "required_inputs_for_switching_claim": [],
+        "secondary_order_parameter_contract": {
+          "default_for_collinear_discussion": "neel_vector",
+          "notes": [
+            "Gu-style S->-S is not claimed yet.",
+            "For collinear AFM cases the natural first descriptor is the Neel vector.",
+            "Other cases may need spin_splitting_S, weak_moment_M, or an explicit order parameter."
+          ],
+          "status": "pending_definition_and_transport"
+        },
         "soc_allowed_polar_axes": [
           {
             "components": [
@@ -558,9 +704,27 @@
               1.0
             ],
             "label": "c",
-            "setting": "msg_parent_space_group_space_group_standard_direct_basis"
+            "setting": "G0std"
           }
         ],
+        "soc_domain_relation_rows": [],
+        "soc_domain_relation_text": null,
+        "soc_domain_reversal_symmetry_screening": {
+          "candidate_operation_tests": [
+            "construct_parent_msg_coset_representatives",
+            "test_real_space_part_maps_P_to_minus_P",
+            "deduplicate_transformed_magnetic_structures_by_equivalence"
+          ],
+          "candidate_reversal_domains": [],
+          "ordered_stabilizer": "soc_magnetic_space_group",
+          "primary_order_parameter": {
+            "name": "electric_polarization",
+            "required_test": "real_space_part_maps_P_to_minus_P",
+            "symbol": "P"
+          },
+          "scope": "symmetry_only_soc_magnetic",
+          "status": "requires_soc_parent_msg_coset_validation"
+        },
         "soc_magnetic_symmetry": {
           "allowed_polar_axes": [
             {
@@ -570,10 +734,11 @@
                 1.0
               ],
               "label": "c",
-              "setting": "msg_parent_space_group_space_group_standard_direct_basis"
+              "setting": "G0std"
             }
           ],
-          "allowed_polar_axes_setting": "msg_parent_space_group_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": false,
           "is_polar": true,
           "msg_num": 1285,
@@ -590,17 +755,18 @@
         },
         "special_coset": {
           "reason": "The switching screen uses the structural parent SG modulo the ordered OSSG real-space projection. A representative is only a reversal candidate after the real-space P -> -P test; pure translation does not flip polarization.",
-          "status": "replaced_by_sg_to_ossg_coset_screening"
+          "status": "not_promoted_to_switching_claim"
         },
         "status": "ordered_symmetry_forbids_polarization",
         "structural_parent_symmetry": {
           "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "input_structure_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "current_ordered_exact_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_source": "space_group_number",
           "is_centrosymmetric": true,
           "is_polar": false,
           "msg_num": null,
           "msg_symbol": null,
-          "source": "input_structure_parent",
+          "source": "current_ordered_exact_parent",
           "space_group_number": 194,
           "space_group_symbol": "P6_3/mmc"
         },
@@ -617,188 +783,82 @@
           ],
           "status": "not_candidate_from_current_ferroelectric_altermagnet_screening"
         },
-        "switching_detected": false
+        "switching_detected": false,
+        "translation_quotient_contract": {
+          "implementation_target": "retain raw parent-grey cosets for diagnostics, then deduplicate physical domains by transformed signed collinear pattern",
+          "principle": "Translations introduced only to embed parent operations in a common supercell are gauge/redundant; translations outside the actual magnetic-cell translation breaking should not create additional physical domains.",
+          "status": "implemented_by_signed_pattern_dedup_for_collinear_output"
+        }
       },
       "gspg": {
         "effective_mpg_symbol": "6/m'm'm'",
         "npg_symbol_s": "D3d",
         "output_mode": "explicit_ops",
-        "point_part_linear": "2_{100}|6_{3}/ -1|m m_{100}|m -1|m",
+        "point_part_linear": "2_{100}|6/ -1|m m_{100}|m -1|m",
         "real_space_setting": "G0std",
         "spin_frame_setting": "ossg_oriented_spin_frame",
         "spin_only_component_symbol_s": "C3",
         "spin_only_part_linear": "3|1",
-        "symbol_linear": "2_{100}|6_{3}/ -1|m m_{100}|m -1|m 3|1",
+        "spin_space_point_group_symbol_hm": "-3m",
+        "spin_space_point_group_symbol_s": "D3d",
+        "symbol_linear": "2_{100}|6/ -1|m m_{100}|m -1|m 3|1",
         "symbol_mode": "point_part_and_spin_only",
         "tentative_symbol_s": null,
-        "text": {
-          "effective_mpg_symbol": "6/m'm'm'",
-          "npg_symbol_s": "D3d",
-          "operation_count": 72,
-          "operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x,y,z,+1; uvw=-v,u-v,w",
-            "3: xyzt=x,y,z,+1; uvw=-u+v,-u,w",
-            "4: xyzt=y,-x+y,z,+1; uvw=u-v,-v,-w",
-            "5: xyzt=y,-x+y,z,+1; uvw=v,u,-w",
-            "6: xyzt=y,-x+y,z,+1; uvw=-u,-u+v,-w",
-            "7: xyzt=x-y,x,z,+1; uvw=u-v,-v,-w",
-            "8: xyzt=x-y,x,z,+1; uvw=v,u,-w",
-            "9: xyzt=x-y,x,z,+1; uvw=-u,-u+v,-w",
-            "10: xyzt=-y,-x,z,-1; uvw=-u+v,v,w",
-            "11: xyzt=-y,-x,z,-1; uvw=-v,-u,w",
-            "12: xyzt=-y,-x,z,-1; uvw=u,u-v,w",
-            "13: xyzt=x,y,-z,-1; uvw=-u,-v,-w",
-            "14: xyzt=y,x,z,-1; uvw=-u,-v,-w",
-            "15: xyzt=x,y,-z,-1; uvw=v,-u+v,-w",
-            "16: xyzt=y,x,z,-1; uvw=v,-u+v,-w",
-            "17: xyzt=x,y,-z,-1; uvw=u-v,u,-w",
-            "18: xyzt=y,x,z,-1; uvw=u-v,u,-w",
-            "19: xyzt=-x+y,y,z,-1; uvw=-u+v,v,w",
-            "20: xyzt=x,x-y,z,-1; uvw=-u+v,v,w",
-            "21: xyzt=-x+y,y,z,-1; uvw=-v,-u,w",
-            "22: xyzt=x,x-y,z,-1; uvw=-v,-u,w",
-            "23: xyzt=-x+y,y,z,-1; uvw=u,u-v,w",
-            "24: xyzt=x,x-y,z,-1; uvw=u,u-v,w",
-            "25: xyzt=x-y,-y,z,-1; uvw=-u,-v,-w",
-            "26: xyzt=-x,-x+y,z,-1; uvw=-u,-v,-w",
-            "27: xyzt=x-y,-y,z,-1; uvw=v,-u+v,-w",
-            "28: xyzt=-x,-x+y,z,-1; uvw=v,-u+v,-w",
-            "29: xyzt=x-y,-y,z,-1; uvw=u-v,u,-w",
-            "30: xyzt=-x,-x+y,z,-1; uvw=u-v,u,-w",
-            "31: xyzt=-x+y,-x,z,+1; uvw=u,v,w",
-            "32: xyzt=-y,x-y,z,+1; uvw=u,v,w",
-            "33: xyzt=y,-x+y,-z,-1; uvw=-u+v,v,w",
-            "34: xyzt=x-y,x,-z,-1; uvw=-u+v,v,w",
-            "35: xyzt=y,-x+y,-z,-1; uvw=-v,-u,w",
-            "36: xyzt=x-y,x,-z,-1; uvw=-v,-u,w",
-            "37: xyzt=-y,x-y,z,+1; uvw=-v,u-v,w",
-            "38: xyzt=-x+y,-x,z,+1; uvw=-v,u-v,w",
-            "39: xyzt=y,-x+y,-z,-1; uvw=u,u-v,w",
-            "40: xyzt=x-y,x,-z,-1; uvw=u,u-v,w",
-            "41: xyzt=-y,x-y,z,+1; uvw=-u+v,-u,w",
-            "42: xyzt=-x+y,-x,z,+1; uvw=-u+v,-u,w",
-            "43: xyzt=y,x,-z,+1; uvw=u,v,w",
-            "44: xyzt=y,x,-z,+1; uvw=-v,u-v,w",
-            "45: xyzt=y,x,-z,+1; uvw=-u+v,-u,w",
-            "46: xyzt=-y,-x,-z,+1; uvw=u-v,-v,-w",
-            "47: xyzt=-x,-y,z,+1; uvw=u-v,-v,-w",
-            "48: xyzt=-y,-x,-z,+1; uvw=v,u,-w",
-            "49: xyzt=-x,-y,z,+1; uvw=v,u,-w",
-            "50: xyzt=-x,-y,z,+1; uvw=-u,-u+v,-w",
-            "51: xyzt=-y,-x,-z,+1; uvw=-u,-u+v,-w",
-            "52: xyzt=x-y,-y,-z,+1; uvw=u,v,w",
-            "53: xyzt=-x,-x+y,-z,+1; uvw=u,v,w",
-            "54: xyzt=x-y,-y,-z,+1; uvw=-v,u-v,w",
-            "55: xyzt=-x,-x+y,-z,+1; uvw=-v,u-v,w",
-            "56: xyzt=x-y,-y,-z,+1; uvw=-u+v,-u,w",
-            "57: xyzt=-x,-x+y,-z,+1; uvw=-u+v,-u,w",
-            "58: xyzt=-x+y,y,-z,+1; uvw=u-v,-v,-w",
-            "59: xyzt=x,x-y,-z,+1; uvw=u-v,-v,-w",
-            "60: xyzt=-x+y,y,-z,+1; uvw=v,u,-w",
-            "61: xyzt=x,x-y,-z,+1; uvw=v,u,-w",
-            "62: xyzt=-x+y,y,-z,+1; uvw=-u,-u+v,-w",
-            "63: xyzt=x,x-y,-z,+1; uvw=-u,-u+v,-w",
-            "64: xyzt=-x+y,-x,-z,-1; uvw=-u,-v,-w",
-            "65: xyzt=-y,x-y,-z,-1; uvw=-u,-v,-w",
-            "66: xyzt=-x+y,-x,-z,-1; uvw=v,-u+v,-w",
-            "67: xyzt=-y,x-y,-z,-1; uvw=v,-u+v,-w",
-            "68: xyzt=-x+y,-x,-z,-1; uvw=u-v,u,-w",
-            "69: xyzt=-y,x-y,-z,-1; uvw=u-v,u,-w",
-            "70: xyzt=-x,-y,-z,-1; uvw=-u+v,v,w",
-            "71: xyzt=-x,-y,-z,-1; uvw=-v,-u,w",
-            "72: xyzt=-x,-y,-z,-1; uvw=u,u-v,w"
-          ],
-          "output_mode": "explicit_ops",
-          "raw_operation_count": 72,
-          "raw_operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x,y,z,+1; uvw=-v,u-v,w",
-            "3: xyzt=x,y,z,+1; uvw=-u+v,-u,w",
-            "4: xyzt=y,-x+y,z,+1; uvw=u-v,-v,-w",
-            "5: xyzt=y,-x+y,z,+1; uvw=v,u,-w",
-            "6: xyzt=y,-x+y,z,+1; uvw=-u,-u+v,-w",
-            "7: xyzt=x-y,x,z,+1; uvw=u-v,-v,-w",
-            "8: xyzt=x-y,x,z,+1; uvw=v,u,-w",
-            "9: xyzt=x-y,x,z,+1; uvw=-u,-u+v,-w",
-            "10: xyzt=-y,-x,z,-1; uvw=-u+v,v,w",
-            "11: xyzt=-y,-x,z,-1; uvw=-v,-u,w",
-            "12: xyzt=-y,-x,z,-1; uvw=u,u-v,w",
-            "13: xyzt=x,y,-z,-1; uvw=-u,-v,-w",
-            "14: xyzt=y,x,z,-1; uvw=-u,-v,-w",
-            "15: xyzt=x,y,-z,-1; uvw=v,-u+v,-w",
-            "16: xyzt=y,x,z,-1; uvw=v,-u+v,-w",
-            "17: xyzt=x,y,-z,-1; uvw=u-v,u,-w",
-            "18: xyzt=y,x,z,-1; uvw=u-v,u,-w",
-            "19: xyzt=-x+y,y,z,-1; uvw=-u+v,v,w",
-            "20: xyzt=x,x-y,z,-1; uvw=-u+v,v,w",
-            "21: xyzt=-x+y,y,z,-1; uvw=-v,-u,w",
-            "22: xyzt=x,x-y,z,-1; uvw=-v,-u,w",
-            "23: xyzt=-x+y,y,z,-1; uvw=u,u-v,w",
-            "24: xyzt=x,x-y,z,-1; uvw=u,u-v,w",
-            "25: xyzt=x-y,-y,z,-1; uvw=-u,-v,-w",
-            "26: xyzt=-x,-x+y,z,-1; uvw=-u,-v,-w",
-            "27: xyzt=x-y,-y,z,-1; uvw=v,-u+v,-w",
-            "28: xyzt=-x,-x+y,z,-1; uvw=v,-u+v,-w",
-            "29: xyzt=x-y,-y,z,-1; uvw=u-v,u,-w",
-            "30: xyzt=-x,-x+y,z,-1; uvw=u-v,u,-w",
-            "31: xyzt=-x+y,-x,z,+1; uvw=u,v,w",
-            "32: xyzt=-y,x-y,z,+1; uvw=u,v,w",
-            "33: xyzt=y,-x+y,-z,-1; uvw=-u+v,v,w",
-            "34: xyzt=x-y,x,-z,-1; uvw=-u+v,v,w",
-            "35: xyzt=y,-x+y,-z,-1; uvw=-v,-u,w",
-            "36: xyzt=x-y,x,-z,-1; uvw=-v,-u,w",
-            "37: xyzt=-y,x-y,z,+1; uvw=-v,u-v,w",
-            "38: xyzt=-x+y,-x,z,+1; uvw=-v,u-v,w",
-            "39: xyzt=y,-x+y,-z,-1; uvw=u,u-v,w",
-            "40: xyzt=x-y,x,-z,-1; uvw=u,u-v,w",
-            "41: xyzt=-y,x-y,z,+1; uvw=-u+v,-u,w",
-            "42: xyzt=-x+y,-x,z,+1; uvw=-u+v,-u,w",
-            "43: xyzt=y,x,-z,+1; uvw=u,v,w",
-            "44: xyzt=y,x,-z,+1; uvw=-v,u-v,w",
-            "45: xyzt=y,x,-z,+1; uvw=-u+v,-u,w",
-            "46: xyzt=-y,-x,-z,+1; uvw=u-v,-v,-w",
-            "47: xyzt=-x,-y,z,+1; uvw=u-v,-v,-w",
-            "48: xyzt=-y,-x,-z,+1; uvw=v,u,-w",
-            "49: xyzt=-x,-y,z,+1; uvw=v,u,-w",
-            "50: xyzt=-x,-y,z,+1; uvw=-u,-u+v,-w",
-            "51: xyzt=-y,-x,-z,+1; uvw=-u,-u+v,-w",
-            "52: xyzt=x-y,-y,-z,+1; uvw=u,v,w",
-            "53: xyzt=-x,-x+y,-z,+1; uvw=u,v,w",
-            "54: xyzt=x-y,-y,-z,+1; uvw=-v,u-v,w",
-            "55: xyzt=-x,-x+y,-z,+1; uvw=-v,u-v,w",
-            "56: xyzt=x-y,-y,-z,+1; uvw=-u+v,-u,w",
-            "57: xyzt=-x,-x+y,-z,+1; uvw=-u+v,-u,w",
-            "58: xyzt=-x+y,y,-z,+1; uvw=u-v,-v,-w",
-            "59: xyzt=x,x-y,-z,+1; uvw=u-v,-v,-w",
-            "60: xyzt=-x+y,y,-z,+1; uvw=v,u,-w",
-            "61: xyzt=x,x-y,-z,+1; uvw=v,u,-w",
-            "62: xyzt=-x+y,y,-z,+1; uvw=-u,-u+v,-w",
-            "63: xyzt=x,x-y,-z,+1; uvw=-u,-u+v,-w",
-            "64: xyzt=-x+y,-x,-z,-1; uvw=-u,-v,-w",
-            "65: xyzt=-y,x-y,-z,-1; uvw=-u,-v,-w",
-            "66: xyzt=-x+y,-x,-z,-1; uvw=v,-u+v,-w",
-            "67: xyzt=-y,x-y,-z,-1; uvw=v,-u+v,-w",
-            "68: xyzt=-x+y,-x,-z,-1; uvw=u-v,u,-w",
-            "69: xyzt=-y,x-y,-z,-1; uvw=u-v,u,-w",
-            "70: xyzt=-x,-y,-z,-1; uvw=-u+v,v,w",
-            "71: xyzt=-x,-y,-z,-1; uvw=-v,-u,w",
-            "72: xyzt=-x,-y,-z,-1; uvw=u,u-v,w"
-          ],
-          "real_space_setting": "G0std",
-          "spin_frame_setting": "ossg_oriented_spin_frame",
-          "spin_only_component_symbol_s": "C3",
-          "spin_only_operation_count": 3,
-          "spin_only_operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x,y,z,+1; uvw=-v,u-v,w",
-            "3: xyzt=x,y,z,+1; uvw=-u+v,-u,w"
-          ],
-          "symbol_linear": "2_{100}|6_{3}/ -1|m m_{100}|m -1|m 3|1"
-        }
+        "text": "GSPG linear symbol: 2_{100}|6/ -1|m m_{100}|m -1|m 3|1\nSpin-space point group symbol: -3m (D3d)\nEffective MPG: 6/m'm'm'\nReal-space setting: G0std\nSpin-frame setting: ossg_oriented_spin_frame\n\ngenerators (excluding spin-only):\n4 y,-x+y,z,+1 u-v,-v,-w\n5 y,-x+y,z,+1 v,u,-w\n10 -y,-x,z,-1 -u+v,v,w\n13 x,y,-z,-1 -u,-v,-w\n\noperations:\n1 x,y,z,+1 u,v,w\n2 x,y,z,+1 -v,u-v,w\n3 x,y,z,+1 -u+v,-u,w\n4 y,-x+y,z,+1 u-v,-v,-w\n5 y,-x+y,z,+1 v,u,-w\n6 y,-x+y,z,+1 -u,-u+v,-w\n7 x-y,x,z,+1 u-v,-v,-w\n8 x-y,x,z,+1 v,u,-w\n9 x-y,x,z,+1 -u,-u+v,-w\n10 -y,-x,z,-1 -u+v,v,w\n11 -y,-x,z,-1 -v,-u,w\n12 -y,-x,z,-1 u,u-v,w\n13 x,y,-z,-1 -u,-v,-w\n14 y,x,z,-1 -u,-v,-w\n15 x,y,-z,-1 v,-u+v,-w\n16 y,x,z,-1 v,-u+v,-w\n17 x,y,-z,-1 u-v,u,-w\n18 y,x,z,-1 u-v,u,-w\n19 -x+y,y,z,-1 -u+v,v,w\n20 x,x-y,z,-1 -u+v,v,w\n21 -x+y,y,z,-1 -v,-u,w\n22 x,x-y,z,-1 -v,-u,w\n23 -x+y,y,z,-1 u,u-v,w\n24 x,x-y,z,-1 u,u-v,w\n25 x-y,-y,z,-1 -u,-v,-w\n26 -x,-x+y,z,-1 -u,-v,-w\n27 x-y,-y,z,-1 v,-u+v,-w\n28 -x,-x+y,z,-1 v,-u+v,-w\n29 x-y,-y,z,-1 u-v,u,-w\n30 -x,-x+y,z,-1 u-v,u,-w\n31 -x+y,-x,z,+1 u,v,w\n32 -y,x-y,z,+1 u,v,w\n33 y,-x+y,-z,-1 -u+v,v,w\n34 x-y,x,-z,-1 -u+v,v,w\n35 y,-x+y,-z,-1 -v,-u,w\n36 x-y,x,-z,-1 -v,-u,w\n37 -y,x-y,z,+1 -v,u-v,w\n38 -x+y,-x,z,+1 -v,u-v,w\n39 y,-x+y,-z,-1 u,u-v,w\n40 x-y,x,-z,-1 u,u-v,w\n41 -y,x-y,z,+1 -u+v,-u,w\n42 -x+y,-x,z,+1 -u+v,-u,w\n43 y,x,-z,+1 u,v,w\n44 y,x,-z,+1 -v,u-v,w\n45 y,x,-z,+1 -u+v,-u,w\n46 -y,-x,-z,+1 u-v,-v,-w\n47 -x,-y,z,+1 u-v,-v,-w\n48 -y,-x,-z,+1 v,u,-w\n49 -x,-y,z,+1 v,u,-w\n50 -x,-y,z,+1 -u,-u+v,-w\n51 -y,-x,-z,+1 -u,-u+v,-w\n52 x-y,-y,-z,+1 u,v,w\n53 -x,-x+y,-z,+1 u,v,w\n54 x-y,-y,-z,+1 -v,u-v,w\n55 -x,-x+y,-z,+1 -v,u-v,w\n56 x-y,-y,-z,+1 -u+v,-u,w\n57 -x,-x+y,-z,+1 -u+v,-u,w\n58 -x+y,y,-z,+1 u-v,-v,-w\n59 x,x-y,-z,+1 u-v,-v,-w\n60 -x+y,y,-z,+1 v,u,-w\n61 x,x-y,-z,+1 v,u,-w\n62 -x+y,y,-z,+1 -u,-u+v,-w\n63 x,x-y,-z,+1 -u,-u+v,-w\n64 -x+y,-x,-z,-1 -u,-v,-w\n65 -y,x-y,-z,-1 -u,-v,-w\n66 -x+y,-x,-z,-1 v,-u+v,-w\n67 -y,x-y,-z,-1 v,-u+v,-w\n68 -x+y,-x,-z,-1 u-v,u,-w\n69 -y,x-y,-z,-1 u-v,u,-w\n70 -x,-y,-z,-1 -u+v,v,w\n71 -x,-y,-z,-1 -v,-u,w\n72 -x,-y,-z,-1 u,u-v,w\n\nspin only:\n1 x,y,z,+1 u,v,w"
       },
       "index": "194.149.3.3",
       "phase": "AFM\n(SOM)",
+      "polar_axes_by_symmetry": {
+        "msg": {
+          "allowed_polar_axes": [
+            {
+              "components": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "label": "c",
+              "setting": "G0std"
+            }
+          ],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
+          "is_centrosymmetric": false,
+          "is_polar": true,
+          "msg_num": 1285,
+          "msg_symbol": "P31m'",
+          "role": "soc_magnetic_space_group_parent",
+          "source": "msg_parent_space_group",
+          "space_group_number": 157,
+          "space_group_symbol": null
+        },
+        "ossg": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "ordered_spin_space_real_space_projection",
+          "source": "ossg_real_space_projection",
+          "space_group_number": 194,
+          "space_group_symbol": null
+        },
+        "sg": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "nonmagnetic_space_group_in_ssg_convention",
+          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
+          "space_group_number": 194,
+          "space_group_symbol": "P6_3/mmc"
+        }
+      },
       "properties": {
         "ahc_w_soc": "Yes",
         "ahc_wo_soc": "No",
@@ -867,14 +927,23 @@
               1.0
             ],
             "label": "c",
-            "setting": "ossg_real_space_projection_space_group_standard_direct_basis"
+            "setting": "G0std"
           }
         ],
-        "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
-        "analysis_level": "symmetry_only_parent_ordered_coset_screened",
-        "candidate_reversal_domain_status": "no_parent_ordered_coset_maps_p_to_minus_p",
+        "allowed_polar_axes_setting": "G0std",
+        "allowed_polar_axes_source": "real_space_operations",
+        "analysis_level": "symmetry_only_collinear_switching_not_evaluated",
+        "candidate_reversal_domain_status": "not_evaluated_coplanar_order_collinear_only",
         "candidate_reversal_domains": [],
+        "claim_level_contract": {
+          "current_positive_level": "p_reversal_symmetry_candidate",
+          "final_level": "validated_switchable",
+          "next_level": "switchable_candidate_pending_secondary_descriptor_and_path"
+        },
         "comparison_symmetry": {
+          "current_ordered_exact_parent_is_polar": false,
+          "current_ordered_exact_parent_space_group_number": 189,
+          "current_ordered_exact_parent_space_group_symbol": "P-62m",
           "input_is_polar": false,
           "input_space_group_number": 189,
           "input_space_group_symbol": "P-62m",
@@ -885,42 +954,29 @@
           "ssg_is_polar": true,
           "ssg_space_group_number": 38
         },
+        "domain_deduplication_contract": {
+          "domain_level_output": "after magnetic-structure equivalence deduplication, aggregate soc_allowed_exists and exchange_only_exists for the domain",
+          "mode": "transformed_magnetic_structure_equivalence",
+          "representative_level_output": "keep each symmetry representative and its SOC/exchange class",
+          "status": "required_before_validated_switching_claim"
+        },
+        "domain_relation_output_contract": {
+          "candidate_reversal_domains_scope": "P -> -P candidates only",
+          "display_descriptor_note": "Neel vector L, magnetization M, or signed pattern labels are presentation choices; classification should use the signed collinear pattern.",
+          "general_collinear_domain_relation_scope": "record P/L relation classes including P -> P, L -> -L outside candidate_reversal_domains",
+          "internal_descriptor": "signed_collinear_magnetic_pattern"
+        },
+        "domain_relation_rows": [],
+        "domain_relation_text": null,
         "domain_reversal_symmetry_screening": {
-          "basis_setting": "G0std",
           "candidate_operation_tests": [
             "construct_parent_ordered_coset_representatives",
             "test_real_space_part_maps_P_to_minus_P",
-            "deduplicate_equivalent_domains_mod_translation_origin_setting_and_sublattice_relabeling",
+            "deduplicate_transformed_magnetic_structures_by_equivalence",
             "test_optional_secondary_descriptor_transform_for_each_surviving_candidate",
             "classify_representative_as_msg_compatible_or_spin_space_only"
           ],
-          "candidate_reversal_domain_count": 0,
           "candidate_reversal_domains": [],
-          "left_coset_convention": "domain cosets are gH with H the ordered subgroup",
-          "left_coset_count": 1,
-          "left_coset_sizes": [
-            8
-          ],
-          "left_equals_right": true,
-          "ordered_operation_count": 8,
-          "ordered_polar_axes": [
-            {
-              "components": [
-                0.0,
-                0.0,
-                1.0
-              ],
-              "label": "c",
-              "setting": "G0std"
-            }
-          ],
-          "ordered_space_group_number": 38,
-          "ordered_subgroup_source": "ordered_spin_space_real_space_projection",
-          "ordered_subset_of_parent": true,
-          "parent_group_source": "nonmagnetic_space_group_of_ordered_standard_cell",
-          "parent_operation_count": 8,
-          "parent_space_group_number": 189,
-          "parent_space_group_symbol": "P-62m",
           "primary_order_parameter": {
             "name": "electric_polarization",
             "required_test": "real_space_part_maps_P_to_minus_P",
@@ -930,29 +986,27 @@
             "msg_compatible": "SOC-allowed candidate relation",
             "spin_space_only": "exchange_allowed_nonrelativistic_candidate_relation"
           },
-          "right_coset_count": 1,
-          "right_coset_sizes": [
-            8
-          ],
           "scope": "symmetry_only",
           "secondary_order_parameter": {
             "examples": [
+              "collinear_neel_vector",
               "spin_splitting_S",
               "weak_moment_M",
               "magnetic_order_parameter"
             ],
-            "name": "optional_descriptor",
+            "name": "pending_explicit_descriptor",
             "required_test": "transport_descriptor_under_same_representative_and_compare_to_requested_target"
           },
-          "status": "no_parent_ordered_coset_maps_p_to_minus_p"
+          "status": "not_evaluated_coplanar_order_collinear_only"
         },
         "domain_switching_relation": {
           "barrier_note": "Representative class is a symmetry label, not a barrier estimate; energy barriers require a structural path calculation.",
           "exchange_allowed_if": "the representative is valid in spin-space symmetry but is not MSG-compatible",
           "ordered_subgroup": "ossg_real_space_projection",
-          "parent_group": "input_structure_parent",
+          "parent_group": "current_ordered_exact_parent",
+          "scope": "collinear_only",
           "soc_allowed_if": "the same representative is compatible with the MSG spin-real locking map",
-          "status": "not_evaluated_missing_parent_ordered_cosets",
+          "status": "not_evaluated_coplanar_order_collinear_only",
           "switching_test": "real_space_coset_representative_maps_P_to_minus_P"
         },
         "energy_barrier_workflow": {
@@ -965,7 +1019,7 @@
           "required_inputs": [
             "initial_domain_structure",
             "target_domain_structure_or_generating_operation",
-            "polarization_vector_and_basis",
+            "polar_axis_basis_or_optional_polarization_vector",
             "candidate_structural_path_or_mode_decomposition",
             "dft_total_energy_or_neb_profile"
           ],
@@ -1010,10 +1064,11 @@
                 1.0
               ],
               "label": "c",
-              "setting": "ossg_real_space_projection_space_group_standard_direct_basis"
+              "setting": "G0std"
             }
           ],
-          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": false,
           "is_polar": true,
           "msg_num": null,
@@ -1021,6 +1076,24 @@
           "source": "ossg_real_space_projection",
           "space_group_number": 38,
           "space_group_symbol": null
+        },
+        "input_structure_parent_symmetry": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "input_structure_exact_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_source": "space_group_number",
+          "is_centrosymmetric": false,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "source": "input_structure_exact_parent",
+          "space_group_number": 189,
+          "space_group_symbol": "P-62m"
+        },
+        "msg_compatibility_rule": {
+          "exchange_only_label": "valid_spin_space_operation_not_msg_compatible",
+          "oriented_spin_frame_condition": "For an oriented spin-space operation {S||R|t}, MSG compatibility requires S = theta * det(R_cart) * R_cart in the same spin Cartesian frame, where theta=+1/-1 is the unitary/time-reversal branch.",
+          "soc_label": "msg_compatible",
+          "status": "rule_recorded_classification_pending"
         },
         "ordered_allowed_polar_axes": [
           {
@@ -1030,7 +1103,7 @@
               1.0
             ],
             "label": "c",
-            "setting": "ossg_real_space_projection_space_group_standard_direct_basis"
+            "setting": "G0std"
           }
         ],
         "ordered_spin_space_symmetry": {
@@ -1042,10 +1115,11 @@
                 1.0
               ],
               "label": "c",
-              "setting": "ossg_real_space_projection_space_group_standard_direct_basis"
+              "setting": "G0std"
             }
           ],
-          "allowed_polar_axes_setting": "ossg_real_space_projection_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": false,
           "is_polar": true,
           "msg_num": null,
@@ -1055,9 +1129,65 @@
           "space_group_symbol": null
         },
         "parent_allowed_polar_axes": [],
+        "parent_selection": {
+          "default": "current_ordered_exact_parent",
+          "high_temperature_parent_status": "not_inferred_from_fsg_inputs",
+          "override_status": "not_enabled_in_current_draft",
+          "source": "input_structure_exact_parent"
+        },
         "polarity_status": "magnetically_induced_polar_candidate",
+        "polarization_coupling_contract": {
+          "collinear_relation_classes": [
+            {
+              "label": "p_and_magnetic_order_reversed",
+              "magnetic_order_relation": "L -> -L",
+              "polarization_relation": "P -> -P",
+              "traditional_magnetically_controlled": true
+            },
+            {
+              "label": "p_reversed_magnetic_order_preserved",
+              "magnetic_order_relation": "L -> L",
+              "polarization_relation": "P -> -P",
+              "traditional_magnetically_controlled": false
+            },
+            {
+              "label": "p_preserved_magnetic_order_reversed",
+              "magnetic_order_relation": "L -> -L",
+              "polarization_relation": "P -> P",
+              "traditional_magnetically_controlled": false
+            }
+          ],
+          "collinear_spin_space_branches": [
+            {
+              "meaning": "preserve the signed collinear order descriptor",
+              "spin_space_operation": "+1"
+            },
+            {
+              "meaning": "reverse the signed collinear order descriptor",
+              "spin_space_operation": "-1"
+            }
+          ],
+          "current_evaluation_status": "not_evaluated_coplanar_order_collinear_only",
+          "input_magnetic_configuration": "Coplanar",
+          "magnetically_controlled_polarization": {
+            "definition": "A symmetry-allowed relation between polarization and the collinear magnetic order descriptor under a domain operation. Symmetry can classify possible relations, but the practical switching path remains case dependent.",
+            "fsg_reporting_contract": "report all three collinear symmetry possibilities without promoting them to validated switching claims",
+            "traditional_strong_condition": "both polarization and the magnetic order descriptor reverse"
+          },
+          "magnetically_induced_polarization": {
+            "current_status_field": "polarity_status",
+            "current_status_value": "magnetically_induced_polar_candidate",
+            "definition": "The exact nonmagnetic parent of the ordered structure is nonpolar, while the ordered spin-space real-space projection is polar."
+          },
+          "scope": "collinear_only"
+        },
+        "polarization_test_contract": {
+          "claim": "The current screen tests whether a representative reverses an allowed polar-axis direction; it does not use a computed Berry phase polarization vector.",
+          "mode": "polar_axis_basis_only"
+        },
         "post_fsg_path_validation_requirements": {
           "checks": [
+            "deduplicate_transformed_magnetic_structures_by_equivalence",
             "whether_polarization_reversal_is_structurally_switchable",
             "which_minus_p_domain_is_selected_by_the_practical_electric_field_path",
             "whether_the_practical_minus_p_domain_has_the_requested_secondary_descriptor_state",
@@ -1067,11 +1197,16 @@
           "scope": "outside_fsg_symmetry_only_contract",
           "status": "not_evaluated_by_findspingroup"
         },
-        "required_inputs_for_switching_claim": [
-          "polarization_vector_in_declared_basis",
-          "parent_ordered_coset_representatives",
-          "msg_compatibility_map_for_coset_representatives"
-        ],
+        "required_inputs_for_switching_claim": [],
+        "secondary_order_parameter_contract": {
+          "default_for_collinear_discussion": "neel_vector",
+          "notes": [
+            "Gu-style S->-S is not claimed yet.",
+            "For collinear AFM cases the natural first descriptor is the Neel vector.",
+            "Other cases may need spin_splitting_S, weak_moment_M, or an explicit order parameter."
+          ],
+          "status": "pending_definition_and_transport"
+        },
         "soc_allowed_polar_axes": [
           {
             "components": [
@@ -1080,9 +1215,27 @@
               1.0
             ],
             "label": "c",
-            "setting": "msg_parent_space_group_space_group_standard_direct_basis"
+            "setting": "G0std"
           }
         ],
+        "soc_domain_relation_rows": [],
+        "soc_domain_relation_text": null,
+        "soc_domain_reversal_symmetry_screening": {
+          "candidate_operation_tests": [
+            "construct_parent_msg_coset_representatives",
+            "test_real_space_part_maps_P_to_minus_P",
+            "deduplicate_transformed_magnetic_structures_by_equivalence"
+          ],
+          "candidate_reversal_domains": [],
+          "ordered_stabilizer": "soc_magnetic_space_group",
+          "primary_order_parameter": {
+            "name": "electric_polarization",
+            "required_test": "real_space_part_maps_P_to_minus_P",
+            "symbol": "P"
+          },
+          "scope": "symmetry_only_soc_magnetic",
+          "status": "requires_soc_parent_msg_coset_validation"
+        },
         "soc_magnetic_symmetry": {
           "allowed_polar_axes": [
             {
@@ -1092,10 +1245,11 @@
                 1.0
               ],
               "label": "c",
-              "setting": "msg_parent_space_group_space_group_standard_direct_basis"
+              "setting": "G0std"
             }
           ],
-          "allowed_polar_axes_setting": "msg_parent_space_group_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
           "is_centrosymmetric": false,
           "is_polar": true,
           "msg_num": 289,
@@ -1112,22 +1266,23 @@
         },
         "special_coset": {
           "reason": "The switching screen uses the structural parent SG modulo the ordered OSSG real-space projection. A representative is only a reversal candidate after the real-space P -> -P test; pure translation does not flip polarization.",
-          "status": "replaced_by_sg_to_ossg_coset_screening"
+          "status": "not_promoted_to_switching_claim"
         },
-        "status": "candidate_requires_parent_ordered_coset",
+        "status": "not_evaluated_coplanar_order_collinear_only",
         "structural_parent_symmetry": {
           "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "input_structure_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_setting": "current_ordered_exact_parent_space_group_standard_direct_basis",
+          "allowed_polar_axes_source": "space_group_number",
           "is_centrosymmetric": false,
           "is_polar": false,
           "msg_num": null,
           "msg_symbol": null,
-          "source": "input_structure_parent",
+          "source": "current_ordered_exact_parent",
           "space_group_number": 189,
           "space_group_symbol": "P-62m"
         },
         "switchable_altermagnet_screening": {
-          "domain_relation_status": "not_evaluated_missing_parent_ordered_cosets",
+          "domain_relation_status": "not_evaluated_coplanar_order_collinear_only",
           "representative_classes": {
             "msg_compatible": "SOC-allowed magnetic-domain representative with spin and real-space locking compatible with the MSG map",
             "spin_space_only": "exchange-allowed nonrelativistic representative present in spin-space symmetry but not MSG-compatible"
@@ -1137,9 +1292,14 @@
             "test_spin_splitting_secondary_descriptor_S_to_minus_S_for_each_candidate",
             "classify_candidate_representative_as_msg_compatible_or_spin_space_only"
           ],
-          "status": "not_candidate_from_current_ferroelectric_altermagnet_screening"
+          "status": "not_evaluated_coplanar_order_collinear_only"
         },
-        "switching_detected": null
+        "switching_detected": null,
+        "translation_quotient_contract": {
+          "implementation_target": "retain raw parent-grey cosets for diagnostics, then deduplicate physical domains by transformed signed collinear pattern",
+          "principle": "Translations introduced only to embed parent operations in a common supercell are gauge/redundant; translations outside the actual magnetic-cell translation breaking should not create additional physical domains.",
+          "status": "implemented_by_signed_pattern_dedup_for_collinear_output"
+        }
       },
       "gspg": {
         "effective_mpg_symbol": "mm21'",
@@ -1150,48 +1310,76 @@
         "spin_frame_setting": "ossg_oriented_spin_frame",
         "spin_only_component_symbol_s": "Cs",
         "spin_only_part_linear": "m|1",
+        "spin_space_point_group_symbol_hm": "mm2",
+        "spin_space_point_group_symbol_s": "C2v",
         "symbol_linear": "1|m 2_{001}|m 2_{001}|2 m|1",
         "symbol_mode": "npg_x_spin_only",
         "tentative_symbol_s": "C2 x Cs",
-        "text": {
-          "effective_mpg_symbol": "mm21'",
-          "npg_symbol_s": "C2",
-          "operation_count": 8,
-          "operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x,y,z,-1; uvw=-u,v,w",
-            "3: xyzt=-x,y,z,+1; uvw=u,v,w",
-            "4: xyzt=-x,y,z,-1; uvw=-u,v,w",
-            "5: xyzt=x,-y,z,-1; uvw=u,-v,w",
-            "6: xyzt=x,-y,z,+1; uvw=-u,-v,w",
-            "7: xyzt=-x,-y,z,-1; uvw=u,-v,w",
-            "8: xyzt=-x,-y,z,+1; uvw=-u,-v,w"
-          ],
-          "output_mode": "explicit_ops",
-          "raw_operation_count": 8,
-          "raw_operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x,y,z,-1; uvw=-u,v,w",
-            "3: xyzt=-x,y,z,+1; uvw=u,v,w",
-            "4: xyzt=-x,y,z,-1; uvw=-u,v,w",
-            "5: xyzt=x,-y,z,-1; uvw=u,-v,w",
-            "6: xyzt=x,-y,z,+1; uvw=-u,-v,w",
-            "7: xyzt=-x,-y,z,-1; uvw=u,-v,w",
-            "8: xyzt=-x,-y,z,+1; uvw=-u,-v,w"
-          ],
-          "real_space_setting": "G0std",
-          "spin_frame_setting": "ossg_oriented_spin_frame",
-          "spin_only_component_symbol_s": "Cs",
-          "spin_only_operation_count": 2,
-          "spin_only_operations": [
-            "1: xyzt=x,y,z,+1; uvw=u,v,w",
-            "2: xyzt=x,y,z,-1; uvw=-u,v,w"
-          ],
-          "symbol_linear": "1|m 2_{001}|m 2_{001}|2 m|1"
-        }
+        "text": "GSPG linear symbol: 1|m 2_{001}|m 2_{001}|2 m|1\nSpin-space point group symbol: mm2 (C2v)\nEffective MPG: mm21'\nReal-space setting: G0std\nSpin-frame setting: ossg_oriented_spin_frame\n\ngenerators (excluding spin-only):\n3 -x,y,z,+1 u,v,w\n4 -x,y,z,-1 -u,v,w\n5 x,-y,z,-1 u,-v,w\n\noperations:\n1 x,y,z,+1 u,v,w\n2 x,y,z,-1 -u,v,w\n3 -x,y,z,+1 u,v,w\n4 -x,y,z,-1 -u,v,w\n5 x,-y,z,-1 u,-v,w\n6 x,-y,z,+1 -u,-v,w\n7 -x,-y,z,-1 u,-v,w\n8 -x,-y,z,+1 -u,-v,w\n\nspin only:\n1 x,y,z,+1 u,v,w\n2 x,y,z,-1 -u,v,w"
       },
       "index": "38.6.1.2.P2",
       "phase": "FM/FiM",
+      "polar_axes_by_symmetry": {
+        "msg": {
+          "allowed_polar_axes": [
+            {
+              "components": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "label": "c",
+              "setting": "G0std"
+            }
+          ],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
+          "is_centrosymmetric": false,
+          "is_polar": true,
+          "msg_num": 289,
+          "msg_symbol": "Am'm'2",
+          "role": "soc_magnetic_space_group_parent",
+          "source": "msg_parent_space_group",
+          "space_group_number": 38,
+          "space_group_symbol": null
+        },
+        "ossg": {
+          "allowed_polar_axes": [
+            {
+              "components": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "label": "c",
+              "setting": "G0std"
+            }
+          ],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "real_space_operations",
+          "is_centrosymmetric": false,
+          "is_polar": true,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "ordered_spin_space_real_space_projection",
+          "source": "ossg_real_space_projection",
+          "space_group_number": 38,
+          "space_group_symbol": null
+        },
+        "sg": {
+          "allowed_polar_axes": [],
+          "allowed_polar_axes_setting": "G0std",
+          "allowed_polar_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
+          "is_centrosymmetric": false,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "nonmagnetic_space_group_in_ssg_convention",
+          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
+          "space_group_number": 189,
+          "space_group_symbol": "P-62m"
+        }
+      },
       "properties": {
         "ahc_w_soc": "Yes",
         "ahc_wo_soc": "No",

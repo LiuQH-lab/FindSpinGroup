@@ -25,6 +25,8 @@ Environment overrides:
   SAVE_SCIF    current: ${SAVE_SCIF:-1}
   QUIET        current: ${QUIET:-1}
   SBATCH_BIN   current: ${SBATCH_BIN:-sbatch}
+  SBATCH_ARGS  current: ${SBATCH_ARGS:-<none>}
+  PYTHON_BIN   current: ${PYTHON_BIN:-<auto>}
 
 Examples:
   $(basename "$0")
@@ -45,6 +47,9 @@ MATRIX_TOL="${MATRIX_TOL:-0.01}"
 COMPARE_CONF="${COMPARE_CONF:-1}"
 SAVE_SCIF="${SAVE_SCIF:-1}"
 QUIET="${QUIET:-1}"
+SBATCH_ARGS="${SBATCH_ARGS:-}"
+PYTHON_BIN="${PYTHON_BIN:-}"
+BATCH_WORKERS="${BATCH_WORKERS:-1}"
 
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
   usage
@@ -79,9 +84,24 @@ echo "Tolerances    : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRI
 echo "Compare conf  : $COMPARE_CONF"
 echo "Save scif     : $SAVE_SCIF"
 echo "Quiet         : $QUIET"
+echo "Sbatch args   : ${SBATCH_ARGS:-<none>}"
+echo "Python bin    : ${PYTHON_BIN:-<auto>}"
+echo "Workers       : $BATCH_WORKERS"
 
 CMD=(
   "$SBATCH_BIN"
+)
+if [[ -n "$SBATCH_ARGS" ]]; then
+  read -r -a SBATCH_ARG_ARRAY <<< "$SBATCH_ARGS"
+  CMD+=("${SBATCH_ARG_ARRAY[@]}")
+fi
+if [[ "$BATCH_WORKERS" != "1" ]]; then
+  CMD+=(
+    --cpus-per-task
+    "$BATCH_WORKERS"
+  )
+fi
+CMD+=(
   "$SLURM_SCRIPT"
   "$INPUT_DIR"
   "$OUTPUT_ROOT"
@@ -98,5 +118,6 @@ MATRIX_TOL="$MATRIX_TOL" \
 COMPARE_CONF="$COMPARE_CONF" \
 SAVE_SCIF="$SAVE_SCIF" \
 QUIET="$QUIET" \
+PYTHON_BIN="$PYTHON_BIN" \
 FSG_REPO_ROOT="$REPO_ROOT" \
 "${CMD[@]}"

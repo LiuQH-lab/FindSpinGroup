@@ -10,8 +10,14 @@ set -euo pipefail
 ulimit -s unlimited
 ulimit -l unlimited
 
-module load anaconda
-source activate base
+if command -v module >/dev/null 2>&1; then
+  module load anaconda || true
+fi
+if command -v conda >/dev/null 2>&1; then
+  set +u
+  source activate base || true
+  set -u
+fi
 
 export OMP_NUM_THREADS=1
 export OPENBLAS_NUM_THREADS=1
@@ -33,6 +39,7 @@ MATRIX_TOL="${MATRIX_TOL:-0.01}"
 COMPARE_CONF="${COMPARE_CONF:-1}"
 SAVE_SCIF="${SAVE_SCIF:-1}"
 QUIET="${QUIET:-1}"
+WORKERS="${BATCH_WORKERS:-${SLURM_CPUS_PER_TASK:-1}}"
 
 if [[ ! -d "$INPUT_DIR" ]]; then
   echo "Input directory does not exist: $INPUT_DIR" >&2
@@ -49,10 +56,12 @@ PACKAGE_VERSION="${PACKAGE_VERSION:-unknown}"
 OUTPUT_DIR="${OUTPUT_ROOT}/run_v${PACKAGE_VERSION}_${RUN_STAMP}_scif"
 mkdir -p "$OUTPUT_DIR"
 
-if [[ -x "$REPO_ROOT/.venv/bin/python" ]]; then
+if [[ -n "${PYTHON_BIN:-}" ]]; then
+  PYTHON_BIN="$PYTHON_BIN"
+elif [[ -x "$REPO_ROOT/.venv/bin/python" ]]; then
   PYTHON_BIN="$REPO_ROOT/.venv/bin/python"
 else
-  PYTHON_BIN="${PYTHON_BIN:-python3}"
+  PYTHON_BIN="python3"
 fi
 
 if [[ ! -d "$REPO_ROOT/src/findspingroup" ]]; then
@@ -77,6 +86,8 @@ CMD=(
   "$MEIGTOL"
   --matrix-tol
   "$MATRIX_TOL"
+  --workers
+  "$WORKERS"
 )
 
 if [[ "$COMPARE_CONF" == "0" ]]; then
@@ -99,6 +110,7 @@ echo "Tolerances  : space=$SPACE_TOL mtol=$MTOL meigtol=$MEIGTOL matrix=$MATRIX_
 echo "Compare conf: $COMPARE_CONF"
 echo "Save scif   : $SAVE_SCIF"
 echo "Quiet       : $QUIET"
+echo "Workers     : $WORKERS"
 echo "Python      : $PYTHON_BIN"
 echo "Start time  : $(date '+%Y-%m-%d %H:%M:%S')"
 

@@ -1,0 +1,65 @@
+# Copy this file to `.fsg-batch-profiles.local.toml` and fill in local values.
+# The local file is gitignored because it may contain SSH aliases, private
+# cluster paths, partitions, QOS names, and interpreter paths.
+
+[profiles.fast-full-node]
+description = "Full-node profile for fast full-dataset validation."
+server_alias = "<ssh-login-alias>"
+remote_shared_repo = "<remote FindSpinGroup checkout used for shared .venv/baselines>"
+remote_snapshot_root = "<remote snapshot directory>"
+remote_output_base = "<remote output base directory>"
+remote_tmp_dir = "<remote tmp directory for snapshot extraction>"
+python_bin = "<remote Python interpreter>"
+workers = 192
+sbatch_args = ["--partition", "<full-node-partition>", "--qos", "<qos-name>"]
+
+[profiles.standard]
+description = "Conservative profile for standard cluster validation."
+server_alias = "<ssh-login-alias>"
+remote_shared_repo = "<remote FindSpinGroup checkout used for shared .venv/baselines>"
+remote_snapshot_root = "<remote snapshot directory>"
+remote_output_base = "<remote output base directory>"
+remote_tmp_dir = "<remote tmp directory for snapshot extraction>"
+python_bin = "<remote Python interpreter>"
+workers = 8
+sbatch_args = ["--partition", "<standard-partition>", "--qos", "<qos-name>"]
+
+[datasets.mcif_241130_no2186]
+description = "Bundled standard regression set."
+input_subdir = "tests/testset/mcif_241130_no2186"
+baseline_suite = "mcif_241130_no2186"
+output_root_name = "mcif_241130_no2186_run"
+
+[datasets.mcif_260414_no2241]
+description = "External Magndata 2241 set."
+remote_input_dir = "<remote dataset directory>"
+baseline_suite = "mcif_260414_no2241"
+output_root_name = "mcif_260414_no2241_full_run"
+
+[datasets.mcif_260414_no2241_basic]
+description = "External Magndata 2241 basic-route release regression."
+remote_input_dir = "<remote 2241 dataset directory>"
+baseline_suite = "mcif_260414_no2241_basic"
+output_root_name = "mcif_260414_no2241_basic_run"
+
+[datasets.mcif_260414_no2241_full]
+description = "External Magndata 2241 full-route release regression."
+remote_input_dir = "<remote 2241 dataset directory>"
+baseline_suite = "mcif_260414_no2241_full"
+output_root_name = "mcif_260414_no2241_full_run"
+
+[datasets.poscar_roundtrip_2241]
+description = "POSCAR ACC primitive roundtrip release regression on the 2241 set."
+remote_input_dir = "<remote 2241 dataset directory>"
+output_root_name = "poscar_roundtrip_2241_run"
+
+[datasets.scif_roundtrip_2241]
+description = "SCIF roundtrip release regression on the 2241 set."
+remote_input_dir = "<remote 2241 dataset directory>"
+output_root_name = "scif_roundtrip_2241_run"
+
+[datasets.quasi2d_inputversion]
+description = "Quasi-2D inputversion validation set."
+remote_input_dir = "<remote quasi-2d inputversion dataset directory>"
+baseline_suite = "quasi2d_inputversion"
+output_root_name = "2d_inputversion_run"

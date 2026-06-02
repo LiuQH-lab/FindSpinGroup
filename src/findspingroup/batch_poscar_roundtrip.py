@@ -7,6 +7,7 @@ import math
 import tempfile
 import time
 import traceback
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from pathlib import Path
 
 import numpy as np
@@ -500,6 +501,204 @@ def _result_payload(
     return payload, differences
 
 
+def _run_poscar_roundtrip_case(
+    index: int,
+    total_cases: int,
+    source_path: Path,
+    *,
+    output_root: Path,
+    source_mode: str,
+    compare_mode: str,
+    compare_conf: bool,
+    compare_float_atol: float,
+    compare_float_rtol: float,
+    max_differences_per_case: int,
+    save_poscar: bool,
+    space_tol: float,
+    mtol: float,
+    meigtol: float,
+    matrix_tol: float,
+) -> dict:
+    case_start = time.perf_counter()
+    original_duration = None
+    roundtrip_duration = None
+    case_id = _normalize_case_id(source_path)
+    file_name = source_path.name
+    occupancy_annotation = {
+        "source_has_fractional_occupancy": None,
+        "source_occupancy_values": None,
+        "source_fractional_occupancy_values": None,
+        "source_fractional_occupancy_site_count": None,
+    }
+    try:
+        original_start = time.perf_counter()
+        original = find_spin_group(
+            str(source_path),
+            space_tol=space_tol,
+            mtol=mtol,
+            meigtol=meigtol,
+            matrix_tol=matrix_tol,
+        )
+        original_duration = round(time.perf_counter() - original_start, 6)
+        occupancy_annotation = _source_fractional_occupancy_annotation(original)
+        source_name, poscar_text, record_input_format = _source_poscar_payload(
+            original,
+            case_id=case_id,
+            source_mode=source_mode,
+        )
+
+        roundtrip_start = time.perf_counter()
+        roundtrip = _roundtrip_from_poscar_text(
+            source_name=source_name,
+            poscar_text=poscar_text,
+            compare_mode=compare_mode,
+            space_tol=space_tol,
+            mtol=mtol,
+            meigtol=meigtol,
+            matrix_tol=matrix_tol,
+            output_dir=output_root,
+            save_poscar=save_poscar,
+        )
+        roundtrip_duration = round(time.perf_counter() - roundtrip_start, 6)
+        payload, differences = _result_payload(
+            original,
+            roundtrip,
+            compare_mode=compare_mode,
+            compare_conf=compare_conf,
+            compare_float_atol=compare_float_atol,
+            compare_float_rtol=compare_float_rtol,
+            max_differences_per_case=max_differences_per_case,
+        )
+
+        record = {
+            "case_id": case_id,
+            "file_name": file_name,
+            "status": "ok" if not differences else "mismatch",
+            "duration_seconds": round(time.perf_counter() - case_start, 6),
+            "original_duration_seconds": original_duration,
+            "roundtrip_duration_seconds": roundtrip_duration,
+            "original": {
+                "index": _result_value(original, "index"),
+                "conf": _result_value(original, "conf"),
+            },
+            "roundtrip": payload,
+        }
+        record.update(occupancy_annotation)
+        return {
+            "index": index,
+            "case_id": case_id,
+            "file_name": file_name,
+            "status": record["status"],
+            "record": record,
+            "mismatch": record if differences else None,
+            "error_by_file": None,
+            "input_format": record_input_format,
+            "source_has_fractional_occupancy": bool(
+                occupancy_annotation["source_has_fractional_occupancy"]
+            ),
+            "progress_message": f"[{index}/{total_cases}] {case_id} {record['status']}",
+        }
+    except Exception as exc:  # pragma: no cover - exercised in batch mode
+        error_by_file = {
+            "type": type(exc).__name__,
+            "message": str(exc),
+            "traceback": traceback.format_exc(),
+            **occupancy_annotation,
+        }
+        record = {
+            "case_id": case_id,
+            "file_name": file_name,
+            "status": "error",
+            "duration_seconds": round(time.perf_counter() - case_start, 6),
+            "original_duration_seconds": original_duration,
+            "roundtrip_duration_seconds": roundtrip_duration,
+            **occupancy_annotation,
+            "error": {
+                "type": type(exc).__name__,
+                "message": str(exc),
+            },
+        }
+        return {
+            "index": index,
+            "case_id": case_id,
+            "file_name": file_name,
+            "status": "error",
+            "record": record,
+            "mismatch": None,
+            "error_by_file": error_by_file,
+            "input_format": None,
+            "source_has_fractional_occupancy": bool(
+                occupancy_annotation["source_has_fractional_occupancy"]
+            ),
+            "progress_message": f"[{index}/{total_cases}] {case_id} error",
+        }
+
+
+def _iter_poscar_roundtrip_case_results(
+    files: list[Path],
+    *,
+    workers: int,
+    output_root: Path,
+    source_mode: str,
+    compare_mode: str,
+    compare_conf: bool,
+    compare_float_atol: float,
+    compare_float_rtol: float,
+    max_differences_per_case: int,
+    save_poscar: bool,
+    space_tol: float,
+    mtol: float,
+    meigtol: float,
+    matrix_tol: float,
+):
+    total_cases = len(files)
+    case_kwargs = {
+        "output_root": output_root,
+        "source_mode": source_mode,
+        "compare_mode": compare_mode,
+        "compare_conf": compare_conf,
+        "compare_float_atol": compare_float_atol,
+        "compare_float_rtol": compare_float_rtol,
+        "max_differences_per_case": max_differences_per_case,
+        "save_poscar": save_poscar,
+        "space_tol": space_tol,
+        "mtol": mtol,
+        "meigtol": meigtol,
+        "matrix_tol": matrix_tol,
+    }
+    if workers == 1:
+        for case_index, file_path in enumerate(files, start=1):
+            yield _run_poscar_roundtrip_case(case_index, total_cases, file_path, **case_kwargs)
+        return
+
+    next_index = 1
+    next_yield_index = 1
+    pending = set()
+    completed: dict[int, dict] = {}
+    max_pending = max(workers, workers * 2)
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        while next_index <= total_cases or pending:
+            while next_index <= total_cases and len(pending) < max_pending:
+                file_path = files[next_index - 1]
+                pending.add(
+                    executor.submit(
+                        _run_poscar_roundtrip_case,
+                        next_index,
+                        total_cases,
+                        file_path,
+                        **case_kwargs,
+                    )
+                )
+                next_index += 1
+            done, pending = wait(pending, return_when=FIRST_COMPLETED)
+            for future in done:
+                result = future.result()
+                completed[int(result["index"])] = result
+            while next_yield_index in completed:
+                yield completed.pop(next_yield_index)
+                next_yield_index += 1
+
+
 def run_poscar_roundtrip_batch(
     files: list[Path],
     output_dir: Path | str,
@@ -515,8 +714,11 @@ def run_poscar_roundtrip_batch(
     mtol: float = 0.02,
     meigtol: float = 0.00002,
     matrix_tol: float = 0.01,
+    workers: int = 1,
     quiet: bool = False,
 ) -> dict:
+    if workers < 1:
+        raise ValueError("workers must be at least 1.")
     output_root = Path(output_dir)
     output_root.mkdir(parents=True, exist_ok=True)
 
@@ -527,6 +729,7 @@ def run_poscar_roundtrip_batch(
     mismatches_path = output_root / "mismatches.json"
     errors_path = output_root / "errors_by_file.json"
     summary_path = output_root / "summary.json"
+    records_path.write_text("", encoding="utf-8")
 
     processed_cases = 0
     success_count = 0
@@ -539,114 +742,43 @@ def run_poscar_roundtrip_batch(
     errors_by_file = {}
     input_format = None
 
-    for source_path in files:
-        case_start = time.perf_counter()
-        original_duration = None
-        roundtrip_duration = None
+    for case_result in _iter_poscar_roundtrip_case_results(
+        files,
+        workers=workers,
+        output_root=output_root,
+        source_mode=source_mode,
+        compare_mode=compare_mode,
+        compare_conf=compare_conf,
+        compare_float_atol=compare_float_atol,
+        compare_float_rtol=compare_float_rtol,
+        max_differences_per_case=max_differences_per_case,
+        save_poscar=save_poscar,
+        space_tol=space_tol,
+        mtol=mtol,
+        meigtol=meigtol,
+        matrix_tol=matrix_tol,
+    ):
         processed_cases += 1
-        case_id = _normalize_case_id(source_path)
-        file_name = source_path.name
-        occupancy_annotation = {
-            "source_has_fractional_occupancy": None,
-            "source_occupancy_values": None,
-            "source_fractional_occupancy_values": None,
-            "source_fractional_occupancy_site_count": None,
-        }
         if not quiet:
-            print(f"[{processed_cases}/{len(files)}] {case_id}")
-        try:
-            original_start = time.perf_counter()
-            original = find_spin_group(
-                str(source_path),
-                space_tol=space_tol,
-                mtol=mtol,
-                meigtol=meigtol,
-                matrix_tol=matrix_tol,
-            )
-            original_duration = round(time.perf_counter() - original_start, 6)
-            occupancy_annotation = _source_fractional_occupancy_annotation(original)
-            if occupancy_annotation["source_has_fractional_occupancy"]:
-                fractional_occupancy_case_count += 1
-            source_name, poscar_text, record_input_format = _source_poscar_payload(
-                original,
-                case_id=case_id,
-                source_mode=source_mode,
-            )
-            if input_format is None:
-                input_format = record_input_format
+            print(case_result["progress_message"])
+        if case_result["source_has_fractional_occupancy"]:
+            fractional_occupancy_case_count += 1
+        if input_format is None and case_result["input_format"] is not None:
+            input_format = case_result["input_format"]
+        _append_jsonl(records_path, case_result["record"])
 
-            roundtrip_start = time.perf_counter()
-            roundtrip = _roundtrip_from_poscar_text(
-                source_name=source_name,
-                poscar_text=poscar_text,
-                compare_mode=compare_mode,
-                space_tol=space_tol,
-                mtol=mtol,
-                meigtol=meigtol,
-                matrix_tol=matrix_tol,
-                output_dir=output_root,
-                save_poscar=save_poscar,
-            )
-            roundtrip_duration = round(time.perf_counter() - roundtrip_start, 6)
-            payload, differences = _result_payload(
-                original,
-                roundtrip,
-                compare_mode=compare_mode,
-                compare_conf=compare_conf,
-                compare_float_atol=compare_float_atol,
-                compare_float_rtol=compare_float_rtol,
-                max_differences_per_case=max_differences_per_case,
-            )
-
-            record = {
-                "case_id": case_id,
-                "file_name": file_name,
-                "status": "ok" if not differences else "mismatch",
-                "duration_seconds": round(time.perf_counter() - case_start, 6),
-                "original_duration_seconds": original_duration,
-                "roundtrip_duration_seconds": roundtrip_duration,
-                "original": {
-                    "index": _result_value(original, "index"),
-                    "conf": _result_value(original, "conf"),
-                },
-                "roundtrip": payload,
-            }
-            record.update(occupancy_annotation)
-            _append_jsonl(records_path, record)
-
-            if differences:
-                mismatch_count += 1
-                if occupancy_annotation["source_has_fractional_occupancy"]:
-                    fractional_occupancy_mismatch_count += 1
-                mismatches.append(record)
-            else:
-                success_count += 1
-        except Exception as exc:  # pragma: no cover - exercised in batch mode
+        if case_result["status"] == "ok":
+            success_count += 1
+        elif case_result["status"] == "mismatch":
+            mismatch_count += 1
+            if case_result["source_has_fractional_occupancy"]:
+                fractional_occupancy_mismatch_count += 1
+            mismatches.append(case_result["mismatch"])
+        else:
             error_count += 1
-            errors_by_file[case_id] = {
-                "type": type(exc).__name__,
-                "message": str(exc),
-                "traceback": traceback.format_exc(),
-                **occupancy_annotation,
-            }
-            if occupancy_annotation["source_has_fractional_occupancy"]:
+            errors_by_file[case_result["case_id"]] = case_result["error_by_file"]
+            if case_result["source_has_fractional_occupancy"]:
                 fractional_occupancy_error_count += 1
-            _append_jsonl(
-                records_path,
-                {
-                    "case_id": case_id,
-                    "file_name": file_name,
-                    "status": "error",
-                    "duration_seconds": round(time.perf_counter() - case_start, 6),
-                    "original_duration_seconds": original_duration,
-                    "roundtrip_duration_seconds": roundtrip_duration,
-                    **occupancy_annotation,
-                    "error": {
-                        "type": type(exc).__name__,
-                        "message": str(exc),
-                    },
-                },
-            )
 
     finished_at = _isoformat_now()
     summary = {
@@ -674,6 +806,7 @@ def run_poscar_roundtrip_batch(
             "meigtol": meigtol,
             "matrix_tol": matrix_tol,
         },
+        "workers": workers,
         "total_cases_requested": len(files),
         "processed_cases": processed_cases,
         "success_count": success_count,
@@ -764,6 +897,14 @@ def _parse_args() -> argparse.Namespace:
         type=float,
         default=0.01,
     )
+    parser.add_argument(
+        "--workers",
+        "--parallel-cores",
+        dest="workers",
+        type=int,
+        default=1,
+        help="Number of independent roundtrip cases to process concurrently. Default is 1.",
+    )
     parser.add_argument("--quiet", action="store_true")
     return parser.parse_args()
 
@@ -799,6 +940,7 @@ def main() -> None:
         mtol=args.mtol,
         meigtol=args.meigtol,
         matrix_tol=args.matrix_tol,
+        workers=args.workers,
         quiet=args.quiet,
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2, cls=NumpyEncoder))

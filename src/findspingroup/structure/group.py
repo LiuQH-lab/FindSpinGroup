@@ -1,3 +1,4 @@
+import ast
 import re
 from copy import deepcopy
 from findspingroup.version import __version__
@@ -25,6 +26,124 @@ from findspingroup.utils.symbolic_format import format_symbolic_scalar
 def parse_label_and_value(text):
     label, value = text.split(':', 1)
     return label, value
+
+
+_KPOINT_PARAMETER_NAMES = ("u", "v", "w")
+_KPOINT_PARAMETER_DEFAULTS = {"u": 0.417, "v": 0.789, "w": 0.117}
+
+
+def _kpoint_coordinate_expressions(symbol: str) -> tuple[str, str, str]:
+    _, value = parse_label_and_value(symbol)
+    stripped = value.strip()
+    if not stripped.startswith("(") or not stripped.endswith(")"):
+        raise ValueError(f"Invalid k-point symbol: {symbol}")
+    coords = tuple(coord.strip() for coord in stripped[1:-1].split(","))
+    if len(coords) != 3:
+        raise ValueError(f"Invalid k-point coordinate count in: {symbol}")
+    return coords
+
+
+def _kpoint_linear_coefficients(expression: str) -> np.ndarray:
+    tree = ast.parse(expression, mode="eval")
+
+    def visit(node) -> np.ndarray:
+        if isinstance(node, ast.Expression):
+            return visit(node.body)
+        if isinstance(node, ast.Constant):
+            if isinstance(node.value, (int, float)):
+                return np.array([float(node.value), 0.0, 0.0, 0.0], dtype=float)
+            raise ValueError(f"Unsupported k-point constant: {expression}")
+        if isinstance(node, ast.Name):
+            if node.id not in _KPOINT_PARAMETER_NAMES:
+                raise ValueError(f"Unsupported k-point parameter {node.id!r}: {expression}")
+            coeffs = np.zeros(4, dtype=float)
+            coeffs[1 + _KPOINT_PARAMETER_NAMES.index(node.id)] = 1.0
+            return coeffs
+        if isinstance(node, ast.UnaryOp):
+            operand = visit(node.operand)
+            if isinstance(node.op, ast.USub):
+                return -operand
+            if isinstance(node.op, ast.UAdd):
+                return operand
+            raise ValueError(f"Unsupported k-point unary expression: {expression}")
+        if isinstance(node, ast.BinOp):
+            left = visit(node.left)
+            right = visit(node.right)
+            if isinstance(node.op, ast.Add):
+                return left + right
+            if isinstance(node.op, ast.Sub):
+                return left - right
+            if isinstance(node.op, ast.Mult):
+                left_has_vars = np.any(np.abs(left[1:]) > 1e-12)
+                right_has_vars = np.any(np.abs(right[1:]) > 1e-12)
+                if left_has_vars and right_has_vars:
+                    raise ValueError(f"Nonlinear k-point expression: {expression}")
+                return left * right[0] if left_has_vars else right * left[0]
+            if isinstance(node.op, ast.Div):
+                if np.any(np.abs(right[1:]) > 1e-12) or abs(right[0]) < 1e-12:
+                    raise ValueError(f"Unsupported k-point denominator: {expression}")
+                return left / right[0]
+            raise ValueError(f"Unsupported k-point binary expression: {expression}")
+        raise ValueError(f"Unsupported k-point expression: {expression}")
+
+    return visit(tree)
+
+
+def _fit_kpoint_parameters(reference_symbols, reference_values) -> dict[str, float]:
+    equations = []
+    targets = []
+    for symbol, value in zip(reference_symbols, reference_values):
+        for expression, target in zip(_kpoint_coordinate_expressions(symbol), value):
+            coeffs = _kpoint_linear_coefficients(expression)
+            if np.any(np.abs(coeffs[1:]) > 1e-12):
+                equations.append(coeffs[1:])
+                targets.append(float(target) - coeffs[0])
+
+    parameters = dict(_KPOINT_PARAMETER_DEFAULTS)
+    if not equations:
+        return parameters
+
+    solution, *_ = np.linalg.lstsq(
+        np.asarray(equations, dtype=float),
+        np.asarray(targets, dtype=float),
+        rcond=None,
+    )
+    for name, value in zip(_KPOINT_PARAMETER_NAMES, solution):
+        if np.isfinite(value):
+            parameters[name] = float(value)
+    return parameters
+
+
+def _evaluate_kpoint_symbols(symbols, parameters: dict[str, float]) -> tuple[tuple[float, float, float], ...]:
+    parameter_vector = np.array(
+        [0.0] + [parameters[name] for name in _KPOINT_PARAMETER_NAMES],
+        dtype=float,
+    )
+    values = []
+    for symbol in symbols:
+        coords = []
+        for expression in _kpoint_coordinate_expressions(symbol):
+            coeffs = _kpoint_linear_coefficients(expression)
+            coords.append(float(coeffs[0] + np.dot(coeffs[1:], parameter_vector[1:])))
+        values.append(tuple(coords))
+    return tuple(values)
+
+
+def _runtime_kpoint_values_with_legacy_labels(runtime_symbols, legacy_entries):
+    legacy_symbols, legacy_values = zip(*legacy_entries)
+    parameters = _fit_kpoint_parameters(legacy_symbols, legacy_values)
+    values_by_label = {
+        parse_label_and_value(symbol)[0]: tuple(value)
+        for symbol, value in legacy_entries
+    }
+    runtime_values = []
+    for symbol in runtime_symbols:
+        label = parse_label_and_value(symbol)[0]
+        if label in values_by_label:
+            runtime_values.append(values_by_label[label])
+        else:
+            runtime_values.extend(_evaluate_kpoint_symbols((symbol,), parameters))
+    return tuple(runtime_values), parameters
 
 
 def combine_parametric_solutions(rref_matrix, tol=1e-3):
@@ -1672,45 +1791,104 @@ class SpinSpaceGroup:
         else:
             return np.eye(3)
 
+    def _runtime_index_label(self) -> str | None:
+        if self.__dict__.get("index"):
+            return self.__dict__["index"]
+        if self._input_index:
+            return self._input_index
+        try:
+            return self.identify_index(tol=self.identify_tol or 0.001)
+        except Exception:
+            return None
+
     @cached_property
-    def _kpoints_data(self):
+    def _acc_kpoints_data(self):
         from findspingroup.data import ARITHMETIC_CRYSTAL_CLASS
-        k_conv = ARITHMETIC_CRYSTAL_CLASS.ACC_K_POINTS_CONVENTIONAL[self.acc_num]
-        k_prim = ARITHMETIC_CRYSTAL_CLASS.ACC_K_POINTS_PRIMITIVE[self.acc_num]
+        from findspingroup.data.acc_aligned_p_index_loader import (
+            get_acc_kpoint_symbols_by_acc_number,
+        )
 
-        k_sym_c, k_val_c = zip(*k_conv)
-        k_sym_p, k_val_p = zip(*k_prim)
+        runtime_entry = get_acc_kpoint_symbols_by_acc_number(self.acc_num)
+        k_acc_conv_sym = tuple(runtime_entry["conventional"])
+        k_prim_sym = tuple(runtime_entry["primitive"])
 
-        k_label, k_prim_str = zip(*(parse_label_and_value(i) for i in k_sym_p))
+        legacy_prim = ARITHMETIC_CRYSTAL_CLASS.ACC_K_POINTS_PRIMITIVE[self.acc_num]
+        k_prim_val, parameter_values = _runtime_kpoint_values_with_legacy_labels(
+            k_prim_sym,
+            legacy_prim,
+        )
+        k_acc_conv_val = _evaluate_kpoint_symbols(k_acc_conv_sym, parameter_values)
+
+        k_label, k_prim_str = zip(*(parse_label_and_value(i) for i in k_prim_sym))
         return {
-            'conv_sym': k_sym_c, 'conv_val': k_val_c,
-            'prim_sym': k_sym_p, 'prim_val': k_val_p,
-            'label': k_label, 'prim_str': k_prim_str
+            'acc_conv_sym': k_acc_conv_sym,
+            'acc_conv_val': k_acc_conv_val,
+            'prim_sym': k_prim_sym,
+            'prim_val': k_prim_val,
+            'label': k_label,
+            'prim_str': k_prim_str,
+            'parameter_values': parameter_values,
+        }
+
+    @cached_property
+    def _ssg_conventional_kpoints_data(self):
+        from findspingroup.data.acc_aligned_p_index_loader import (
+            get_ssg_conventional_kpoint_symbols_for_label,
+        )
+
+        label = self._runtime_index_label()
+        if label is None:
+            return {
+                'conv_sym': self._acc_kpoints_data['acc_conv_sym'],
+                'conv_val': self._acc_kpoints_data['acc_conv_val'],
+            }
+        try:
+            k_sym_c = get_ssg_conventional_kpoint_symbols_for_label(label)
+        except KeyError:
+            return {
+                'conv_sym': self._acc_kpoints_data['acc_conv_sym'],
+                'conv_val': self._acc_kpoints_data['acc_conv_val'],
+            }
+        k_val_c = _evaluate_kpoint_symbols(
+            k_sym_c,
+            self._acc_kpoints_data['parameter_values'],
+        )
+        return {
+            'conv_sym': k_sym_c,
+            'conv_val': k_val_c,
         }
 
     @property
     def kpoints_symbol_conventional(self):
-        return self._kpoints_data['conv_sym']
+        return self._ssg_conventional_kpoints_data['conv_sym']
 
     @property
     def kpoints_conventional(self):
-        return self._kpoints_data['conv_val']
+        return self._ssg_conventional_kpoints_data['conv_val']
+
+    @property
+    def kpoints_symbol_acc_conventional(self):
+        return self._acc_kpoints_data['acc_conv_sym']
+
+    @property
+    def kpoints_acc_conventional(self):
+        return self._acc_kpoints_data['acc_conv_val']
 
     @property
     def kpoints_symbol_primitive(self):
-        return self._kpoints_data['prim_sym']
+        return self._acc_kpoints_data['prim_sym']
 
     @property
     def kpoints_primitive(self):
-        return self._kpoints_data['prim_val']
+        return self._acc_kpoints_data['prim_val']
 
     @property
     def kpoints_label(self):
-        return self._kpoints_data['label']
+        return self._acc_kpoints_data['label']
 
     @property
     def kpoints_primitive_string(self):
-        return self._kpoints_data['prim_str']
+        return self._acc_kpoints_data['prim_str']
 
     @cached_property
     def little_groups(self):

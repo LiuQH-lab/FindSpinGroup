@@ -34,6 +34,9 @@ Environment overrides:
   BATCH_WORKERS  current: ${BATCH_WORKERS:-1}
   LIMIT          current: ${LIMIT:-<none>}
   SBATCH_BIN     current: ${SBATCH_BIN:-sbatch}
+  SBATCH_ARGS    current: ${SBATCH_ARGS:-<none>}
+  PYTHON_BIN     current: ${PYTHON_BIN:-<auto>}
+  EXPORT_RUNTIME_ROWS current: ${EXPORT_RUNTIME_ROWS:-1}
 
 Examples:
   $(basename "$0")
@@ -62,6 +65,9 @@ SHARD_COUNT="${SHARD_COUNT:-1}"
 BATCH_WORKERS="${BATCH_WORKERS:-1}"
 LIMIT="${LIMIT:-}"
 EXPORT_FERROELECTRIC_SWITCHING_OPS="${EXPORT_FERROELECTRIC_SWITCHING_OPS:-0}"
+EXPORT_RUNTIME_ROWS="${EXPORT_RUNTIME_ROWS:-1}"
+PYTHON_BIN="${PYTHON_BIN:-}"
+SBATCH_ARGS="${SBATCH_ARGS:-}"
 
 EXPORT_TXT="${EXPORT_TXT:-selected.txt}"
 if [[ -n "${EXPORT_FIELDS+x}" ]]; then
@@ -122,10 +128,17 @@ echo "G0 self audit  : ${INCLUDE_G0_SELF_AUDIT:-0}"
 echo "Shard          : $SHARD_INDEX / $SHARD_COUNT"
 echo "Workers        : $BATCH_WORKERS"
 echo "Limit          : ${LIMIT:-<none>}"
+echo "Sbatch args    : ${SBATCH_ARGS:-<none>}"
+echo "Python bin     : ${PYTHON_BIN:-<auto>}"
+echo "Runtime export : $EXPORT_RUNTIME_ROWS"
 
 CMD=(
   "$SBATCH_BIN"
 )
+if [[ -n "$SBATCH_ARGS" ]]; then
+  read -r -a SBATCH_ARG_ARRAY <<< "$SBATCH_ARGS"
+  CMD+=("${SBATCH_ARG_ARRAY[@]}")
+fi
 if [[ "$BATCH_WORKERS" != "1" ]]; then
   CMD+=(
     --cpus-per-task
@@ -159,5 +172,7 @@ SHARD_INDEX="$SHARD_INDEX" \
 SHARD_COUNT="$SHARD_COUNT" \
 BATCH_WORKERS="$BATCH_WORKERS" \
 LIMIT="$LIMIT" \
+EXPORT_RUNTIME_ROWS="$EXPORT_RUNTIME_ROWS" \
+PYTHON_BIN="$PYTHON_BIN" \
 FSG_REPO_ROOT="$REPO_ROOT" \
 "${CMD[@]}"

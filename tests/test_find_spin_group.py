@@ -10,6 +10,10 @@ import findspingroup.core.identify_symmetry_from_ops as identify_symmetry_from_o
 import findspingroup.core.identify_spin_space_group as identify_spin_space_group_module
 import findspingroup.structure.cell as cell_module
 import findspingroup.structure.group as group_module
+from findspingroup.data.acc_aligned_p_index_loader import (
+    get_pair_id_for_ssg_label,
+    get_ssg_conventional_kpoint_symbols_for_label,
+)
 from findspingroup import (
     find_spin_group,
     find_spin_group_acc_primitive,
@@ -364,8 +368,8 @@ def test_acc_primitive_oriented_seitz_uses_same_spin_frame_as_oriented_ops_for_3
     )
     assert r"2_{112}" in result.acc_primitive_ssg_seitz_latex_oriented[1]
     assert r"2_{001}" not in result.acc_primitive_ssg_seitz_latex_oriented[1]
-    assert r"3^{2}_{110}" in result.acc_primitive_ssg_seitz_latex_oriented[10]
-    assert r"3^{1}_{110}" not in result.acc_primitive_ssg_seitz_latex_oriented[10]
+    assert r"3^{1}_{110}" in result.acc_primitive_ssg_seitz_latex_oriented[10]
+    assert r"3^{2}_{111}" in result.acc_primitive_ssg_seitz_latex_oriented[10]
 
 
 def test_find_spin_group_acc_primitive_oriented_seitz_uses_acc_lattice_frame_for_324():
@@ -1591,10 +1595,16 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
         [np.zeros(3)],
     )
 
-    def fake_parse_structure_file(filename, atol=0.01, return_metadata=False):
+    def fake_parse_structure_file(
+        filename,
+        atol=0.01,
+        return_metadata=False,
+        **kwargs,
+    ):
         captured["filename"] = filename
         captured["atol"] = atol
         captured["return_metadata"] = return_metadata
+        captured["parse_kwargs"] = kwargs
         return fake_parsed, {"kind": "fake"}
 
     def fake_find_spin_group_from_parsed(
@@ -1608,11 +1618,15 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
         source_metadata=None,
         parser_atol=None,
         input_spin_setting=None,
+        calculation_mode=None,
+        vacuum_axis=None,
     ):
         captured["source_name"] = source_name
         captured["source_metadata"] = source_metadata
         captured["parser_atol"] = parser_atol
         captured["input_spin_setting"] = input_spin_setting
+        captured["calculation_mode"] = calculation_mode
+        captured["vacuum_axis"] = vacuum_axis
         return {"ok": True}
 
     monkeypatch.setattr(find_spin_group_module, "parse_structure_file", fake_parse_structure_file)
@@ -1624,10 +1638,16 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
     assert captured["filename"] == "dummy.scif"
     assert captured["atol"] == 0.123
     assert captured["return_metadata"] is True
+    assert captured["parse_kwargs"] == {
+        "poscar_allow_incar_magmom": False,
+        "poscar_prefer_incar_magmom": False,
+    }
     assert captured["source_name"] == "dummy.scif"
     assert captured["source_metadata"] == {"kind": "fake"}
     assert captured["parser_atol"] == 0.123
     assert captured["input_spin_setting"] == "in_lattice"
+    assert captured["calculation_mode"] == "3d"
+    assert captured["vacuum_axis"] == "c"
 
 
 def test_find_transition_matrix_deterministic_error_suggests_pg_standardization_direction(monkeypatch):
@@ -1841,7 +1861,7 @@ def test_identify_transformations_send_167_tmptin_to_database_symbol_with_spin_t
 
     assert result.index == "25.8.2.1.P3"
     assert database_std_ssg.international_symbol_linear_current_frame == (
-        "P 2_{100}|m 2_{010}|m 2_{001}|2 : (1,2_{010},2_{010}) m_{010}|1"
+        "P 2_{001}|m 2_{100}|m 2_{010}|2 : (2_{001},1,2_{001}) m_{001}|1"
     )
 
 
@@ -1851,10 +1871,10 @@ def test_scif_chen_transform_contract_for_167_tmptin_uses_current_lattice_scaled
 
     assert metadata["space_group_spin"]["spin_space_group_number_chen"] == "25.8.2.1.P3"
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] == (
-        "P 1|m 2_{010}|m 1|2 : (1,2_{010},2_{010}) m_{010}|1"
+        "P 1|m 2_{100}|m 1|2 : (2_{010},1,2_{010}) m_{010}|1"
     )
     assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == (
-        "1/2b,-2a,c;0,1/2,0;26.098542cs,13.049617as,22.602bs"
+        "1/2b,-2a,c;0,1/2,0;26.098542cs,-13.049617bs,22.602as"
     )
 
 
@@ -1906,7 +1926,7 @@ def test_build_candidate_transform_chen_pp_abcs_for_324_hex_spatial_cubic_spin()
     assert candidate["to_spin_frame"] == "chen_cubic_spin_basis"
     assert candidate["transform_Chen_Pp_abcs"] == (
         "a,b,c;0,0,0;"
-        "1/3as-1/3bs+4/3cs,1/3as+2/3bs+4/3cs,-2/3as-1/3bs+4/3cs"
+        "4/3as+4/3bs+4/3cs,-1/3as+2/3bs-1/3cs,-2/3as+1/3bs+1/3cs"
     )
 
     spin_basis_columns = np.asarray(candidate["spin_basis_rows_abcs"], dtype=float).T
@@ -1920,10 +1940,10 @@ def test_build_candidate_transform_chen_pp_abcs_for_324_hex_spatial_cubic_spin()
     ]
     expected_point_ops = [
         np.eye(3),
-        np.array([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]),
-        np.array([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]),
-        np.array([[0.0, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]),
-        np.array([[0.0, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]),
+        np.array([[0.0, 0.25, 0.5], [-2.666667, 0.666667, 0.333333], [1.333333, -1.333333, -0.666667]]),
+        np.array([[0.0, 0.25, 0.5], [-2.666667, 0.666667, 0.333333], [1.333333, -1.333333, -0.666667]]),
+        np.array([[0.0, -0.5, -0.25], [-1.333333, -0.666667, -1.333333], [2.666667, 0.333333, 0.666667]]),
+        np.array([[0.0, -0.5, -0.25], [-1.333333, -0.666667, -1.333333], [2.666667, 0.333333, 0.666667]]),
         np.eye(3),
     ]
     for actual, expected in zip(transformed_point_ops, expected_point_ops):
@@ -1937,9 +1957,9 @@ def test_build_candidate_transform_chen_pp_abcs_for_324_hex_spatial_cubic_spin()
     ]
     expected_lattice_ops = [
         np.eye(3),
-        np.diag([-1.0, -1.0, 1.0]),
-        np.diag([-1.0, -1.0, 1.0]),
-        np.diag([-1.0, 1.0, -1.0]),
+        np.array([[-1.166667, 0.041667, 0.125], [3.333333, -1.833333, -2.5], [-4.0, 1.0, 2.0]]),
+        np.array([[-1.166667, 0.041667, 0.125], [3.333333, -1.833333, -2.5], [-4.0, 1.0, 2.0]]),
+        np.array([[0.944444, 0.680556, 0.486111], [-2.222222, -1.777778, -0.555556], [3.333333, 1.166667, -0.166667]]),
     ]
     for actual, expected in zip(transformed_lattice_ops, expected_lattice_ops):
         assert np.allclose(actual, expected, atol=1e-6)
@@ -2232,6 +2252,54 @@ def test_little_groups_symbols_recover_for_conbnb3s6_tripleq():
     assert isinstance(symbols, list)
     assert len(symbols) == len(ssg.kpoints_symbol_primitive)
     assert all(symbol != "?" for symbol in symbols)
+
+
+def test_acc_aligned_runtime_index_exposes_ssg_conventional_kpoints():
+    label = "12.6.4.11.P"
+
+    assert get_pair_id_for_ssg_label(label) == "A010_P26"
+    assert get_ssg_conventional_kpoint_symbols_for_label(label)[:5] == (
+        "A:(1,0,0)",
+        "B:(1/2,0,1/2)",
+        "C:(1/2,1/2,-1/2)",
+        "D:(1/2,1/2,1/2)",
+        "E:(1,1/2,0)",
+    )
+
+
+def test_kpoint_symbols_use_runtime_index_for_primitive_and_ssg_convention():
+    identity = np.eye(3)
+    ssg = SpinSpaceGroup([[identity, identity, np.zeros(3)]])
+    ssg._input_index = "12.6.4.11.P"
+    ssg.__dict__["acc_num"] = 10
+
+    assert ssg.kpoints_symbol_primitive[:3] == (
+        "A:(1/2,0,1/2)",
+        "B:(0,0,1/2)",
+        "C:(1/2,1/2,0)",
+    )
+    assert ssg.kpoints_symbol_conventional[:5] == (
+        "A:(1,0,0)",
+        "B:(1/2,0,1/2)",
+        "C:(1/2,1/2,-1/2)",
+        "D:(1/2,1/2,1/2)",
+        "E:(1,1/2,0)",
+    )
+    assert ssg.kpoints_primitive[0] == (0.5, 0, 0.5)
+
+
+def test_kpoint_symbols_fall_back_to_acc_convention_without_runtime_index():
+    identity = np.eye(3)
+    ssg = SpinSpaceGroup([[identity, identity, np.zeros(3)]])
+    ssg._input_index = "not.in.runtime.index"
+    ssg.__dict__["acc_num"] = 10
+
+    assert ssg.kpoints_symbol_conventional[:3] == (
+        "A:(1/2,0,1/2)",
+        "B:(0,0,1/2)",
+        "C:(1/2,1/2,0)",
+    )
+    assert ssg.kpoints_conventional[0] == (0.5, 0, 0.5)
 
 
 def test_little_groups_symbols_use_minus3_not_minus6_for_vcl2_trigonal_cogroups():
@@ -3856,8 +3924,14 @@ def test_find_spin_group_input_setting_payload_warns_when_input_ssg_differs_from
 
 def test_input_setting_oriented_seitz_uses_cartesian_order_with_input_spin_frame():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        with pytest.raises(KeyError, match="not in identify-index database"):
-            find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+        result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+
+    assert result.identify_index_details is None
+    assert result.index.startswith("not in identify-index database:")
+    assert (
+        "No identify-index reduction record for L0=143, G0=147, it=2, ik=12, iso=64"
+        in result.index
+    )
 
 
 @pytest.mark.parametrize(
@@ -4389,7 +4463,7 @@ def test_scif_transform_tags_use_basis_relation_contract():
     ) in default_scif
     assert (
         "_space_group_spin.fsg_transform_to_magnetic_primitive_Pp  "
-        "'-1/3a+1/3b-1/3c,2/3a+1/3b-1/3c,-1/3a-2/3b-1/3c;0,0,0'"
+        "'-1/3a-2/3b-1/3c,-1/3a+1/3b-1/3c,2/3a+1/3b-1/3c;0,0,0'"
     ) in default_scif
     assert (
         "_space_group_spin.fsg_transform_to_L0std_Pp  "
