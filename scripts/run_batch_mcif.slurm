@@ -72,10 +72,12 @@ PACKAGE_VERSION="${PACKAGE_VERSION:-unknown}"
 OUTPUT_DIR="${OUTPUT_ROOT}/run_v${PACKAGE_VERSION}_${RUN_STAMP}"
 mkdir -p "$OUTPUT_DIR"
 
-if [[ -x "$REPO_ROOT/.venv/bin/python" ]]; then
+if [[ -n "${PYTHON_BIN:-}" ]]; then
+  PYTHON_BIN="$PYTHON_BIN"
+elif [[ -x "$REPO_ROOT/.venv/bin/python" ]]; then
   PYTHON_BIN="$REPO_ROOT/.venv/bin/python"
 else
-  PYTHON_BIN="${PYTHON_BIN:-python3}"
+  PYTHON_BIN="python3"
 fi
 
 if [[ ! -d "$REPO_ROOT/src/findspingroup" ]]; then

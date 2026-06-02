@@ -218,6 +218,11 @@ datasets/
 artifacts/
 .playwright-mcp/
 .skill-staging/
+
+# Local batch execution profiles. Keep private SSH aliases, cluster paths,
+# partitions, QOS names, and interpreter paths out of git history.
+.fsg-batch-profiles.local.toml
+fsg-batch-profiles.local.toml
 ~$*.pptx
 ~$*.xlsx
 

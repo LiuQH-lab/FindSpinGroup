@@ -30,6 +30,8 @@ Environment overrides:
   SAVE_POSCAR  current: ${SAVE_POSCAR:-1}
   QUIET        current: ${QUIET:-1}
   SBATCH_BIN   current: ${SBATCH_BIN:-sbatch}
+  SBATCH_ARGS  current: ${SBATCH_ARGS:-<none>}
+  PYTHON_BIN   current: ${PYTHON_BIN:-<auto>}
 
 Examples:
   $(basename "$0")
@@ -54,6 +56,9 @@ COMPARE_RTOL="${COMPARE_RTOL:-1e-8}"
 MAX_DIFFERENCES_PER_CASE="${MAX_DIFFERENCES_PER_CASE:-200}"
 SAVE_POSCAR="${SAVE_POSCAR:-1}"
 QUIET="${QUIET:-1}"
+SBATCH_ARGS="${SBATCH_ARGS:-}"
+PYTHON_BIN="${PYTHON_BIN:-}"
+BATCH_WORKERS="${BATCH_WORKERS:-1}"
 
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
   usage
@@ -93,9 +98,24 @@ echo "Compare rtol  : $COMPARE_RTOL"
 echo "Max diffs/case: $MAX_DIFFERENCES_PER_CASE"
 echo "Save poscar   : $SAVE_POSCAR"
 echo "Quiet         : $QUIET"
+echo "Sbatch args   : ${SBATCH_ARGS:-<none>}"
+echo "Python bin    : ${PYTHON_BIN:-<auto>}"
+echo "Workers       : $BATCH_WORKERS"
 
 CMD=(
   "$SBATCH_BIN"
+)
+if [[ -n "$SBATCH_ARGS" ]]; then
+  read -r -a SBATCH_ARG_ARRAY <<< "$SBATCH_ARGS"
+  CMD+=("${SBATCH_ARG_ARRAY[@]}")
+fi
+if [[ "$BATCH_WORKERS" != "1" ]]; then
+  CMD+=(
+    --cpus-per-task
+    "$BATCH_WORKERS"
+  )
+fi
+CMD+=(
   "$SLURM_SCRIPT"
   "$INPUT_DIR"
   "$OUTPUT_ROOT"
@@ -117,5 +137,6 @@ COMPARE_RTOL="$COMPARE_RTOL" \
 MAX_DIFFERENCES_PER_CASE="$MAX_DIFFERENCES_PER_CASE" \
 SAVE_POSCAR="$SAVE_POSCAR" \
 QUIET="$QUIET" \
+PYTHON_BIN="$PYTHON_BIN" \
 FSG_REPO_ROOT="$REPO_ROOT" \
 "${CMD[@]}"

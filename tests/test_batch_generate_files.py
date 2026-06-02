@@ -453,6 +453,45 @@ def test_run_scif_roundtrip_batch_smoke_manifest(tmp_path):
     assert (tmp_path / "scif" / "0.800_MnTe.scif").exists()
 
 
+def test_run_scif_roundtrip_batch_supports_parallel_workers(monkeypatch, tmp_path):
+    files = [_write_fake_mcif(tmp_path, f"case_{index}.mcif") for index in range(3)]
+    monkeypatch.setattr(batch_scif_roundtrip, "ProcessPoolExecutor", ThreadPoolExecutor)
+
+    def _fake_case(index, total_cases, source_path, **kwargs):
+        case_id = batch_mcif._normalize_case_id(source_path)
+        record = {
+            "case_id": case_id,
+            "file_name": source_path.name,
+            "status": "ok",
+            "original": {"index": str(index), "conf": "Collinear"},
+            "roundtrip": {"index_match": True, "conf_match": True, "differences": []},
+        }
+        return {
+            "index": index,
+            "case_id": case_id,
+            "file_name": source_path.name,
+            "status": "ok",
+            "record": record,
+            "mismatch": None,
+            "error_by_file": None,
+            "source_has_fractional_occupancy": False,
+            "progress_message": f"[{index}/{total_cases}] ok",
+        }
+
+    monkeypatch.setattr(batch_scif_roundtrip, "_run_scif_roundtrip_case", _fake_case)
+
+    summary = run_scif_roundtrip_batch(files, tmp_path / "scif_parallel", workers=2, quiet=True)
+
+    records = [
+        json.loads(line)
+        for line in (tmp_path / "scif_parallel" / "records.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert summary["workers"] == 2
+    assert summary["processed_cases"] == len(files)
+    assert summary["success_count"] == len(files)
+    assert [record["file_name"] for record in records] == [path.name for path in files]
+
+
 def test_run_scif_roundtrip_batch_marks_fractional_occupancy_mismatches(monkeypatch, tmp_path):
     file_path = _write_fake_mcif(tmp_path, "fractional_case.mcif")
     original = _FakeRoundtripBatchResult(
@@ -525,6 +564,46 @@ def test_run_poscar_roundtrip_batch_marks_fractional_occupancy_errors(monkeypatc
     assert errors[case_id]["source_fractional_occupancy_values"] == [0.08, 0.92]
     assert errors[case_id]["source_fractional_occupancy_site_count"] == 2
     assert record["source_has_fractional_occupancy"] is True
+
+
+def test_run_poscar_roundtrip_batch_supports_parallel_workers(monkeypatch, tmp_path):
+    files = [_write_fake_mcif(tmp_path, f"case_{index}.mcif") for index in range(3)]
+    monkeypatch.setattr(batch_poscar_roundtrip, "ProcessPoolExecutor", ThreadPoolExecutor)
+
+    def _fake_case(index, total_cases, source_path, **kwargs):
+        case_id = batch_mcif._normalize_case_id(source_path)
+        record = {
+            "case_id": case_id,
+            "file_name": source_path.name,
+            "status": "ok",
+            "original": {"index": str(index), "conf": "Collinear"},
+            "roundtrip": {"index_match": True, "conf_match": True, "differences": []},
+        }
+        return {
+            "index": index,
+            "case_id": case_id,
+            "file_name": source_path.name,
+            "status": "ok",
+            "record": record,
+            "mismatch": None,
+            "error_by_file": None,
+            "input_format": "repo_generated_acc_primitive_magnetic_poscar",
+            "source_has_fractional_occupancy": False,
+            "progress_message": f"[{index}/{total_cases}] ok",
+        }
+
+    monkeypatch.setattr(batch_poscar_roundtrip, "_run_poscar_roundtrip_case", _fake_case)
+
+    summary = run_poscar_roundtrip_batch(files, tmp_path / "poscar_parallel", workers=2, quiet=True)
+
+    records = [
+        json.loads(line)
+        for line in (tmp_path / "poscar_parallel" / "records.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert summary["workers"] == 2
+    assert summary["processed_cases"] == len(files)
+    assert summary["success_count"] == len(files)
+    assert [record["file_name"] for record in records] == [path.name for path in files]
 
 
 def test_run_poscar_roundtrip_batch_supports_g0_cptrans_candidate_source_mode(monkeypatch, tmp_path):

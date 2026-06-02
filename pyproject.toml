@@ -50,7 +50,7 @@ findspingroup = [
     "core/identify_index/databases/*.db",
     "core/identify_index/data/*.json",
     "core/identify-py-222/databases/*.db",
-    "data/acc_aligned_p_index.json",
+    "data/acc_aligned_kpoint_runtime_index.json",
     "examples/*.mcif",
 ]
 
