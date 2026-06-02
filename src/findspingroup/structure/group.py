@@ -106,9 +106,12 @@ def _axis_subscript_from_point_info(info: dict, *, latex: bool = False) -> str:
     return _axis_parameter_subscript(info.get("axis_parameter_values"), latex=latex)
 
 
-def _gspg_spin_only_symbol_from_rotations(rotations, conf: str, tol: float) -> dict[str, str]:
+def _gspg_spin_only_symbol_from_unique_rotations(
+    unique_rotations,
+    conf: str,
+    tol: float,
+) -> dict[str, str]:
     symbol_tol = calibrated_symbol_tol(tol)
-    unique_rotations = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in rotations], tol=tol)
     non_identity = [op for op in unique_rotations if not np.allclose(op, np.eye(3), atol=tol)]
 
     if not non_identity:
@@ -178,6 +181,12 @@ def _gspg_spin_only_symbol_from_rotations(rotations, conf: str, tol: float) -> d
     }
 
 
+def _gspg_spin_only_symbol_from_rotations(rotations, conf: str, tol: float) -> dict[str, str]:
+    unique_rotations = deduplicate_matrix_pairs([np.asarray(op, dtype=float) for op in rotations], tol=tol)
+    rotations_key = _matrix_ops_cache_key(unique_rotations)
+    return dict(_cached_gspg_spin_only_symbol_by_key(rotations_key, conf, float(tol)))
+
+
 
 
 def _normalize_group_tol(tol: float | Tolerances) -> float:
@@ -235,6 +244,12 @@ def _matrix_ops_cache_key(ops) -> tuple:
 
 
 @lru_cache(maxsize=512)
+def _cached_gspg_spin_only_symbol_by_key(rotations_key: tuple, conf: str, tol: float):
+    rotations = [_restore_matrix_from_bytes(rotation_bytes) for rotation_bytes in rotations_key]
+    return _gspg_spin_only_symbol_from_unique_rotations(rotations, conf, tol)
+
+
+@lru_cache(maxsize=512)
 def _cached_space_group_dataset_by_key(ops_key: tuple):
     ops = [
         [_restore_matrix_from_bytes(rotation_bytes), _restore_vector_from_bytes(translation_bytes)]
@@ -287,6 +302,21 @@ def _cached_magnetic_space_group_info_by_key(ops_key: tuple):
     ]
     info = get_magnetic_space_group_from_operations(ops)
     return None if info is None else deepcopy(info)
+
+
+@lru_cache(maxsize=512)
+def _cached_space_group_pointgroup_by_key(ops_key: tuple):
+    ops = [
+        [_restore_matrix_from_bytes(rotation_bytes), _restore_vector_from_bytes(translation_bytes)]
+        for rotation_bytes, translation_bytes in ops_key
+    ]
+    return get_space_group_from_operations(ops).pointgroup
+
+
+@lru_cache(maxsize=512)
+def _cached_effective_mpg_symbol_by_key(ops_key: tuple):
+    info = _cached_magnetic_space_group_info_by_key(ops_key)
+    return None if info is None else info.get("mpg_symbol")
 
 
 def _matrix_lookup_key(matrix, *, key_tol: float) -> tuple[int, ...]:
@@ -2524,9 +2554,12 @@ class GeneralizedSpinPointGroup:
             if i[0]==-1 and np.allclose(i[1],np.eye(3),atol=1e-5):
                 try:
                     effective_space_rotation = deduplicate_matrix_pairs([_[1] for _ in empg_ops], tol=1e-5)
-                    empg_symbol=get_space_group_from_operations([[j,np.array([0,0,0])] for j in effective_space_rotation]).pointgroup+"1'"
+                    space_ops = [[j, np.array([0, 0, 0], dtype=float)] for j in effective_space_rotation]
+                    empg_symbol = _cached_space_group_pointgroup_by_key(
+                        _space_group_ops_cache_key(space_ops)
+                    ) + "1'"
                 except:
                     empg_symbol=None
                 return empg_symbol
-        empg_info = get_magnetic_space_group_from_operations([[i[0],i[1],np.array([0,0,0])] for i in empg_ops])
-        return empg_info['mpg_symbol'] if empg_info else None
+        msg_ops = [[i[0], i[1], np.array([0, 0, 0], dtype=float)] for i in empg_ops]
+        return _cached_effective_mpg_symbol_by_key(_magnetic_space_group_ops_cache_key(msg_ops))

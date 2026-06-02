@@ -1407,6 +1407,7 @@ def _maximal_audited_ssg_subgroups_from_generators(
     group_tol=DEFAULT_TOL,
     *,
     label="matched SSG",
+    preserve_cache: dict[tuple[int, ...], bool] | None = None,
 ):
     if not raw_ssg_ops:
         return []
@@ -1456,7 +1457,8 @@ def _maximal_audited_ssg_subgroups_from_generators(
 
     valid = []
     seen = set()
-    preserve_cache = {}
+    if preserve_cache is None:
+        preserve_cache = {}
     for generator_set in generator_sets:
         seed_ops = [identity, *generator_set]
         try:
@@ -1846,6 +1848,7 @@ def _build_candidate_profile(
     group_tol,
     tol,
     configuration_details,
+    preserve_cache: dict[tuple[int, ...], bool] | None = None,
 ):
     configuration = configuration_details["configuration"]
     raw_ssg_ops = get_ssg_ops(space_operations_list, pg_ops, mag_atoms, tol=tol)
@@ -1855,6 +1858,7 @@ def _build_candidate_profile(
             mag_atoms,
             group_tol=group_tol,
             label=f"{candidate['symbol']} order-{len(pg_ops)} matched SSG",
+            preserve_cache=preserve_cache,
         )
         ssg_ops = _project_ssg_spin_rotations_to_exact_point_group(
             ssg_ops,
@@ -1867,6 +1871,7 @@ def _build_candidate_profile(
             mag_atoms,
             group_tol=group_tol,
             label=f"{candidate['symbol']} order-{len(pg_ops)} projected matched SSG",
+            preserve_cache=preserve_cache,
         )
         audit_failure = _candidate_audit_failure(ssg_ops, group_tol=group_tol)
     except ValueError as exc:
@@ -1875,6 +1880,7 @@ def _build_candidate_profile(
             mag_atoms,
             group_tol=group_tol,
             label=f"{candidate['symbol']} order-{len(pg_ops)} matched SSG",
+            preserve_cache=preserve_cache,
         )
         if subgroup_options:
             def subgroup_sort_key(ops):
@@ -1936,6 +1942,7 @@ def _select_identify_pg_candidate(bundle, space_operations_list, mag_atoms, meig
     pg_subgroup_tol = _candidate_audit_tol(tol)
 
     profiles = []
+    preserve_cache: dict[tuple[int, ...], bool] = {}
     for candidate in bundle["candidates"]:
         full_profile = _build_candidate_profile(
             candidate,
@@ -1945,6 +1952,7 @@ def _select_identify_pg_candidate(bundle, space_operations_list, mag_atoms, meig
             group_tol,
             tol,
             bundle["configuration_details"],
+            preserve_cache=preserve_cache,
         )
         profiles.append(full_profile)
         if full_profile["audit_failure"] is None:
@@ -1964,6 +1972,7 @@ def _select_identify_pg_candidate(bundle, space_operations_list, mag_atoms, meig
                     group_tol,
                     tol,
                     bundle["configuration_details"],
+                    preserve_cache=preserve_cache,
                 )
             )
 
