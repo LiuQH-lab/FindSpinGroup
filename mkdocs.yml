@@ -8,8 +8,20 @@ theme:
   name: readthedocs
 nav:
   - Home: index.md
-  - Installation: installation.md
-  - Usage: usage.md
-  - Examples: examples.md
-  - SCIF: scif.md
-  - CLI: cli.md
+  - Guide:
+      - Overview: guide/index.md
+      - Getting Started: guide/getting-started.md
+      - Choosing an API: guide/choosing-an-api.md
+      - Understanding Results: guide/understanding-results.md
+      - Input Formats: guide/input-formats.md
+      - Examples: guide/examples.md
+      - Troubleshooting: guide/troubleshooting.md
+  - Reference:
+      - Overview: reference/index.md
+      - Python API: reference/python-api.md
+      - MagSymmetryResult: reference/magsymmetry-result.md
+      - CLI: reference/cli.md
+      - Output Fields: reference/output-fields.md
+      - SCIF Export: reference/scif.md
+  - Advanced Notes:
+      - Overview: advanced/index.md

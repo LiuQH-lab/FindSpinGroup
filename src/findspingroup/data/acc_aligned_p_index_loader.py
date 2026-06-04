@@ -8,11 +8,12 @@ from typing import TypeAlias
 
 
 Matrix: TypeAlias = tuple[tuple[Fraction, Fraction, Fraction], ...]
+RUNTIME_INDEX_FILE = "ssg_label_acc_kpoint_wave_index_20260604.json"
 
 
 @lru_cache(maxsize=1)
 def load_acc_aligned_kpoint_runtime_index() -> dict:
-    data_file = files("findspingroup.data").joinpath("acc_aligned_kpoint_runtime_index.json")
+    data_file = files("findspingroup.data").joinpath(RUNTIME_INDEX_FILE)
     return json.loads(data_file.read_text(encoding="utf-8"))
 
 
@@ -39,9 +40,18 @@ def acc_kpoint_symbols_by_number() -> dict[int, dict]:
     }
 
 
-def get_p_id_for_ssg_label(label: str) -> str:
+@lru_cache(maxsize=1)
+def ssg_label_records() -> dict[str, dict]:
     data = load_acc_aligned_kpoint_runtime_index()
-    return data["ssg_label_to_p_id"][label]
+    columns = tuple(data["ssg_label_record_columns"])
+    return {
+        label: dict(zip(columns, values, strict=True))
+        for label, values in data["ssg_label_records"].items()
+    }
+
+
+def get_p_id_for_ssg_label(label: str) -> str:
+    return ssg_label_records()[label]["p_id"]
 
 
 def get_acc_aligned_conventional_to_primitive_p(label: str) -> Matrix:
@@ -49,8 +59,7 @@ def get_acc_aligned_conventional_to_primitive_p(label: str) -> Matrix:
 
 
 def get_pair_id_for_ssg_label(label: str) -> str:
-    data = load_acc_aligned_kpoint_runtime_index()
-    return data["label_to_pair_id"][label]
+    return ssg_label_records()[label]["pair_id"]
 
 
 def get_acc_kpoint_symbols_by_acc_number(acc_number: int) -> dict:
@@ -59,5 +68,15 @@ def get_acc_kpoint_symbols_by_acc_number(acc_number: int) -> dict:
 
 def get_ssg_conventional_kpoint_symbols_for_label(label: str) -> tuple[str, ...]:
     data = load_acc_aligned_kpoint_runtime_index()
-    pair_id = data["label_to_pair_id"][label]
+    pair_id = get_pair_id_for_ssg_label(label)
     return tuple(data["ssg_conventional_kpoint_symbols_by_pair_id"][pair_id])
+
+
+def get_wave_spin_config_id_for_ssg_label(label: str) -> str:
+    return ssg_label_records()[label]["wave_spin_config_id"]
+
+
+def get_wave_spin_config_for_ssg_label(label: str) -> dict:
+    data = load_acc_aligned_kpoint_runtime_index()
+    config_id = get_wave_spin_config_id_for_ssg_label(label)
+    return data["wave_spin_config_by_id"][config_id]

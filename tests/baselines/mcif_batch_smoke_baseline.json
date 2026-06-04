@@ -395,6 +395,16 @@
         "is_spin_orbit_magnet": "",
         "ss_w_soc": "Yes",
         "ss_wo_soc": "k-dependent"
+      },
+      "wave_spin_config": {
+        "basis": [
+          "C1*((-0.6666666667*ky^3*kz)*sigma_z - (kx*ky^2*kz)*sigma_z + (kx^2*ky*kz)*sigma_z + (0.6666666667*kx^3*kz)*sigma_z)"
+        ],
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 4,
+        "spin_rank": 1,
+        "wave_type": "g-wave"
       }
     },
     "status": "ok",
@@ -866,6 +876,16 @@
         "is_spin_orbit_magnet": "(SOM)",
         "ss_w_soc": "Yes",
         "ss_wo_soc": "k-dependent"
+      },
+      "wave_spin_config": {
+        "basis": [
+          "C1*((-0.6666666667*ky^3)*sigma_z - (kx*ky^2)*sigma_z + (kx^2*ky)*sigma_z + (0.6666666667*kx^3)*sigma_z)"
+        ],
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 3,
+        "spin_rank": 1,
+        "wave_type": "f-wave"
       }
     },
     "status": "ok",
@@ -1387,6 +1407,16 @@
         "is_spin_orbit_magnet": "",
         "ss_w_soc": "Yes",
         "ss_wo_soc": "Zeeman"
+      },
+      "wave_spin_config": {
+        "basis": [
+          "C1*((1)*sigma_z)"
+        ],
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 0,
+        "spin_rank": 1,
+        "wave_type": "s-wave"
       }
     },
     "status": "ok",

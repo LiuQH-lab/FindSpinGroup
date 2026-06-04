@@ -1,6 +1,7 @@
 import json
 import re
 import warnings
+from copy import deepcopy
 from fractions import Fraction
 from functools import lru_cache
 from itertools import permutations, product
@@ -27,6 +28,7 @@ from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
 from findspingroup.data import MSGMPG_DB
 from findspingroup.data.acc_aligned_p_index_loader import (
     get_acc_aligned_conventional_to_primitive_p,
+    get_wave_spin_config_for_ssg_label,
 )
 from findspingroup.ferroelectric import (
     build_ferroelectric_switching_payload,
@@ -85,6 +87,13 @@ class NumpyEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return super(NumpyEncoder, self).default(obj)
+
+
+def _wave_spin_config_for_public_output(index: str) -> dict | None:
+    try:
+        return deepcopy(get_wave_spin_config_for_ssg_label(index))
+    except KeyError:
+        return None
 
 
 def _format_spin_only_direction(direction) -> str:
@@ -985,6 +994,7 @@ class MagSymmetryResult:
         self.magnetic_phase_modifier = symmetry.get('magnetic_phase_modifier', '')
         self.magnetic_phase_spin_orbit_magnet = symmetry.get('magnetic_phase_spin_orbit_magnet', '')
         self.magnetic_phase_details = symmetry.get('magnetic_phase_details', None)
+        self.wave_spin_config = symmetry.get('wave_spin_config', None)
         self.acc = symmetry['acc']
         self.msg_acc = symmetry.get('msg_acc', None)
         self.KPOINTS = symmetry['KPOINTS']
@@ -1559,6 +1569,7 @@ class MagSymmetryResult:
             'acc': self.acc,
             'properties': self.properties_summary(),
             'gspg': self.gspg_summary(),
+            'wave_spin_config': self.wave_spin_config,
             'polar_axes_by_symmetry': self.polar_axes_by_symmetry,
             'ferroelectric_switching': self.ferroelectric_switching,
         }
@@ -1613,6 +1624,7 @@ class MagSymmetryResult:
                 'phase_modifier': self.magnetic_phase_modifier,
                 'acc': self.acc,
                 'msg_acc': self.msg_acc,
+                'wave_spin_config': self.wave_spin_config,
                 'is_alter': self.is_alter,
                 'is_spin_orbit_magnet': self.is_spin_orbit_magnet,
                 'tolerances': self.tolerances,
@@ -7589,6 +7601,7 @@ def _find_spin_group_from_parsed(
         site_order=acc_primitive_wp_site_order,
     )
     acc_p_c_poscar = acc_primitive_output_poscar
+    wave_spin_config = _wave_spin_config_for_public_output(identify_info)
 
     result = {
         'index':identify_info,
@@ -7601,6 +7614,7 @@ def _find_spin_group_from_parsed(
         'poscar_mp':acc_primitive_output_poscar,
         'acc':ssg_primitive.acc,
         'msg_acc': msg_acc,
+        'wave_spin_config': wave_spin_config,
         'KPOINTS':KPOINTS,
         'quasi_2d': quasi_2d_diagnostics,
         'polar_axes_by_symmetry': polar_axes_by_symmetry,
@@ -7654,6 +7668,7 @@ def _find_spin_group_from_parsed(
                 'magnetic_phase_modifier': magnetic_phase_modifier,
                 'magnetic_phase_spin_orbit_magnet': magnetic_phase_payload['spin_orbit_magnet_tag'],
                 'magnetic_phase_details': magnetic_phase_details,
+                'wave_spin_config': wave_spin_config,
                 'acc':ssg_primitive.acc,
                 'msg_acc': msg_acc,
                 'G0_symbol': ssg_primitive.G0_symbol,
@@ -8270,6 +8285,7 @@ def _find_spin_group_basic_from_parsed(
         msg_symmetry=ferroelectric_switching.get("soc_magnetic_symmetry"),
         tol=tol_cfg.m_matrix_tol,
     )
+    wave_spin_config = _wave_spin_config_for_public_output(identify_info)
 
     return {
         "index": identify_info,
@@ -8305,6 +8321,7 @@ def _find_spin_group_basic_from_parsed(
         "magnetic_phase_base": magnetic_phase_payload["base_phase"],
         "magnetic_phase_modifier": magnetic_phase_payload["modifier"],
         "magnetic_phase_details": magnetic_phase_details,
+        "wave_spin_config": wave_spin_config,
         "net_moment": magnetic_phase_details["net_moment"],
         "zero_net_moment_tol": magnetic_phase_details["zero_net_moment_tol"],
         "properties": {
@@ -8616,12 +8633,14 @@ def _find_spin_group_acc_primitive_from_parsed(
             },
         }
     )
+    wave_spin_config = _wave_spin_config_for_public_output(identify_info)
 
     return {
         "index": identify_info,
         "identify_index_details": identify_index_details,
         "acc_symbol": ssg_primitive.acc,
         "conf": ssg_primitive.conf,
+        "wave_spin_config": wave_spin_config,
         "quasi_2d": None,
         "operation_views": operation_views,
         "acc_primitive_resolution_audit": acc_primitive_resolution_audit,
