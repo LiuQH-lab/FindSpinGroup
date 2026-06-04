@@ -30,12 +30,66 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
                 "conf": "Collinear",
                 "phase": "AFM",
                 "acc": "4/mmmP",
+                "convention_spin_only_direction": "0,0,1",
+                "convention_ssg_international_linear": "P 1",
+                "convention_ssg_international_latex": "P 1",
+                "gspg_effective_mpg_symbol": "mmm1'",
                 "spinsplitting_w_soc": "spin splitting",
                 "spinsplitting_wo_soc": "spin splitting",
+                "spin_texture_config_no_soc": {
+                    "spin_texture_type": "d-wave",
+                    "momentum_space_spin_configuration": "coplanar",
+                },
+                "spin_texture_config_soc": {
+                    "spin_texture_type": "s-wave",
+                    "momentum_space_spin_configuration": "noncoplanar",
+                },
                 "ahc_w_soc": "No",
                 "ahc_wo_soc": "No",
+                "tensor_outputs": {
+                    "AHE_wSOC": {
+                        "is_zero": False,
+                        "relations": [r"\sigma_{xy} = -\sigma_{yx}"],
+                        "components": [["0", "C1", "0"], ["-C1", "0", "0"], ["0", "0", "0"]],
+                    },
+                    "AHE_woSOC": {"is_zero": True},
+                    "QMDTensor": {"is_zero": True},
+                    "MSGQMDTensor": {
+                        "is_zero": False,
+                        "relations": [],
+                        "components": [
+                            [["C1", "0", "0"], ["0", "0", "0"], ["0", "0", "0"]],
+                            [["0", "0", "0"], ["0", "0", "0"], ["0", "0", "0"]],
+                            [["0", "0", "0"], ["0", "0", "0"], ["0", "0", "0"]],
+                        ],
+                    },
+                    "IMDTensor": {"is_zero": True},
+                    "MSGIMDTensor": {"is_zero": True},
+                    "BCDTensor": {"is_zero": True},
+                    "MSGBCDTensor": {"is_zero": True},
+                },
                 "is_alter": "(Altermagnet)",
                 "is_spin_orbit_magnet": "",
+                "polar_axes_by_symmetry": {
+                    "sg": {
+                        "allowed_polar_axes": [{"label": "z", "setting": "G0std"}],
+                        "allowed_polar_axes_setting": "G0std",
+                    },
+                    "ossg": {
+                        "allowed_polar_axes": [{"label": "x", "setting": "G0std"}],
+                        "allowed_polar_axes_setting": "G0std",
+                    },
+                    "msg": {
+                        "allowed_polar_axes": [],
+                        "allowed_polar_axes_setting": "G0std",
+                    },
+                },
+                "wp_chain": [
+                    ["Fe", "2a", 0, "1a", 0, "1a", 0],
+                    ["Fe", "2a", 0, "1b", 1, "1b", 1],
+                    ["Mn", "1c", 1, "1c", 2, "1d", 2],
+                    ["Mn", "1c", 1, "1c", 2, "1e", 3],
+                ],
                 "magnetic_site_summary": {
                     "status": "ok",
                     "setting": "G0_standard",
@@ -137,6 +191,18 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
                         "spin_polarization_changed": True,
                         "summary": "k_changed_spin_splitting_changed",
                     },
+                    "spin_texture_config_no_soc": {
+                        "spin_texture_type": "d-wave",
+                        "basis_setting": "quasi2d_ossg_unit_cartesian_in_plane",
+                    },
+                    "spin_texture_config_soc": {
+                        "spin_texture_type": "s-wave",
+                        "basis_setting": "quasi2d_ossg_unit_cartesian_in_plane",
+                    },
+                    "spin_texture_config_basis": {
+                        "setting": "quasi2d_ossg_unit_cartesian_in_plane",
+                        "in_plane_k_axes": ["a", "b"],
+                    },
                 },
             },
         }
@@ -154,6 +220,9 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
     assert row["quasi2d_gp_label"] == "GP"
     assert row["quasi2d_gp_symbol"] == "GP:(0.237,0.371,0)"
     assert row["quasi2d_gp_spin_splitting"] == "spin splitting"
+    assert row["quasi2d_spin_texture_config_no_soc"]["spin_texture_type"] == "d-wave"
+    assert row["quasi2d_spin_texture_config_soc"]["spin_texture_type"] == "s-wave"
+    assert row["quasi2d_spin_texture_basis"]["in_plane_k_axes"] == ["a", "b"]
     assert "quasi2d_3d_gp_symbol" not in row
     assert "quasi2d_2d_gp_symbol" not in row
     assert "quasi2d_gp_spin_splitting_changed" not in row
@@ -168,16 +237,36 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
     ]
     assert row["spin_splitting_with_soc"] == "spin splitting"
     assert row["spin_splitting_without_soc"] == "spin splitting"
+    assert row["spin_only_direction(ossg convention)"] == "0,0,1"
+    assert row["ossg_symbol_linear"] == "P 1"
+    assert row["ossg_symbol_latex"] == "P 1"
+    assert row["empg_symbol"] == "mmm1'"
+    assert row["spin_texture_config_no_soc"]["spin_texture_type"] == "d-wave"
+    assert row["spin_texture_type_no_soc"] == "d-wave"
+    assert row["momentum_space_spin_configuration_no_soc"] == "coplanar"
+    assert row["spin_texture_type_soc"] == "s-wave"
+    assert row["momentum_space_spin_configuration_soc"] == "noncoplanar"
     assert row["ahc_with_soc"] == "No"
     assert row["ahc_without_soc"] == "No"
+    assert r"\sigma_{xy} = -\sigma_{yx}" in row["ahe_tensor_equations_soc"]
+    assert r"\sigma_{xy} = C1" in row["ahe_tensor_equations_soc"]
+    assert row["ahe_tensor_equations_no_soc"] == r"\sigma=0"
+    assert "Q_{xxx} = C1" in row["qmd_tensor_equations_soc"]
+    assert row["sg_polar_axes"] == "z"
+    assert row["sg_polar_axes_setting"] == "G0std"
+    assert row["ossg_polar_axes"] == "x"
+    assert row["msg_polar_axes"] is None
+    assert row["has_wyckoff_splitting_sg_to_ossg"] is True
+    assert row["has_wyckoff_splitting_ossg_to_msg"] is True
     assert row["is_altermagnet"] == "(Altermagnet)"
     assert row["is_spin_orbit_magnet"] == ""
-    assert row["magnetic_site_status"] == "ok"
+    assert "status" not in row
+    assert "magnetic_site_status" not in row
     assert row["magnetic_site_sg_primitive_to_magnetic_primitive_cell_expansion"] == 4
     assert row["magnetic_atom_count"] == 8
     assert row["nonzero_moment_atom_count"] == 6
     assert row["zero_moment_magnetic_atom_count"] == 2
-    assert row["magnetic_atom_selection_mode"] == "sg_orbit_closure_of_nonzero_moment_sites"
+    assert "magnetic_atom_selection_mode" not in row
     assert "magnetic_site_cell_expansion" not in row
     assert "magnetic_site_nonmagnetic_sg_num" not in row
     assert "magnetic_site_nonmagnetic_sg_symbol" not in row
@@ -223,6 +312,14 @@ def test_excel_export_schema_is_shared_and_error_rows_are_complete(tmp_path):
     assert len(exporter.MAGNETIC_ORBIT_COLUMNS) == len(set(exporter.MAGNETIC_ORBIT_COLUMNS))
     assert "calculation_mode" not in exporter.COLUMNS
     assert "dimension" not in exporter.COLUMNS
+    assert "source_route" not in exporter.COLUMNS
+    assert "status" not in exporter.COLUMNS
+    assert "magnetic_site_status" not in exporter.COLUMNS
+    assert "magnetic_atom_selection_mode" not in exporter.COLUMNS
+    assert "primitive_ssg_symbol" not in exporter.COLUMNS
+    assert "wave" + "_spin_config_no_soc" not in exporter.COLUMNS
+    assert "spin_texture_config_no_soc" in exporter.COLUMNS
+    assert "spin_only_direction(ossg convention)" in exporter.COLUMNS
     assert "quasi2d_3d_gp_symbol" not in exporter.COLUMNS
     assert "quasi2d_status" not in exporter.COLUMNS
     assert "quasi2d_status" in exporter.QUASI2D_COLUMNS
@@ -231,7 +328,7 @@ def test_excel_export_schema_is_shared_and_error_rows_are_complete(tmp_path):
 
     for column in exporter.COLUMNS:
         assert column in row
-    assert row["status"] == "error"
+    assert "status" not in row
     assert row["error_type"] == "RuntimeError"
     assert row["error_message"] == "boom"
     assert "quasi2d_magnetic_phase" not in row
@@ -382,5 +479,4 @@ def test_export_can_read_parallel_shard_root(tmp_path):
     assert [path.parent.name for path in runtime_paths] == ["shard_0", "shard_1"]
     assert [row["case_id"] for row in rows] == ["cases/a.mcif", "cases/b.mcif"]
     assert metadata["source_run_tag"] == "parallel"
-    assert metadata["source_route"] == "full"
     assert metadata["source_fsg_version"] == "0.test"

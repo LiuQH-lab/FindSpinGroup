@@ -95,6 +95,7 @@ class CifParser:
             except ValueError:
                 parts = re.split(r'\s+', line)
 
+            parts = self._repair_loop_row_missing_default_values(keys, parts)
             values.append(parts)
             i += 1
 
@@ -103,6 +104,17 @@ class CifParser:
             self.data[key] = [row[idx] for row in values]
 
         return i
+
+    @staticmethod
+    def _repair_loop_row_missing_default_values(keys, parts):
+        if (
+            len(parts) == len(keys) - 1
+            and keys
+            and keys[-1] == '_atom_site_occupancy'
+            and all(key.startswith('_atom_site_') for key in keys)
+        ):
+            return [*parts, '1']
+        return parts
 
     @staticmethod
     def _convert_value(value):

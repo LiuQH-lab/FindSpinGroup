@@ -146,6 +146,7 @@ Use this when the request is equivalent to:
 - "test the 2D cases"
 - "run the quasi-2D inputversion validation"
 - "check 2D spin splitting after this change"
+- "check whether the 2D wave-config plane-preserving guard fires"
 
 Command:
 
@@ -156,7 +157,7 @@ python scripts/fsg_workflow.py quasi2d-test \
   --execute
 ```
 
-For an explicit vacuum axis:
+For an explicit physical vacuum axis:
 
 ```bash
 python scripts/fsg_workflow.py quasi2d-test \
@@ -166,13 +167,41 @@ python scripts/fsg_workflow.py quasi2d-test \
   --execute
 ```
 
+For a quick diagnostic sample:
+
+```bash
+python scripts/fsg_workflow.py quasi2d-test \
+  --profile fast-full-node \
+  --vacuum-axis c \
+  --limit 300 \
+  --tag <short-change-name> \
+  --execute
+```
+
+For a guard-only three-axis sweep:
+
+```bash
+python scripts/fsg_workflow.py quasi2d-test \
+  --profile fast-full-node \
+  --axis-sweep \
+  --limit 300 \
+  --tag <short-change-name> \
+  --execute
+```
+
+`--axis-sweep` submits three independent explicit-axis runs for `a`, `b`, and
+`c`.  Each axis gets its own output-root suffix and baseline suite.  Use it to
+stress-test axis handling and the quasi-2D wave-config plane-preserving audit;
+do not interpret forced `a` or `b` runs as physical unless those axes are the
+actual vacuum axes for the inputs.
+
 Default intent:
 
 - run the full route with `calculation_mode=quasi2d`
 - use the configured quasi-2D inputversion dataset
 - export a compact `selected.txt` containing index, phase, quasi-2D status,
-  vacuum axis, magnetic phase, projected spin splitting, interpretation, and
-  generic-point comparison fields
+  vacuum axis, magnetic phase, projected spin splitting, interpretation,
+  generic-point comparison fields, and 2D wave-config plane audit fields
 - skip business Excel export during compute
 
 Acceptance:
@@ -182,6 +211,22 @@ Acceptance:
 - previous tracked 2D hard cases stay resolved
 - `quasi_2d.generic_point_comparison` and `spin_splitting_changed` counts are
   summarized before making physics conclusions
+- for wave-config guard checks, successful records should have
+  `quasi_2d.spin_texture_config_no_soc.operation_audit.non_plane_preserving_operation_count = 0`
+  and the same SOC count equal to zero; forced wrong-axis errors should be
+  classified separately from this audit
+
+Operational notes:
+
+- The configured quasi-2D dataset path must be visible from the target compute
+  node, not only from the login node.  Full-node profiles may use a different
+  filesystem from the standard cluster route.
+- Keep the inputversion dataset cleaned of macOS `._*` resource files.  The
+  batch resolver ignores those files, but a clean target dataset makes counts
+  and diagnostics easier to read.
+- If a target profile uses a shared virtual environment, verify the interpreter
+  path on the compute node.  A symlinked Python that works on the login node can
+  be broken on a different compute partition.
 
 ## 5. User Install Smoke
 

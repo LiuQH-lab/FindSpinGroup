@@ -60,6 +60,10 @@ output_root_name = "scif_roundtrip_2241_run"
 
 [datasets.quasi2d_inputversion]
 description = "Quasi-2D inputversion validation set."
+# This path must be visible from the compute nodes used by the selected profile.
+# If the full-node profile uses a different filesystem, stage a clean copy there
+# and point this field at that target-local copy.  Keep macOS `._*` resource
+# files out of the staged dataset so case counts are easy to audit.
 remote_input_dir = "<remote quasi-2d inputversion dataset directory>"
 baseline_suite = "quasi2d_inputversion"
 output_root_name = "2d_inputversion_run"

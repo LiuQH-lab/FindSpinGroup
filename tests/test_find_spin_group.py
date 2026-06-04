@@ -13,8 +13,8 @@ import findspingroup.structure.group as group_module
 from findspingroup.data.acc_aligned_p_index_loader import (
     get_pair_id_for_ssg_label,
     get_ssg_conventional_kpoint_symbols_for_label,
-    get_wave_spin_config_for_ssg_label,
-    get_wave_spin_config_id_for_ssg_label,
+    get_spin_texture_config_for_ssg_label,
+    get_spin_texture_config_id_for_ssg_label,
 )
 from findspingroup import (
     find_spin_group,
@@ -27,6 +27,10 @@ from findspingroup import (
     write_ssg_operation_matrices,
 )
 from findspingroup.find_spin_group import _expand_magnetic_indices_by_sg_orbit
+from findspingroup.spin_splitting import (
+    classify_public_spin_texture_config,
+    operation_pairs_from_gspg_ops,
+)
 from findspingroup.core.identify_index.functions import (
     find_stand_gen_maps,
     is_matrix_equal,
@@ -179,13 +183,18 @@ def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
     monkeypatch.setattr(find_spin_group_module, "generate_scif", _unexpected)
 
     payload = find_spin_group_basic("examples/0.800_MnTe.mcif")
-    expected_wave_spin_config = get_wave_spin_config_for_ssg_label("194.164.1.1.L")
+    expected_spin_texture_config = get_spin_texture_config_for_ssg_label("194.164.1.1.L")
 
     assert payload["index"] == "194.164.1.1.L"
     assert payload["conf"] == "Collinear"
     assert payload["acc_symbol"] == "6/mmmP"
-    assert payload["wave_spin_config"] == expected_wave_spin_config
-    assert "id" not in payload["wave_spin_config"]
+    assert payload["spin_texture_config_no_soc"]["spin_texture_type"] == "g-wave"
+    assert payload["spin_texture_config_no_soc"]["source"] == "ossg_unit_cartesian_generators"
+    assert payload["spin_texture_config_no_soc"]["basis_setting"] == "ossg_unit_cartesian"
+    assert payload["spin_texture_config_soc"]["source"] == "ossg_unit_cartesian_msg_ops"
+    assert payload["spin_texture_config_soc"]["basis_setting"] == "ossg_unit_cartesian"
+    assert payload["spin_texture_config"] == expected_spin_texture_config
+    assert "id" not in payload["spin_texture_config"]
     assert payload["quasi_2d"] is None
     assert payload["g0_number"] == 194
     assert payload["l0_number"] == 164
@@ -294,13 +303,17 @@ def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypa
     monkeypatch.setattr(find_spin_group_module, "generate_scif", _unexpected)
 
     payload = find_spin_group_acc_primitive("examples/0.800_MnTe.mcif")
-    expected_wave_spin_config = get_wave_spin_config_for_ssg_label("194.164.1.1.L")
+    expected_spin_texture_config = get_spin_texture_config_for_ssg_label("194.164.1.1.L")
 
     assert payload["index"] == "194.164.1.1.L"
     assert payload["conf"] == "Collinear"
     assert payload["acc_symbol"] == "6/mmmP"
-    assert payload["wave_spin_config"] == expected_wave_spin_config
-    assert "id" not in payload["wave_spin_config"]
+    assert payload["spin_texture_config"] == expected_spin_texture_config
+    assert "id" not in payload["spin_texture_config"]
+    assert payload["spin_texture_config_no_soc"]["source"] == "ossg_unit_cartesian_generators"
+    assert payload["spin_texture_config_no_soc"]["basis_setting"] == "ossg_unit_cartesian"
+    assert payload["spin_texture_config_no_soc"]["spin_texture_type"] == expected_spin_texture_config["spin_texture_type"]
+    assert payload["spin_texture_config_soc"]["source"] == "ossg_unit_cartesian_msg_ops"
     assert payload["acc_primitive_cell_setting"] == "acc_primitive"
     assert payload["acc_primitive_cell_detail"] is not None
     assert payload["acc_primitive_poscar"]
@@ -1769,7 +1782,7 @@ def _build_identify_standardization_debug(result):
 
 def test_find_spin_group_exposes_main_flow_identify_result_for_collinear_case():
     result = find_spin_group("examples/0.800_MnTe.mcif")
-    expected_wave_spin_config = get_wave_spin_config_for_ssg_label("194.164.1.1.L")
+    expected_spin_texture_config = get_spin_texture_config_for_ssg_label("194.164.1.1.L")
 
     assert result.index == "194.164.1.1.L"
     assert result.conf == "Collinear"
@@ -1786,11 +1799,27 @@ def test_find_spin_group_exposes_main_flow_identify_result_for_collinear_case():
     assert result.identify_index_details["L0_id"] == 164
     assert result.identify_index_details["k_index"] == 1
     assert result.identify_index_details["equivalent_map_index"] == 1
-    assert result.wave_spin_config == expected_wave_spin_config
-    assert "id" not in result.wave_spin_config
-    assert result.to_summary_dict()["wave_spin_config"] == expected_wave_spin_config
-    assert result.to_structured_dict()["summary"]["wave_spin_config"] == expected_wave_spin_config
-    assert result.to_dict()["wave_spin_config"] == expected_wave_spin_config
+    assert result.spin_texture_config == expected_spin_texture_config
+    assert result.spin_texture_config_no_soc["source"] == "ossg_unit_cartesian_generators"
+    assert result.spin_texture_config_no_soc["basis_setting"] == "ossg_unit_cartesian"
+    assert result.spin_texture_config_no_soc["spin_texture_type"] == expected_spin_texture_config["spin_texture_type"]
+    assert result.spin_texture_config_no_soc["order"] == expected_spin_texture_config["order"]
+    assert result.spin_texture_config_no_soc["spin_rank"] == expected_spin_texture_config["spin_rank"]
+    assert result.spin_texture_config_soc["source"] == "ossg_unit_cartesian_msg_ops"
+    assert result.spin_texture_config_soc["spin_texture_type"] == "d-wave"
+    assert "id" not in result.spin_texture_config
+    assert result.to_summary_dict()["spin_texture_config"] == expected_spin_texture_config
+    assert result.to_summary_dict()["spin_texture_config_no_soc"] == result.spin_texture_config_no_soc
+    assert result.to_summary_dict()["spin_texture_config_soc"] == result.spin_texture_config_soc
+    assert result.to_structured_dict()["summary"]["spin_texture_config"] == expected_spin_texture_config
+    assert (
+        result.to_structured_dict()["summary"]["spin_texture_config_no_soc"]
+        == result.spin_texture_config_no_soc
+    )
+    assert result.to_structured_dict()["summary"]["spin_texture_config_soc"] == result.spin_texture_config_soc
+    assert result.to_dict()["spin_texture_config"] == expected_spin_texture_config
+    assert result.to_dict()["spin_texture_config_no_soc"] == result.spin_texture_config_no_soc
+    assert result.to_dict()["spin_texture_config_soc"] == result.spin_texture_config_soc
 
 
 def test_spin_space_group_index_is_lazy_identify_index_not_legacy_shorthand(monkeypatch):
@@ -2281,18 +2310,18 @@ def test_acc_aligned_runtime_index_exposes_ssg_conventional_kpoints():
     )
 
 
-def test_acc_aligned_runtime_index_exposes_wave_spin_config_records():
+def test_acc_aligned_runtime_index_exposes_spin_texture_config_records():
     label = "115.3.2.17.P"
 
     assert get_pair_id_for_ssg_label(label) == "A123_P02"
-    assert get_wave_spin_config_id_for_ssg_label(label) == "W0043"
-    assert get_wave_spin_config_for_ssg_label(label) == {
+    assert get_spin_texture_config_id_for_ssg_label(label) == "W0043"
+    assert get_spin_texture_config_for_ssg_label(label) == {
         "basis": ["C1*((-ky^2*kz)*sigma_z + (kx^2*kz)*sigma_z)"],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
         "order": 3,
         "spin_rank": 1,
-        "wave_type": "f-wave",
+        "spin_texture_type": "f-wave",
     }
 
 
@@ -2921,7 +2950,7 @@ def test_find_spin_group_basic_does_not_fallback_when_identify_database_entry_is
     assert payload["index"].startswith("not in identify-index database:")
     assert payload["identify_index_details"] is None
     assert payload["phase"]
-    assert payload["wave_spin_config"] is None
+    assert payload["spin_texture_config"] is None
     assert payload["acc_primitive_resolution_audit"]["status"] == "identify_index_unavailable"
 
 
@@ -3630,6 +3659,26 @@ def test_v2se2o_quasi2d_case_study_uses_final_acc_primitive_transform_chain():
     assert quasi_2d["spin_splitting_2d"] == "spin splitting"
     assert quasi_2d["is_alter_2d"] == "(Altermagnet)"
     assert quasi_2d["magnetic_phase"] == "AFM(Altermagnet)\n(SOM)"
+    assert quasi_2d["spin_texture_config_no_soc"]["source"] == (
+        "quasi2d_ossg_unit_cartesian_in_plane_ops"
+    )
+    assert quasi_2d["spin_texture_config_no_soc"]["basis_setting"] == (
+        "quasi2d_ossg_unit_cartesian_in_plane"
+    )
+    assert quasi_2d["spin_texture_config_no_soc"]["spin_texture_type"] == "d-wave"
+    assert quasi_2d["spin_texture_config_no_soc"]["in_plane_k_axes"] == ["a", "b"]
+    assert quasi_2d["spin_texture_config_no_soc"]["operation_audit"][
+        "plane_preserving_operation_count"
+    ] > 0
+    assert quasi_2d["spin_texture_config_no_soc"]["operation_audit"][
+        "non_plane_preserving_operation_count"
+    ] == 0
+    assert quasi_2d["spin_texture_config_soc"]["source"] == (
+        "quasi2d_ossg_unit_cartesian_in_plane_msg_ops"
+    )
+    assert quasi_2d["spin_texture_config_basis"]["setting"] == (
+        "quasi2d_ossg_unit_cartesian_in_plane"
+    )
     assert "magnetic_phase_base" not in quasi_2d
     assert not hasattr(result, "magnetic_phase_2d")
     assert quasi_2d["KPOINTS"].startswith(result.KPOINTS.splitlines()[0])
@@ -3725,8 +3774,62 @@ def test_quasi2d_calculation_mode_parameter_overrides_geometry_heuristic():
     assert result.quasi_2d["vacuum_axis_input"] == "c"
     assert result.quasi_2d["spin_splitting_2d"] == "spin splitting"
     assert result.quasi_2d["interpretation"] == "in_plane_k_dependent"
+    assert result.quasi_2d["spin_texture_config_no_soc"]["basis_setting"] == (
+        "quasi2d_ossg_unit_cartesian_in_plane"
+    )
+    assert result.quasi_2d["spin_texture_config_no_soc"]["in_plane_k_axes"] == ["a", "b"]
     assert result.quasi_2d["generic_point_comparison"]["k_input_changed"] is True
     assert result.quasi_2d["generic_point_comparison"]["spin_splitting_changed"] is False
+
+
+def test_quasi2d_spin_texture_config_honors_explicit_a_vacuum_axis():
+    result = find_spin_group(
+        "tests/testset/V2Se2O_2d.mcif",
+        calculation_mode="quasi2d",
+        vacuum_axis="a",
+    )
+
+    quasi_2d = result.quasi_2d
+    assert quasi_2d["vacuum_axis_input"] == "a"
+    assert quasi_2d["spin_texture_config_basis"]["in_plane_k_axes"] == ["b", "c"]
+    assert quasi_2d["spin_texture_config_no_soc"]["in_plane_k_axes"] == ["b", "c"]
+    assert quasi_2d["spin_texture_config_no_soc"]["k_variable_labels"] == {
+        "kx": "input reciprocal b*",
+        "ky": "input reciprocal c*",
+    }
+    assert quasi_2d["spin_texture_config_no_soc"]["operation_audit"][
+        "non_plane_preserving_operation_count"
+    ] == 0
+
+
+def test_quasi2d_kpoint_plane_uses_raw_vacuum_component_for_forced_axis():
+    result = find_spin_group(
+        "tests/testset/quasi2d_small/1AgVP2S6-1/"
+        "5.1.1.1,5.5.1.1.L,a,m1_p0_p0_p0_p0_m1_p0_p0_p0_p0_p1_"
+        "p0_p0_p0_p0_p1,1,1,[[0,0,0]],epY-mpY-spY-ahcN.mcif",
+        calculation_mode="quasi2d",
+        vacuum_axis="a",
+    )
+
+    quasi_2d = result.quasi_2d
+    rows = {
+        row["label"]: row
+        for row in quasi_2d["kpoints"]
+        if row["kind"] == "acc_table"
+    }
+    assert rows["Γ"]["plane_classification"] == "in_plane"
+    assert rows["Y"]["plane_classification"] == "in_plane"
+    assert rows["U"]["plane_classification"] == "mixed"
+    assert rows["R"]["plane_classification"] == "mixed"
+    assert rows["U"]["vacuum_component_distance_to_integer"] == 0.0
+    assert rows["U"]["vacuum_component_distance_to_zero"] > 2.9
+    assert rows["U"]["k_input_reciprocal_raw"][0] < -2.9
+    assert quasi_2d["kpoint_projection_summary"]["by_plane_count"]["in_plane"] == 2
+    assert quasi_2d["KPOINTS_status"] == "ok"
+    assert quasi_2d["KPOINTS_error"] is None
+    assert "Y ***" in quasi_2d["KPOINTS"]
+    assert "Γ ***" in quasi_2d["KPOINTS"]
+    assert "| GP ***" in quasi_2d["KPOINTS"]
 
 
 def test_quasi2d_input_padding_expands_vacuum_axis_without_stretching_slab():
@@ -4769,6 +4872,48 @@ def test_find_spin_group_exposes_gspg_text_payload_from_public_ossg():
     assert summary_gspg["text"] == result.gspg_text
 
 
+def test_spin_splitting_numeric_classifies_gspg_generators_with_spin_only():
+    result = find_spin_group("examples/0.800_MnTe.mcif")
+    operations = operation_pairs_from_gspg_ops(
+        list(result.gspg_generator_ops) + list(result.gspg_spin_only_ops)
+    )
+
+    payload = classify_public_spin_texture_config(
+        operations,
+        source="gspg_generators",
+    )
+
+    assert payload["source"] == "gspg_generators"
+    assert payload["spin_texture_type"] == "g-wave"
+    assert payload["order"] == 4
+    assert payload["spin_rank"] == 1
+    assert payload["momentum_space_spin_configuration"] == "collinear"
+
+
+@pytest.mark.parametrize(
+    ("mcif_path", "expected_index"),
+    [
+        ("tests/testset/mcif_241130_no2186/0.1035_PbNi1.76Mg0.24V2O8.mcif", "110.43.1.1.L"),
+        ("tests/testset/mcif_241130_no2186/0.799_Sr2Co2O5.mcif", "46.28.2.1.L"),
+    ],
+)
+def test_spin_texture_config_uses_ossg_unit_cartesian_generators(mcif_path, expected_index):
+    result = find_spin_group(mcif_path)
+    expected_spin_texture_config = get_spin_texture_config_for_ssg_label(expected_index)
+
+    assert result.index == expected_index
+    assert result.spin_texture_config_no_soc["source"] == "ossg_unit_cartesian_generators"
+    assert result.spin_texture_config_no_soc["basis_setting"] == "ossg_unit_cartesian"
+    for key in (
+        "spin_texture_type",
+        "order",
+        "nullity",
+        "spin_rank",
+        "momentum_space_spin_configuration",
+    ):
+        assert result.spin_texture_config_no_soc[key] == expected_spin_texture_config[key]
+
+
 @pytest.mark.parametrize(
     "path",
     [
@@ -5242,7 +5387,14 @@ def test_wp_chain_uses_crystallographic_orbits_for_sg_multiplicity():
     assert [row[1] for row in fe_rows].count("12f") == 2
     assert "4f" not in {row[1] for row in fe_rows}
     assert "8f" not in {row[1] for row in fe_rows}
-    assert {row[3] for row in fe_rows if row[1] == "12f"} == {"4d", "8f"}
+    assert {row[3] for row in fe_rows if row[1] == "12f"} == {"4d(0)", "8f(2)"}
+    assert {row[5] for row in fe_rows if row[1] == "12f"} == {"4d(0)", "8f(3)"}
+    assert {row[3] for row in fe_rows if row[1] == "4a"} == {"4a"}
+
+    acc_fe_rows = [row for row in result.acc_primitive_wp_chain if row[0] == "Fe"]
+    assert {row[3] for row in acc_fe_rows if row[1] == "6f"} == {"2d(0)", "4f(2)"}
+    assert {row[5] for row in acc_fe_rows if row[1] == "6f"} == {"2d(0)", "4f(3)"}
+    assert {row[3] for row in acc_fe_rows if row[1] == "2a"} == {"2a"}
     assert result.magnetic_site_summary["status"] == "ok"
     assert result.magnetic_site_summary["setting"] == "acc_primitive"
     assert result.magnetic_site_summary["cell_expansion"] == 2

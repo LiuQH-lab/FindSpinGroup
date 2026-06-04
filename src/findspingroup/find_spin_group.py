@@ -28,7 +28,7 @@ from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
 from findspingroup.data import MSGMPG_DB
 from findspingroup.data.acc_aligned_p_index_loader import (
     get_acc_aligned_conventional_to_primitive_p,
-    get_wave_spin_config_for_ssg_label,
+    get_spin_texture_config_for_ssg_label,
 )
 from findspingroup.ferroelectric import (
     build_ferroelectric_switching_payload,
@@ -43,6 +43,10 @@ from findspingroup.io.scif_generator import (
     generate_scif,
 )
 from findspingroup.quasi2d import build_quasi2d_diagnostics, prepare_quasi2d_input_cell
+from findspingroup.spin_splitting import (
+    classify_public_spin_texture_config,
+    collinear_axis_constraint_operation,
+)
 from findspingroup.structure import SpinSpaceGroup,SpinSpaceGroupOperation
 from findspingroup.structure.group import integer_points_in_new_cell, op_key, _resolve_point_group_info
 from findspingroup.structure.cell import (
@@ -89,11 +93,504 @@ class NumpyEncoder(json.JSONEncoder):
         return super(NumpyEncoder, self).default(obj)
 
 
-def _wave_spin_config_for_public_output(index: str) -> dict | None:
+def _spin_texture_config_for_public_output(index: str) -> dict | None:
     try:
-        return deepcopy(get_wave_spin_config_for_ssg_label(index))
+        return deepcopy(get_spin_texture_config_for_ssg_label(index))
     except KeyError:
         return None
+
+
+_SPIN_TEXTURE_CONFIG_CLASSIFICATION_FIELDS = (
+    "spin_texture_type",
+    "order",
+    "nullity",
+    "spin_rank",
+    "momentum_space_spin_configuration",
+)
+
+
+def _spin_texture_config_classification_key(payload: dict | None) -> tuple | None:
+    if not isinstance(payload, dict):
+        return None
+    return tuple(payload.get(field) for field in _SPIN_TEXTURE_CONFIG_CLASSIFICATION_FIELDS)
+
+
+def _safe_classify_spin_texture_config(
+    operations,
+    *,
+    source: str,
+    include_diagnostics: bool = False,
+    k_dimension: int | None = None,
+    k_names: tuple[str, ...] | None = None,
+    atol: float = 1e-10,
+    rtol: float = 1e-8,
+    zero_tol: float = 1e-8,
+) -> dict | None:
+    try:
+        return classify_public_spin_texture_config(
+            operations,
+            source=source,
+            include_diagnostics=include_diagnostics,
+            k_dimension=k_dimension,
+            k_names=k_names,
+            atol=atol,
+            rtol=rtol,
+            zero_tol=zero_tol,
+        )
+    except Exception as exc:
+        warnings.warn(
+            f"Unable to classify spin texture config from {source}: {exc}",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        return None
+
+
+def _ossg_unit_cartesian_frame(cell: CrystalCell) -> np.ndarray:
+    lattice_col = _lattice_column_matrix(cell)
+    a_vec = lattice_col[:, 0]
+    b_vec = lattice_col[:, 1]
+    x_axis = a_vec / np.linalg.norm(a_vec)
+    y_axis = b_vec - x_axis * float(np.dot(x_axis, b_vec))
+    y_norm = float(np.linalg.norm(y_axis))
+    if y_norm <= 1e-12:
+        raise ValueError("Cannot build OSSG unit Cartesian frame from collinear a/b lattice vectors")
+    y_axis = y_axis / y_norm
+    z_axis = np.cross(x_axis, y_axis)
+    z_axis = z_axis / np.linalg.norm(z_axis)
+    return np.column_stack([x_axis, y_axis, z_axis])
+
+
+def _ossg_setting_to_unit_cartesian_transform(cell: CrystalCell) -> np.ndarray:
+    lattice_col = _lattice_column_matrix(cell)
+    unit_frame = _ossg_unit_cartesian_frame(cell)
+    return unit_frame.T @ lattice_col
+
+
+def _similarity_to_unit_cartesian(matrix, transform: np.ndarray, transform_inv: np.ndarray) -> np.ndarray:
+    return transform @ np.asarray(matrix, dtype=float) @ transform_inv
+
+
+def _ssg_operation_pairs_in_ossg_unit_cartesian(
+    ops,
+    cell: CrystalCell,
+    *,
+    collinear_axis=None,
+) -> list[dict]:
+    transform = _ossg_setting_to_unit_cartesian_transform(cell)
+    transform_inv = np.linalg.inv(transform)
+    pairs = [
+        {
+            "spin_rotation": _similarity_to_unit_cartesian(
+                op.spin_rotation,
+                transform,
+                transform_inv,
+            ),
+            "real_rotation": _similarity_to_unit_cartesian(
+                op.rotation,
+                transform,
+                transform_inv,
+            ),
+        }
+        for op in ops
+    ]
+    if collinear_axis is not None:
+        pairs.append(collinear_axis_constraint_operation(transform @ np.asarray(collinear_axis, dtype=float)))
+    return pairs
+
+
+def _msg_operation_pairs_in_ossg_unit_cartesian(ops, cell: CrystalCell) -> list[dict]:
+    transform = _ossg_setting_to_unit_cartesian_transform(cell)
+    transform_inv = np.linalg.inv(transform)
+    pairs = []
+    for op in ops:
+        time_reversal = int(op[0])
+        real_rotation = _similarity_to_unit_cartesian(op[1], transform, transform_inv)
+        spin_rotation = time_reversal * np.linalg.det(real_rotation) * real_rotation
+        pairs.append(
+            {
+                "spin_rotation": spin_rotation,
+                "real_rotation": real_rotation,
+            }
+        )
+    return pairs
+
+
+def _quasi2d_input_in_plane_axes(vacuum_axis_index: int) -> list[int]:
+    return [axis for axis in range(3) if axis != int(vacuum_axis_index)]
+
+
+def _quasi2d_axis_labels(axis_indices: list[int]) -> list[str]:
+    labels = ["a", "b", "c"]
+    return [labels[index] for index in axis_indices]
+
+
+def _input_in_plane_reciprocal_basis_in_ossg_unit_cartesian(
+    *,
+    convention_cell: CrystalCell,
+    transformation_input_to_convention,
+    vacuum_axis_index: int,
+) -> tuple[np.ndarray, list[str]]:
+    input_to_convention = np.asarray(transformation_input_to_convention[0], dtype=float)
+    input_axes = _quasi2d_input_in_plane_axes(vacuum_axis_index)
+    input_basis = np.eye(3)[:, input_axes]
+    convention_reciprocal_basis = np.linalg.solve(input_to_convention.T, input_basis)
+    direct_transform = _ossg_setting_to_unit_cartesian_transform(convention_cell)
+    unit_reciprocal_basis = np.linalg.solve(direct_transform.T, convention_reciprocal_basis)
+    return unit_reciprocal_basis, _quasi2d_axis_labels(input_axes)
+
+
+def _reciprocal_action_from_unit_cartesian_pair(spin_rotation, real_rotation) -> np.ndarray:
+    spin_rotation = np.asarray(spin_rotation, dtype=float)
+    real_rotation = np.asarray(real_rotation, dtype=float)
+    det_factor = 1.0 if np.linalg.det(spin_rotation) >= 0.0 else -1.0
+    return det_factor * np.linalg.inv(real_rotation).T
+
+
+def _reduce_unit_cartesian_pair_to_in_plane(pair: dict, in_plane_basis: np.ndarray, *, tol: float):
+    q_unit = _reciprocal_action_from_unit_cartesian_pair(
+        pair["spin_rotation"],
+        pair["real_rotation"],
+    )
+    target = q_unit @ in_plane_basis
+    q_2d, *_ = np.linalg.lstsq(in_plane_basis, target, rcond=None)
+    residual = float(np.max(np.abs(in_plane_basis @ q_2d - target)))
+    if residual > max(tol, 1e-8):
+        return None, residual
+    return {
+        "Q": q_2d,
+        "S": pair["spin_rotation"],
+    }, residual
+
+
+def _quasi2d_operation_pairs_in_plane(
+    unit_cartesian_pairs: list[dict],
+    *,
+    in_plane_basis: np.ndarray,
+    tol: float,
+) -> tuple[list[dict], dict]:
+    pairs = []
+    skipped_residuals = []
+    kept_residuals = []
+    for pair in unit_cartesian_pairs:
+        reduced, residual = _reduce_unit_cartesian_pair_to_in_plane(
+            pair,
+            in_plane_basis,
+            tol=tol,
+        )
+        if reduced is None:
+            skipped_residuals.append(residual)
+            continue
+        kept_residuals.append(residual)
+        pairs.append(reduced)
+    return pairs, {
+        "input_operation_count": len(unit_cartesian_pairs),
+        "plane_preserving_operation_count": len(pairs),
+        "non_plane_preserving_operation_count": len(skipped_residuals),
+        "skipped_operation_count": len(skipped_residuals),
+        "max_kept_plane_residual": max(kept_residuals) if kept_residuals else None,
+        "max_skipped_plane_residual": max(skipped_residuals) if skipped_residuals else None,
+        "plane_residual_tol": max(tol, 1e-8),
+    }
+
+
+def _classify_quasi2d_spin_texture_config(
+    pairs: list[dict],
+    *,
+    source: str,
+    operation_audit: dict,
+    in_plane_axes: list[str],
+    calibration_atol_limit: float,
+    relax_without_reference: bool,
+) -> dict | None:
+    if int(operation_audit.get("non_plane_preserving_operation_count") or 0) > 0:
+        return {
+            "status": "not_evaluated_non_plane_preserving_operations",
+            "source": source,
+            "basis_setting": "quasi2d_ossg_unit_cartesian_in_plane",
+            "in_plane_k_axes": list(in_plane_axes),
+            "k_variable_labels": {
+                "kx": f"input reciprocal {in_plane_axes[0]}*",
+                "ky": f"input reciprocal {in_plane_axes[1]}*",
+            },
+            "operation_audit": operation_audit,
+        }
+    if not pairs:
+        return {
+            "status": "not_evaluated_no_plane_preserving_operations",
+            "source": source,
+            "basis_setting": "quasi2d_ossg_unit_cartesian_in_plane",
+            "in_plane_k_axes": list(in_plane_axes),
+            "k_variable_labels": {
+                "kx": f"input reciprocal {in_plane_axes[0]}*",
+                "ky": f"input reciprocal {in_plane_axes[1]}*",
+            },
+            "operation_audit": operation_audit,
+        }
+    payload = _safe_classify_spin_texture_config(
+        pairs,
+        source=source,
+        k_dimension=2,
+        k_names=("kx", "ky"),
+    )
+    if payload is None:
+        return None
+    if (
+        relax_without_reference
+        and payload.get("spin_texture_type") == "forbidden"
+        and calibration_atol_limit > 1e-10
+    ):
+        relaxed = _safe_classify_spin_texture_config(
+            pairs,
+            source=source,
+            k_dimension=2,
+            k_names=("kx", "ky"),
+            atol=float(calibration_atol_limit),
+            zero_tol=max(1e-8, min(float(calibration_atol_limit), 1e-4)),
+        )
+        if relaxed is not None and relaxed.get("spin_texture_type") != "forbidden":
+            relaxed["calibration"] = {
+                "status": "tolerance_relaxed_without_reference",
+                "strict_key": list(_spin_texture_config_classification_key(payload) or []),
+                "atol": float(calibration_atol_limit),
+                "boundary_atol": float(calibration_atol_limit),
+            }
+            payload = relaxed
+    payload["basis_setting"] = "quasi2d_ossg_unit_cartesian_in_plane"
+    payload["in_plane_k_axes"] = list(in_plane_axes)
+    payload["k_variable_labels"] = {
+        "kx": f"input reciprocal {in_plane_axes[0]}*",
+        "ky": f"input reciprocal {in_plane_axes[1]}*",
+    }
+    payload["operation_audit"] = operation_audit
+    return payload
+
+
+def _quasi2d_spin_texture_config_from_ossg_convention(
+    *,
+    quasi_2d: dict | None,
+    convention_ossg: SpinSpaceGroup,
+    convention_cell: CrystalCell,
+    transformation_input_to_convention,
+    tol: float,
+    calibration_atol_limit: float,
+) -> dict:
+    if not isinstance(quasi_2d, dict):
+        return {}
+    vacuum_axis_index = quasi_2d.get("vacuum_axis_index")
+    if vacuum_axis_index is None or quasi_2d.get("dimension") != "2d":
+        return {}
+
+    in_plane_basis, in_plane_axes = _input_in_plane_reciprocal_basis_in_ossg_unit_cartesian(
+        convention_cell=convention_cell,
+        transformation_input_to_convention=transformation_input_to_convention,
+        vacuum_axis_index=int(vacuum_axis_index),
+    )
+    collinear_axis = convention_ossg.sog_direction if convention_ossg.conf == "Collinear" else None
+    no_soc_unit_pairs = _ssg_operation_pairs_in_ossg_unit_cartesian(
+        convention_ossg.ops,
+        convention_cell,
+        collinear_axis=collinear_axis,
+    )
+    no_soc_pairs, no_soc_audit = _quasi2d_operation_pairs_in_plane(
+        no_soc_unit_pairs,
+        in_plane_basis=in_plane_basis,
+        tol=tol,
+    )
+    msg_ops = _primitive_msg_ops_from_ssg(
+        convention_ossg.msg_ops,
+        tol=tol,
+        time_reversal_resolver=convention_ossg.classify_magnetic_operation,
+    )
+    soc_unit_pairs = _msg_operation_pairs_in_ossg_unit_cartesian(msg_ops, convention_cell)
+    soc_pairs, soc_audit = _quasi2d_operation_pairs_in_plane(
+        soc_unit_pairs,
+        in_plane_basis=in_plane_basis,
+        tol=tol,
+    )
+    no_soc = _classify_quasi2d_spin_texture_config(
+        no_soc_pairs,
+        source="quasi2d_ossg_unit_cartesian_in_plane_ops",
+        operation_audit=no_soc_audit,
+        in_plane_axes=in_plane_axes,
+        calibration_atol_limit=calibration_atol_limit,
+        relax_without_reference=convention_ossg.conf == "Collinear",
+    )
+    soc = _classify_quasi2d_spin_texture_config(
+        soc_pairs,
+        source="quasi2d_ossg_unit_cartesian_in_plane_msg_ops",
+        operation_audit=soc_audit,
+        in_plane_axes=in_plane_axes,
+        calibration_atol_limit=calibration_atol_limit,
+        relax_without_reference=False,
+    )
+    return {
+        "spin_texture_config_no_soc": no_soc,
+        "spin_texture_config_soc": soc,
+        "spin_texture_config_basis": {
+            "setting": "quasi2d_ossg_unit_cartesian_in_plane",
+            "in_plane_k_axes": in_plane_axes,
+            "k_variable_labels": {
+                "kx": f"input reciprocal {in_plane_axes[0]}*",
+                "ky": f"input reciprocal {in_plane_axes[1]}*",
+            },
+            "input_in_plane_reciprocal_basis_in_ossg_unit_cartesian": in_plane_basis.tolist(),
+        },
+    }
+
+
+def _reference_calibration_atol(reference: dict | None, diagnostics: dict | None, *, limit: float) -> float | None:
+    if not isinstance(reference, dict) or not isinstance(diagnostics, dict):
+        return None
+    target_order = reference.get("order")
+    if target_order is None:
+        return None
+    for order_payload in diagnostics.get("allowed_orders") or []:
+        if order_payload.get("order") != target_order:
+            continue
+        singular = order_payload.get("min_nonzero_singular")
+        if singular is None:
+            return None
+        candidate = float(singular) * 1.25
+        if candidate <= 0:
+            return None
+        return min(candidate, float(limit))
+    return None
+
+
+def _classify_spin_texture_config_with_reference(
+    primary_operations,
+    *,
+    primary_source: str,
+    reference: dict | None,
+    calibration_atol_limit: float,
+    fallback_operations=None,
+    fallback_source: str | None = None,
+) -> dict | None:
+    reference_key = _spin_texture_config_classification_key(reference)
+    primary = _safe_classify_spin_texture_config(primary_operations, source=primary_source)
+    if reference_key is None:
+        if primary is not None:
+            primary["basis_setting"] = "ossg_unit_cartesian"
+        return primary
+    if _spin_texture_config_classification_key(primary) == reference_key:
+        primary["basis_setting"] = "ossg_unit_cartesian"
+        return primary
+
+    strict = primary
+    strict_source = primary_source
+    calibration_operations = primary_operations
+    if fallback_operations is not None and fallback_source is not None:
+        fallback = _safe_classify_spin_texture_config(fallback_operations, source=fallback_source)
+        if _spin_texture_config_classification_key(fallback) == reference_key:
+            fallback["basis_setting"] = "ossg_unit_cartesian"
+            fallback["calibration"] = {
+                "status": "matched_reference_with_full_operations",
+                "reference_key": list(reference_key),
+                "strict_key": list(_spin_texture_config_classification_key(primary) or []),
+            }
+            return fallback
+        strict = fallback if fallback is not None else strict
+        strict_source = fallback_source
+        calibration_operations = fallback_operations
+
+    diagnostics = _safe_classify_spin_texture_config(
+        calibration_operations,
+        source=strict_source,
+        include_diagnostics=True,
+    )
+    candidate_atols = []
+    candidate = _reference_calibration_atol(
+        reference,
+        diagnostics,
+        limit=calibration_atol_limit,
+    )
+    if candidate is not None:
+        candidate_atols.append(candidate)
+    candidate_atols.append(float(calibration_atol_limit))
+
+    attempts = []
+    seen_atols: set[float] = set()
+    for atol in candidate_atols:
+        rounded_atol = float(round(float(atol), 12))
+        if rounded_atol in seen_atols:
+            continue
+        seen_atols.add(rounded_atol)
+        calibrated = _safe_classify_spin_texture_config(
+            calibration_operations,
+            source=strict_source,
+            atol=float(atol),
+            zero_tol=max(1e-8, min(float(atol), 1e-4)),
+        )
+        calibrated_key = _spin_texture_config_classification_key(calibrated)
+        attempts.append({"atol": float(atol), "key": list(calibrated_key or [])})
+        if calibrated_key == reference_key:
+            calibrated["basis_setting"] = "ossg_unit_cartesian"
+            calibrated["calibration"] = {
+                "status": "calibrated_to_reference",
+                "reference_key": list(reference_key),
+                "strict_key": list(_spin_texture_config_classification_key(strict) or []),
+                "atol": float(atol),
+                "boundary_atol": float(calibration_atol_limit),
+                "attempts": attempts,
+            }
+            return calibrated
+
+    if strict is not None:
+        strict["basis_setting"] = "ossg_unit_cartesian"
+        strict["calibration"] = {
+            "status": "reference_mismatch",
+            "reference_key": list(reference_key),
+            "strict_key": list(_spin_texture_config_classification_key(strict) or []),
+            "boundary_atol": float(calibration_atol_limit),
+            "attempts": attempts,
+        }
+    return strict
+
+
+def _spin_texture_config_from_ossg_convention(
+    convention_ossg: SpinSpaceGroup,
+    convention_cell: CrystalCell,
+    *,
+    tol: float,
+    calibration_atol_limit: float | None = None,
+    reference: dict | None = None,
+    generator_ops: list[SpinSpaceGroupOperation] | None = None,
+) -> tuple[dict | None, dict | None]:
+    if generator_ops is None:
+        generator_ops = _symbol_generator_ops_for_current_basis(convention_ossg)
+    collinear_axis = convention_ossg.sog_direction if convention_ossg.conf == "Collinear" else None
+    generator_pairs = _ssg_operation_pairs_in_ossg_unit_cartesian(
+        generator_ops or convention_ossg.ops,
+        convention_cell,
+        collinear_axis=collinear_axis,
+    )
+    full_pairs = _ssg_operation_pairs_in_ossg_unit_cartesian(
+        convention_ossg.ops,
+        convention_cell,
+        collinear_axis=collinear_axis,
+    )
+    no_soc = _classify_spin_texture_config_with_reference(
+        generator_pairs,
+        primary_source="ossg_unit_cartesian_generators",
+        reference=reference,
+        calibration_atol_limit=tol if calibration_atol_limit is None else calibration_atol_limit,
+        fallback_operations=full_pairs,
+        fallback_source="ossg_unit_cartesian_ops",
+    )
+
+    msg_ops = _primitive_msg_ops_from_ssg(
+        convention_ossg.msg_ops,
+        tol=tol,
+        time_reversal_resolver=convention_ossg.classify_magnetic_operation,
+    )
+    soc = _safe_classify_spin_texture_config(
+        _msg_operation_pairs_in_ossg_unit_cartesian(msg_ops, convention_cell),
+        source="ossg_unit_cartesian_msg_ops",
+    )
+    if soc is not None:
+        soc["basis_setting"] = "ossg_unit_cartesian"
+    return no_soc, soc
 
 
 def _format_spin_only_direction(direction) -> str:
@@ -994,7 +1491,12 @@ class MagSymmetryResult:
         self.magnetic_phase_modifier = symmetry.get('magnetic_phase_modifier', '')
         self.magnetic_phase_spin_orbit_magnet = symmetry.get('magnetic_phase_spin_orbit_magnet', '')
         self.magnetic_phase_details = symmetry.get('magnetic_phase_details', None)
-        self.wave_spin_config = symmetry.get('wave_spin_config', None)
+        self.spin_texture_config_no_soc = symmetry.get(
+            'spin_texture_config_no_soc',
+            symmetry.get('spin_texture_config', None),
+        )
+        self.spin_texture_config_soc = symmetry.get('spin_texture_config_soc', None)
+        self.spin_texture_config = symmetry.get('spin_texture_config', self.spin_texture_config_no_soc)
         self.acc = symmetry['acc']
         self.msg_acc = symmetry.get('msg_acc', None)
         self.KPOINTS = symmetry['KPOINTS']
@@ -1569,7 +2071,9 @@ class MagSymmetryResult:
             'acc': self.acc,
             'properties': self.properties_summary(),
             'gspg': self.gspg_summary(),
-            'wave_spin_config': self.wave_spin_config,
+            'spin_texture_config': self.spin_texture_config,
+            'spin_texture_config_no_soc': self.spin_texture_config_no_soc,
+            'spin_texture_config_soc': self.spin_texture_config_soc,
             'polar_axes_by_symmetry': self.polar_axes_by_symmetry,
             'ferroelectric_switching': self.ferroelectric_switching,
         }
@@ -1624,7 +2128,9 @@ class MagSymmetryResult:
                 'phase_modifier': self.magnetic_phase_modifier,
                 'acc': self.acc,
                 'msg_acc': self.msg_acc,
-                'wave_spin_config': self.wave_spin_config,
+                'spin_texture_config': self.spin_texture_config,
+                'spin_texture_config_no_soc': self.spin_texture_config_no_soc,
+                'spin_texture_config_soc': self.spin_texture_config_soc,
                 'is_alter': self.is_alter,
                 'is_spin_orbit_magnet': self.is_spin_orbit_magnet,
                 'tolerances': self.tolerances,
@@ -5339,6 +5845,8 @@ def _build_wp_chain_payload_and_site_order(
     g0_cell: CrystalCell,
     g0_ssg: SpinSpaceGroup,
     tol_cfg: Tolerances,
+    *,
+    annotate_magnetic_site_dof: bool = False,
 ):
     sg_dataset = get_symmetry_dataset(g0_cell.to_spglib(), symprec=tol_cfg.space)
     oriented_ssg = _ossg_oriented_spin_frame_ssg(g0_ssg, g0_cell)
@@ -5351,18 +5859,74 @@ def _build_wp_chain_payload_and_site_order(
     wp_extended_sg = get_wp_from_dataset(sg_dataset, max=False)
     wp_extended_ssg = _get_wp_for_original_sites(ssg_dataset, site_count)
     wp_extended_msg = _get_wp_for_original_sites(msg_dataset, site_count)
+    ssg_dof_by_site = None
+    msg_dof_by_site = None
+    if annotate_magnetic_site_dof:
+        ssg_dof_by_site, msg_dof_by_site = _magnetic_site_dof_maps_for_cell(
+            g0_cell,
+            g0_ssg,
+            tol_cfg,
+        )
     return _make_wp_chain_and_site_order(
         wp_extended_sg,
         wp_extended_ssg,
         wp_extended_msg,
         g0_cell.to_spglib(mag=True),
         g0_cell.atom_types_to_symbol,
+        ssg_dof_by_site=ssg_dof_by_site,
+        msg_dof_by_site=msg_dof_by_site,
     )
 
 
 def _build_wp_chain_payload(g0_cell: CrystalCell, g0_ssg: SpinSpaceGroup, tol_cfg: Tolerances):
     wp_chain, _ = _build_wp_chain_payload_and_site_order(g0_cell, g0_ssg, tol_cfg)
     return wp_chain
+
+
+def _magnetic_site_dof_maps_for_cell(
+    cell: CrystalCell,
+    ssg: SpinSpaceGroup,
+    tol_cfg: Tolerances,
+) -> tuple[dict[int, int], dict[int, int]]:
+    sg_dataset = get_symmetry_dataset(cell.to_spglib(), symprec=tol_cfg.space)
+    site_count = len(cell.to_spglib(mag=True)[1])
+    nonzero_moment_indices = [] if cell.magnetic_atom_indices is None else list(cell.magnetic_atom_indices)
+    magnetic_indices, _selection = _expand_magnetic_indices_by_sg_orbit(
+        sg_dataset,
+        nonzero_moment_indices,
+        site_count,
+    )
+    _ssg_magnetic_indices, _ssg_classes, ssg_dof, ssg_spin_classes, ssg_constraints = (
+        get_spin_wyckoff(
+            cell,
+            ssg.ops,
+            atol=tol_cfg.m_matrix_tol,
+            magnetic_indices=magnetic_indices,
+        )
+    )
+    ssg_dof_rows = _site_dof_rows(ssg_spin_classes, ssg_dof, ssg_constraints)
+    ssg_dof_by_site, _ssg_constraints_by_site, _ssg_representative_by_site = _site_dof_maps(
+        ssg_dof_rows
+    )
+
+    msg_dof_by_site = {}
+    oriented_ssg = _ossg_oriented_spin_frame_ssg(ssg, cell)
+    msg_ops = list(oriented_ssg.msg_ops)
+    if msg_ops:
+        _msg_magnetic_indices, _msg_classes, msg_dof, msg_spin_classes, msg_constraints = (
+            get_spin_wyckoff(
+                cell,
+                msg_ops,
+                atol=tol_cfg.m_matrix_tol,
+                magnetic_indices=magnetic_indices,
+            )
+        )
+        msg_dof_rows = _site_dof_rows(msg_spin_classes, msg_dof, msg_constraints)
+        msg_dof_by_site, _msg_constraints_by_site, _msg_representative_by_site = _site_dof_maps(
+            msg_dof_rows
+        )
+
+    return ssg_dof_by_site, msg_dof_by_site
 
 
 def _is_fm_fim_spin_point_group_symbol(symbol: str) -> bool:
@@ -7315,6 +7879,17 @@ def _find_spin_group_from_parsed(
             tol=public_ossg_ssg.tol,
             real_space_metric=public_ossg_ssg.real_space_metric,
         )
+    if quasi_2d_diagnostics is not None:
+        quasi_2d_diagnostics.update(
+            _quasi2d_spin_texture_config_from_ossg_convention(
+                quasi_2d=quasi_2d_diagnostics,
+                convention_ossg=public_convention_oriented_ssg,
+                convention_cell=convention_cell,
+                transformation_input_to_convention=transformation_input_to_convention,
+                tol=tol_cfg.m_matrix_tol,
+                calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
+            )
+        )
     public_convention_cartesian_ssg = public_convention_oriented_ssg.transform_spin(
         _lattice_column_matrix(convention_cell)
     )
@@ -7472,6 +8047,7 @@ def _find_spin_group_from_parsed(
         G0std_cell,
         G0std_ssg,
         tol_cfg,
+        annotate_magnetic_site_dof=True,
     )
     (
         acc_primitive_wp_chain,
@@ -7480,6 +8056,7 @@ def _find_spin_group_from_parsed(
         acc_primitive_output_cell,
         acc_primitive_output_ssg,
         tol_cfg,
+        annotate_magnetic_site_dof=True,
     )
     input_wp_site_order = None
     if input_setting_matches_true_ssg:
@@ -7487,6 +8064,7 @@ def _find_spin_group_from_parsed(
             input_cell_cartesian,
             input_setting_ssg,
             tol_cfg,
+            annotate_magnetic_site_dof=True,
         )
     else:
         input_wp_chain = None
@@ -7601,7 +8179,15 @@ def _find_spin_group_from_parsed(
         site_order=acc_primitive_wp_site_order,
     )
     acc_p_c_poscar = acc_primitive_output_poscar
-    wave_spin_config = _wave_spin_config_for_public_output(identify_info)
+    spin_texture_config = _spin_texture_config_for_public_output(identify_info)
+    spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
+        public_convention_oriented_ssg,
+        convention_cell,
+        tol=tol_cfg.m_matrix_tol,
+        calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
+        reference=spin_texture_config,
+        generator_ops=convention_oriented_generator_ops,
+    )
 
     result = {
         'index':identify_info,
@@ -7614,7 +8200,9 @@ def _find_spin_group_from_parsed(
         'poscar_mp':acc_primitive_output_poscar,
         'acc':ssg_primitive.acc,
         'msg_acc': msg_acc,
-        'wave_spin_config': wave_spin_config,
+        'spin_texture_config': spin_texture_config,
+        'spin_texture_config_no_soc': spin_texture_config_no_soc,
+        'spin_texture_config_soc': spin_texture_config_soc,
         'KPOINTS':KPOINTS,
         'quasi_2d': quasi_2d_diagnostics,
         'polar_axes_by_symmetry': polar_axes_by_symmetry,
@@ -7668,7 +8256,9 @@ def _find_spin_group_from_parsed(
                 'magnetic_phase_modifier': magnetic_phase_modifier,
                 'magnetic_phase_spin_orbit_magnet': magnetic_phase_payload['spin_orbit_magnet_tag'],
                 'magnetic_phase_details': magnetic_phase_details,
-                'wave_spin_config': wave_spin_config,
+                'spin_texture_config': spin_texture_config,
+                'spin_texture_config_no_soc': spin_texture_config_no_soc,
+                'spin_texture_config_soc': spin_texture_config_soc,
                 'acc':ssg_primitive.acc,
                 'msg_acc': msg_acc,
                 'G0_symbol': ssg_primitive.G0_symbol,
@@ -8192,6 +8782,13 @@ def _find_spin_group_basic_from_parsed(
     selected_standard_cell = magnetic_primitive_cell.transform(
         *selected_transformation_primitive_to_standard
     )
+    selected_standard_ssg = ssg_primitive.transform(
+        *selected_transformation_primitive_to_standard
+    )
+    selected_standard_ossg = _ossg_oriented_spin_frame_ssg(
+        selected_standard_ssg,
+        selected_standard_cell,
+    )
     if identify_index_details is None:
         acc_magnetic_primitive_cell = legacy_acc_magnetic_primitive_cell
         acc_magnetic_primitive_ssg = ssg_primitive.transform(
@@ -8285,7 +8882,14 @@ def _find_spin_group_basic_from_parsed(
         msg_symmetry=ferroelectric_switching.get("soc_magnetic_symmetry"),
         tol=tol_cfg.m_matrix_tol,
     )
-    wave_spin_config = _wave_spin_config_for_public_output(identify_info)
+    spin_texture_config = _spin_texture_config_for_public_output(identify_info)
+    spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
+        selected_standard_ossg,
+        selected_standard_cell,
+        tol=tol_cfg.m_matrix_tol,
+        calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
+        reference=spin_texture_config,
+    )
 
     return {
         "index": identify_info,
@@ -8321,7 +8925,9 @@ def _find_spin_group_basic_from_parsed(
         "magnetic_phase_base": magnetic_phase_payload["base_phase"],
         "magnetic_phase_modifier": magnetic_phase_payload["modifier"],
         "magnetic_phase_details": magnetic_phase_details,
-        "wave_spin_config": wave_spin_config,
+        "spin_texture_config": spin_texture_config,
+        "spin_texture_config_no_soc": spin_texture_config_no_soc,
+        "spin_texture_config_soc": spin_texture_config_soc,
         "net_moment": magnetic_phase_details["net_moment"],
         "zero_net_moment_tol": magnetic_phase_details["zero_net_moment_tol"],
         "properties": {
@@ -8511,12 +9117,18 @@ def _find_spin_group_acc_primitive_from_parsed(
     )
     if selected_standard_setting == G0_STANDARD_SETTING:
         selected_standard_cell = G0std_cell
+        selected_standard_ssg = G0std_ssg
         transformation_input_to_selected_standard = transformation_input_to_G0std
         transformation_input_to_database_standard = raw_transformation_input_to_G0std
     else:
         selected_standard_cell = L0std_cell
+        selected_standard_ssg = L0std_ssg
         transformation_input_to_selected_standard = transformation_input_to_L0std
         transformation_input_to_database_standard = raw_transformation_input_to_L0std
+    selected_standard_ossg = _ossg_oriented_spin_frame_ssg(
+        selected_standard_ssg,
+        selected_standard_cell,
+    )
 
     if identify_index_details is None:
         acc_primitive_cell = legacy_acc_primitive_cell
@@ -8594,6 +9206,7 @@ def _find_spin_group_acc_primitive_from_parsed(
         acc_primitive_cell,
         acc_primitive_ssg,
         tol_cfg,
+        annotate_magnetic_site_dof=True,
     )
     acc_primitive_poscar = _cell_to_poscar_in_snapshot_order(
         acc_primitive_cell,
@@ -8633,14 +9246,32 @@ def _find_spin_group_acc_primitive_from_parsed(
             },
         }
     )
-    wave_spin_config = _wave_spin_config_for_public_output(identify_info)
+    magnetic_phase_payload = classify_magnetic_phase(
+        conf=ssg_primitive.conf,
+        full_spin_part_point_group_hm=ssg_primitive.spin_part_point_group_symbol_hm,
+        full_spin_part_point_group_s=ssg_primitive.spin_part_point_group_symbol_s,
+        net_moment=magnetic_primitive_cell.net_moment,
+        net_moment_tol=tol_cfg.moment,
+        mpg_identifier=selected_standard_ossg.mpg_num,
+        is_ss_gp=ssg_primitive.is_spinsplitting[-1],
+    )
+    spin_texture_config = _spin_texture_config_for_public_output(identify_info)
+    spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
+        selected_standard_ossg,
+        selected_standard_cell,
+        tol=tol_cfg.m_matrix_tol,
+        calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
+        reference=spin_texture_config,
+    )
 
     return {
         "index": identify_info,
         "identify_index_details": identify_index_details,
         "acc_symbol": ssg_primitive.acc,
         "conf": ssg_primitive.conf,
-        "wave_spin_config": wave_spin_config,
+        "spin_texture_config": spin_texture_config,
+        "spin_texture_config_no_soc": spin_texture_config_no_soc,
+        "spin_texture_config_soc": spin_texture_config_soc,
         "quasi_2d": None,
         "operation_views": operation_views,
         "acc_primitive_resolution_audit": acc_primitive_resolution_audit,

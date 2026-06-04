@@ -396,7 +396,7 @@
         "ss_w_soc": "Yes",
         "ss_wo_soc": "k-dependent"
       },
-      "wave_spin_config": {
+      "spin_texture_config": {
         "basis": [
           "C1*((-0.6666666667*ky^3*kz)*sigma_z - (kx*ky^2*kz)*sigma_z + (kx^2*ky*kz)*sigma_z + (0.6666666667*kx^3*kz)*sigma_z)"
         ],
@@ -404,7 +404,43 @@
         "nullity": 1,
         "order": 4,
         "spin_rank": 1,
-        "wave_type": "g-wave"
+        "spin_texture_type": "g-wave"
+      },
+      "spin_texture_config_no_soc": {
+        "basis": [
+          "C1*((-sqrt(3)/9*ky^3*kz)*sigma_x + (sqrt(3)/3*kx^2*ky*kz)*sigma_x - (1/3*ky^3*kz)*sigma_y + (kx^2*ky*kz)*sigma_y)"
+        ],
+        "basis_setting": "ossg_unit_cartesian",
+        "classifier_tolerances": {
+          "atol": 1e-10,
+          "rtol": 1e-08,
+          "zero_tol": 1e-08
+        },
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 4,
+        "source": "ossg_unit_cartesian_generators",
+        "spin_rank": 1,
+        "spin_texture_type": "g-wave"
+      },
+      "spin_texture_config_soc": {
+        "basis": [
+          "C1*((ky*kz)*sigma_x - (kx*kz)*sigma_y)",
+          "C2*((kx*kz)*sigma_x - (ky*kz)*sigma_y + (sqrt(12)/3*kx*kz)*sigma_y)",
+          "C3*((ky^2)*sigma_z - (sqrt(12)/3*kx*ky)*sigma_z - (kx^2)*sigma_z)"
+        ],
+        "basis_setting": "ossg_unit_cartesian",
+        "classifier_tolerances": {
+          "atol": 1e-10,
+          "rtol": 1e-08,
+          "zero_tol": 1e-08
+        },
+        "momentum_space_spin_configuration": "noncoplanar",
+        "nullity": 3,
+        "order": 2,
+        "source": "ossg_unit_cartesian_msg_ops",
+        "spin_rank": 3,
+        "spin_texture_type": "d-wave"
       }
     },
     "status": "ok",
@@ -877,7 +913,7 @@
         "ss_w_soc": "Yes",
         "ss_wo_soc": "k-dependent"
       },
-      "wave_spin_config": {
+      "spin_texture_config": {
         "basis": [
           "C1*((-0.6666666667*ky^3)*sigma_z - (kx*ky^2)*sigma_z + (kx^2*ky)*sigma_z + (0.6666666667*kx^3)*sigma_z)"
         ],
@@ -885,7 +921,41 @@
         "nullity": 1,
         "order": 3,
         "spin_rank": 1,
-        "wave_type": "f-wave"
+        "spin_texture_type": "f-wave"
+      },
+      "spin_texture_config_no_soc": {
+        "basis": [
+          "C1*((kx*ky^2)*sigma_z - (1/3*kx^3)*sigma_z)"
+        ],
+        "basis_setting": "ossg_unit_cartesian",
+        "classifier_tolerances": {
+          "atol": 1e-10,
+          "rtol": 1e-08,
+          "zero_tol": 1e-08
+        },
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 3,
+        "source": "ossg_unit_cartesian_generators",
+        "spin_rank": 1,
+        "spin_texture_type": "f-wave"
+      },
+      "spin_texture_config_soc": {
+        "basis": [
+          "C1*((1)*sigma_z)"
+        ],
+        "basis_setting": "ossg_unit_cartesian",
+        "classifier_tolerances": {
+          "atol": 1e-10,
+          "rtol": 1e-08,
+          "zero_tol": 1e-08
+        },
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 0,
+        "source": "ossg_unit_cartesian_msg_ops",
+        "spin_rank": 1,
+        "spin_texture_type": "s-wave"
       }
     },
     "status": "ok",
@@ -1408,7 +1478,7 @@
         "ss_w_soc": "Yes",
         "ss_wo_soc": "Zeeman"
       },
-      "wave_spin_config": {
+      "spin_texture_config": {
         "basis": [
           "C1*((1)*sigma_z)"
         ],
@@ -1416,7 +1486,41 @@
         "nullity": 1,
         "order": 0,
         "spin_rank": 1,
-        "wave_type": "s-wave"
+        "spin_texture_type": "s-wave"
+      },
+      "spin_texture_config_no_soc": {
+        "basis": [
+          "C1*((1)*sigma_z)"
+        ],
+        "basis_setting": "ossg_unit_cartesian",
+        "classifier_tolerances": {
+          "atol": 1e-10,
+          "rtol": 1e-08,
+          "zero_tol": 1e-08
+        },
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 0,
+        "source": "ossg_unit_cartesian_generators",
+        "spin_rank": 1,
+        "spin_texture_type": "s-wave"
+      },
+      "spin_texture_config_soc": {
+        "basis": [
+          "C1*((1)*sigma_z)"
+        ],
+        "basis_setting": "ossg_unit_cartesian",
+        "classifier_tolerances": {
+          "atol": 1e-10,
+          "rtol": 1e-08,
+          "zero_tol": 1e-08
+        },
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 0,
+        "source": "ossg_unit_cartesian_msg_ops",
+        "spin_rank": 1,
+        "spin_texture_type": "s-wave"
       }
     },
     "status": "ok",

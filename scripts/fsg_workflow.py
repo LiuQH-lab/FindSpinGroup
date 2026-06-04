@@ -208,18 +208,20 @@ def _submit_mcif_stage(
     calculation_mode: str,
     vacuum_axis: str | None,
     workers: int | None,
+    limit: int | None,
     runtime_export: bool,
     selected_export: bool,
     export_fields_override: str | None,
     tag: str | None,
     dry_run: bool,
+    baseline_suite_override: str | None = None,
 ) -> None:
     dataset = _dataset(config, dataset_name)
     input_dir = _remote_input_dir(snapshot.remote_repo_root, dataset)
     output_root = _remote_output_root(profile, dataset)
     if tag:
         output_root = f"{output_root}_{tag}"
-    baseline_suite = str(dataset.get("baseline_suite") or dataset_name)
+    baseline_suite = str(baseline_suite_override or dataset.get("baseline_suite") or dataset_name)
     baseline_root = f"{snapshot.remote_repo_root}/batch_baselines"
     export_txt = "selected.txt" if selected_export else ""
     if export_fields_override is not None:
@@ -238,6 +240,7 @@ def _submit_mcif_stage(
         f"BATCH_ROUTE={_q(route)} "
         f"CALCULATION_MODE={_q(calculation_mode)} "
         f"VACUUM_AXIS={_q(vacuum_axis or '')} "
+        f"LIMIT={_q(limit or '')} "
         f"EXPORT_RUNTIME_ROWS={_q('1' if runtime_export else '0')} "
         f"EXPORT_TXT={_q(export_txt)} "
         f"EXPORT_FIELDS={_q(export_fields)} "
@@ -289,9 +292,11 @@ def command_batch_test(args: argparse.Namespace) -> None:
         calculation_mode=args.calculation_mode,
         vacuum_axis=None,
         workers=args.workers,
+        limit=None,
         runtime_export=False,
         selected_export=False,
         export_fields_override=None,
+        baseline_suite_override=None,
         tag=args.tag,
         dry_run=not args.execute,
     )
@@ -301,28 +306,48 @@ def command_batch_test(args: argparse.Namespace) -> None:
 def command_quasi2d_test(args: argparse.Namespace) -> None:
     config = _load_config(args.profile_config)
     profile = _profile(config, args.profile)
+    if args.axis_sweep and args.vacuum_axis:
+        raise SystemExit("--axis-sweep cannot be combined with --vacuum-axis.")
     snapshot = _prepare_remote_snapshot(profile, dry_run=not args.execute)
-    _submit_mcif_stage(
-        config,
-        profile,
-        snapshot,
-        dataset_name=args.dataset,
-        route="full",
-        calculation_mode="quasi2d",
-        vacuum_axis=args.vacuum_axis,
-        workers=args.workers,
-        runtime_export=False,
-        selected_export=True,
-        export_fields_override=(
-            "index,phase,quasi_2d.status,quasi_2d.source,"
-            "quasi_2d.vacuum_axis_input,quasi_2d.magnetic_phase,"
-            "quasi_2d.spin_splitting_2d,quasi_2d.interpretation,"
-            "quasi_2d.generic_point_comparison.summary,"
-            "quasi_2d.generic_point_comparison.spin_splitting_changed"
-        ),
-        tag=args.tag,
-        dry_run=not args.execute,
+    axes = ["a", "b", "c"] if args.axis_sweep else [args.vacuum_axis]
+    export_fields = (
+        "index,phase,quasi_2d.status,quasi_2d.source,"
+        "quasi_2d.vacuum_axis_input,quasi_2d.magnetic_phase,"
+        "quasi_2d.spin_splitting_2d,quasi_2d.interpretation,"
+        "quasi_2d.generic_point_comparison.summary,"
+        "quasi_2d.generic_point_comparison.spin_splitting_changed,"
+        "quasi_2d.spin_texture_config_no_soc.spin_texture_type,"
+        "quasi_2d.spin_texture_config_no_soc.momentum_space_spin_configuration,"
+        "quasi_2d.spin_texture_config_no_soc.operation_audit.non_plane_preserving_operation_count,"
+        "quasi_2d.spin_texture_config_soc.spin_texture_type,"
+        "quasi_2d.spin_texture_config_soc.momentum_space_spin_configuration,"
+        "quasi_2d.spin_texture_config_soc.operation_audit.non_plane_preserving_operation_count"
     )
+    dataset = _dataset(config, args.dataset)
+    base_baseline_suite = str(dataset.get("baseline_suite") or args.dataset)
+    for axis in axes:
+        axis_tag = args.tag
+        baseline_suite_override = None
+        if args.axis_sweep:
+            axis_tag = f"{args.tag}_axis_{axis}" if args.tag else f"axis_{axis}"
+            baseline_suite_override = f"{base_baseline_suite}_axis_{axis}"
+        _submit_mcif_stage(
+            config,
+            profile,
+            snapshot,
+            dataset_name=args.dataset,
+            route="full",
+            calculation_mode="quasi2d",
+            vacuum_axis=axis,
+            workers=args.workers,
+            limit=args.limit,
+            runtime_export=False,
+            selected_export=True,
+            export_fields_override=export_fields,
+            baseline_suite_override=baseline_suite_override,
+            tag=axis_tag,
+            dry_run=not args.execute,
+        )
     print(
         "Quasi2D-test submission prepared. Inspect summary.json, errors_by_file.json, "
         "selected.txt, and quasi_2d aggregate counts after completion."
@@ -355,9 +380,11 @@ def command_release_test(args: argparse.Namespace) -> None:
         calculation_mode="3d",
         vacuum_axis=None,
         workers=args.workers,
+        limit=None,
         runtime_export=False,
         selected_export=False,
         export_fields_override=None,
+        baseline_suite_override=None,
         tag=args.tag,
         dry_run=not args.execute,
     )
@@ -370,9 +397,11 @@ def command_release_test(args: argparse.Namespace) -> None:
         calculation_mode="3d",
         vacuum_axis=None,
         workers=args.workers,
+        limit=None,
         runtime_export=False,
         selected_export=False,
         export_fields_override=None,
+        baseline_suite_override=None,
         tag=args.tag,
         dry_run=not args.execute,
     )
@@ -495,6 +524,16 @@ def main() -> int:
         "--vacuum-axis",
         choices=("a", "b", "c"),
         help="Optional explicit vacuum axis. Omit to use runtime auto/heuristic handling.",
+    )
+    quasi2d.add_argument(
+        "--axis-sweep",
+        action="store_true",
+        help="Submit separate explicit a/b/c vacuum-axis runs for 2D guard diagnostics.",
+    )
+    quasi2d.add_argument(
+        "--limit",
+        type=int,
+        help="Limit the number of resolved .mcif inputs for quick 2D diagnostics.",
     )
     quasi2d.set_defaults(func=command_quasi2d_test)
 

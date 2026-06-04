@@ -307,6 +307,14 @@ def _extract_transform_matrix(transform) -> np.ndarray | None:
 
 def _distance_to_reciprocal_plane(k_input: np.ndarray, vacuum_axis_index: int) -> float:
     component = float(k_input[vacuum_axis_index])
+    return float(abs(component))
+
+
+def _distance_to_reciprocal_plane_mod_integer(
+    k_input: np.ndarray,
+    vacuum_axis_index: int,
+) -> float:
+    component = float(k_input[vacuum_axis_index])
     return float(abs(component - round(component)))
 
 
@@ -316,11 +324,15 @@ def _classify_kpoint_plane(
     vacuum_axis_index: int,
     *,
     tol: float,
-) -> tuple[str, np.ndarray, float]:
+) -> tuple[str, np.ndarray, float, float]:
     k_acc = np.asarray(k_acc_primitive, dtype=float).reshape(3)
     k_input = input_to_acc_matrix.T @ k_acc
     component_distances = np.abs(k_input - np.round(k_input))
     vacuum_distance = _distance_to_reciprocal_plane(k_input, vacuum_axis_index)
+    vacuum_distance_to_integer = _distance_to_reciprocal_plane_mod_integer(
+        k_input,
+        vacuum_axis_index,
+    )
     in_plane_axes = [axis for axis in range(3) if axis != vacuum_axis_index]
     in_plane_distances = component_distances[in_plane_axes]
     if vacuum_distance <= tol:
@@ -329,7 +341,7 @@ def _classify_kpoint_plane(
         classification = "out_of_plane"
     else:
         classification = "mixed"
-    return classification, k_input, vacuum_distance
+    return classification, k_input, vacuum_distance, vacuum_distance_to_integer
 
 
 def _little_group_for_primitive_kpoint(ssg, k_point, *, tol: float) -> list:
@@ -416,7 +428,12 @@ def _serialize_kpoint_analysis(
     kind: str,
     k_symbol_2d: str | None = None,
 ) -> dict:
-    plane_class, k_input, vacuum_distance = _classify_kpoint_plane(
+    (
+        plane_class,
+        k_input,
+        vacuum_distance,
+        vacuum_distance_to_integer,
+    ) = _classify_kpoint_plane(
         k_acc,
         input_to_acc_matrix,
         vacuum_axis_index,
@@ -428,8 +445,10 @@ def _serialize_kpoint_analysis(
         "k_symbol_2d": k_symbol_2d,
         "k_acc_primitive": _json_vector(k_acc),
         "k_input_reciprocal": _json_mod1_vector(k_input),
+        "k_input_reciprocal_raw": _json_vector(k_input),
         "plane_classification": plane_class,
-        "vacuum_component_distance_to_integer": _json_float(vacuum_distance),
+        "vacuum_component_distance_to_zero": _json_float(vacuum_distance),
+        "vacuum_component_distance_to_integer": _json_float(vacuum_distance_to_integer),
         "spin_splitting": spin_splitting,
         "spin_polarizations": list(spin_polarizations),
     }
@@ -475,8 +494,6 @@ def _build_in_plane_compact_kpoints(
         acc_primitive_ssg.kpoints_primitive_string,
         acc_primitive_ssg.is_spinsplitting,
     ):
-        if label not in in_plane_labels:
-            continue
         rules.append((label, kpoint_string, spin_splitting == "spin splitting"))
     if not rules:
         return ""
@@ -496,7 +513,7 @@ def _build_in_plane_compact_kpoints(
         start = np.asarray(original_point_coords[start_label], dtype=float)
         end = np.asarray(original_point_coords[end_label], dtype=float)
         midpoint = (start + end) / 2.0
-        midpoint_plane, _, _ = _classify_kpoint_plane(
+        midpoint_plane, _, _, _ = _classify_kpoint_plane(
             midpoint,
             input_to_acc_matrix,
             vacuum_axis_index,
@@ -509,7 +526,13 @@ def _build_in_plane_compact_kpoints(
     extra_points = [
         (acc_primitive_ssg.kpoints_primitive[index], acc_primitive_ssg.kpoints_label[index])
         for index in low_symm_indices
-        if acc_primitive_ssg.kpoints_label[index] in in_plane_labels
+        if _classify_kpoint_plane(
+            np.asarray(acc_primitive_ssg.kpoints_primitive[index], dtype=float),
+            input_to_acc_matrix,
+            vacuum_axis_index,
+            tol=tol,
+        )[0]
+        == "in_plane"
     ]
     kpoints_text = write_kpoints(
         {"point_coords": filtered_point_coords, "path": filtered_path},
@@ -689,6 +712,8 @@ def build_quasi2d_diagnostics(
         "vacuum_axis_index": vacuum_axis_index,
         "geometry": geometry,
         "KPOINTS": None,
+        "KPOINTS_status": "not_applicable",
+        "KPOINTS_error": None,
         "KPOINTS_setting": "acc_primitive",
         "KPOINTS_filter": "in_plane",
         "kpoints": [],
@@ -811,13 +836,25 @@ def build_quasi2d_diagnostics(
     interpretation, spin_splitting_2d = _interpret_2d_spin_splitting(rows)
     projection_summary = _kpoint_projection_summary(rows)
     generic_point_comparison = _generic_point_comparison(rows, diagnostic_row, tol=tol)
-    compact_kpoints = _build_in_plane_compact_kpoints(
-        acc_primitive_ssg,
-        rows,
-        input_to_acc_matrix=input_to_acc_matrix,
-        vacuum_axis_index=vacuum_axis_index,
-        tol=tol,
-    )
+    kpoints_status = "ok"
+    kpoints_error = None
+    try:
+        compact_kpoints = _build_in_plane_compact_kpoints(
+            acc_primitive_ssg,
+            rows,
+            input_to_acc_matrix=input_to_acc_matrix,
+            vacuum_axis_index=vacuum_axis_index,
+            tol=tol,
+        )
+    except ValueError as exc:
+        compact_kpoints = ""
+        kpoints_error = str(exc)
+        if "No matching rule found for k-point" in kpoints_error:
+            kpoints_status = "not_available_unmatched_kpoint_rule"
+        else:
+            kpoints_status = "not_available_error"
+    if not compact_kpoints and kpoints_status == "ok":
+        kpoints_status = "empty"
     base_payload.update(
         {
             "reciprocal_transform": {
@@ -825,6 +862,8 @@ def build_quasi2d_diagnostics(
                 "acc_k_to_input_k_matrix": _json_matrix(input_to_acc_matrix.T),
             },
             "KPOINTS": compact_kpoints,
+            "KPOINTS_status": kpoints_status,
+            "KPOINTS_error": kpoints_error,
             "kpoints": rows,
             "kpoint_projection_summary": projection_summary,
             "generic_point_comparison": generic_point_comparison,
