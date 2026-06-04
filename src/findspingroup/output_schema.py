@@ -68,13 +68,11 @@ PUBLIC_OUTPUT_LAYERS: Final = (
 EXPORT_METADATA_COLUMNS: Final = (
     "source_fsg_version",
     "source_run_tag",
-    "source_route",
 )
 
 EXPORT_CASE_COLUMNS: Final = (
     "case_id",
     "file_name",
-    "status",
     "duration_seconds",
     "index",
     "conf",
@@ -96,12 +94,12 @@ EXPORT_SPIN_POINT_GROUP_COLUMNS: Final = (
     "sspg_hm",
     "sspg_symbol",
     "ssg_type",
-    "spin_only_direction",
+    "spin_only_direction(ossg convention)",
 )
 
 EXPORT_SYMBOL_COLUMNS: Final = (
-    "ossg_symbol",
-    "primitive_ssg_symbol",
+    "ossg_symbol_linear",
+    "ossg_symbol_latex",
     "sg_symbol",
     "sg_num",
     "sg_is_centrosymmetric",
@@ -120,30 +118,51 @@ EXPORT_SYMBOL_COLUMNS: Final = (
     "msg_is_centrosymmetric",
     "msg_is_polar",
     "msg_is_chiral",
+    "empg_symbol",
 )
 
 EXPORT_PROPERTY_COLUMNS: Final = (
     "spin_splitting_with_soc",
     "spin_splitting_without_soc",
+    "spin_texture_config_soc",
+    "spin_texture_type_soc",
+    "momentum_space_spin_configuration_soc",
+    "spin_texture_config_no_soc",
+    "spin_texture_type_no_soc",
+    "momentum_space_spin_configuration_no_soc",
     "ahc_with_soc",
     "ahc_without_soc",
+    "ahe_tensor_equations_soc",
+    "ahe_tensor_equations_no_soc",
+    "qmd_tensor_equations_soc",
+    "qmd_tensor_equations_no_soc",
+    "imd_tensor_equations_soc",
+    "imd_tensor_equations_no_soc",
+    "bcd_tensor_equations_soc",
+    "bcd_tensor_equations_no_soc",
     "is_altermagnet",
     "is_spin_orbit_magnet",
+    "sg_polar_axes",
+    "sg_polar_axes_setting",
+    "ossg_polar_axes",
+    "ossg_polar_axes_setting",
+    "msg_polar_axes",
+    "msg_polar_axes_setting",
 )
 
 EXPORT_WYCKOFF_COLUMNS: Final = (
     "wyckoff_split",
     "acc_primitive_wyckoff_split",
+    "has_wyckoff_splitting_sg_to_ossg",
+    "has_wyckoff_splitting_ossg_to_msg",
 )
 
 EXPORT_MAGNETIC_SITE_COLUMNS: Final = (
-    "magnetic_site_status",
     "magnetic_site_setting",
     "magnetic_site_sg_primitive_to_magnetic_primitive_cell_expansion",
     "magnetic_atom_count",
     "nonzero_moment_atom_count",
     "zero_moment_magnetic_atom_count",
-    "magnetic_atom_selection_mode",
     "number_of_magnetic_orbits_sg",
     "number_of_magnetic_orbits_ssg",
     "number_of_magnetic_orbits_msg",
@@ -171,6 +190,13 @@ QUASI2D_EXPORT_COLUMNS: Final = (
     "quasi2d_gp_k_acc",
     "quasi2d_gp_spin_splitting",
     "quasi2d_gp_spin_polarizations",
+    "quasi2d_spin_texture_config_no_soc",
+    "quasi2d_spin_texture_type_no_soc",
+    "quasi2d_momentum_space_spin_configuration_no_soc",
+    "quasi2d_spin_texture_config_soc",
+    "quasi2d_spin_texture_type_soc",
+    "quasi2d_momentum_space_spin_configuration_soc",
+    "quasi2d_spin_texture_basis",
     "quasi2d_kpoint_projection_summary",
     "quasi2d_kpoints",
 )

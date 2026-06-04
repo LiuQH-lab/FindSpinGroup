@@ -58,11 +58,168 @@ def _compact_magnetic_wp_dof_rows(rows: Any, *, limit: int = 16) -> str | None:
     return " | ".join(items)
 
 
+def _normalize_spin_texture_config(config: Any) -> Any:
+    if not isinstance(config, dict):
+        return config
+    normalized = dict(config)
+    legacy_type_key = "wave" + "_type"
+    if legacy_type_key in normalized and "spin_texture_type" not in normalized:
+        normalized["spin_texture_type"] = normalized.pop(legacy_type_key)
+    return normalized
+
+
+def _spin_texture_type(config: Any) -> Any:
+    if not isinstance(config, dict):
+        return None
+    return config.get("spin_texture_type", config.get("wave" + "_type"))
+
+
+def _momentum_space_spin_configuration(config: Any) -> Any:
+    if not isinstance(config, dict):
+        return None
+    return config.get("momentum_space_spin_configuration")
+
+
+def _is_zero_expression(value: Any) -> bool:
+    text = str(value).strip()
+    if text in {"0", "0.0", "+0", "-0"}:
+        return True
+    try:
+        return abs(float(text)) < 1e-12
+    except ValueError:
+        return False
+
+
+def _component_equations(components: Any, *, symbol: str) -> list[str]:
+    axes = ("x", "y", "z")
+    equations: list[str] = []
+
+    def visit(value: Any, indices: tuple[int, ...]) -> None:
+        if isinstance(value, list):
+            for index, item in enumerate(value):
+                visit(item, (*indices, index))
+            return
+        if _is_zero_expression(value):
+            return
+        suffix = "".join(axes[index] if index < len(axes) else str(index) for index in indices)
+        equations.append(f"{symbol}_{{{suffix}}} = {value}")
+
+    visit(components, ())
+    return equations
+
+
+def _tensor_equations(payload: Any, *, symbol: str) -> str | None:
+    if not isinstance(payload, dict):
+        return None
+    if "error" in payload:
+        return f"ERROR: {payload['error']}"
+    if payload.get("is_zero") is True:
+        return f"{symbol}=0"
+
+    parts: list[str] = []
+    relations = payload.get("relations")
+    if isinstance(relations, list) and relations:
+        parts.append("; ".join(str(relation) for relation in relations))
+    components = _component_equations(payload.get("components"), symbol=symbol)
+    if components:
+        parts.append("components: " + "; ".join(components))
+    return " | ".join(parts) if parts else None
+
+
+def _tensor_equation_export_values(tensor_outputs: Any) -> dict[str, Any]:
+    payload = tensor_outputs if isinstance(tensor_outputs, dict) else {}
+    return {
+        "ahe_tensor_equations_soc": _tensor_equations(payload.get("AHE_wSOC"), symbol=r"\sigma"),
+        "ahe_tensor_equations_no_soc": _tensor_equations(payload.get("AHE_woSOC"), symbol=r"\sigma"),
+        "qmd_tensor_equations_soc": _tensor_equations(payload.get("MSGQMDTensor"), symbol="Q"),
+        "qmd_tensor_equations_no_soc": _tensor_equations(payload.get("QMDTensor"), symbol="Q"),
+        "imd_tensor_equations_soc": _tensor_equations(payload.get("MSGIMDTensor"), symbol="I"),
+        "imd_tensor_equations_no_soc": _tensor_equations(payload.get("IMDTensor"), symbol="I"),
+        "bcd_tensor_equations_soc": _tensor_equations(payload.get("MSGBCDTensor"), symbol="D"),
+        "bcd_tensor_equations_no_soc": _tensor_equations(payload.get("BCDTensor"), symbol="D"),
+    }
+
+
+def _polar_axis_label(axis: Any) -> str | None:
+    if not isinstance(axis, dict):
+        return str(axis) if axis is not None else None
+    label = axis.get("label")
+    if label:
+        return str(label)
+    components = axis.get("components")
+    if components is not None:
+        return str(components)
+    return None
+
+
+def _polar_axes_export_values(payload: Any) -> dict[str, Any]:
+    polar = payload if isinstance(payload, dict) else {}
+    values: dict[str, Any] = {}
+    for key in ("sg", "ossg", "msg"):
+        entry = polar.get(key) if isinstance(polar.get(key), dict) else {}
+        axes = entry.get("allowed_polar_axes") if isinstance(entry, dict) else None
+        labels = [
+            label
+            for axis in (axes or [])
+            if (label := _polar_axis_label(axis)) is not None
+        ]
+        values[f"{key}_polar_axes"] = ", ".join(labels) if labels else None
+        values[f"{key}_polar_axes_setting"] = (
+            entry.get("allowed_polar_axes_setting") if isinstance(entry, dict) else None
+        )
+    return values
+
+
+def _has_wyckoff_splitting(
+    wp_chain: Any,
+    *,
+    from_wp_index: int,
+    from_orbit_index: int,
+    to_wp_index: int,
+    to_orbit_index: int,
+) -> bool | None:
+    if not wp_chain:
+        return None
+    mapping: dict[tuple[Any, Any, Any], set[tuple[Any, Any, Any]]] = {}
+    saw_valid = False
+    for row in wp_chain:
+        if not isinstance(row, (list, tuple)) or len(row) <= max(to_wp_index, to_orbit_index):
+            continue
+        element = row[0]
+        source = (element, row[from_wp_index], row[from_orbit_index])
+        target = (element, row[to_wp_index], row[to_orbit_index])
+        if source[1] in (None, "") or target[1] in (None, ""):
+            continue
+        saw_valid = True
+        mapping.setdefault(source, set()).add(target)
+    if not saw_valid:
+        return None
+    return any(len(targets) > 1 for targets in mapping.values())
+
+
+def _wyckoff_splitting_export_values(wp_chain: Any) -> dict[str, Any]:
+    return {
+        "has_wyckoff_splitting_sg_to_ossg": _has_wyckoff_splitting(
+            wp_chain,
+            from_wp_index=1,
+            from_orbit_index=2,
+            to_wp_index=3,
+            to_orbit_index=4,
+        ),
+        "has_wyckoff_splitting_ossg_to_msg": _has_wyckoff_splitting(
+            wp_chain,
+            from_wp_index=3,
+            from_orbit_index=4,
+            to_wp_index=5,
+            to_orbit_index=6,
+        ),
+    }
+
+
 def _magnetic_site_export_values(summary: Any) -> dict[str, Any]:
     payload = summary if isinstance(summary, dict) else {}
     magnetic_wp_dof_rows = payload.get("magnetic_wp_dof_rows")
     return {
-        "magnetic_site_status": payload.get("status"),
         "magnetic_site_setting": payload.get("setting"),
         "magnetic_site_sg_primitive_to_magnetic_primitive_cell_expansion": (
             payload.get("cell_expansion")
@@ -70,7 +227,6 @@ def _magnetic_site_export_values(summary: Any) -> dict[str, Any]:
         "magnetic_atom_count": payload.get("magnetic_atom_count"),
         "nonzero_moment_atom_count": payload.get("nonzero_moment_atom_count"),
         "zero_moment_magnetic_atom_count": payload.get("zero_moment_magnetic_atom_count"),
-        "magnetic_atom_selection_mode": payload.get("magnetic_atom_selection_mode"),
         "number_of_magnetic_orbits_sg": payload.get("n_magnetic_orbits_sg"),
         "number_of_magnetic_orbits_ssg": payload.get("n_magnetic_orbits_ssg"),
         "number_of_magnetic_orbits_msg": payload.get("n_magnetic_orbits_msg"),
@@ -87,6 +243,8 @@ def _quasi2d_export_values(quasi_2d: Any) -> dict[str, Any]:
     if not isinstance(quasi_2d, dict):
         return {}
     payload = quasi_2d
+    no_soc_config = payload.get("spin_texture_config_no_soc", payload.get("wave" + "_spin_config_no_soc"))
+    soc_config = payload.get("spin_texture_config_soc", payload.get("wave" + "_spin_config_soc"))
     diagnostic_points = payload.get("diagnostic_points") or []
     generated_point = diagnostic_points[0] if diagnostic_points else {}
     kpoints = payload.get("kpoints") or []
@@ -105,6 +263,20 @@ def _quasi2d_export_values(quasi_2d: Any) -> dict[str, Any]:
         "quasi2d_gp_k_acc": generated_point.get("k_acc_primitive"),
         "quasi2d_gp_spin_splitting": generated_point.get("spin_splitting"),
         "quasi2d_gp_spin_polarizations": generated_point.get("spin_polarizations"),
+        "quasi2d_spin_texture_config_no_soc": _normalize_spin_texture_config(no_soc_config),
+        "quasi2d_spin_texture_type_no_soc": _spin_texture_type(no_soc_config),
+        "quasi2d_momentum_space_spin_configuration_no_soc": (
+            _momentum_space_spin_configuration(no_soc_config)
+        ),
+        "quasi2d_spin_texture_config_soc": _normalize_spin_texture_config(soc_config),
+        "quasi2d_spin_texture_type_soc": _spin_texture_type(soc_config),
+        "quasi2d_momentum_space_spin_configuration_soc": (
+            _momentum_space_spin_configuration(soc_config)
+        ),
+        "quasi2d_spin_texture_basis": payload.get(
+            "spin_texture_config_basis",
+            payload.get("wave" + "_spin_config_basis"),
+        ),
         "quasi2d_kpoint_projection_summary": projection_summary,
         "quasi2d_kpoints": [
             {
@@ -137,11 +309,12 @@ def _serialized_payload_value(payload: dict[str, Any], key: str, *legacy_keys: s
 def _row_from_result(file_path: Path, result, *, duration_seconds: float | None = None) -> dict[str, Any]:
     identify = result.identify_index_details or {}
     primitive_ssg = SpinSpaceGroup(result.primitive_magnetic_cell_ssg_ops)
+    no_soc_config = result.spin_texture_config_no_soc
+    soc_config = result.spin_texture_config_soc
 
     row = {
         "case_id": batch_mcif._normalize_case_id(file_path),
         "file_name": file_path.name,
-        "status": "ok",
         "duration_seconds": duration_seconds,
         "index": result.index,
         "conf": result.conf,
@@ -157,9 +330,9 @@ def _row_from_result(file_path: Path, result, *, duration_seconds: float | None 
         "sspg_hm": primitive_ssg.spin_part_point_group_symbol_hm,
         "sspg_symbol": primitive_ssg.spin_part_point_group_symbol_s,
         "ssg_type": result.primitive_magnetic_cell_ssg_type,
-        "spin_only_direction": result.convention_spin_only_direction,
-        "ossg_symbol": result.convention_ssg_international_linear,
-        "primitive_ssg_symbol": result.primitive_magnetic_cell_ssg_international_linear,
+        "spin_only_direction(ossg convention)": result.convention_spin_only_direction,
+        "ossg_symbol_linear": result.convention_ssg_international_linear,
+        "ossg_symbol_latex": result.convention_ssg_international_latex,
         "sg_symbol": result.input_space_group_symbol,
         "sg_num": result.input_space_group_number,
         "sg_is_centrosymmetric": result.sg_is_centrosymmetric,
@@ -178,8 +351,19 @@ def _row_from_result(file_path: Path, result, *, duration_seconds: float | None 
         "msg_is_centrosymmetric": result.msg_is_centrosymmetric,
         "msg_is_polar": result.msg_is_polar,
         "msg_is_chiral": result.msg_is_chiral,
+        "empg_symbol": result.gspg_effective_mpg_symbol,
         "spin_splitting_with_soc": result.spinsplitting_w_soc,
         "spin_splitting_without_soc": result.spinsplitting_wo_soc,
+        "spin_texture_config_soc": _normalize_spin_texture_config(soc_config),
+        "spin_texture_type_soc": _spin_texture_type(soc_config),
+        "momentum_space_spin_configuration_soc": (
+            _momentum_space_spin_configuration(soc_config)
+        ),
+        "spin_texture_config_no_soc": _normalize_spin_texture_config(no_soc_config),
+        "spin_texture_type_no_soc": _spin_texture_type(no_soc_config),
+        "momentum_space_spin_configuration_no_soc": (
+            _momentum_space_spin_configuration(no_soc_config)
+        ),
         "ahc_with_soc": result.ahc_w_soc,
         "ahc_without_soc": result.ahc_wo_soc,
         "is_altermagnet": result.is_alter,
@@ -187,6 +371,9 @@ def _row_from_result(file_path: Path, result, *, duration_seconds: float | None 
         "wyckoff_split": _compact_wp_chain(result.wp_chain),
         "acc_primitive_wyckoff_split": _compact_wp_chain(result.acc_primitive_wp_chain),
     }
+    row.update(_tensor_equation_export_values(getattr(result, "tensor_outputs", None)))
+    row.update(_polar_axes_export_values(getattr(result, "polar_axes_by_symmetry", None)))
+    row.update(_wyckoff_splitting_export_values(result.wp_chain))
     row.update(_magnetic_site_export_values(getattr(result, "magnetic_site_summary", None)))
     row.update(_quasi2d_export_values(getattr(result, "quasi_2d", None)))
     return complete_export_row(row)
@@ -197,11 +384,12 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
     identify = payload.get("identify_index_details") or {}
     primitive_ops = payload.get("primitive_magnetic_cell_ssg_ops") or []
     primitive_ssg = SpinSpaceGroup(primitive_ops) if primitive_ops else None
+    no_soc_config = payload.get("spin_texture_config_no_soc", payload.get("wave" + "_spin_config_no_soc"))
+    soc_config = payload.get("spin_texture_config_soc", payload.get("wave" + "_spin_config_soc"))
 
     row = {
         "case_id": record.get("case_id"),
         "file_name": record.get("file_name"),
-        "status": record.get("status", "ok"),
         "duration_seconds": record.get("duration_seconds"),
         "index": payload.get("index"),
         "conf": payload.get("conf"),
@@ -221,9 +409,9 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "sspg_hm": primitive_ssg.spin_part_point_group_symbol_hm if primitive_ssg is not None else None,
         "sspg_symbol": primitive_ssg.spin_part_point_group_symbol_s if primitive_ssg is not None else None,
         "ssg_type": payload.get("primitive_magnetic_cell_ssg_type"),
-        "spin_only_direction": payload.get("convention_spin_only_direction"),
-        "ossg_symbol": payload.get("convention_ssg_international_linear"),
-        "primitive_ssg_symbol": payload.get("primitive_magnetic_cell_ssg_international_linear"),
+        "spin_only_direction(ossg convention)": payload.get("convention_spin_only_direction"),
+        "ossg_symbol_linear": payload.get("convention_ssg_international_linear"),
+        "ossg_symbol_latex": payload.get("convention_ssg_international_latex"),
         "sg_symbol": payload.get("input_space_group_symbol"),
         "sg_num": payload.get("input_space_group_number"),
         "sg_is_centrosymmetric": _serialized_payload_value(
@@ -254,8 +442,19 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         ),
         "msg_is_polar": payload.get("msg_is_polar"),
         "msg_is_chiral": payload.get("msg_is_chiral"),
+        "empg_symbol": payload.get("gspg_effective_mpg_symbol"),
         "spin_splitting_with_soc": _serialized_property(payload, "spinsplitting_w_soc", "ss_w_soc"),
         "spin_splitting_without_soc": _serialized_property(payload, "spinsplitting_wo_soc", "ss_wo_soc"),
+        "spin_texture_config_soc": _normalize_spin_texture_config(soc_config),
+        "spin_texture_type_soc": _spin_texture_type(soc_config),
+        "momentum_space_spin_configuration_soc": (
+            _momentum_space_spin_configuration(soc_config)
+        ),
+        "spin_texture_config_no_soc": _normalize_spin_texture_config(no_soc_config),
+        "spin_texture_type_no_soc": _spin_texture_type(no_soc_config),
+        "momentum_space_spin_configuration_no_soc": (
+            _momentum_space_spin_configuration(no_soc_config)
+        ),
         "ahc_with_soc": _serialized_property(payload, "ahc_w_soc", "ahc_w_soc"),
         "ahc_without_soc": _serialized_property(payload, "ahc_wo_soc", "ahc_wo_soc"),
         "is_altermagnet": _serialized_property(payload, "is_alter", "is_alter"),
@@ -271,6 +470,9 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "error_type": record.get("error", {}).get("type"),
         "error_message": record.get("error", {}).get("message"),
     }
+    row.update(_tensor_equation_export_values(payload.get("tensor_outputs")))
+    row.update(_polar_axes_export_values(payload.get("polar_axes_by_symmetry")))
+    row.update(_wyckoff_splitting_export_values(payload.get("wp_chain")))
     row.update(_magnetic_site_export_values(payload.get("magnetic_site_summary")))
     row.update(_quasi2d_export_values(payload.get("quasi_2d")))
     return complete_export_row(row)
@@ -285,7 +487,6 @@ def _row_from_error(
     return complete_export_row({
         "case_id": batch_mcif._normalize_case_id(file_path),
         "file_name": file_path.name,
-        "status": "error",
         "duration_seconds": duration_seconds,
         "error_type": type(exc).__name__,
         "error_message": str(exc),
@@ -297,14 +498,12 @@ def _runtime_export_metadata(runtime_jsonl: Path | None) -> dict[str, Any]:
         return {
             "source_fsg_version": FSG_VERSION,
             "source_run_tag": None,
-            "source_route": "full",
         }
 
     summary_path = runtime_jsonl.parent / "summary.json"
     metadata = {
         "source_fsg_version": None,
         "source_run_tag": runtime_jsonl.parent.name,
-        "source_route": None,
     }
     if summary_path.exists():
         try:
@@ -315,7 +514,6 @@ def _runtime_export_metadata(runtime_jsonl: Path | None) -> dict[str, Any]:
             {
                 "source_fsg_version": summary.get("package_version"),
                 "source_run_tag": summary.get("run_tag") or runtime_jsonl.parent.name,
-                "source_route": summary.get("route"),
             }
         )
     return metadata
@@ -326,25 +524,19 @@ def _runtime_export_metadata_from_paths(runtime_jsonls: list[Path]) -> dict[str,
         return {
             "source_fsg_version": FSG_VERSION,
             "source_run_tag": None,
-            "source_route": "full",
         }
     metadata = _runtime_export_metadata(runtime_jsonls[0])
     run_tags = []
-    routes = set()
     versions = set()
     for runtime_jsonl in runtime_jsonls:
         item = _runtime_export_metadata(runtime_jsonl)
         if item.get("source_run_tag"):
             run_tags.append(item["source_run_tag"])
-        if item.get("source_route"):
-            routes.add(item["source_route"])
         if item.get("source_fsg_version"):
             versions.add(item["source_fsg_version"])
     if len(runtime_jsonls) > 1:
         parent = runtime_jsonls[0].parent.parent
         metadata["source_run_tag"] = parent.name if parent.name else "sharded_runtime"
-    if len(routes) == 1:
-        metadata["source_route"] = next(iter(routes))
     if len(versions) == 1:
         metadata["source_fsg_version"] = next(iter(versions))
     return metadata
@@ -354,7 +546,6 @@ def _apply_export_metadata(rows: list[dict[str, Any]], metadata: dict[str, Any])
     for row in rows:
         row["source_fsg_version"] = metadata.get("source_fsg_version")
         row["source_run_tag"] = metadata.get("source_run_tag")
-        row["source_route"] = metadata.get("source_route")
 
 
 COLUMNS = list(EXPORT_ROW_COLUMNS)

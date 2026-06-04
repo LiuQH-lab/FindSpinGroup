@@ -72,11 +72,21 @@ def get_ssg_conventional_kpoint_symbols_for_label(label: str) -> tuple[str, ...]
     return tuple(data["ssg_conventional_kpoint_symbols_by_pair_id"][pair_id])
 
 
-def get_wave_spin_config_id_for_ssg_label(label: str) -> str:
-    return ssg_label_records()[label]["wave_spin_config_id"]
+def _spin_texture_config_record(payload: dict) -> dict:
+    record = dict(payload)
+    legacy_type_key = "wave" + "_type"
+    if legacy_type_key in record and "spin_texture_type" not in record:
+        record["spin_texture_type"] = record.pop(legacy_type_key)
+    return record
 
 
-def get_wave_spin_config_for_ssg_label(label: str) -> dict:
+def get_spin_texture_config_id_for_ssg_label(label: str) -> str:
+    record = ssg_label_records()[label]
+    return record.get("spin_texture_config_id") or record["wave" + "_spin_config_id"]
+
+
+def get_spin_texture_config_for_ssg_label(label: str) -> dict:
     data = load_acc_aligned_kpoint_runtime_index()
-    config_id = get_wave_spin_config_id_for_ssg_label(label)
-    return data["wave_spin_config_by_id"][config_id]
+    config_id = get_spin_texture_config_id_for_ssg_label(label)
+    records = data.get("spin_texture_config_by_id") or data["wave" + "_spin_config_by_id"]
+    return _spin_texture_config_record(records[config_id])
