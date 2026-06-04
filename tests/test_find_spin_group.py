@@ -13,6 +13,8 @@ import findspingroup.structure.group as group_module
 from findspingroup.data.acc_aligned_p_index_loader import (
     get_pair_id_for_ssg_label,
     get_ssg_conventional_kpoint_symbols_for_label,
+    get_wave_spin_config_for_ssg_label,
+    get_wave_spin_config_id_for_ssg_label,
 )
 from findspingroup import (
     find_spin_group,
@@ -177,10 +179,13 @@ def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
     monkeypatch.setattr(find_spin_group_module, "generate_scif", _unexpected)
 
     payload = find_spin_group_basic("examples/0.800_MnTe.mcif")
+    expected_wave_spin_config = get_wave_spin_config_for_ssg_label("194.164.1.1.L")
 
     assert payload["index"] == "194.164.1.1.L"
     assert payload["conf"] == "Collinear"
     assert payload["acc_symbol"] == "6/mmmP"
+    assert payload["wave_spin_config"] == expected_wave_spin_config
+    assert "id" not in payload["wave_spin_config"]
     assert payload["quasi_2d"] is None
     assert payload["g0_number"] == 194
     assert payload["l0_number"] == 164
@@ -289,10 +294,13 @@ def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypa
     monkeypatch.setattr(find_spin_group_module, "generate_scif", _unexpected)
 
     payload = find_spin_group_acc_primitive("examples/0.800_MnTe.mcif")
+    expected_wave_spin_config = get_wave_spin_config_for_ssg_label("194.164.1.1.L")
 
     assert payload["index"] == "194.164.1.1.L"
     assert payload["conf"] == "Collinear"
     assert payload["acc_symbol"] == "6/mmmP"
+    assert payload["wave_spin_config"] == expected_wave_spin_config
+    assert "id" not in payload["wave_spin_config"]
     assert payload["acc_primitive_cell_setting"] == "acc_primitive"
     assert payload["acc_primitive_cell_detail"] is not None
     assert payload["acc_primitive_poscar"]
@@ -1761,6 +1769,7 @@ def _build_identify_standardization_debug(result):
 
 def test_find_spin_group_exposes_main_flow_identify_result_for_collinear_case():
     result = find_spin_group("examples/0.800_MnTe.mcif")
+    expected_wave_spin_config = get_wave_spin_config_for_ssg_label("194.164.1.1.L")
 
     assert result.index == "194.164.1.1.L"
     assert result.conf == "Collinear"
@@ -1777,6 +1786,11 @@ def test_find_spin_group_exposes_main_flow_identify_result_for_collinear_case():
     assert result.identify_index_details["L0_id"] == 164
     assert result.identify_index_details["k_index"] == 1
     assert result.identify_index_details["equivalent_map_index"] == 1
+    assert result.wave_spin_config == expected_wave_spin_config
+    assert "id" not in result.wave_spin_config
+    assert result.to_summary_dict()["wave_spin_config"] == expected_wave_spin_config
+    assert result.to_structured_dict()["summary"]["wave_spin_config"] == expected_wave_spin_config
+    assert result.to_dict()["wave_spin_config"] == expected_wave_spin_config
 
 
 def test_spin_space_group_index_is_lazy_identify_index_not_legacy_shorthand(monkeypatch):
@@ -2265,6 +2279,21 @@ def test_acc_aligned_runtime_index_exposes_ssg_conventional_kpoints():
         "D:(1/2,1/2,1/2)",
         "E:(1,1/2,0)",
     )
+
+
+def test_acc_aligned_runtime_index_exposes_wave_spin_config_records():
+    label = "115.3.2.17.P"
+
+    assert get_pair_id_for_ssg_label(label) == "A123_P02"
+    assert get_wave_spin_config_id_for_ssg_label(label) == "W0043"
+    assert get_wave_spin_config_for_ssg_label(label) == {
+        "basis": ["C1*((-ky^2*kz)*sigma_z + (kx^2*kz)*sigma_z)"],
+        "momentum_space_spin_configuration": "collinear",
+        "nullity": 1,
+        "order": 3,
+        "spin_rank": 1,
+        "wave_type": "f-wave",
+    }
 
 
 def test_kpoint_symbols_use_runtime_index_for_primitive_and_ssg_convention():
@@ -2892,6 +2921,7 @@ def test_find_spin_group_basic_does_not_fallback_when_identify_database_entry_is
     assert payload["index"].startswith("not in identify-index database:")
     assert payload["identify_index_details"] is None
     assert payload["phase"]
+    assert payload["wave_spin_config"] is None
     assert payload["acc_primitive_resolution_audit"]["status"] == "identify_index_unavailable"
 
 

@@ -1,49 +1,74 @@
-# FINDSPINGROUP
+# FindSpinGroup Documentation
 
-`findspingroup` is a Python toolkit, command-line program, and
-[web application](https://app.findspingroup.com) for identifying and inspecting
-oriented spin space group (OSSG) symmetry in magnetic crystal structures.
+`findspingroup` is a Python package, command-line program, and
+[web application](https://app.findspingroup.com) for identifying oriented spin
+space group (OSSG) symmetry in magnetic crystal structures.
 
-It is designed for research workflows involving the interplay between
-exchange-driven magnetic geometry and spin-orbit coupling, which are described
-by spin space group (SSG) and magnetic space group (MSG) frameworks,
-respectively.
+Given a structure with magnetic moments, FindSpinGroup identifies the OSSG,
+reports the corresponding magnetic space group (MSG), classifies the magnetic
+phase, and can generate symmetry data for downstream first-principles,
+high-throughput, and web-application workflows.
 
-Given a magnetic structure, FINDSPINGROUP identifies the OSSG, derives the
-corresponding MSG, and organizes crystallographic and physical information
-needed to analyze the material with and without spin-orbit coupling.
+## Where Things Belong
 
-## Main outputs
+This documentation is split into three layers.
 
-Main outputs can include:
+**Guide** explains how to complete user tasks. Start here if you are not sure
+which command or Python function to use.
 
-- OSSG information and corresponding MSG information in matched settings;
-- spin Wyckoff positions and Wyckoff splitting from space group (SG) to OSSG and MSG;
-- spin Brillouin zones, high-symmetry k points, and symmetry-allowed spin-polarization components;
-- additive quasi-2D k-point and spin-splitting diagnostics for slab inputs;
-- magnetic-phase classification, including unconventional cases such as altermagnets and spin-orbit magnets;
-- symmetry constraints on anomalous Hall conductivity, nonlinear tensors, and related physical responses;
-- chiral and polar group information with and without spin-orbit coupling;
-- `.scif` files in public convention, database-standard, magnetic-primitive, or input-cell settings;
-- magnetic primitive-cell POSCAR files in relevant coordinate conventions;
-- compact GSPG text and operation output;
-- KPOINTS files labeled with symmetry-allowed spin-polarization components.
+**Reference** documents the exact Python functions, return objects, CLI flags,
+and output fields. Use it when you know the entry point and need precise
+parameter or output meaning.
 
-## Quick start
+**Advanced Notes** explain internal settings, transform terminology, and
+diagnostic routes that are useful for expert users and maintainers.
+
+The repository `README.md` is intentionally shorter than this site. It is only
+the project entry point: what the package does, how to install it, and where to
+continue.
+
+## Start Here
+
+Use the quick path if you only need the identified group labels and magnetic
+phase:
 
 ```python
-from findspingroup import example_path, find_spin_group
+from findspingroup import example_path, find_spin_group_basic
 
-result = find_spin_group(example_path("0.800_MnTe.mcif"))
-print(result.index)
-print(result.convention_ssg_international_linear)
-print(result.magnetic_phase)
+summary = find_spin_group_basic(example_path("0.800_MnTe.mcif"))
+
+print(summary["index"])
+print(summary["magnetic_phase"])
+print(summary["msg_bns_number"], summary["msg_symbol"])
 ```
 
-## Next steps
+Expected output:
 
-- See [Installation](installation.md) for package installation options.
-- See [Usage](usage.md) for `MagSymmetryResult`, basic summaries, and input-SSG outputs.
-- See [Examples](examples.md) for packaged sample inputs.
-- See [SCIF](scif.md) for `.scif` export and roundtrip notes.
-- See [CLI](cli.md) for command-line entry points.
+```text
+194.164.1.1.L
+AFM(Altermagnet)
+63.457 Cmcm
+```
+
+## Main Routes
+
+Use `find_spin_group_basic(...)` or `fsg file.mcif` for compact identification.
+
+Use `find_spin_group(...)` or `fsg --all file.mcif` for the full result object,
+generated SCIF, POSCAR, KPOINTS, tensor outputs, quasi-2D diagnostics, and audit
+information.
+
+Use `find_spin_group_input_ssg(...)` or `fsg -w file.mcif` when you need SSG and
+MSG operations in the input-cell setting and optional helper files written to
+disk.
+
+## Next Steps
+
+- [Getting Started](guide/getting-started.md) - install and run the first case.
+- [Choosing an API](guide/choosing-an-api.md) - choose the right function or CLI
+  route.
+- [Understanding Results](guide/understanding-results.md) - read the OSSG, MSG,
+  magnetic phase, settings, and artifacts.
+- [Python API Reference](reference/python-api.md) - exact function signatures,
+  parameters, returns, and examples.
+- [Output Fields](reference/output-fields.md) - field-by-field output meaning.

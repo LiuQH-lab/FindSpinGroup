@@ -226,3 +226,46 @@ want to review the planned commands:
 ```bash
 python scripts/fsg_workflow.py batch-test --profile fast-full-node
 ```
+
+## Operational Checks
+
+Before the first cluster-backed run in a new local checkout, verify the local
+profile and remote runtime instead of rebuilding ad-hoc Slurm commands:
+
+```bash
+python scripts/fsg_workflow.py batch-test --profile fast-full-node --tag dry-run
+```
+
+The dry run should show a snapshot build, remote snapshot preparation, the
+shared runtime symlinks, the selected dataset, the intended baseline suite, the
+worker count, and the Slurm arguments from the profile.  If the profile file is
+missing, create the gitignored `.fsg-batch-profiles.local.toml` from
+`fsg-batch-profiles.example.toml`; do not hard-code private paths into tracked
+docs or scripts.
+
+Common failure modes and fixes:
+
+- Missing Python packages usually means the Slurm job used system Python instead
+  of the profile interpreter.  Fix the profile `python_bin`; do not tune FSG
+  tolerances.
+- A Python path that works on the login node may not be visible on every compute
+  node.  Keep the profile tied to a verified runtime and node/partition
+  combination.
+- If `comparison.json` is missing or `comparison` is `null`, check whether the
+  snapshot `batch_baselines` symlink points to the accepted baseline directory.
+  Otherwise the first run may create a new baseline instead of comparing.
+- Use the snapshot `PYTHONPATH` check to confirm the run is importing the
+  current snapshot source.  The shared virtual environment's installed
+  `findspingroup` version can be older and is not by itself evidence that the
+  batch used stale code.
+- For change validation, keep runtime Excel export off during compute.  Generate
+  business Excel files later from an existing `full_results.jsonl`.
+
+When the user asks for one of the standard scenarios, map it to the workflow
+command instead of hand-writing `sbatch`:
+
+- "batch test this change" -> `batch-test` on the 2241 full route
+- "pre-push release batch test" -> `release-test`
+- "generate an Excel/table" -> `export` from an existing full run
+- "test 2D cases" -> `quasi2d-test`
+- "test a fresh install / CLI" -> `install-smoke`

@@ -25,7 +25,7 @@ Environment overrides:
   BATCH_ROUTE    current: ${BATCH_ROUTE:-full}
   CALCULATION_MODE current: ${CALCULATION_MODE:-auto}
   VACUUM_AXIS    current: ${VACUUM_AXIS:-<auto>}
-  EXPORT_TXT     current: ${EXPORT_TXT:-selected.txt}
+  EXPORT_TXT     current: ${EXPORT_TXT-selected.txt}
   EXPORT_FIELDS  current: ${EXPORT_FIELDS:-index,phase,properties.ss_w_soc}
   EXPORT_FERROELECTRIC_SWITCHING_OPS current: ${EXPORT_FERROELECTRIC_SWITCHING_OPS:-0}
   INCLUDE_G0_SELF_AUDIT current: ${INCLUDE_G0_SELF_AUDIT:-0}
@@ -69,7 +69,11 @@ EXPORT_RUNTIME_ROWS="${EXPORT_RUNTIME_ROWS:-1}"
 PYTHON_BIN="${PYTHON_BIN:-}"
 SBATCH_ARGS="${SBATCH_ARGS:-}"
 
-EXPORT_TXT="${EXPORT_TXT:-selected.txt}"
+if [[ -n "${EXPORT_TXT+x}" ]]; then
+  EXPORT_TXT="${EXPORT_TXT}"
+else
+  EXPORT_TXT="selected.txt"
+fi
 if [[ -n "${EXPORT_FIELDS+x}" ]]; then
   EXPORT_FIELDS="${EXPORT_FIELDS}"
 elif [[ "$BATCH_ROUTE" == "basic" ]]; then

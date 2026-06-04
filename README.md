@@ -3,30 +3,14 @@
 FindSpinGroup is a Python package and command-line program for identifying
 oriented spin space group symmetry in magnetic crystal structures.
 
-It is designed for research workflows where the same magnetic structure must be
-understood in both spin-space-group and magnetic-space-group language. Given a
-magnetic crystal structure, FindSpinGroup identifies the spin symmetry,
-constructs standard and ACC primitive settings, and prepares symmetry data for
+Given a structure with magnetic moments, FindSpinGroup identifies the oriented
+spin space group (OSSG), reports the corresponding magnetic space group (MSG),
+classifies the magnetic phase, and can generate symmetry data for
 first-principles, high-throughput, and web-application workflows.
 
 The project also powers the public web application:
 
 [https://app.findspingroup.com](https://app.findspingroup.com)
-
-## What It Does
-
-FindSpinGroup takes a magnetic structure and organizes its symmetry information
-across the main settings used by the project:
-
-- the input structure and its magnetic primitive cell;
-- the database standard setting used for spin-space-group identification;
-- the public convention setting used for symbols and operation display;
-- the ACC primitive cell used for downstream Brillouin-zone and POSCAR output.
-
-The full route can also prepare SCIF, POSCAR, KPOINTS, Wyckoff-splitting,
-magnetic-site, quasi-2D, tensor, and ferroelectric-switching data. Detailed
-field-level output contracts are intentionally kept in the documentation rather
-than in this README.
 
 ## Installation
 
@@ -47,29 +31,34 @@ python -m pip install -e ".[dev]"
 Run a compact identification from the command line:
 
 ```bash
-fsg path/to/structure.mcif
-```
-
-Run the full analysis route:
-
-```bash
-fsg --all path/to/structure.mcif
+fsg path/to/structure.mcif --show index --show magnetic_phase --show msg_symbol
 ```
 
 Use the Python API when the result will be consumed by another program:
 
 ```python
-from findspingroup import example_path, find_spin_group
+from findspingroup import example_path, find_spin_group_basic
 
-result = find_spin_group(example_path("0.800_MnTe.mcif"))
-summary = result.to_summary_dict()
+summary = find_spin_group_basic(example_path("0.800_MnTe.mcif"))
+
+print(summary["index"])
+print(summary["magnetic_phase"])
+print(summary["msg_bns_number"], summary["msg_symbol"])
 ```
 
-## Choosing A Route
+Expected output:
+
+```text
+194.164.1.1.L
+AFM(Altermagnet)
+63.457 Cmcm
+```
+
+## Main Routes
 
 Most users should start with the default CLI command or
-`find_spin_group_basic(...)`. It is the fast identification route and returns a
-compact summary.
+`find_spin_group_basic(...)`. This route returns the identified OSSG,
+corresponding MSG, magnetic phase, and compact property flags.
 
 Use the full route, `fsg --all` or `find_spin_group(...)`, when you need the
 complete result object, generated artifacts, quasi-2D diagnostics, tensor
@@ -81,6 +70,17 @@ explicit operation files.
 
 The legacy `--mode` selector is still available for compatibility, but new CLI
 usage should prefer the default route, `--all`, and `-w`.
+
+## Main Outputs
+
+Depending on the route, outputs can include:
+
+- identified OSSG index and symbols;
+- corresponding MSG identifiers;
+- magnetic-phase and spin-splitting classification;
+- SSG and MSG operations in named settings;
+- SCIF, POSCAR, KPOINTS, and GSPG text artifacts;
+- magnetic-site, tensor, quasi-2D, and ferroelectric-switching diagnostics.
 
 ## Supported Inputs
 
@@ -113,24 +113,17 @@ fsg --all --calculation-mode quasi2d --vacuum-axis c path/to/slab.mcif
 The ordinary 3D symmetry result remains the base result. Quasi-2D data is added
 only when the quasi-2D calculation mode is requested.
 
-## Batch And Validation Tools
-
-Batch entry points are included for regression validation and high-throughput
-screening:
-
-```bash
-fsg-batch --help
-findspingroup-batch --help
-```
-
-Repository scripts under `scripts/` provide additional project-maintenance
-workflows, such as batch submission, tolerance scans, POSCAR roundtrip checks,
-and Excel exports. These scripts are mainly intended for project development
-and database validation.
-
 ## Documentation
 
-The README is only the entry point. User-facing documentation lives in `site_docs/` and is published through Read the Docs. Development notes, batch logs, and local validation records should stay outside tracked documentation.
+The README is only the entry point. Detailed documentation is split into:
+
+- Guide: how to choose a route, run examples, and understand results;
+- Reference: exact Python functions, return objects, CLI flags, and output
+  fields;
+- Advanced Notes: settings, diagnostics, and validation terminology.
+
+Local source files live under [`site_docs/`](site_docs/index.md) and are
+published through Read the Docs.
 
 ## Development
 
