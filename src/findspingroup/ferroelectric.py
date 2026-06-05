@@ -27,7 +27,7 @@ def _as_int_or_none(value: Any) -> int | None:
         return None
 
 
-def _polar_axis_payload(
+def _axis_payload(
     basis: tuple[tuple[float, float, float], ...] | None,
     *,
     setting: str,
@@ -56,28 +56,55 @@ def _real_rotation_from_operation(op: Any) -> np.ndarray:
     raise ValueError("operation does not contain a 3x3 real-space rotation")
 
 
+def _spin_rotation_from_operation(op: Any) -> np.ndarray:
+    if len(op) < 2:
+        raise ValueError("operation must contain at least spin and real-space rotations")
+    first = np.asarray(op[0], dtype=float)
+    second = np.asarray(op[1], dtype=float)
+    if first.shape == (3, 3) and second.shape == (3, 3):
+        return first
+    raise ValueError("operation does not contain a 3x3 spin rotation")
+
+
 def _polar_axis_basis_from_real_ops(
     ops: Any | None,
     *,
     tol: float = 1e-8,
 ) -> tuple[tuple[float, float, float], ...] | None:
+    return _vector_axis_basis_from_ops(
+        ops,
+        representation_matrix=lambda op: _real_rotation_from_operation(op),
+        tol=tol,
+    )
+
+
+def _time_sign_from_spin_operation(op: Any) -> float:
+    return float(np.sign(np.linalg.det(_spin_rotation_from_operation(op))))
+
+
+def _vector_axis_basis_from_ops(
+    ops: Any | None,
+    *,
+    representation_matrix,
+    tol: float = 1e-8,
+) -> tuple[tuple[float, float, float], ...] | None:
     if ops is None:
         return None
 
-    unique_rotations: list[np.ndarray] = []
+    unique_matrices: list[np.ndarray] = []
     for op in ops:
-        rotation = _real_rotation_from_operation(op)
+        matrix = np.asarray(representation_matrix(op), dtype=float)
         if not any(
-            np.allclose(rotation, existing, atol=tol, rtol=0.0)
-            for existing in unique_rotations
+            np.allclose(matrix, existing, atol=tol, rtol=0.0)
+            for existing in unique_matrices
         ):
-            unique_rotations.append(rotation)
+            unique_matrices.append(matrix)
 
-    if not unique_rotations:
+    if not unique_matrices:
         return None
 
     constraint_matrix = np.concatenate(
-        [rotation - np.eye(3, dtype=float) for rotation in unique_rotations],
+        [matrix - np.eye(3, dtype=float) for matrix in unique_matrices],
         axis=0,
     )
     _, singular_values, vh = np.linalg.svd(constraint_matrix)
@@ -129,14 +156,14 @@ def _space_group_payload(
         "is_polar": space_group_is_polar(space_group_number),
         "is_centrosymmetric": space_group_is_centrosymmetric(space_group_number),
         "allowed_polar_axes": (
-            [] if axes is None else _polar_axis_payload(axes, setting=axes_setting)
+            [] if axes is None else _axis_payload(axes, setting=axes_setting)
         ),
         "allowed_polar_axes_setting": axes_setting,
         "allowed_polar_axes_source": axes_source,
     }
 
 
-def _polar_axes_symmetry_payload(
+def _symmetry_constraint_base_payload(
     payload: dict[str, Any] | None,
     *,
     role: str,
@@ -152,21 +179,154 @@ def _polar_axes_symmetry_payload(
         "msg_symbol": payload.get("msg_symbol"),
         "is_polar": payload.get("is_polar"),
         "is_centrosymmetric": payload.get("is_centrosymmetric"),
-        "allowed_polar_axes": payload.get("allowed_polar_axes"),
-        "allowed_polar_axes_setting": payload.get("allowed_polar_axes_setting"),
-        "allowed_polar_axes_source": payload.get("allowed_polar_axes_source"),
     }
 
 
-def build_polar_axes_by_symmetry_payload(
+def _polar_vector_constraint_payload(payload: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    axes = payload.get("allowed_polar_axes")
+    return {
+        "vector_kind": "T_even_P_odd_real_space_polar_vector",
+        "constraint": "R * v = v",
+        "allowed_axes": axes,
+        "allowed_axes_setting": payload.get("allowed_polar_axes_setting"),
+        "allowed_axes_source": payload.get("allowed_polar_axes_source"),
+        "free_dimension": None if axes is None else len(axes),
+    }
+
+
+def _vector_constraint_payload_from_ops(
+    ops: Any | None,
+    *,
+    vector_kind: str,
+    constraint: str,
+    setting: str | None,
+    source: str | None,
+    representation_matrix,
+    tol: float,
+) -> dict[str, Any] | None:
+    axes = _vector_axis_basis_from_ops(
+        ops,
+        representation_matrix=representation_matrix,
+        tol=tol,
+    )
+    return {
+        "vector_kind": vector_kind,
+        "constraint": constraint,
+        "allowed_axes": (
+            None
+            if axes is None
+            else _axis_payload(axes, setting=setting or "unknown")
+        ),
+        "allowed_axes_setting": setting,
+        "allowed_axes_source": source if axes is not None else None,
+        "free_dimension": None if axes is None else len(axes),
+    }
+
+
+def _vector_constraints_symmetry_payload(
+    payload: dict[str, Any] | None,
+    *,
+    role: str,
+    real_space_ops: Any | None,
+    real_space_ops_setting: str | None,
+    spin_space_ops: Any | None,
+    spin_space_setting: str | None,
+    tol: float,
+) -> dict[str, Any] | None:
+    base = _symmetry_constraint_base_payload(payload, role=role)
+    if base is None:
+        return None
+    real_source = "real_space_operations"
+    spin_real_source = "spin_space_operations_real_space_projection"
+    spin_source = "spin_space_operations"
+    base["constraints"] = {
+        "real_space_t_even_p_odd": _polar_vector_constraint_payload(payload),
+        "real_space_t_even_p_even": _vector_constraint_payload_from_ops(
+            real_space_ops,
+            vector_kind="T_even_P_even_real_space_axial_vector",
+            constraint="det(R) * R * v = v",
+            setting=real_space_ops_setting,
+            source=real_source,
+            representation_matrix=lambda op: (
+                np.linalg.det(_real_rotation_from_operation(op))
+                * _real_rotation_from_operation(op)
+            ),
+            tol=tol,
+        ),
+    }
+    if spin_space_ops is not None:
+        base["constraints"].update(
+            {
+                "real_space_t_odd_p_odd": _vector_constraint_payload_from_ops(
+                    spin_space_ops,
+                    vector_kind="T_odd_P_odd_real_space_polar_vector",
+                    constraint="det(S) * R * v = v",
+                    setting=real_space_ops_setting,
+                    source=spin_real_source,
+                    representation_matrix=lambda op: (
+                        _time_sign_from_spin_operation(op)
+                        * _real_rotation_from_operation(op)
+                    ),
+                    tol=tol,
+                ),
+                "real_space_t_odd_p_even": _vector_constraint_payload_from_ops(
+                    spin_space_ops,
+                    vector_kind="T_odd_P_even_real_space_axial_vector",
+                    constraint="det(S) * det(R) * R * v = v",
+                    setting=real_space_ops_setting,
+                    source=spin_real_source,
+                    representation_matrix=lambda op: (
+                        _time_sign_from_spin_operation(op)
+                        * np.linalg.det(_real_rotation_from_operation(op))
+                        * _real_rotation_from_operation(op)
+                    ),
+                    tol=tol,
+                ),
+                "spin_space_t_odd_p_even": _vector_constraint_payload_from_ops(
+                    spin_space_ops,
+                    vector_kind="T_odd_P_even_spin_space_vector",
+                    constraint="S * v = v",
+                    setting=spin_space_setting,
+                    source=spin_source,
+                    representation_matrix=lambda op: _spin_rotation_from_operation(op),
+                    tol=tol,
+                ),
+                "spin_space_t_even_p_even": _vector_constraint_payload_from_ops(
+                    spin_space_ops,
+                    vector_kind="T_even_P_even_spin_space_vector",
+                    constraint="det(S) * S * v = v",
+                    setting=spin_space_setting,
+                    source=spin_source,
+                    representation_matrix=lambda op: (
+                        _time_sign_from_spin_operation(op)
+                        * _spin_rotation_from_operation(op)
+                    ),
+                    tol=tol,
+                ),
+            }
+        )
+    return base
+
+
+def build_vector_constraints_by_symmetry_payload(
     *,
     sg_symmetry: dict[str, Any] | None = None,
-    sg_space_group_number: int | None,
+    sg_space_group_number: int | None = None,
     sg_space_group_symbol: str | None = None,
     sg_real_space_ops: Any | None = None,
     sg_real_space_ops_setting: str | None = None,
     ossg_symmetry: dict[str, Any] | None = None,
+    ossg_real_space_ops: Any | None = None,
+    ossg_real_space_ops_setting: str | None = None,
+    ossg_spin_space_ops: Any | None = None,
+    ossg_spin_space_setting: str | None = None,
     msg_symmetry: dict[str, Any] | None = None,
+    msg_real_space_ops: Any | None = None,
+    msg_real_space_ops_setting: str | None = None,
+    msg_spin_space_ops: Any | None = None,
+    msg_spin_space_setting: str | None = None,
     tol: float = 1e-8,
 ) -> dict[str, Any] | None:
     if sg_symmetry is None:
@@ -179,17 +339,32 @@ def build_polar_axes_by_symmetry_payload(
             tol=tol,
         )
     payload = {
-        "sg": _polar_axes_symmetry_payload(
+        "sg": _vector_constraints_symmetry_payload(
             sg_symmetry,
             role="nonmagnetic_space_group_in_ssg_convention",
+            real_space_ops=sg_real_space_ops,
+            real_space_ops_setting=sg_real_space_ops_setting,
+            spin_space_ops=None,
+            spin_space_setting=None,
+            tol=tol,
         ),
-        "ossg": _polar_axes_symmetry_payload(
+        "ossg": _vector_constraints_symmetry_payload(
             ossg_symmetry,
             role="ordered_spin_space_real_space_projection",
+            real_space_ops=ossg_real_space_ops,
+            real_space_ops_setting=ossg_real_space_ops_setting,
+            spin_space_ops=ossg_spin_space_ops,
+            spin_space_setting=ossg_spin_space_setting,
+            tol=tol,
         ),
-        "msg": _polar_axes_symmetry_payload(
+        "msg": _vector_constraints_symmetry_payload(
             msg_symmetry,
             role="soc_magnetic_space_group_parent",
+            real_space_ops=msg_real_space_ops,
+            real_space_ops_setting=msg_real_space_ops_setting,
+            spin_space_ops=msg_spin_space_ops,
+            spin_space_setting=msg_spin_space_setting,
+            tol=tol,
         ),
     }
     if all(entry is None for entry in payload.values()):

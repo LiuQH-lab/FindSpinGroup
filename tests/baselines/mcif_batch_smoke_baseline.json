@@ -347,47 +347,6 @@
       },
       "index": "194.164.1.1.L",
       "phase": "AFM(Altermagnet)",
-      "polar_axes_by_symmetry": {
-        "msg": {
-          "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "real_space_operations",
-          "is_centrosymmetric": true,
-          "is_polar": false,
-          "msg_num": 555,
-          "msg_symbol": "Cmcm",
-          "role": "soc_magnetic_space_group_parent",
-          "source": "msg_parent_space_group",
-          "space_group_number": 63,
-          "space_group_symbol": null
-        },
-        "ossg": {
-          "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "real_space_operations",
-          "is_centrosymmetric": true,
-          "is_polar": false,
-          "msg_num": null,
-          "msg_symbol": null,
-          "role": "ordered_spin_space_real_space_projection",
-          "source": "ossg_real_space_projection",
-          "space_group_number": 194,
-          "space_group_symbol": null
-        },
-        "sg": {
-          "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
-          "is_centrosymmetric": true,
-          "is_polar": false,
-          "msg_num": null,
-          "msg_symbol": null,
-          "role": "nonmagnetic_space_group_in_ssg_convention",
-          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
-          "space_group_number": 194,
-          "space_group_symbol": "P6_3/mmc"
-        }
-      },
       "properties": {
         "ahc_w_soc": "No",
         "ahc_wo_soc": "No",
@@ -452,6 +411,156 @@
         "source": "ossg_unit_cartesian_msg_ops",
         "spin_rank": 3,
         "spin_texture_type": "d-wave"
+      },
+      "vector_constraints_by_symmetry": {
+        "msg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            },
+            "real_space_t_odd_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_even_real_space_axial_vector"
+            },
+            "real_space_t_odd_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_odd_real_space_polar_vector"
+            },
+            "spin_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "det(S) * S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_spin_space_vector"
+            },
+            "spin_space_t_odd_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_even_spin_space_vector"
+            }
+          },
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": 555,
+          "msg_symbol": "Cmcm",
+          "role": "soc_magnetic_space_group_parent",
+          "source": "msg_parent_space_group",
+          "space_group_number": 63,
+          "space_group_symbol": null
+        },
+        "ossg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            },
+            "real_space_t_odd_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_even_real_space_axial_vector"
+            },
+            "real_space_t_odd_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_odd_real_space_polar_vector"
+            },
+            "spin_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "det(S) * S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_spin_space_vector"
+            },
+            "spin_space_t_odd_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_even_spin_space_vector"
+            }
+          },
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "ordered_spin_space_real_space_projection",
+          "source": "ossg_real_space_projection",
+          "space_group_number": 194,
+          "space_group_symbol": null
+        },
+        "sg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
+              "constraint": "R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            }
+          },
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "nonmagnetic_space_group_in_ssg_convention",
+          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
+          "space_group_number": 194,
+          "space_group_symbol": "P6_3/mmc"
+        }
       }
     },
     "status": "ok",
@@ -865,57 +974,6 @@
       },
       "index": "194.149.3.3",
       "phase": "AFM\n(SOM)",
-      "polar_axes_by_symmetry": {
-        "msg": {
-          "allowed_polar_axes": [
-            {
-              "components": [
-                0.0,
-                0.0,
-                1.0
-              ],
-              "label": "c",
-              "setting": "G0std"
-            }
-          ],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "real_space_operations",
-          "is_centrosymmetric": false,
-          "is_polar": true,
-          "msg_num": 1285,
-          "msg_symbol": "P31m'",
-          "role": "soc_magnetic_space_group_parent",
-          "source": "msg_parent_space_group",
-          "space_group_number": 157,
-          "space_group_symbol": null
-        },
-        "ossg": {
-          "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "real_space_operations",
-          "is_centrosymmetric": true,
-          "is_polar": false,
-          "msg_num": null,
-          "msg_symbol": null,
-          "role": "ordered_spin_space_real_space_projection",
-          "source": "ossg_real_space_projection",
-          "space_group_number": 194,
-          "space_group_symbol": null
-        },
-        "sg": {
-          "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
-          "is_centrosymmetric": true,
-          "is_polar": false,
-          "msg_num": null,
-          "msg_symbol": null,
-          "role": "nonmagnetic_space_group_in_ssg_convention",
-          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
-          "space_group_number": 194,
-          "space_group_symbol": "P6_3/mmc"
-        }
-      },
       "properties": {
         "ahc_w_soc": "Yes",
         "ahc_wo_soc": "No",
@@ -976,6 +1034,186 @@
         "source": "ossg_unit_cartesian_msg_ops",
         "spin_rank": 1,
         "spin_texture_type": "s-wave"
+      },
+      "vector_constraints_by_symmetry": {
+        "msg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [
+                {
+                  "components": [
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "label": "c",
+                  "setting": "G0std"
+                }
+              ],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "R * v = v",
+              "free_dimension": 1,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            },
+            "real_space_t_odd_p_even": {
+              "allowed_axes": [
+                {
+                  "components": [
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "label": "c",
+                  "setting": "G0std"
+                }
+              ],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * det(R) * R * v = v",
+              "free_dimension": 1,
+              "vector_kind": "T_odd_P_even_real_space_axial_vector"
+            },
+            "real_space_t_odd_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_odd_real_space_polar_vector"
+            },
+            "spin_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "det(S) * S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_spin_space_vector"
+            },
+            "spin_space_t_odd_p_even": {
+              "allowed_axes": [
+                {
+                  "components": [
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "label": "c",
+                  "setting": "ossg_oriented_spin_frame"
+                }
+              ],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "S * v = v",
+              "free_dimension": 1,
+              "vector_kind": "T_odd_P_even_spin_space_vector"
+            }
+          },
+          "is_centrosymmetric": false,
+          "is_polar": true,
+          "msg_num": 1285,
+          "msg_symbol": "P31m'",
+          "role": "soc_magnetic_space_group_parent",
+          "source": "msg_parent_space_group",
+          "space_group_number": 157,
+          "space_group_symbol": null
+        },
+        "ossg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            },
+            "real_space_t_odd_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_even_real_space_axial_vector"
+            },
+            "real_space_t_odd_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_odd_real_space_polar_vector"
+            },
+            "spin_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "det(S) * S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_spin_space_vector"
+            },
+            "spin_space_t_odd_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_even_spin_space_vector"
+            }
+          },
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "ordered_spin_space_real_space_projection",
+          "source": "ossg_real_space_projection",
+          "space_group_number": 194,
+          "space_group_symbol": null
+        },
+        "sg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
+              "constraint": "R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            }
+          },
+          "is_centrosymmetric": true,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "nonmagnetic_space_group_in_ssg_convention",
+          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
+          "space_group_number": 194,
+          "space_group_symbol": "P6_3/mmc"
+        }
       }
     },
     "status": "ok",
@@ -1429,67 +1667,6 @@
       },
       "index": "38.6.1.2.P2",
       "phase": "FM/FiM",
-      "polar_axes_by_symmetry": {
-        "msg": {
-          "allowed_polar_axes": [
-            {
-              "components": [
-                0.0,
-                0.0,
-                1.0
-              ],
-              "label": "c",
-              "setting": "G0std"
-            }
-          ],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "real_space_operations",
-          "is_centrosymmetric": false,
-          "is_polar": true,
-          "msg_num": 289,
-          "msg_symbol": "Am'm'2",
-          "role": "soc_magnetic_space_group_parent",
-          "source": "msg_parent_space_group",
-          "space_group_number": 38,
-          "space_group_symbol": null
-        },
-        "ossg": {
-          "allowed_polar_axes": [
-            {
-              "components": [
-                0.0,
-                0.0,
-                1.0
-              ],
-              "label": "c",
-              "setting": "G0std"
-            }
-          ],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "real_space_operations",
-          "is_centrosymmetric": false,
-          "is_polar": true,
-          "msg_num": null,
-          "msg_symbol": null,
-          "role": "ordered_spin_space_real_space_projection",
-          "source": "ossg_real_space_projection",
-          "space_group_number": 38,
-          "space_group_symbol": null
-        },
-        "sg": {
-          "allowed_polar_axes": [],
-          "allowed_polar_axes_setting": "G0std",
-          "allowed_polar_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
-          "is_centrosymmetric": false,
-          "is_polar": false,
-          "msg_num": null,
-          "msg_symbol": null,
-          "role": "nonmagnetic_space_group_in_ssg_convention",
-          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
-          "space_group_number": 189,
-          "space_group_symbol": "P-62m"
-        }
-      },
       "properties": {
         "ahc_w_soc": "Yes",
         "ahc_wo_soc": "No",
@@ -1550,6 +1727,206 @@
         "source": "ossg_unit_cartesian_msg_ops",
         "spin_rank": 1,
         "spin_texture_type": "s-wave"
+      },
+      "vector_constraints_by_symmetry": {
+        "msg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [
+                {
+                  "components": [
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "label": "c",
+                  "setting": "G0std"
+                }
+              ],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "R * v = v",
+              "free_dimension": 1,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            },
+            "real_space_t_odd_p_even": {
+              "allowed_axes": [
+                {
+                  "components": [
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "label": "c",
+                  "setting": "G0std"
+                }
+              ],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * det(R) * R * v = v",
+              "free_dimension": 1,
+              "vector_kind": "T_odd_P_even_real_space_axial_vector"
+            },
+            "real_space_t_odd_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_odd_real_space_polar_vector"
+            },
+            "spin_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "det(S) * S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_spin_space_vector"
+            },
+            "spin_space_t_odd_p_even": {
+              "allowed_axes": [
+                {
+                  "components": [
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "label": "c",
+                  "setting": "ossg_oriented_spin_frame"
+                }
+              ],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "S * v = v",
+              "free_dimension": 1,
+              "vector_kind": "T_odd_P_even_spin_space_vector"
+            }
+          },
+          "is_centrosymmetric": false,
+          "is_polar": true,
+          "msg_num": 289,
+          "msg_symbol": "Am'm'2",
+          "role": "soc_magnetic_space_group_parent",
+          "source": "msg_parent_space_group",
+          "space_group_number": 38,
+          "space_group_symbol": null
+        },
+        "ossg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [
+                {
+                  "components": [
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "label": "c",
+                  "setting": "G0std"
+                }
+              ],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "R * v = v",
+              "free_dimension": 1,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            },
+            "real_space_t_odd_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_even_real_space_axial_vector"
+            },
+            "real_space_t_odd_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "spin_space_operations_real_space_projection",
+              "constraint": "det(S) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_odd_P_odd_real_space_polar_vector"
+            },
+            "spin_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "det(S) * S * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_spin_space_vector"
+            },
+            "spin_space_t_odd_p_even": {
+              "allowed_axes": [
+                {
+                  "components": [
+                    0.0,
+                    0.0,
+                    1.0
+                  ],
+                  "label": "c",
+                  "setting": "ossg_oriented_spin_frame"
+                }
+              ],
+              "allowed_axes_setting": "ossg_oriented_spin_frame",
+              "allowed_axes_source": "spin_space_operations",
+              "constraint": "S * v = v",
+              "free_dimension": 1,
+              "vector_kind": "T_odd_P_even_spin_space_vector"
+            }
+          },
+          "is_centrosymmetric": false,
+          "is_polar": true,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "ordered_spin_space_real_space_projection",
+          "source": "ossg_real_space_projection",
+          "space_group_number": 38,
+          "space_group_symbol": null
+        },
+        "sg": {
+          "constraints": {
+            "real_space_t_even_p_even": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "real_space_operations",
+              "constraint": "det(R) * R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_even_real_space_axial_vector"
+            },
+            "real_space_t_even_p_odd": {
+              "allowed_axes": [],
+              "allowed_axes_setting": "G0std",
+              "allowed_axes_source": "space_group_standard_basis_transformed_to_ssg_convention",
+              "constraint": "R * v = v",
+              "free_dimension": 0,
+              "vector_kind": "T_even_P_odd_real_space_polar_vector"
+            }
+          },
+          "is_centrosymmetric": false,
+          "is_polar": false,
+          "msg_num": null,
+          "msg_symbol": null,
+          "role": "nonmagnetic_space_group_in_ssg_convention",
+          "source": "nonmagnetic_space_group_standard_transformed_to_ssg_convention",
+          "space_group_number": 189,
+          "space_group_symbol": "P-62m"
+        }
       }
     },
     "status": "ok",

@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import json
 import importlib
@@ -74,6 +75,7 @@ from findspingroup.ferroelectric import (
     build_domain_reversal_coset_analysis,
     build_ferroelectric_switching_payload,
     build_parent_standard_supercell_domain_coset_analysis,
+    build_vector_constraints_by_symmetry_payload,
 )
 from findspingroup.find_spin_group import (
     SCIF_CELL_MODE_INPUT_IDENTIFIED,
@@ -81,6 +83,7 @@ from findspingroup.find_spin_group import (
     SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     _classify_quasi2d_spin_texture_config,
     _canonicalize_input_to_standard_setting,
+    _nonmagnetic_space_group_real_space_ops_in_cell_basis,
     audit_spatial_transform_effect,
     classify_magnetic_phase,
     get_magnetic_phase,
@@ -1408,17 +1411,56 @@ def test_find_spin_group_exposes_conservative_ferroelectric_switching_payload():
     induced = find_spin_group("tests/testset/mcif_241130_no2186/0.1000_Fe4O5.mcif")
 
     polar_payload = polar.ferroelectric_switching
-    assert set(polar.polar_axes_by_symmetry) == {"sg", "ossg", "msg"}
+    constraints = polar.vector_constraints_by_symmetry
+    sg_constraint_keys = {
+        "real_space_t_even_p_odd",
+        "real_space_t_even_p_even",
+    }
+    spin_constraint_keys = {
+        "real_space_t_even_p_odd",
+        "real_space_t_odd_p_odd",
+        "real_space_t_odd_p_even",
+        "spin_space_t_odd_p_even",
+        "real_space_t_even_p_even",
+        "spin_space_t_even_p_even",
+    }
+    assert set(constraints) == {"sg", "ossg", "msg"}
+    assert set(constraints["sg"]["constraints"]) == sg_constraint_keys
+    assert set(constraints["ossg"]["constraints"]) == spin_constraint_keys
+    assert set(constraints["msg"]["constraints"]) == spin_constraint_keys
     assert (
-        polar.polar_axes_by_symmetry["ossg"]["allowed_polar_axes"]
+        constraints["ossg"]["constraints"]["real_space_t_even_p_odd"]["allowed_axes"]
         == polar_payload["allowed_polar_axes"]
     )
-    assert polar.polar_axes_by_symmetry["sg"]["allowed_polar_axes_setting"] == "G0std"
     assert (
-        polar.polar_axes_by_symmetry["sg"]["allowed_polar_axes_source"]
+        constraints["sg"]["constraints"]["real_space_t_even_p_odd"][
+            "allowed_axes_setting"
+        ]
+        == "G0std"
+    )
+    assert (
+        constraints["sg"]["constraints"]["real_space_t_even_p_odd"][
+            "allowed_axes_source"
+        ]
         == "space_group_standard_basis_transformed_to_ssg_convention"
     )
-    assert polar.to_summary_dict()["polar_axes_by_symmetry"] == polar.polar_axes_by_symmetry
+    assert polar.to_summary_dict()["vector_constraints_by_symmetry"] == constraints
+    assert (
+        constraints["sg"]["constraints"]["real_space_t_even_p_even"][
+            "allowed_axes_setting"
+        ]
+        == constraints["sg"]["constraints"]["real_space_t_even_p_odd"][
+            "allowed_axes_setting"
+        ]
+    )
+    assert (
+        constraints["ossg"]["constraints"]["real_space_t_even_p_even"][
+            "allowed_axes_setting"
+        ]
+        == constraints["ossg"]["constraints"]["real_space_t_even_p_odd"][
+            "allowed_axes"
+        ][0]["setting"]
+    )
     assert polar_payload["analysis_level"] == "symmetry_only_collinear_switching_not_evaluated"
     assert polar_payload["polarity_status"] == "parent_polar_axis_preserved"
     assert polar_payload["status"].endswith("_collinear_only")
@@ -1434,7 +1476,9 @@ def test_find_spin_group_exposes_conservative_ferroelectric_switching_payload():
         ]
     assert polar_payload["allowed_polar_axes_source"] == "real_space_operations"
     assert (
-        polar.polar_axes_by_symmetry["msg"]["allowed_polar_axes_source"]
+        constraints["msg"]["constraints"]["real_space_t_even_p_odd"][
+            "allowed_axes_source"
+        ]
         == "real_space_operations"
     )
     assert polar_payload["special_coset"]["status"] == "not_promoted_to_switching_claim"
@@ -1495,24 +1539,169 @@ def test_find_spin_group_exposes_conservative_ferroelectric_switching_payload():
     )
 
 
+def test_real_space_axial_axes_are_distinct_from_polar_axes():
+    inversion_ops = [(-np.eye(3), np.zeros(3))]
+    constraints = build_vector_constraints_by_symmetry_payload(
+        sg_space_group_number=2,
+        sg_real_space_ops=inversion_ops,
+        sg_real_space_ops_setting="test_setting",
+    )
+
+    assert constraints["sg"]["constraints"]["real_space_t_even_p_odd"]["allowed_axes"] == []
+    assert (
+        constraints["sg"]["constraints"]["real_space_t_even_p_even"]["free_dimension"]
+        == 3
+    )
+    assert {
+        axis["label"]
+        for axis in constraints["sg"]["constraints"]["real_space_t_even_p_even"][
+            "allowed_axes"
+        ]
+    } == {"a", "b", "c"}
+    assert (
+        constraints["sg"]["constraints"]["real_space_t_even_p_even"]["constraint"]
+        == "det(R) * R * v = v"
+    )
+
+    mirror_ops = [(np.diag([1.0, 1.0, -1.0]), np.zeros(3))]
+    mirror_constraints = build_vector_constraints_by_symmetry_payload(
+        sg_space_group_number=6,
+        sg_space_group_symbol="Pm",
+        sg_real_space_ops=mirror_ops,
+        sg_real_space_ops_setting="test_setting",
+    )
+    assert mirror_constraints["sg"]["constraints"]["real_space_t_even_p_even"][
+        "allowed_axes"
+    ] == [
+        {
+            "label": "c",
+            "components": [0.0, 0.0, 1.0],
+            "setting": "test_setting",
+        }
+    ]
+
+    spin_inversion_constraints = build_vector_constraints_by_symmetry_payload(
+        ossg_symmetry={
+            "source": "test_ossg",
+            "space_group_number": 1,
+            "space_group_symbol": "P1",
+            "is_polar": True,
+            "is_centrosymmetric": False,
+            "allowed_polar_axes": None,
+            "allowed_polar_axes_setting": "test_real_setting",
+            "allowed_polar_axes_source": "test",
+        },
+        ossg_real_space_ops=[(np.eye(3), np.zeros(3))],
+        ossg_real_space_ops_setting="test_real_setting",
+        ossg_spin_space_ops=[(-np.eye(3), np.eye(3), np.zeros(3))],
+        ossg_spin_space_setting="test_spin_setting",
+    )
+    spin_constraints = spin_inversion_constraints["ossg"]["constraints"]
+    assert spin_constraints["real_space_t_odd_p_odd"]["allowed_axes"] == []
+    assert spin_constraints["real_space_t_odd_p_even"]["allowed_axes"] == []
+    assert spin_constraints["spin_space_t_odd_p_even"]["allowed_axes"] == []
+    assert {
+        axis["label"]
+        for axis in spin_constraints["spin_space_t_even_p_even"]["allowed_axes"]
+    } == {"a", "b", "c"}
+
+
+def test_nonmagnetic_sg_ops_are_database_ops_transformed_to_current_basis(monkeypatch):
+    current_to_standard = np.diag([2.0, 1.0, 1.0])
+    dataset = SimpleNamespace(
+        hall_number=1,
+        rotations=[np.eye(3, dtype=int)],
+        translations=[np.zeros(3)],
+        transformation_matrix=current_to_standard,
+    )
+    standard_rotation = np.array(
+        [
+            [0.0, -1.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    standard_translation = np.array([0.5, 0.0, 0.0])
+    calls = []
+
+    class FakeCell:
+        def to_spglib(self, *, mag):
+            assert mag is False
+            return "fake-spglib-cell"
+
+    def fake_get_symmetry_dataset(cell, *, symprec):
+        assert cell == "fake-spglib-cell"
+        assert symprec == DEFAULT_TOL.space
+        return dataset
+
+    def fake_get_symmetry_from_database(hall_number):
+        calls.append(hall_number)
+        return {
+            "rotations": [standard_rotation],
+            "translations": [standard_translation],
+        }
+
+    find_spin_group_module = sys.modules[
+        _nonmagnetic_space_group_real_space_ops_in_cell_basis.__module__
+    ]
+    monkeypatch.setattr(find_spin_group_module, "get_symmetry_dataset", fake_get_symmetry_dataset)
+    monkeypatch.setattr(
+        find_spin_group_module,
+        "get_symmetry_from_database",
+        fake_get_symmetry_from_database,
+    )
+
+    ops = _nonmagnetic_space_group_real_space_ops_in_cell_basis(
+        FakeCell(),
+        tol_cfg=DEFAULT_TOL,
+    )
+
+    expected_rotation = np.linalg.inv(current_to_standard) @ standard_rotation @ current_to_standard
+    expected_translation = np.mod(
+        np.linalg.inv(current_to_standard) @ standard_translation,
+        1.0,
+    )
+    assert calls == [1]
+    assert len(ops) == 1
+    assert np.allclose(ops[0][0], expected_rotation)
+    assert np.allclose(ops[0][1], expected_translation)
+
+
 def test_find_spin_group_basic_exposes_ferroelectric_switching_payload():
     result = find_spin_group_basic("tests/testset/mcif_241130_no2186/0.425_Na2CoP2O7.mcif")
 
     payload = result["ferroelectric_switching"]
-    assert set(result["polar_axes_by_symmetry"]) == {"sg", "ossg", "msg"}
+    constraints = result["vector_constraints_by_symmetry"]
+    assert set(constraints) == {"sg", "ossg", "msg"}
     assert (
-        result["polar_axes_by_symmetry"]["ossg"]["allowed_polar_axes"]
+        constraints["ossg"]["constraints"]["real_space_t_even_p_odd"]["allowed_axes"]
         == payload["allowed_polar_axes"]
     )
     assert (
-        result["polar_axes_by_symmetry"]["sg"]["allowed_polar_axes_setting"]
+        constraints["sg"]["constraints"]["real_space_t_even_p_odd"][
+            "allowed_axes_setting"
+        ]
+        == "acc_primitive"
+    )
+    assert (
+        constraints["sg"]["constraints"]["real_space_t_even_p_even"][
+            "allowed_axes_setting"
+        ]
+        == constraints["sg"]["constraints"]["real_space_t_even_p_odd"][
+            "allowed_axes_setting"
+        ]
+    )
+    assert (
+        constraints["ossg"]["constraints"]["real_space_t_even_p_even"][
+            "allowed_axes_setting"
+        ]
         == "acc_primitive"
     )
     assert payload["polarity_status"] == "parent_polar_axis_preserved"
     assert payload["comparison_symmetry"]["ssg_space_group_number"] == 33
     assert payload["comparison_symmetry"]["ossg_space_group_number"] is None
     assert payload["ordered_spin_space_symmetry"]["source"] == "ssg_g0_real_space_projection"
-    assert result["polar_axes_by_symmetry"]["ossg"]["source"] == "ssg_g0_real_space_projection"
+    assert constraints["ossg"]["source"] == "ssg_g0_real_space_projection"
     assert (
         payload["ferroelectric_altermagnet_screening"]["status"]
         == "candidate_k_dependent_spin_splitting_not_flagged_altermagnet"

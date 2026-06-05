@@ -140,7 +140,7 @@ def _tensor_equation_export_values(tensor_outputs: Any) -> dict[str, Any]:
     }
 
 
-def _polar_axis_label(axis: Any) -> str | None:
+def _vector_axis_label(axis: Any) -> str | None:
     if not isinstance(axis, dict):
         return str(axis) if axis is not None else None
     label = axis.get("label")
@@ -152,21 +152,41 @@ def _polar_axis_label(axis: Any) -> str | None:
     return None
 
 
-def _polar_axes_export_values(payload: Any) -> dict[str, Any]:
-    polar = payload if isinstance(payload, dict) else {}
+def _axis_constraint_export_value(entry: Any, constraint_key: str) -> tuple[str | None, str | None]:
+    constraint = {}
+    if isinstance(entry, dict):
+        constraints = entry.get("constraints")
+        if isinstance(constraints, dict) and isinstance(constraints.get(constraint_key), dict):
+            constraint = constraints[constraint_key]
+    axes = constraint.get("allowed_axes") if isinstance(constraint, dict) else None
+    labels = [
+        label
+        for axis in (axes or [])
+        if (label := _vector_axis_label(axis)) is not None
+    ]
+    return (
+        ", ".join(labels) if labels else None,
+        constraint.get("allowed_axes_setting") if isinstance(constraint, dict) else None,
+    )
+
+
+def _vector_constraints_export_values(payload: Any) -> dict[str, Any]:
+    constraints_payload = payload if isinstance(payload, dict) else {}
     values: dict[str, Any] = {}
     for key in ("sg", "ossg", "msg"):
-        entry = polar.get(key) if isinstance(polar.get(key), dict) else {}
-        axes = entry.get("allowed_polar_axes") if isinstance(entry, dict) else None
-        labels = [
-            label
-            for axis in (axes or [])
-            if (label := _polar_axis_label(axis)) is not None
-        ]
-        values[f"{key}_polar_axes"] = ", ".join(labels) if labels else None
-        values[f"{key}_polar_axes_setting"] = (
-            entry.get("allowed_polar_axes_setting") if isinstance(entry, dict) else None
+        entry = constraints_payload.get(key) if isinstance(constraints_payload.get(key), dict) else {}
+        polar_axes, polar_setting = _axis_constraint_export_value(
+            entry,
+            "real_space_t_even_p_odd",
         )
+        axial_axes, axial_setting = _axis_constraint_export_value(
+            entry,
+            "real_space_t_even_p_even",
+        )
+        values[f"{key}_polar_axes"] = polar_axes
+        values[f"{key}_polar_axes_setting"] = polar_setting
+        values[f"{key}_real_space_axial_axes"] = axial_axes
+        values[f"{key}_real_space_axial_axes_setting"] = axial_setting
     return values
 
 
@@ -372,7 +392,11 @@ def _row_from_result(file_path: Path, result, *, duration_seconds: float | None 
         "acc_primitive_wyckoff_split": _compact_wp_chain(result.acc_primitive_wp_chain),
     }
     row.update(_tensor_equation_export_values(getattr(result, "tensor_outputs", None)))
-    row.update(_polar_axes_export_values(getattr(result, "polar_axes_by_symmetry", None)))
+    row.update(
+        _vector_constraints_export_values(
+            getattr(result, "vector_constraints_by_symmetry", None)
+        )
+    )
     row.update(_wyckoff_splitting_export_values(result.wp_chain))
     row.update(_magnetic_site_export_values(getattr(result, "magnetic_site_summary", None)))
     row.update(_quasi2d_export_values(getattr(result, "quasi_2d", None)))
@@ -471,7 +495,9 @@ def _row_from_serialized_result_record(record: dict[str, Any]) -> dict[str, Any]
         "error_message": record.get("error", {}).get("message"),
     }
     row.update(_tensor_equation_export_values(payload.get("tensor_outputs")))
-    row.update(_polar_axes_export_values(payload.get("polar_axes_by_symmetry")))
+    row.update(
+        _vector_constraints_export_values(payload.get("vector_constraints_by_symmetry"))
+    )
     row.update(_wyckoff_splitting_export_values(payload.get("wp_chain")))
     row.update(_magnetic_site_export_values(payload.get("magnetic_site_summary")))
     row.update(_quasi2d_export_values(payload.get("quasi_2d")))
