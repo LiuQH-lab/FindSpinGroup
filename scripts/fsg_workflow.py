@@ -75,8 +75,11 @@ def _dataset(config: dict[str, Any], name: str) -> dict[str, Any]:
     return datasets[name]
 
 
-def _sbatch_args(profile: dict[str, Any]) -> str:
-    args = profile.get("sbatch_args") or []
+def _sbatch_args(profile: dict[str, Any], *, key: str = "sbatch_args") -> str:
+    args = profile.get(key)
+    if args is None and key != "sbatch_args":
+        args = profile.get("sbatch_args")
+    args = args or []
     if isinstance(args, str):
         return args
     return " ".join(shlex.quote(str(arg)) for arg in args)
@@ -173,9 +176,14 @@ def _prepare_remote_snapshot(
     )
 
 
-def _remote_env_prefix(profile: dict[str, Any], *, workers: int | None) -> str:
+def _remote_env_prefix(
+    profile: dict[str, Any],
+    *,
+    workers: int | None,
+    sbatch_args_key: str = "sbatch_args",
+) -> str:
     env = {
-        "SBATCH_ARGS": _sbatch_args(profile),
+        "SBATCH_ARGS": _sbatch_args(profile, key=sbatch_args_key),
         "PYTHON_BIN": str(profile.get("python_bin") or ""),
         "BATCH_WORKERS": str(workers or profile.get("workers") or 1),
     }
@@ -266,7 +274,11 @@ def _submit_roundtrip_stage(
     output_root = _remote_output_root(profile, dataset)
     if tag:
         output_root = f"{output_root}_{tag}"
-    env_prefix = _remote_env_prefix(profile, workers=workers)
+    env_prefix = _remote_env_prefix(
+        profile,
+        workers=workers,
+        sbatch_args_key="roundtrip_sbatch_args",
+    )
     if kind == "poscar":
         wrapper = "scripts/submit_batch_poscar_roundtrip.sh"
         extra = "SOURCE_MODE=acc_primitive COMPARE_MODE=basic"

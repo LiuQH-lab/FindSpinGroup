@@ -12,6 +12,10 @@ remote_tmp_dir = "<remote tmp directory for snapshot extraction>"
 python_bin = "<remote Python interpreter>"
 workers = 192
 sbatch_args = ["--partition", "<full-node-partition>", "--qos", "<qos-name>"]
+# Optional: use for POSCAR/SCIF roundtrip stages when they need different
+# Slurm resources than the full MCIF stages, for example extra memory with
+# fewer workers.
+roundtrip_sbatch_args = ["--partition", "<full-node-partition>", "--qos", "<qos-name>", "--mem", "<memory>"]
 
 [profiles.standard]
 description = "Conservative profile for standard cluster validation."
