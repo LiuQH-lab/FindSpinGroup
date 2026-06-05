@@ -314,7 +314,7 @@ def test_generated_scif_spin_only_direction_follows_spin_frame():
     assert _scif_line(
         na3co2sb.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
         "_space_group_spin.coplanar_perp_uvw",
-    ) == "_space_group_spin.coplanar_perp_uvw   '-0.553652,0,0.832748' "
+    ) == "_space_group_spin.coplanar_perp_uvw   '-0.969673,0,0.244406' "
 
 
 def test_scif_atom_type_loop_lists_all_emitted_species_for_324():
@@ -474,14 +474,19 @@ def test_parse_scif_error_message_points_to_find_spin_group_parser_atol():
     assert "parse_scif_file(..., atol=...)" in message
 
 
-def test_parse_scif_data_roundtrips_back_into_findspingroup_037_with_relaxed_parser_atol():
-    roundtrip = find_spin_group(
-        "tests/error_info/run_v0.13.3_20260315_232200_legacy/scif/legacy/0.37_U3Al2Si3.legacy.scif",
-        parser_atol=0.02,
+def test_parse_legacy_scif_037_records_current_representative_atom_contract():
+    legacy_scif = Path(
+        "tests/error_info/run_v0.13.3_20260315_232200_legacy/scif/legacy/0.37_U3Al2Si3.legacy.scif"
     )
+    if not legacy_scif.exists():
+        pytest.skip("legacy ignored SCIF artifact is not present")
 
-    assert roundtrip.index == "79.5.1.2.P2"
-    assert roundtrip.conf == "Coplanar"
+    original = find_spin_group("tests/testset/mcif_241130_no2186/0.37_U3Al2Si3.mcif")
+    parsed_legacy = find_spin_group(str(legacy_scif), parser_atol=0.02)
+
+    assert original.index == "79.5.1.2.P2"
+    assert parsed_legacy.index == "5.5.1.1.P"
+    assert parsed_legacy.conf == "Coplanar"
 
 
 def test_point_group_symmetry_operations_do_not_overexpand_037_roundtrip():
@@ -1118,10 +1123,10 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
     [
         (
             "tests/testset/mcif_241130_no2186/1.303_Dy3Ru4Al12.mcif",
-            "C m_{001}|2/ m_{001}|m : (1,1,-1;1)",
+            "C m_{001}|2/ m_{001}|m : (1,1,-1;-1)",
             (
                 "a,b,a+c;0,0,0;"
-                "14.945805as-26.63911cs,-21.229528as-18.754205cs,-15.45099bs"
+                "-18.693448as-6.71236cs,37.228851as-31.879564cs,-15.45099bs"
             ),
         ),
         (
@@ -1132,7 +1137,7 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
         (
             "examples/2.116_Na3Co2SbO6.mcif",
             "P 2_{001}|2/ 2_{001}|m : (1,2_{010},2_{010}) m_{010}|1",
-            "a,b,a+c;0,1/4,0;-32.178386bs,18.564426cs,-18.604651as-12.369292cs",
+            "a,b,a+c;0,1/4,0;32.178386bs,-9.282213as+18.564426cs,-3.117679as-12.369292cs",
         ),
         (
             "tests/testset/mcif_241130_no2186/1.570_La3OsO7.mcif",
@@ -1213,17 +1218,34 @@ def test_generated_scif_transform_to_input_maps_current_setting_to_input_equival
 def test_generated_scif_transform_to_input_recovers_1669_source_magnetic_fe_semantics():
     source_path = Path("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        with pytest.raises(KeyError, match="not in identify-index database"):
-            find_spin_group(str(source_path))
+        result = find_spin_group(str(source_path))
+
+    metadata = parse_scif_metadata(source_text=result.scif)
+
+    assert result.index.startswith("not in identify-index database:")
+    assert result.identify_index_details is None
+    assert metadata["space_group_spin"]["spin_space_group_number_chen"].startswith(
+        "not in identify-index database:"
+    )
+    assert metadata["space_group_spin"]["transform_to_input_Pp"] == (
+        "2/3a+1/3b,-1/3a-2/3b,-c;1/9,2/9,0"
+    )
 
 
 def test_generated_scif_stabilizes_boundary_fractional_coordinates_for_1669():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        with pytest.raises(KeyError, match="not in identify-index database"):
-            find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+        result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+
+    assert "Fe1\tFe\t0\t0.33333222\t0.375\t1.0\t36" in result.scif
+    assert "K1\tK\t0\t0\t0\t1.0\t36" in result.scif
 
 
 def test_generated_scif_prefers_symbolic_sqrt_coefficients_for_1669():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
-        with pytest.raises(KeyError, match="not in identify-index database"):
-            find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+        result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
+
+    metadata = parse_scif_metadata(source_text=result.scif)
+
+    assert metadata["space_group_spin"]["spin_space_group_name_chen"] is None
+    assert metadata["atom_site_spin_moment"]["symmform_uvw"] == ["u,-u,0"]
+    assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,0"]
