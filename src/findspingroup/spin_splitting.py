@@ -25,6 +25,230 @@ SPIN_TEXTURE_TYPE_NAMES = {
 }
 
 
+def _split_top_level(text: str, delimiter: str) -> list[str]:
+    parts: list[str] = []
+    depth = 0
+    start = 0
+    i = 0
+    while i < len(text):
+        char = text[i]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth = max(0, depth - 1)
+        elif depth == 0 and text.startswith(delimiter, i):
+            parts.append(text[start:i])
+            i += len(delimiter)
+            start = i
+            continue
+        i += 1
+    parts.append(text[start:])
+    return parts
+
+
+def _strip_outer_parentheses(text: str) -> str:
+    text = text.strip()
+    if not (text.startswith("(") and text.endswith(")")):
+        return text
+    depth = 0
+    for i, char in enumerate(text):
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0 and i != len(text) - 1:
+                return text
+    return text[1:-1].strip()
+
+
+def _latex_symbol(name: str) -> str:
+    if name.startswith("sigma_") and len(name) == len("sigma_x"):
+        return rf"\sigma_{{{name[-1]}}}"
+    if name in {"kx", "ky", "kz"}:
+        return rf"k_{{{name[-1]}}}"
+    return name
+
+
+def _latex_variable_factor(token: str) -> str | None:
+    if "^" in token:
+        base, power = token.split("^", 1)
+    else:
+        base, power = token, None
+    if base not in {"kx", "ky", "kz"}:
+        return None
+    symbol = _latex_symbol(base)
+    return symbol if power in {None, "1"} else rf"{symbol}^{{{power}}}"
+
+
+def _latex_radical_token(token: str) -> str:
+    token = token.strip()
+    if token.startswith("sqrt(") and token.endswith(")"):
+        return rf"\sqrt{{{token[5:-1]}}}"
+    return token
+
+
+def _latex_numeric_value(value: float, *, zero_tol: float = 1e-8) -> str | None:
+    if abs(value) < zero_tol:
+        return "0"
+    rounded = round(value)
+    if abs(value - rounded) < zero_tol:
+        return str(int(rounded))
+
+    rational = Fraction(float(value)).limit_denominator(24)
+    rational_value = rational.numerator / rational.denominator
+    if abs(value - rational_value) < max(zero_tol, 1e-9):
+        if rational.denominator == 1:
+            return str(rational.numerator)
+        return rf"\frac{{{rational.numerator}}}{{{rational.denominator}}}"
+
+    radical = radical_text(
+        value,
+        zero_tol=max(zero_tol, 1e-8),
+        max_radicand=12,
+        max_denominator=24,
+        max_multiplier=12,
+    )
+    if radical is None:
+        return None
+    return _latex_coefficient_token(radical)
+
+
+def _latex_coefficient_token(token: str) -> str:
+    token = token.strip()
+    if not token:
+        return ""
+    try:
+        numeric = float(token)
+    except ValueError:
+        pass
+    else:
+        numeric_latex = _latex_numeric_value(numeric)
+        return numeric_latex if numeric_latex is not None else token
+
+    if "/" in token:
+        numerator, denominator = token.split("/", 1)
+        return rf"\frac{{{_latex_coefficient_token(numerator)}}}{{{_latex_coefficient_token(denominator)}}}"
+    if "*" in token:
+        return "".join(_latex_coefficient_token(part) for part in _split_top_level(token, "*"))
+    return _latex_radical_token(token)
+
+
+def _latex_factor(factor: str) -> tuple[int, str]:
+    factor = _strip_outer_parentheses(factor)
+    sign = 1
+    if factor.startswith("-"):
+        sign = -1
+        factor = factor[1:].strip()
+    elif factor.startswith("+"):
+        factor = factor[1:].strip()
+
+    coefficient_parts: list[str] = []
+    variable_parts: list[str] = []
+    for part in _split_top_level(factor, "*"):
+        token = part.strip()
+        if not token:
+            continue
+        variable = _latex_variable_factor(token)
+        if variable is not None:
+            variable_parts.append(variable)
+        else:
+            coefficient_parts.append(_latex_coefficient_token(token))
+
+    coefficient = "".join(part for part in coefficient_parts if part not in {"", "1"})
+    body = "".join([coefficient, *variable_parts])
+    return sign, body or "1"
+
+
+def _split_signed_terms(text: str) -> list[tuple[int, str]]:
+    terms: list[tuple[int, str]] = []
+    depth = 0
+    sign = 1
+    start = 0
+    i = 0
+    if text.startswith("-"):
+        sign = -1
+        start = 1
+        i = 1
+    elif text.startswith("+"):
+        start = 1
+        i = 1
+    while i < len(text):
+        char = text[i]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth = max(0, depth - 1)
+        elif depth == 0 and text.startswith(" + ", i):
+            terms.append((sign, text[start:i].strip()))
+            sign = 1
+            i += 3
+            start = i
+            continue
+        elif depth == 0 and text.startswith(" - ", i):
+            terms.append((sign, text[start:i].strip()))
+            sign = -1
+            i += 3
+            start = i
+            continue
+        i += 1
+    tail = text[start:].strip()
+    if tail:
+        terms.append((sign, tail))
+    return terms
+
+
+def basis_expression_to_latex(expression: str) -> str:
+    """Convert the public ASCII spin-texture basis expression to LaTeX."""
+
+    text = str(expression).strip()
+    if text in {"", "0"}:
+        return "0"
+
+    coefficient = None
+    inner = text
+    if "*(" in text and text.endswith(")"):
+        prefix, maybe_inner = text.split("*(", 1)
+        if prefix.startswith("C") and prefix[1:].isdigit():
+            coefficient = rf"C_{{{prefix[1:]}}}"
+            inner = maybe_inner[:-1]
+
+    latex_terms: list[tuple[int, str]] = []
+    for term_sign, term in _split_signed_terms(inner):
+        if "*sigma_" not in term:
+            latex_terms.append((term_sign, term))
+            continue
+        factor, sigma = term.rsplit("*", 1)
+        factor_sign, factor_latex = _latex_factor(factor)
+        sign = term_sign * factor_sign
+        sigma_latex = _latex_symbol(sigma.strip())
+        if factor_latex == "1":
+            body = sigma_latex
+        else:
+            body = rf"{factor_latex}\,{sigma_latex}"
+        latex_terms.append((sign, body))
+
+    if not latex_terms:
+        body = inner
+    else:
+        pieces: list[str] = []
+        for i, (sign, body) in enumerate(latex_terms):
+            if i == 0:
+                pieces.append(body if sign > 0 else rf"-{body}")
+            else:
+                pieces.append((" + " if sign > 0 else " - ") + body)
+        body = "".join(pieces)
+
+    if coefficient is None:
+        return body
+    return rf"{coefficient}\left({body}\right)"
+
+
+def spin_texture_basis_latex(basis: Sequence[str] | None) -> list[str]:
+    if not basis:
+        return []
+    return [basis_expression_to_latex(expression) for expression in basis]
+
+
 @dataclass(frozen=True)
 class OperationPair:
     """One reciprocal/spin operation pair using d(Q k) = S d(k)."""
@@ -615,6 +839,7 @@ def result_to_jsonable(result: SpinSplittingResult, *, include_diagnostics: bool
         payload.pop("allowed_orders", None)
         payload.pop("engine", None)
         payload.pop("convention", None)
+    payload["basis_latex"] = spin_texture_basis_latex(payload.get("basis"))
     return payload
 
 

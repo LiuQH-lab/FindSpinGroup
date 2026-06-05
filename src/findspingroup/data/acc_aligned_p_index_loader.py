@@ -6,6 +6,8 @@ from functools import lru_cache
 from importlib.resources import files
 from typing import TypeAlias
 
+from findspingroup.spin_splitting import spin_texture_basis_latex
+
 
 Matrix: TypeAlias = tuple[tuple[Fraction, Fraction, Fraction], ...]
 RUNTIME_INDEX_FILE = "ssg_label_acc_kpoint_wave_index_20260604.json"
@@ -77,6 +79,7 @@ def _spin_texture_config_record(payload: dict) -> dict:
     legacy_type_key = "wave" + "_type"
     if legacy_type_key in record and "spin_texture_type" not in record:
         record["spin_texture_type"] = record.pop(legacy_type_key)
+    record.setdefault("basis_latex", spin_texture_basis_latex(record.get("basis")))
     return record
 
 
