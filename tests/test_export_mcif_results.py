@@ -70,18 +70,42 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
                 },
                 "is_alter": "(Altermagnet)",
                 "is_spin_orbit_magnet": "",
-                "polar_axes_by_symmetry": {
+                "vector_constraints_by_symmetry": {
                     "sg": {
-                        "allowed_polar_axes": [{"label": "z", "setting": "G0std"}],
-                        "allowed_polar_axes_setting": "G0std",
+                        "constraints": {
+                            "real_space_t_even_p_odd": {
+                                "allowed_axes": [{"label": "z", "setting": "G0std"}],
+                                "allowed_axes_setting": "G0std",
+                            },
+                            "real_space_t_even_p_even": {
+                                "allowed_axes": [{"label": "x", "setting": "G0std"}],
+                                "allowed_axes_setting": "G0std",
+                            },
+                        },
                     },
                     "ossg": {
-                        "allowed_polar_axes": [{"label": "x", "setting": "G0std"}],
-                        "allowed_polar_axes_setting": "G0std",
+                        "constraints": {
+                            "real_space_t_even_p_odd": {
+                                "allowed_axes": [{"label": "x", "setting": "G0std"}],
+                                "allowed_axes_setting": "G0std",
+                            },
+                            "real_space_t_even_p_even": {
+                                "allowed_axes": [],
+                                "allowed_axes_setting": "G0std",
+                            },
+                        },
                     },
                     "msg": {
-                        "allowed_polar_axes": [],
-                        "allowed_polar_axes_setting": "G0std",
+                        "constraints": {
+                            "real_space_t_even_p_odd": {
+                                "allowed_axes": [],
+                                "allowed_axes_setting": "G0std",
+                            },
+                            "real_space_t_even_p_even": {
+                                "allowed_axes": [{"label": "z", "setting": "G0std"}],
+                                "allowed_axes_setting": "G0std",
+                            },
+                        },
                     },
                 },
                 "wp_chain": [
@@ -256,6 +280,9 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
     assert row["sg_polar_axes_setting"] == "G0std"
     assert row["ossg_polar_axes"] == "x"
     assert row["msg_polar_axes"] is None
+    assert row["sg_real_space_axial_axes"] == "x"
+    assert row["ossg_real_space_axial_axes"] is None
+    assert row["msg_real_space_axial_axes"] == "z"
     assert row["has_wyckoff_splitting_sg_to_ossg"] is True
     assert row["has_wyckoff_splitting_ossg_to_msg"] is True
     assert row["is_altermagnet"] == "(Altermagnet)"

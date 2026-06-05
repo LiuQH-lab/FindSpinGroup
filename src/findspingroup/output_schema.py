@@ -148,6 +148,12 @@ EXPORT_PROPERTY_COLUMNS: Final = (
     "ossg_polar_axes_setting",
     "msg_polar_axes",
     "msg_polar_axes_setting",
+    "sg_real_space_axial_axes",
+    "sg_real_space_axial_axes_setting",
+    "ossg_real_space_axial_axes",
+    "ossg_real_space_axial_axes_setting",
+    "msg_real_space_axial_axes",
+    "msg_real_space_axial_axes_setting",
 )
 
 EXPORT_WYCKOFF_COLUMNS: Final = (
