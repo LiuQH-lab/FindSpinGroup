@@ -3328,6 +3328,8 @@ def _build_operation_view_set(
     setting_label: str,
     spin_frame: str,
     generator_ops: list[SpinSpaceGroupOperation] | None = None,
+    msg_ops: list[SpinSpaceGroupOperation] | None = None,
+    msg_indices: list[int] | None = None,
 ) -> dict:
     all_ops = list(ssg.ops)
     if len(ops_payload) != len(all_ops):
@@ -3450,11 +3452,43 @@ def _build_operation_view_set(
             label="L0 operations",
         )
 
+    if msg_ops is None:
+        msg_ops = list(ssg.msg_ops) if is_collinear else []
+    else:
+        msg_ops = list(msg_ops)
+
+    if is_collinear:
+        if msg_ops:
+            msg_payload = _serialize_ssg_operation_matrices(msg_ops)
+            _msg_seitz, msg_seitz_latex = _serialize_op_list_seitz_symbols(
+                msg_ops,
+                tol=ssg.symbol_calibration_tol,
+            )
+            views["msg"] = _operation_view_all_row(
+                msg_payload,
+                msg_seitz_latex,
+                label="MSG operations",
+            )
+    else:
+        if msg_indices is None:
+            msg_indices = _operation_view_indices_from_predicate(
+                all_ops,
+                lambda op: ssg.classify_magnetic_operation(op) is not None,
+            )
+        if msg_indices:
+            views["msg"] = _operation_view_index_rows(
+                msg_indices,
+                label="MSG operations",
+            )
+
     return {
         "default_view": "nssg" if is_collinear else "all",
         "setting_label": setting_label,
         "spin_frame": spin_frame,
-        "view_contract": "views with ops store serialized operations; index-only views store 1-based indices into all",
+        "view_contract": (
+            "views with ops store serialized operations and local 1-based indices; "
+            "index-only views store 1-based indices into all"
+        ),
         "views": views,
     }
 
@@ -3478,6 +3512,8 @@ def _build_operation_views(operation_sources: dict[str, dict]) -> dict:
             setting_label=source.get("setting_label", setting_key),
             spin_frame=source.get("spin_frame", "cartesian"),
             generator_ops=source.get("generator_ops"),
+            msg_ops=source.get("msg_ops"),
+            msg_indices=source.get("msg_indices"),
         )
     return operation_views
 
@@ -8005,6 +8041,33 @@ def _find_spin_group_from_parsed(
         input_oriented_generator_ops,
         input_lattice_col,
     )
+    convention_msg_indices = _operation_view_indices_from_predicate(
+        list(public_convention_oriented_ssg.ops),
+        lambda op: public_convention_oriented_ssg.classify_magnetic_operation(op) is not None,
+    )
+    acc_primitive_msg_indices = _operation_view_indices_from_predicate(
+        list(acc_primitive_ossg.ops),
+        lambda op: acc_primitive_ossg.classify_magnetic_operation(op) is not None,
+    )
+    input_msg_indices = _operation_view_indices_from_predicate(
+        list(input_setting_ossg.ops),
+        lambda op: input_setting_ossg.classify_magnetic_operation(op) is not None,
+    )
+    convention_oriented_msg_ops = list(public_convention_oriented_ssg.msg_ops)
+    acc_primitive_oriented_msg_ops = list(acc_primitive_ossg.msg_ops)
+    input_oriented_msg_ops = list(input_setting_ossg.msg_ops)
+    convention_cartesian_msg_ops = _transform_spin_generators(
+        convention_oriented_msg_ops,
+        convention_lattice_col,
+    )
+    acc_primitive_cartesian_msg_ops = _transform_spin_generators(
+        acc_primitive_oriented_msg_ops,
+        acc_primitive_lattice_col,
+    )
+    input_cartesian_msg_ops = _transform_spin_generators(
+        input_oriented_msg_ops,
+        input_lattice_col,
+    )
     operation_views = _build_operation_views(
         {
             "convention_cartesian": {
@@ -8014,6 +8077,8 @@ def _find_spin_group_from_parsed(
                 "setting_label": convention_setting,
                 "spin_frame": "cartesian",
                 "generator_ops": convention_cartesian_generator_ops,
+                "msg_ops": convention_cartesian_msg_ops,
+                "msg_indices": convention_msg_indices,
             },
             "convention_oriented": {
                 "ssg": public_convention_oriented_ssg,
@@ -8022,6 +8087,8 @@ def _find_spin_group_from_parsed(
                 "setting_label": convention_setting,
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": convention_oriented_generator_ops,
+                "msg_ops": convention_oriented_msg_ops,
+                "msg_indices": convention_msg_indices,
             },
             "magnetic_primitive_cartesian": {
                 "ssg": acc_primitive_output_ssg,
@@ -8030,6 +8097,8 @@ def _find_spin_group_from_parsed(
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": "cartesian",
                 "generator_ops": acc_primitive_cartesian_generator_ops,
+                "msg_ops": acc_primitive_cartesian_msg_ops,
+                "msg_indices": acc_primitive_msg_indices,
             },
             "magnetic_primitive_oriented": {
                 "ssg": acc_primitive_ossg,
@@ -8038,6 +8107,8 @@ def _find_spin_group_from_parsed(
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": acc_primitive_oriented_generator_ops,
+                "msg_ops": acc_primitive_oriented_msg_ops,
+                "msg_indices": acc_primitive_msg_indices,
             },
             "input_cartesian": {
                 "ssg": input_setting_ssg,
@@ -8046,6 +8117,8 @@ def _find_spin_group_from_parsed(
                 "setting_label": "input",
                 "spin_frame": "cartesian",
                 "generator_ops": input_cartesian_generator_ops,
+                "msg_ops": input_cartesian_msg_ops,
+                "msg_indices": input_msg_indices,
             },
             "input_oriented": {
                 "ssg": input_setting_ossg,
@@ -8054,6 +8127,8 @@ def _find_spin_group_from_parsed(
                 "setting_label": "input",
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": input_oriented_generator_ops,
+                "msg_ops": input_oriented_msg_ops,
+                "msg_indices": input_msg_indices,
             },
         }
     )
@@ -9290,6 +9365,16 @@ def _find_spin_group_acc_primitive_from_parsed(
     acc_primitive_oriented_ops_payload = _serialize_ssg_operation_matrices(
         list(acc_primitive_ossg.ops)
     )
+    acc_primitive_lattice_col = _lattice_column_matrix(acc_primitive_cell)
+    acc_primitive_msg_indices = _operation_view_indices_from_predicate(
+        list(acc_primitive_ossg.ops),
+        lambda op: acc_primitive_ossg.classify_magnetic_operation(op) is not None,
+    )
+    acc_primitive_oriented_msg_ops = list(acc_primitive_ossg.msg_ops)
+    acc_primitive_cartesian_msg_ops = _transform_spin_generators(
+        acc_primitive_oriented_msg_ops,
+        acc_primitive_lattice_col,
+    )
     operation_views = _build_operation_views(
         {
             "magnetic_primitive_cartesian": {
@@ -9298,6 +9383,8 @@ def _find_spin_group_acc_primitive_from_parsed(
                 "seitz_latex": acc_primitive_ssg.seitz_symbols_latex,
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": "cartesian",
+                "msg_ops": acc_primitive_cartesian_msg_ops,
+                "msg_indices": acc_primitive_msg_indices,
             },
             "magnetic_primitive_oriented": {
                 "ssg": acc_primitive_ossg,
@@ -9305,6 +9392,8 @@ def _find_spin_group_acc_primitive_from_parsed(
                 "seitz_latex": acc_primitive_oriented_seitz_latex,
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
+                "msg_ops": acc_primitive_oriented_msg_ops,
+                "msg_indices": acc_primitive_msg_indices,
             },
         }
     )

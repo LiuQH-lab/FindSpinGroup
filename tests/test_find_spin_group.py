@@ -4974,11 +4974,49 @@ def test_mag_symmetry_result_exposes_compact_operation_views():
     assert nssg_view["note"]["spin_frame"] == "oriented"
     assert nssg_view["operation_count"] == len(SpinSpaceGroup(result.convention_ssg_ops).nssg)
 
+    msg_view = result.operation_views["convention_oriented"]["views"]["msg"]
+    assert msg_view["label"] == "MSG operations"
+    assert "ops" in msg_view
+    assert len(msg_view["ops"]) == len(msg_view["seitz_latex"])
+    assert msg_view["operation_count"] == len(SpinSpaceGroup(result.convention_ssg_ops).msg_ops)
+    assert msg_view["indices"] == list(range(1, msg_view["operation_count"] + 1))
+    assert sorted(msg_view["ops"][0]) == [
+        "index",
+        "real_rotation",
+        "spin_rotation",
+        "translation",
+    ]
+    for cartesian_key, oriented_key in (
+        ("convention_cartesian", "convention_oriented"),
+        ("magnetic_primitive_cartesian", "magnetic_primitive_oriented"),
+        ("input_cartesian", "input_oriented"),
+    ):
+        assert (
+            result.operation_views[cartesian_key]["views"]["msg"]["operation_count"]
+            == result.operation_views[oriented_key]["views"]["msg"]["operation_count"]
+        )
+
     spin_translations = result.operation_views["magnetic_primitive_cartesian"]["views"][
         "spin_translations"
     ]
     assert "ops" not in spin_translations
     assert spin_translations["indices"]
+
+
+def test_operation_views_expose_msg_indices_when_msg_is_all_subset():
+    result = find_spin_group("examples/0.200_Mn3Sn.mcif")
+
+    msg_view = result.operation_views["convention_oriented"]["views"]["msg"]
+    assert msg_view["label"] == "MSG operations"
+    assert "ops" not in msg_view
+    assert msg_view["indices"] == [1, 10, 14, 20, 32, 36, 42, 47]
+    assert msg_view["operation_count"] == 8
+    assert result.operation_views["convention_cartesian"]["views"]["msg"]["indices"] == (
+        msg_view["indices"]
+    )
+    assert result.operation_views["convention_cartesian"]["views"]["msg"]["operation_count"] == (
+        msg_view["operation_count"]
+    )
 
 
 def test_mag_symmetry_result_exposes_structured_output_contract():
