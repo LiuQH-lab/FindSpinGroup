@@ -400,6 +400,9 @@
         "basis": [
           "C1*((-0.6666666667*ky^3*kz)*sigma_z - (kx*ky^2*kz)*sigma_z + (kx^2*ky*kz)*sigma_z + (0.6666666667*kx^3*kz)*sigma_z)"
         ],
+        "basis_latex": [
+          "C_{1}\\left(-\\frac{2}{3}k_{y}^{3}k_{z}\\,\\sigma_{z} - k_{x}k_{y}^{2}k_{z}\\,\\sigma_{z} + k_{x}^{2}k_{y}k_{z}\\,\\sigma_{z} + \\frac{2}{3}k_{x}^{3}k_{z}\\,\\sigma_{z}\\right)"
+        ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
         "order": 4,
@@ -409,6 +412,9 @@
       "spin_texture_config_no_soc": {
         "basis": [
           "C1*((-sqrt(3)/9*ky^3*kz)*sigma_x + (sqrt(3)/3*kx^2*ky*kz)*sigma_x - (1/3*ky^3*kz)*sigma_y + (kx^2*ky*kz)*sigma_y)"
+        ],
+        "basis_latex": [
+          "C_{1}\\left(-\\frac{\\sqrt{3}}{9}k_{y}^{3}k_{z}\\,\\sigma_{x} + \\frac{\\sqrt{3}}{3}k_{x}^{2}k_{y}k_{z}\\,\\sigma_{x} - \\frac{1}{3}k_{y}^{3}k_{z}\\,\\sigma_{y} + k_{x}^{2}k_{y}k_{z}\\,\\sigma_{y}\\right)"
         ],
         "basis_setting": "ossg_unit_cartesian",
         "classifier_tolerances": {
@@ -428,6 +434,11 @@
           "C1*((ky*kz)*sigma_x - (kx*kz)*sigma_y)",
           "C2*((kx*kz)*sigma_x - (ky*kz)*sigma_y + (sqrt(12)/3*kx*kz)*sigma_y)",
           "C3*((ky^2)*sigma_z - (sqrt(12)/3*kx*ky)*sigma_z - (kx^2)*sigma_z)"
+        ],
+        "basis_latex": [
+          "C_{1}\\left(k_{y}k_{z}\\,\\sigma_{x} - k_{x}k_{z}\\,\\sigma_{y}\\right)",
+          "C_{2}\\left(k_{x}k_{z}\\,\\sigma_{x} - k_{y}k_{z}\\,\\sigma_{y} + \\frac{\\sqrt{12}}{3}k_{x}k_{z}\\,\\sigma_{y}\\right)",
+          "C_{3}\\left(k_{y}^{2}\\,\\sigma_{z} - \\frac{\\sqrt{12}}{3}k_{x}k_{y}\\,\\sigma_{z} - k_{x}^{2}\\,\\sigma_{z}\\right)"
         ],
         "basis_setting": "ossg_unit_cartesian",
         "classifier_tolerances": {
@@ -917,6 +928,9 @@
         "basis": [
           "C1*((-0.6666666667*ky^3)*sigma_z - (kx*ky^2)*sigma_z + (kx^2*ky)*sigma_z + (0.6666666667*kx^3)*sigma_z)"
         ],
+        "basis_latex": [
+          "C_{1}\\left(-\\frac{2}{3}k_{y}^{3}\\,\\sigma_{z} - k_{x}k_{y}^{2}\\,\\sigma_{z} + k_{x}^{2}k_{y}\\,\\sigma_{z} + \\frac{2}{3}k_{x}^{3}\\,\\sigma_{z}\\right)"
+        ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
         "order": 3,
@@ -926,6 +940,9 @@
       "spin_texture_config_no_soc": {
         "basis": [
           "C1*((kx*ky^2)*sigma_z - (1/3*kx^3)*sigma_z)"
+        ],
+        "basis_latex": [
+          "C_{1}\\left(k_{x}k_{y}^{2}\\,\\sigma_{z} - \\frac{1}{3}k_{x}^{3}\\,\\sigma_{z}\\right)"
         ],
         "basis_setting": "ossg_unit_cartesian",
         "classifier_tolerances": {
@@ -943,6 +960,9 @@
       "spin_texture_config_soc": {
         "basis": [
           "C1*((1)*sigma_z)"
+        ],
+        "basis_latex": [
+          "C_{1}\\left(\\sigma_{z}\\right)"
         ],
         "basis_setting": "ossg_unit_cartesian",
         "classifier_tolerances": {
@@ -1482,6 +1502,9 @@
         "basis": [
           "C1*((1)*sigma_z)"
         ],
+        "basis_latex": [
+          "C_{1}\\left(\\sigma_{z}\\right)"
+        ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
         "order": 0,
@@ -1491,6 +1514,9 @@
       "spin_texture_config_no_soc": {
         "basis": [
           "C1*((1)*sigma_z)"
+        ],
+        "basis_latex": [
+          "C_{1}\\left(\\sigma_{z}\\right)"
         ],
         "basis_setting": "ossg_unit_cartesian",
         "classifier_tolerances": {
@@ -1508,6 +1534,9 @@
       "spin_texture_config_soc": {
         "basis": [
           "C1*((1)*sigma_z)"
+        ],
+        "basis_latex": [
+          "C_{1}\\left(\\sigma_{z}\\right)"
         ],
         "basis_setting": "ossg_unit_cartesian",
         "classifier_tolerances": {

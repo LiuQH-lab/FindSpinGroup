@@ -28,6 +28,7 @@ from findspingroup import (
 )
 from findspingroup.find_spin_group import _expand_magnetic_indices_by_sg_orbit
 from findspingroup.spin_splitting import (
+    basis_expression_to_latex,
     classify_public_spin_texture_config,
     operation_pairs_from_gspg_ops,
 )
@@ -78,6 +79,7 @@ from findspingroup.find_spin_group import (
     SCIF_CELL_MODE_INPUT_IDENTIFIED,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
     SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
+    _classify_quasi2d_spin_texture_config,
     _canonicalize_input_to_standard_setting,
     audit_spatial_transform_effect,
     classify_magnetic_phase,
@@ -2317,6 +2319,9 @@ def test_acc_aligned_runtime_index_exposes_spin_texture_config_records():
     assert get_spin_texture_config_id_for_ssg_label(label) == "W0043"
     assert get_spin_texture_config_for_ssg_label(label) == {
         "basis": ["C1*((-ky^2*kz)*sigma_z + (kx^2*kz)*sigma_z)"],
+        "basis_latex": [
+            r"C_{1}\left(-k_{y}^{2}k_{z}\,\sigma_{z} + k_{x}^{2}k_{z}\,\sigma_{z}\right)"
+        ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
         "order": 3,
@@ -3794,12 +3799,56 @@ def test_quasi2d_spin_texture_config_honors_explicit_a_vacuum_axis():
     assert quasi_2d["spin_texture_config_basis"]["in_plane_k_axes"] == ["b", "c"]
     assert quasi_2d["spin_texture_config_no_soc"]["in_plane_k_axes"] == ["b", "c"]
     assert quasi_2d["spin_texture_config_no_soc"]["k_variable_labels"] == {
-        "kx": "input reciprocal b*",
-        "ky": "input reciprocal c*",
+        "ky": "input reciprocal b*",
+        "kz": "input reciprocal c*",
     }
+    basis_text = " ".join(quasi_2d["spin_texture_config_no_soc"]["basis"])
+    assert "kx" not in basis_text
+    basis_latex = " ".join(quasi_2d["spin_texture_config_no_soc"]["basis_latex"])
+    assert "k_{x}" not in basis_latex
     assert quasi_2d["spin_texture_config_no_soc"]["operation_audit"][
         "non_plane_preserving_operation_count"
     ] == 0
+
+
+def test_quasi2d_spin_texture_config_preserves_free_variable_names():
+    payload = _classify_quasi2d_spin_texture_config(
+        [
+            {
+                "Q": -np.eye(2),
+                "S": -np.eye(3),
+            }
+        ],
+        source="test",
+        operation_audit={
+            "input_operation_count": 1,
+            "plane_preserving_operation_count": 1,
+            "non_plane_preserving_operation_count": 0,
+            "skipped_operation_count": 0,
+            "max_kept_plane_residual": 0.0,
+            "max_skipped_plane_residual": None,
+            "plane_residual_tol": 1e-8,
+        },
+        in_plane_axes=["b", "c"],
+        k_names=("ky", "kz"),
+        calibration_atol_limit=1e-8,
+        relax_without_reference=False,
+    )
+
+    assert payload is not None
+    assert payload["in_plane_k_axes"] == ["b", "c"]
+    assert payload["k_variable_labels"] == {
+        "ky": "input reciprocal b*",
+        "kz": "input reciprocal c*",
+    }
+    basis_text = " ".join(payload["basis"])
+    assert "kx" not in basis_text
+    assert "ky" in basis_text
+    assert "kz" in basis_text
+    basis_latex = " ".join(payload["basis_latex"])
+    assert "k_{x}" not in basis_latex
+    assert "k_{y}" in basis_latex
+    assert "k_{z}" in basis_latex
 
 
 def test_quasi2d_kpoint_plane_uses_raw_vacuum_component_for_forced_axis():
@@ -4888,6 +4937,23 @@ def test_spin_splitting_numeric_classifies_gspg_generators_with_spin_only():
     assert payload["order"] == 4
     assert payload["spin_rank"] == 1
     assert payload["momentum_space_spin_configuration"] == "collinear"
+    assert payload["basis_latex"]
+    assert r"\sigma" in payload["basis_latex"][0]
+
+
+def test_spin_texture_basis_expression_latex_formatter():
+    assert basis_expression_to_latex(
+        "C1*((kx*ky*kz)*sigma_x - (sqrt(3)/3*kx*ky*kz)*sigma_z)"
+    ) == (
+        r"C_{1}\left(k_{x}k_{y}k_{z}\,\sigma_{x} - "
+        r"\frac{\sqrt{3}}{3}k_{x}k_{y}k_{z}\,\sigma_{z}\right)"
+    )
+    assert basis_expression_to_latex(
+        "C1*((-2/3*ky^3)*sigma_z + (kx*ky^2)*sigma_z)"
+    ) == (
+        r"C_{1}\left(-\frac{2}{3}k_{y}^{3}\,\sigma_{z} + "
+        r"k_{x}k_{y}^{2}\,\sigma_{z}\right)"
+    )
 
 
 @pytest.mark.parametrize(

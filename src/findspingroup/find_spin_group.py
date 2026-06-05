@@ -225,6 +225,11 @@ def _quasi2d_axis_labels(axis_indices: list[int]) -> list[str]:
     return [labels[index] for index in axis_indices]
 
 
+def _quasi2d_k_names(axis_indices: list[int]) -> tuple[str, ...]:
+    names = ("kx", "ky", "kz")
+    return tuple(names[index] for index in axis_indices)
+
+
 def _input_in_plane_reciprocal_basis_in_ossg_unit_cartesian(
     *,
     convention_cell: CrystalCell,
@@ -300,19 +305,21 @@ def _classify_quasi2d_spin_texture_config(
     source: str,
     operation_audit: dict,
     in_plane_axes: list[str],
+    k_names: tuple[str, ...],
     calibration_atol_limit: float,
     relax_without_reference: bool,
 ) -> dict | None:
+    k_variable_labels = {
+        k_name: f"input reciprocal {axis}*"
+        for k_name, axis in zip(k_names, in_plane_axes)
+    }
     if int(operation_audit.get("non_plane_preserving_operation_count") or 0) > 0:
         return {
             "status": "not_evaluated_non_plane_preserving_operations",
             "source": source,
             "basis_setting": "quasi2d_ossg_unit_cartesian_in_plane",
             "in_plane_k_axes": list(in_plane_axes),
-            "k_variable_labels": {
-                "kx": f"input reciprocal {in_plane_axes[0]}*",
-                "ky": f"input reciprocal {in_plane_axes[1]}*",
-            },
+            "k_variable_labels": k_variable_labels,
             "operation_audit": operation_audit,
         }
     if not pairs:
@@ -321,17 +328,14 @@ def _classify_quasi2d_spin_texture_config(
             "source": source,
             "basis_setting": "quasi2d_ossg_unit_cartesian_in_plane",
             "in_plane_k_axes": list(in_plane_axes),
-            "k_variable_labels": {
-                "kx": f"input reciprocal {in_plane_axes[0]}*",
-                "ky": f"input reciprocal {in_plane_axes[1]}*",
-            },
+            "k_variable_labels": k_variable_labels,
             "operation_audit": operation_audit,
         }
     payload = _safe_classify_spin_texture_config(
         pairs,
         source=source,
         k_dimension=2,
-        k_names=("kx", "ky"),
+        k_names=k_names,
     )
     if payload is None:
         return None
@@ -344,7 +348,7 @@ def _classify_quasi2d_spin_texture_config(
             pairs,
             source=source,
             k_dimension=2,
-            k_names=("kx", "ky"),
+            k_names=k_names,
             atol=float(calibration_atol_limit),
             zero_tol=max(1e-8, min(float(calibration_atol_limit), 1e-4)),
         )
@@ -358,10 +362,7 @@ def _classify_quasi2d_spin_texture_config(
             payload = relaxed
     payload["basis_setting"] = "quasi2d_ossg_unit_cartesian_in_plane"
     payload["in_plane_k_axes"] = list(in_plane_axes)
-    payload["k_variable_labels"] = {
-        "kx": f"input reciprocal {in_plane_axes[0]}*",
-        "ky": f"input reciprocal {in_plane_axes[1]}*",
-    }
+    payload["k_variable_labels"] = k_variable_labels
     payload["operation_audit"] = operation_audit
     return payload
 
@@ -386,6 +387,7 @@ def _quasi2d_spin_texture_config_from_ossg_convention(
         transformation_input_to_convention=transformation_input_to_convention,
         vacuum_axis_index=int(vacuum_axis_index),
     )
+    in_plane_k_names = _quasi2d_k_names(_quasi2d_input_in_plane_axes(int(vacuum_axis_index)))
     collinear_axis = convention_ossg.sog_direction if convention_ossg.conf == "Collinear" else None
     no_soc_unit_pairs = _ssg_operation_pairs_in_ossg_unit_cartesian(
         convention_ossg.ops,
@@ -413,6 +415,7 @@ def _quasi2d_spin_texture_config_from_ossg_convention(
         source="quasi2d_ossg_unit_cartesian_in_plane_ops",
         operation_audit=no_soc_audit,
         in_plane_axes=in_plane_axes,
+        k_names=in_plane_k_names,
         calibration_atol_limit=calibration_atol_limit,
         relax_without_reference=convention_ossg.conf == "Collinear",
     )
@@ -421,6 +424,7 @@ def _quasi2d_spin_texture_config_from_ossg_convention(
         source="quasi2d_ossg_unit_cartesian_in_plane_msg_ops",
         operation_audit=soc_audit,
         in_plane_axes=in_plane_axes,
+        k_names=in_plane_k_names,
         calibration_atol_limit=calibration_atol_limit,
         relax_without_reference=False,
     )
@@ -431,8 +435,8 @@ def _quasi2d_spin_texture_config_from_ossg_convention(
             "setting": "quasi2d_ossg_unit_cartesian_in_plane",
             "in_plane_k_axes": in_plane_axes,
             "k_variable_labels": {
-                "kx": f"input reciprocal {in_plane_axes[0]}*",
-                "ky": f"input reciprocal {in_plane_axes[1]}*",
+                k_name: f"input reciprocal {axis}*"
+                for k_name, axis in zip(in_plane_k_names, in_plane_axes)
             },
             "input_in_plane_reciprocal_basis_in_ossg_unit_cartesian": in_plane_basis.tolist(),
         },
