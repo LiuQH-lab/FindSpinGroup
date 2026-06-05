@@ -3463,6 +3463,7 @@ def _build_operation_view_set(
             _msg_seitz, msg_seitz_latex = _serialize_op_list_seitz_symbols(
                 msg_ops,
                 tol=ssg.symbol_calibration_tol,
+                allow_unresolved=True,
             )
             views["msg"] = _operation_view_all_row(
                 msg_payload,
@@ -3568,12 +3569,14 @@ def _serialize_op_list_seitz_symbols(
     ops: list[SpinSpaceGroupOperation],
     *,
     tol: float,
+    allow_unresolved: bool = False,
 ) -> tuple[list[str], list[str]]:
     descriptions = [
         op.seitz_description(
             tol=tol,
             max_order=120,
             max_axis_denom=12,
+            allow_unresolved=allow_unresolved,
         )
         for op in ops
     ]

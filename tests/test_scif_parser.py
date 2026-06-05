@@ -1249,3 +1249,23 @@ def test_generated_scif_prefers_symbolic_sqrt_coefficients_for_1669():
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] is None
     assert metadata["atom_site_spin_moment"]["symmform_uvw"] == ["u,-u,0"]
     assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,0"]
+
+
+def test_generated_scif_roundtrip_does_not_fail_on_unresolved_msg_view_seitz_symbol():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.685_NiCr2O4.mcif")
+    lattice_factors, positions, elements, occupancies, _labels, moments = parse_scif_text(result.scif)
+
+    roundtrip = find_spin_group_from_data(
+        "1.685_NiCr2O4.mcif::scif",
+        lattice_factors,
+        positions,
+        elements,
+        occupancies,
+        moments,
+    )
+
+    assert roundtrip.index == result.index
+    assert roundtrip.conf == result.conf
+    msg_view = roundtrip.operation_views["convention_oriented"]["views"]["msg"]
+    assert len(msg_view["ops"]) == len(msg_view["seitz_latex"])
+    assert "?" in "\n".join(msg_view["seitz_latex"])
