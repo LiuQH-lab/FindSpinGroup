@@ -5677,7 +5677,8 @@ def _get_magnetic_little_group(kpoint, primitive_msg_operations, tol: float) -> 
     magnetic_little_group = []
     primitive_kpoint = np.asarray(kpoint, dtype=float)
     for time_reversal, rotation, translation in primitive_msg_operations:
-        transformed_kpoint = time_reversal * np.asarray(rotation, dtype=float) @ primitive_kpoint
+        reciprocal_rotation = np.linalg.inv(np.asarray(rotation, dtype=float)).T
+        transformed_kpoint = time_reversal * reciprocal_rotation @ primitive_kpoint
         if getNormInf(transformed_kpoint % 1, primitive_kpoint) < tol:
             magnetic_little_group.append([time_reversal, rotation, translation])
     return magnetic_little_group
