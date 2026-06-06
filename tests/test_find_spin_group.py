@@ -3500,6 +3500,22 @@ def test_find_spin_group_recovers_msg_little_group_symbols_after_translation_cle
     assert "Unknown" not in set(result.msg_little_group_symbols)
 
 
+def test_msg_little_group_uses_reciprocal_rotation_for_centered_primitive_basis():
+    result = find_spin_group(
+        "tests/testset/mcif_241130_no2186/0.236_CaFe4Al8.mcif",
+        mtol=0.002,
+    )
+
+    assert result.msg_bns_number == "139.535"
+    assert result.msg_little_group_symbols[:5] == [
+        "4'/mmm'",
+        "4'/mmm'",
+        "4'22'",
+        "m'm'm",
+        "2/m",
+    ]
+
+
 def test_find_spin_group_keeps_maximal_ssg_when_ossg_msg_little_group_is_unindexed():
     result = find_spin_group(
         "tests/testset/mcif_241130_no2186/1.85_alpha-Mn.mcif",
