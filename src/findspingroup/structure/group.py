@@ -207,6 +207,106 @@ def combine_parametric_solutions(rref_matrix, tol=1e-3):
     return vector_expr
 
 
+_SPIN_CONSTRAINT_SYMBOLS = ("Sx", "Sy", "Sz")
+
+
+def _format_spin_constraint_term(coeff, variable, tol=1e-3):
+    coeff = float(coeff)
+    if abs(coeff) < tol:
+        return "0"
+    if abs(coeff - 1.0) < tol:
+        return variable
+    if abs(coeff + 1.0) < tol:
+        return f"-{variable}"
+    return f"{format_symbolic_scalar(coeff)}*{variable}"
+
+
+def _format_spin_constraint_expression(terms, tol=1e-3):
+    parts = []
+    for coeff, variable in terms:
+        coeff = float(coeff)
+        if abs(coeff) < tol:
+            continue
+        magnitude = abs(coeff)
+        if abs(magnitude - 1.0) < tol:
+            term = variable
+        else:
+            term = f"{format_symbolic_scalar(magnitude)}*{variable}"
+        if not parts:
+            parts.append(term if coeff > 0 else f"-{term}")
+        else:
+            parts.append(f" + {term}" if coeff > 0 else f" - {term}")
+    return "".join(parts) if parts else "0"
+
+
+def _canonicalize_vector_direction(vector, tol=1e-3):
+    values = np.asarray(vector, dtype=float).reshape(3)
+    pivot = int(np.argmax(np.abs(values)))
+    if abs(values[pivot]) < tol:
+        return values, pivot
+    if values[pivot] < 0:
+        values = -values
+    values = values / values[pivot]
+    values[np.abs(values) < tol] = 0.0
+    values[pivot] = 1.0
+    return values, pivot
+
+
+def _format_one_dimensional_spin_constraint(vector, tol=1e-3):
+    values, pivot = _canonicalize_vector_direction(vector, tol=tol)
+    variable = _SPIN_CONSTRAINT_SYMBOLS[pivot]
+    return [
+        _format_spin_constraint_term(values[index], variable, tol=tol)
+        for index in range(3)
+    ]
+
+
+def _format_two_dimensional_spin_constraint(normal, tol=1e-3):
+    values = np.asarray(normal, dtype=float).reshape(3)
+    pivot = int(np.argmax(np.abs(values)))
+    if abs(values[pivot]) < tol:
+        return list(_SPIN_CONSTRAINT_SYMBOLS)
+    if values[pivot] < 0:
+        values = -values
+    result = ["0", "0", "0"]
+    free_columns = [index for index in range(3) if index != pivot]
+    for index in free_columns:
+        result[index] = _SPIN_CONSTRAINT_SYMBOLS[index]
+    result[pivot] = _format_spin_constraint_expression(
+        [
+            (-values[index] / values[pivot], _SPIN_CONSTRAINT_SYMBOLS[index])
+            for index in free_columns
+        ],
+        tol=tol,
+    )
+    return result
+
+
+def solve_spin_constraint_from_stacked(stacked, tol=1e-3):
+    """Return spin-splitting status and readable spin-polarization constraints.
+
+    The same SVD rank criterion is used for both outputs.  This avoids cases
+    where a nearly collinear C2v presentation is classified as spin splitting
+    by the singular values but formatted as a zero spin direction by RREF.
+    """
+    matrix = np.asarray(stacked, dtype=float).reshape(-1, 3)
+    if matrix.size == 0:
+        return "unknown", []
+
+    _, singular_values, vh = np.linalg.svd(matrix, full_matrices=True)
+    rank = int(np.count_nonzero(singular_values > tol))
+    rank = min(rank, 3)
+    nullity = 3 - rank
+
+    if nullity <= 0:
+        return "no spin splitting", ["0", "0", "0"]
+    if nullity == 3:
+        return "spin splitting", list(_SPIN_CONSTRAINT_SYMBOLS)
+    if nullity == 2:
+        return "spin splitting", _format_two_dimensional_spin_constraint(vh[0], tol=tol)
+    return "spin splitting", _format_one_dimensional_spin_constraint(vh[-1], tol=tol)
+
+
 def _to_latex_point_token(token: str) -> str:
     token = token.replace("alpha", r"\alpha")
     token = token.replace("beta", r"\beta")
@@ -693,14 +793,27 @@ class BrillouinZoneMatcher:
         for label, pattern, splitting in rules:
             parsed = self._parse_pattern(pattern)
             score = self._calculate_specificity_score(parsed)
+            has_splitting, marker = self._normalize_splitting_marker(splitting)
             self.parsed_rules.append({
                 'label': label,
                 'pattern': parsed,
-                'splitting': splitting,
+                'splitting': has_splitting,
+                'marker': marker,
                 'score': score
             })
 
         self.parsed_rules.sort(key=lambda x: x['score'], reverse=True)
+
+    @staticmethod
+    def _normalize_splitting_marker(splitting):
+        if isinstance(splitting, (tuple, list)) and len(splitting) == 2:
+            without_soc, with_soc = splitting
+            marker = ("***" if bool(without_soc) else "") + ("^^^" if bool(with_soc) else "")
+            return bool(without_soc or with_soc), marker
+        if isinstance(splitting, str):
+            return bool(splitting), splitting
+        marker = "***" if bool(splitting) else ""
+        return bool(splitting), marker
 
     def _parse_pattern(self, pattern_str):
         content = pattern_str.strip("()").split(",")
@@ -757,6 +870,7 @@ class BrillouinZoneMatcher:
                 return {
                     "matched_label": rule['label'],
                     "has_splitting": rule['splitting'],
+                    "splitting_marker": rule['marker'],
                     "k_point": (u, v, w)
                 }
 
@@ -765,7 +879,7 @@ class BrillouinZoneMatcher:
 
 def write_kpoints(seekpath_out, matcher: BrillouinZoneMatcher, num_points=40, extra_kpoints=None):
     """
-    Write k-point path string with SOC splitting info for Endpoints AND Path.
+    Write k-point path string with spin-splitting info for endpoints and paths.
     """
     kpts = seekpath_out['point_coords']
     path = seekpath_out['path']
@@ -820,24 +934,23 @@ def write_kpoints(seekpath_out, matcher: BrillouinZoneMatcher, num_points=40, ex
     # Helper: determine the splitting state for one k-point.
     def get_split_status(u, v, w):
         """
-        Return `(matched_label, is_splitting)` for a k-point coordinate.
+        Return `(matched_label, marker)` for a k-point coordinate.
         """
         result = matcher.check(u, v, w)
-        return result['matched_label'], result['has_splitting']
+        fallback_marker = "***" if result['has_splitting'] else ""
+        return result['matched_label'], result.get('splitting_marker', fallback_marker)
 
     # Helper: format the display tag.
-    def make_tag(label, is_splitting, is_path=False):
+    def make_tag(label, marker, is_path=False):
         """
         Format the display string.
         `is_path=True` is used for path information and `False` for endpoints.
         """
 
-        highlight = "***" if is_splitting else ""
-
         if is_path:
-            return f"| {label} {highlight}"
+            return f"| {label} {marker}"
         else:
-            return f"{highlight}"
+            return f"{marker}"
 
     def _write_kpoints(s_head,path_list,kpts_list):
         path_label = []
@@ -873,7 +986,10 @@ def write_kpoints(seekpath_out, matcher: BrillouinZoneMatcher, num_points=40, ex
 
     s = []
     # Write the file header.
-    s.append(f"Generated by seekpath and findspingroup v{__version__} (*** for spin splitting)\n ")
+    s.append(
+        f"Generated by seekpath and findspingroup v{__version__} "
+        f"(*** for spin splitting w/o SOC; ^^^ for spin splitting w/ SOC)\n "
+    )
     s.append(f"{num_points}\nLine-mode\nReciprocal\n")
     path_label,s = _write_kpoints(s,path,kpts)
 
@@ -1903,13 +2019,7 @@ class SpinSpaceGroup:
                 tol=self.tol,
             )
             stacked = np.vstack(spin_matrices)
-            singular_values = np.linalg.svd(stacked.astype(np.float32))[1]
-            spin_splitting = (
-                'no spin splitting'
-                if all(abs(value) > 1e-3 for value in singular_values)
-                else 'spin splitting'
-            )
-            polarizations = combine_parametric_solutions(rref_with_tolerance(stacked))
+            spin_splitting, polarizations = solve_spin_constraint_from_stacked(stacked)
             analysis.append(
                 {
                     "spin_splitting": spin_splitting,
@@ -2046,11 +2156,24 @@ class SpinSpaceGroup:
     def get_international_symbol(self, tol=1e-4, *, basis_mode: str = "standard"):
         return build_international_symbol(self, tol=tol, basis_mode=basis_mode)
 
-    def get_KPOINTS(self):
-        spin_splitting_info = [(self.kpoints_label[i], self.kpoints_primitive_string[i], True)
-                               if j == 'spin splitting' else (self.kpoints_label[i], self.kpoints_primitive_string[i],
-                                                              False)
-                               for i, j in enumerate(self.is_spinsplitting)]
+    def get_KPOINTS(self, spin_splitting_w_soc=None):
+        if spin_splitting_w_soc is None:
+            spin_splitting_w_soc = [False] * len(self.is_spinsplitting)
+        if len(spin_splitting_w_soc) != len(self.is_spinsplitting):
+            raise ValueError(
+                "spin_splitting_w_soc length must match k-point spin-splitting data length."
+            )
+        spin_splitting_info = [
+            (
+                self.kpoints_label[i],
+                self.kpoints_primitive_string[i],
+                (
+                    j == 'spin splitting',
+                    spin_splitting_w_soc[i] == 'spin splitting' or spin_splitting_w_soc[i] is True,
+                ),
+            )
+            for i, j in enumerate(self.is_spinsplitting)
+        ]
         matcher = BrillouinZoneMatcher(spin_splitting_info)
         low_symm_indices = find_uvw_whole_string(self.kpoints_symbol_primitive)
         extra_point_info = [(self.kpoints_primitive[ind], self.kpoints_label[ind]) for ind in low_symm_indices]

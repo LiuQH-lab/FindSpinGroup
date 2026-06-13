@@ -8,12 +8,15 @@ when you know the entry point and need precise parameter or output meaning.
 
 ## Reference Pages
 
-- [Python API](python-api.md) documents the main functions.
-- [MagSymmetryResult](magsymmetry-result.md) documents the full result object
-  and recommended accessors.
+- [Python API](python-api.md) documents the main functions. Each main function
+  has its own page with signature, parameters, returns, returned fields,
+  examples, and notes.
+- [MagSymmetryResult Object](magsymmetry-result.md) documents the full result
+  object and recommended accessors.
+- [Result Schemas](result-schemas/index.md) documents returned dictionaries by
+  schema: `BasicResult`, `SummaryResult`, `StructuredResult`,
+  `InputSSGResult`, and batch exports.
 - [CLI](cli.md) documents command-line routes and flags.
-- [Output Fields](output-fields.md) documents the public fields by function and
-  result layer.
 - [SCIF Export](scif.md) documents `to_scif(...)` and SCIF output modes.
 
 ## Public, Diagnostic, And Raw Output

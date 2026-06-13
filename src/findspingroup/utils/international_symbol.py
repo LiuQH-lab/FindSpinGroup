@@ -564,8 +564,21 @@ def _k_generator_sort_key(op: "SpinSpaceGroupOperation") -> tuple:
     )
 
 
+def _spin_operation_order(op: "SpinSpaceGroupOperation") -> int:
+    info = describe_point_operation(
+        op.spin_rotation,
+        tol=calibrated_symbol_tol(1e-6),
+        max_order=120,
+        max_axis_denom=12,
+    )
+    order = info.get("order")
+    return int(order) if order is not None else 0
+
+
 def _minimal_k_translation_generators(
     ops: list["SpinSpaceGroupOperation"],
+    *,
+    free_generators: list["SpinSpaceGroupOperation"] | None = None,
 ) -> list["SpinSpaceGroupOperation"]:
     candidates = [op for op in ops if not np.allclose(op.spin_rotation, np.eye(3), atol=1e-4)]
     if not candidates:
@@ -574,20 +587,84 @@ def _minimal_k_translation_generators(
     candidates = sorted(candidates, key=_k_generator_sort_key)
 
     target_keys = {_op_key(op) for op in candidates}
+    base_generators = list(free_generators or [])
     selected: list["SpinSpaceGroupOperation"] = []
-    closure: set[tuple] = set()
+    closure: set[tuple] = _closure_from_generators(base_generators)
+    available = list(candidates)
 
-    for op in candidates:
-        if _op_key(op) in closure:
-            continue
+    while not target_keys.issubset(closure):
+        ranked: list[tuple[tuple, "SpinSpaceGroupOperation", set[tuple]]] = []
+        remaining = target_keys - closure
+        for op in available:
+            if _op_key(op) in closure:
+                continue
+            trial_closure = _closure_from_generators(base_generators + selected + [op])
+            gain = len(remaining & trial_closure)
+            if gain == 0:
+                continue
+            ranked.append(
+                (
+                    (-gain, -_spin_operation_order(op), _k_generator_sort_key(op)),
+                    op,
+                    trial_closure,
+                )
+            )
+        if not ranked:
+            break
+        _, op, closure = min(ranked, key=lambda item: item[0])
         selected.append(op)
-        closure = _closure_from_generators(selected)
+        available = [candidate for candidate in available if candidate is not op]
         if target_keys.issubset(closure):
             break
 
     if not target_keys.issubset(closure):
         return candidates
-    return sorted(selected, key=_k_generator_sort_key)
+
+    pruned = list(selected)
+    for op in sorted(selected, key=_k_generator_sort_key):
+        if len(pruned) == 1:
+            break
+        trial = [candidate for candidate in pruned if candidate is not op]
+        if target_keys.issubset(_closure_from_generators(base_generators + trial)):
+            pruned = trial
+
+    return sorted(pruned, key=_k_generator_sort_key)
+
+
+def _pure_centering_translation_generators(
+    identity_real_ops: list["SpinSpaceGroupOperation"],
+    centering_trans: list[np.ndarray],
+    *,
+    tol: float,
+) -> list["SpinSpaceGroupOperation"]:
+    identity = np.eye(3)
+    generators: list["SpinSpaceGroupOperation"] = []
+    seen: set[tuple[float, float, float]] = set()
+
+    for target in centering_trans:
+        matches = [
+            op
+            for op in identity_real_ops
+            if np.allclose(op.spin_rotation, identity, atol=tol, rtol=0)
+            and np.allclose(op.rotation, identity, atol=tol, rtol=0)
+            and _same_translation_mod1(op.translation, target, tol=tol)
+        ]
+        if not matches:
+            continue
+        match = min(
+            matches,
+            key=lambda op: (
+                float(np.linalg.norm(np.asarray(op.translation, dtype=float))),
+                tuple(np.round(_normalize_mod1(op.translation), 6)),
+            ),
+        )
+        key = tuple(float(v) for v in np.round(_normalize_mod1(match.translation), 6))
+        if key in seen:
+            continue
+        seen.add(key)
+        generators.append(match)
+
+    return sorted(generators, key=_k_generator_sort_key)
 
 
 def _minimal_spin_translation_generators(
@@ -818,8 +895,18 @@ def build_international_symbol(
 
     if ssg_type == "k":
         # Nontrivial spin translations with real-space identity.
-        # Only keep a minimal generator set in the symbol.
-        selected_generators = _minimal_k_translation_generators(ssg_basis.n_spin_translation_group)
+        # Only keep a minimal generator set in the symbol.  For centered
+        # settings, the Bravais centering translations are lattice translations
+        # and therefore participate in the closure implicitly.
+        centering_generators = _pure_centering_translation_generators(
+            identity_real_ops,
+            centering_trans,
+            tol=tol,
+        )
+        selected_generators = _minimal_k_translation_generators(
+            ssg_basis.n_spin_translation_group,
+            free_generators=centering_generators,
+        )
         for op in selected_generators:
             spin_info = spin_info_map.get(id(op))
             k_translation_data.append(

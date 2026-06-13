@@ -28,8 +28,11 @@ print(summary["magnetic_phase"])
 CLI:
 
 ```bash
-fsg path/to/structure.mcif --show index --show magnetic_phase
+fsg path/to/structure.mcif
 ```
+
+The default CLI output is a short summary. Use `--show` for selected fields and
+`--json` for the complete compact JSON payload.
 
 ## Full Analysis
 
@@ -69,7 +72,7 @@ Choose this route when:
 - you want `ssg_symm.json` written by the CLI;
 - you need the relation between the input cell and the input magnetic primitive
   cell;
-- you need helper POSCAR text for non-POSCAR inputs.
+- you need helper POSCAR text for the magnetic primitive cell.
 
 CLI:
 
@@ -77,8 +80,9 @@ CLI:
 fsg -w path/to/structure.mcif
 ```
 
-This writes `ssg_symm.json` and may also write `input_poscar.vasp` or
-`magnetic_primitive_poscar.vasp`, depending on the input.
+This writes `ssg_symm.json` and `magnetic_primitive_poscar.vasp`.
+`input_poscar.vasp` is written only when a non-POSCAR input cell is distinct
+from the magnetic primitive cell.
 
 ## Advanced Routes
 

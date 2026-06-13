@@ -48,7 +48,12 @@ from findspingroup.spin_splitting import (
     collinear_axis_constraint_operation,
 )
 from findspingroup.structure import SpinSpaceGroup,SpinSpaceGroupOperation
-from findspingroup.structure.group import integer_points_in_new_cell, op_key, _resolve_point_group_info
+from findspingroup.structure.group import (
+    integer_points_in_new_cell,
+    op_key,
+    solve_spin_constraint_from_stacked,
+    _resolve_point_group_info,
+)
 from findspingroup.structure.cell import (
     CrystalCell,
     SpaceToleranceDegeneracyError,
@@ -120,6 +125,7 @@ def _safe_classify_spin_texture_config(
     *,
     source: str,
     include_diagnostics: bool = False,
+    basis_orders_through: int | None = None,
     k_dimension: int | None = None,
     k_names: tuple[str, ...] | None = None,
     atol: float = 1e-10,
@@ -131,6 +137,8 @@ def _safe_classify_spin_texture_config(
             operations,
             source=source,
             include_diagnostics=include_diagnostics,
+            max_order=int(basis_orders_through) if basis_orders_through is not None else 6,
+            basis_orders_through=basis_orders_through,
             k_dimension=k_dimension,
             k_names=k_names,
             atol=atol,
@@ -308,6 +316,7 @@ def _classify_quasi2d_spin_texture_config(
     k_names: tuple[str, ...],
     calibration_atol_limit: float,
     relax_without_reference: bool,
+    spin_texture_basis_max_order: int | None = None,
 ) -> dict | None:
     k_variable_labels = {
         k_name: f"input reciprocal {axis}*"
@@ -334,6 +343,7 @@ def _classify_quasi2d_spin_texture_config(
     payload = _safe_classify_spin_texture_config(
         pairs,
         source=source,
+        basis_orders_through=spin_texture_basis_max_order,
         k_dimension=2,
         k_names=k_names,
     )
@@ -347,6 +357,7 @@ def _classify_quasi2d_spin_texture_config(
         relaxed = _safe_classify_spin_texture_config(
             pairs,
             source=source,
+            basis_orders_through=spin_texture_basis_max_order,
             k_dimension=2,
             k_names=k_names,
             atol=float(calibration_atol_limit),
@@ -375,6 +386,7 @@ def _quasi2d_spin_texture_config_from_ossg_convention(
     transformation_input_to_convention,
     tol: float,
     calibration_atol_limit: float,
+    spin_texture_basis_max_order: int | None = None,
 ) -> dict:
     if not isinstance(quasi_2d, dict):
         return {}
@@ -418,6 +430,7 @@ def _quasi2d_spin_texture_config_from_ossg_convention(
         k_names=in_plane_k_names,
         calibration_atol_limit=calibration_atol_limit,
         relax_without_reference=convention_ossg.conf == "Collinear",
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
     soc = _classify_quasi2d_spin_texture_config(
         soc_pairs,
@@ -427,6 +440,7 @@ def _quasi2d_spin_texture_config_from_ossg_convention(
         k_names=in_plane_k_names,
         calibration_atol_limit=calibration_atol_limit,
         relax_without_reference=False,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
     return {
         "spin_texture_config_no_soc": no_soc,
@@ -468,11 +482,16 @@ def _classify_spin_texture_config_with_reference(
     primary_source: str,
     reference: dict | None,
     calibration_atol_limit: float,
+    spin_texture_basis_max_order: int | None,
     fallback_operations=None,
     fallback_source: str | None = None,
 ) -> dict | None:
     reference_key = _spin_texture_config_classification_key(reference)
-    primary = _safe_classify_spin_texture_config(primary_operations, source=primary_source)
+    primary = _safe_classify_spin_texture_config(
+        primary_operations,
+        source=primary_source,
+        basis_orders_through=spin_texture_basis_max_order,
+    )
     if reference_key is None:
         if primary is not None:
             primary["basis_setting"] = "ossg_unit_cartesian"
@@ -485,7 +504,11 @@ def _classify_spin_texture_config_with_reference(
     strict_source = primary_source
     calibration_operations = primary_operations
     if fallback_operations is not None and fallback_source is not None:
-        fallback = _safe_classify_spin_texture_config(fallback_operations, source=fallback_source)
+        fallback = _safe_classify_spin_texture_config(
+            fallback_operations,
+            source=fallback_source,
+            basis_orders_through=spin_texture_basis_max_order,
+        )
         if _spin_texture_config_classification_key(fallback) == reference_key:
             fallback["basis_setting"] = "ossg_unit_cartesian"
             fallback["calibration"] = {
@@ -502,6 +525,7 @@ def _classify_spin_texture_config_with_reference(
         calibration_operations,
         source=strict_source,
         include_diagnostics=True,
+        basis_orders_through=spin_texture_basis_max_order,
     )
     candidate_atols = []
     candidate = _reference_calibration_atol(
@@ -523,6 +547,7 @@ def _classify_spin_texture_config_with_reference(
         calibrated = _safe_classify_spin_texture_config(
             calibration_operations,
             source=strict_source,
+            basis_orders_through=spin_texture_basis_max_order,
             atol=float(atol),
             zero_tol=max(1e-8, min(float(atol), 1e-4)),
         )
@@ -560,6 +585,7 @@ def _spin_texture_config_from_ossg_convention(
     calibration_atol_limit: float | None = None,
     reference: dict | None = None,
     generator_ops: list[SpinSpaceGroupOperation] | None = None,
+    spin_texture_basis_max_order: int | None = None,
 ) -> tuple[dict | None, dict | None]:
     if generator_ops is None:
         generator_ops = _symbol_generator_ops_for_current_basis(convention_ossg)
@@ -579,6 +605,7 @@ def _spin_texture_config_from_ossg_convention(
         primary_source="ossg_unit_cartesian_generators",
         reference=reference,
         calibration_atol_limit=tol if calibration_atol_limit is None else calibration_atol_limit,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
         fallback_operations=full_pairs,
         fallback_source="ossg_unit_cartesian_ops",
     )
@@ -591,6 +618,7 @@ def _spin_texture_config_from_ossg_convention(
     soc = _safe_classify_spin_texture_config(
         _msg_operation_pairs_in_ossg_unit_cartesian(msg_ops, convention_cell),
         source="ossg_unit_cartesian_msg_ops",
+        basis_orders_through=spin_texture_basis_max_order,
     )
     if soc is not None:
         soc["basis_setting"] = "ossg_unit_cartesian"
@@ -644,6 +672,10 @@ ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING = "acc_primitive_poscar_spin_frame"
 OSSG_ORIENTED_SPIN_FRAME_SETTING = "ossg_oriented_spin_frame"
 G0_STANDARD_SETTING = "G0std"
 L0_STANDARD_SETTING = "L0std"
+TEMPORARY_DATABASE_REDUNDANT_P_FALLBACK_LABELS = {
+    "12.6.4.11.P",
+    "13.1.4.20.P",
+}
 SCIF_SPIN_FRAME_CARTESIAN = "cartesian"
 SCIF_SPIN_FRAME_ORIENTED = "oriented"
 SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN = "ssg_convention_cartesian"
@@ -1375,6 +1407,7 @@ class IdentifyNoFracGroup:
 
 class MagSymmetryResult:
     def __init__(self, cell, symmetry, properties):
+        self.fsg_version = __version__
         self.input_ssg_ops = symmetry.get('input_ssg_ops', None)
         self.spin_only = symmetry.get('spin_only', None)
         self.ssg_std_cell = symmetry.get('ssg_std_cell', None)
@@ -1495,12 +1528,15 @@ class MagSymmetryResult:
         self.magnetic_phase_modifier = symmetry.get('magnetic_phase_modifier', '')
         self.magnetic_phase_spin_orbit_magnet = symmetry.get('magnetic_phase_spin_orbit_magnet', '')
         self.magnetic_phase_details = symmetry.get('magnetic_phase_details', None)
-        self.spin_texture_config_no_soc = symmetry.get(
-            'spin_texture_config_no_soc',
+        self.spin_texture_config_database = symmetry.get(
+            'spin_texture_config_database',
             symmetry.get('spin_texture_config', None),
         )
+        self.spin_texture_config_no_soc = symmetry.get(
+            'spin_texture_config_no_soc',
+            self.spin_texture_config_database,
+        )
         self.spin_texture_config_soc = symmetry.get('spin_texture_config_soc', None)
-        self.spin_texture_config = symmetry.get('spin_texture_config', self.spin_texture_config_no_soc)
         self.acc = symmetry['acc']
         self.msg_acc = symmetry.get('msg_acc', None)
         self.KPOINTS = symmetry['KPOINTS']
@@ -2075,7 +2111,7 @@ class MagSymmetryResult:
             'acc': self.acc,
             'properties': self.properties_summary(),
             'gspg': self.gspg_summary(),
-            'spin_texture_config': self.spin_texture_config,
+            'spin_texture_config_database': self.spin_texture_config_database,
             'spin_texture_config_no_soc': self.spin_texture_config_no_soc,
             'spin_texture_config_soc': self.spin_texture_config_soc,
             'vector_constraints_by_symmetry': self.vector_constraints_by_symmetry,
@@ -2132,7 +2168,7 @@ class MagSymmetryResult:
                 'phase_modifier': self.magnetic_phase_modifier,
                 'acc': self.acc,
                 'msg_acc': self.msg_acc,
-                'spin_texture_config': self.spin_texture_config,
+                'spin_texture_config_database': self.spin_texture_config_database,
                 'spin_texture_config_no_soc': self.spin_texture_config_no_soc,
                 'spin_texture_config_soc': self.spin_texture_config_soc,
                 'is_alter': self.is_alter,
@@ -3306,6 +3342,66 @@ def _transform_spin_generators(
     ]
 
 
+def _collinear_msg_view_payload_from_oriented_ops(
+    msg_ops: list[SpinSpaceGroupOperation],
+    *,
+    classification_tol: float,
+    seitz_tol: float,
+    spin_transform: np.ndarray | None = None,
+) -> tuple[list[dict], list[str]]:
+    """Build display MSG rows from the magnetic operation relation.
+
+    Collinear MSG operations are represented by a real-space operation and a
+    time-reversal sign.  The spin action shown in operation views should be the
+    axial-vector magnetic action generated from that pair, not whatever
+    spin-only promotion happened to supply the candidate operation.
+    """
+    spin_transform_array = None
+    spin_transform_inv = None
+    if spin_transform is not None:
+        spin_transform_array = np.asarray(spin_transform, dtype=float)
+        spin_transform_inv = np.linalg.inv(spin_transform_array)
+
+    payload: list[dict] = []
+    seitz_ops: list[SpinSpaceGroupOperation] = []
+    for idx, op in enumerate(msg_ops, start=1):
+        time_reversal = op.magnetic_time_reversal(atol=classification_tol)
+        if time_reversal is None:
+            continue
+        real_rotation = np.asarray(op.rotation, dtype=float)
+        translation = np.asarray(op.translation, dtype=float)
+        generated_spin_rotation = (
+            int(time_reversal) * float(np.linalg.det(real_rotation)) * real_rotation
+        )
+        spin_rotation = generated_spin_rotation
+        if spin_transform_array is not None and spin_transform_inv is not None:
+            spin_rotation = spin_transform_array @ spin_rotation @ spin_transform_inv
+
+        payload.append(
+            {
+                "index": idx,
+                "time_reversal": int(time_reversal),
+                "spin_rotation": np.asarray(spin_rotation, dtype=float).tolist(),
+                "real_rotation": real_rotation.tolist(),
+                "translation": translation.tolist(),
+            }
+        )
+        seitz_ops.append(
+            SpinSpaceGroupOperation(
+                spin_rotation,
+                real_rotation,
+                translation,
+            )
+        )
+
+    _msg_seitz, msg_seitz_latex = _serialize_op_list_seitz_symbols(
+        seitz_ops,
+        tol=seitz_tol,
+        allow_unresolved=True,
+    )
+    return payload, msg_seitz_latex
+
+
 def _operation_view_collinear_note(ssg: SpinSpaceGroup, *, spin_frame: str) -> dict:
     public_spin_frame = "oriented" if spin_frame == OSSG_ORIENTED_SPIN_FRAME_SETTING else spin_frame
     return {
@@ -3329,6 +3425,8 @@ def _build_operation_view_set(
     spin_frame: str,
     generator_ops: list[SpinSpaceGroupOperation] | None = None,
     msg_ops: list[SpinSpaceGroupOperation] | None = None,
+    msg_ops_payload: list[dict] | None = None,
+    msg_seitz_latex: list[str] | None = None,
     msg_indices: list[int] | None = None,
 ) -> dict:
     all_ops = list(ssg.ops)
@@ -3458,15 +3556,18 @@ def _build_operation_view_set(
         msg_ops = list(msg_ops)
 
     if is_collinear:
-        if msg_ops:
-            msg_payload = _serialize_ssg_operation_matrices(msg_ops)
+        if msg_ops_payload is None and msg_ops:
+            msg_ops_payload = _serialize_ssg_operation_matrices(msg_ops)
             _msg_seitz, msg_seitz_latex = _serialize_op_list_seitz_symbols(
                 msg_ops,
                 tol=ssg.symbol_calibration_tol,
                 allow_unresolved=True,
             )
+        if msg_ops_payload:
+            if msg_seitz_latex is None:
+                msg_seitz_latex = []
             views["msg"] = _operation_view_all_row(
-                msg_payload,
+                msg_ops_payload,
                 msg_seitz_latex,
                 label="MSG operations",
             )
@@ -3514,6 +3615,8 @@ def _build_operation_views(operation_sources: dict[str, dict]) -> dict:
             spin_frame=source.get("spin_frame", "cartesian"),
             generator_ops=source.get("generator_ops"),
             msg_ops=source.get("msg_ops"),
+            msg_ops_payload=source.get("msg_ops_payload"),
+            msg_seitz_latex=source.get("msg_seitz_latex"),
             msg_indices=source.get("msg_indices"),
         )
     return operation_views
@@ -5746,8 +5849,32 @@ def _get_spin_constraint_for_msg_little_groups(
                 rotation_cartesian = target_rotation @ rotation_cartesian @ target_rotation_inv
             spin_matrices.append(time_reversal * np.linalg.det(rotation_cartesian) * rotation_cartesian - np.eye(3))
         spinmatrices = np.vstack(deduplicate_matrix_pairs(spin_matrices, tol=tol))
-        constraints.append(combine_parametric_solutions(rref_with_tolerance(spinmatrices)))
+        _spin_splitting, constraint = solve_spin_constraint_from_stacked(spinmatrices)
+        constraints.append(constraint)
     return constraints
+
+
+def _get_spin_splitting_for_msg_little_groups(
+    little_groups: list[list[list]],
+    cell: CrystalCell,
+    tol: float,
+) -> list[str]:
+    lattice_col = _lattice_column_matrix(cell)
+    spin_splittings = []
+    for little_group in little_groups:
+        if not little_group:
+            spin_splittings.append("unknown")
+            continue
+        spin_matrices = []
+        for time_reversal, rotation, _ in little_group:
+            rotation_cartesian = _cartesianize_similarity(rotation, lattice_col)
+            spin_matrices.append(
+                time_reversal * np.linalg.det(rotation_cartesian) * rotation_cartesian - np.eye(3)
+            )
+        spinmatrices = np.vstack(deduplicate_matrix_pairs(spin_matrices, tol=tol))
+        spin_splitting, _constraint = solve_spin_constraint_from_stacked(spinmatrices)
+        spin_splittings.append(spin_splitting)
+    return spin_splittings
 
 
 def _build_msg_little_group_payload(
@@ -7295,6 +7422,7 @@ def _find_spin_group_from_parsed(
     input_spin_setting: str = "in_lattice",
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
+    spin_texture_basis_max_order: int | None = None,
 ) -> MagSymmetryResult:
     input_lattice_for_cell = lattice_factors
     input_positions_for_cell = positions
@@ -7419,6 +7547,7 @@ def _find_spin_group_from_parsed(
         legacy_transformation_primitive_to_acc_primitive[0],
         legacy_transformation_primitive_to_acc_primitive[1],
     )
+    use_temporary_database_redundant_p_fallback = False
     if identify_index_details is None:
         selected_standard_setting = G0_STANDARD_SETTING
         selected_transformation_primitive_to_standard = raw_transformation_primitive_to_G0std
@@ -7436,23 +7565,53 @@ def _find_spin_group_from_parsed(
             "identify_index": identify_info,
         }
     else:
-        (
-            selected_standard_setting,
-            selected_transformation_primitive_to_standard,
-            standard_transform_selection_audit,
-        ) = _select_standard_transform_for_acc_alignment(
-            ssg_primitive,
-            magnetic_primitive_cell,
-            {
-                G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
-                L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
-            },
-            legacy_transformation_primitive_to_acc_primitive,
-            legacy_acc_magnetic_primitive_cell,
-            identify_info=identify_info,
-            identify_index_details=identify_index_details,
-            tol=tol_cfg,
-        )
+        try:
+            (
+                selected_standard_setting,
+                selected_transformation_primitive_to_standard,
+                standard_transform_selection_audit,
+            ) = _select_standard_transform_for_acc_alignment(
+                ssg_primitive,
+                magnetic_primitive_cell,
+                {
+                    G0_STANDARD_SETTING: raw_transformation_primitive_to_G0std,
+                    L0_STANDARD_SETTING: raw_transformation_primitive_to_L0std,
+                },
+                legacy_transformation_primitive_to_acc_primitive,
+                legacy_acc_magnetic_primitive_cell,
+                identify_info=identify_info,
+                identify_index_details=identify_index_details,
+                tol=tol_cfg,
+            )
+        except ValueError as exc:
+            if identify_info not in TEMPORARY_DATABASE_REDUNDANT_P_FALLBACK_LABELS:
+                raise
+            use_temporary_database_redundant_p_fallback = True
+            selected_standard_setting = _selected_standard_setting_from_identify_index_details(
+                identify_index_details
+            )
+            selected_transformation_primitive_to_standard = (
+                raw_transformation_primitive_to_G0std
+                if selected_standard_setting == G0_STANDARD_SETTING
+                else raw_transformation_primitive_to_L0std
+            )
+            standard_transform_selection_audit = {
+                "strategy": "temporary_database_redundant_p_fallback",
+                "status": "fallback",
+                "identify_index": identify_info,
+                "selected_standard_setting": selected_standard_setting,
+                "preferred_standard_setting": selected_standard_setting,
+                "standard_setting_rule": "t_index/k_index",
+                "selected_strategy": "raw_standard_plus_legacy_acc_transform",
+                "selected_matrix": np.asarray(
+                    selected_transformation_primitive_to_standard[0], dtype=float
+                ).tolist(),
+                "selected_origin_shift": np.asarray(
+                    selected_transformation_primitive_to_standard[1], dtype=float
+                ).tolist(),
+                "database_refresh_required": True,
+                "nonfallback_error": str(exc),
+            }
     if selected_standard_setting == G0_STANDARD_SETTING:
         raw_transformation_primitive_to_G0std = selected_transformation_primitive_to_standard
     else:
@@ -7517,7 +7676,7 @@ def _find_spin_group_from_parsed(
         transformation_input_to_selected_standard = transformation_input_to_L0std
         transformation_input_to_database_standard = raw_transformation_input_to_L0std
 
-    if identify_index_details is None:
+    if identify_index_details is None or use_temporary_database_redundant_p_fallback:
         acc_magnetic_primitive_cell = legacy_acc_magnetic_primitive_cell
         acc_magnetic_primitive_ssg = ssg_primitive.transform(
             *legacy_transformation_primitive_to_acc_primitive
@@ -7529,16 +7688,29 @@ def _find_spin_group_from_parsed(
             transformation_input_to_acc_primitive[0],
             transformation_input_to_acc_primitive[1],
         )
-        acc_primitive_resolution_audit = {
-            "strategy": "legacy_acc_transform_without_identify_index",
-            "status": "identify_index_unavailable",
-            "identify_index": identify_info,
-            "selected_standard_setting": selected_standard_setting,
-            "note": (
-                "identify-index database details are unavailable, so ACC P-table "
-                "validation is skipped; non-ACC symmetry outputs remain available."
-            ),
-        }
+        if use_temporary_database_redundant_p_fallback:
+            acc_primitive_resolution_audit = {
+                "strategy": "temporary_legacy_acc_transform_for_database_redundant_p",
+                "status": "temporary_database_redundant_p_fallback",
+                "identify_index": identify_info,
+                "selected_standard_setting": selected_standard_setting,
+                "database_refresh_required": True,
+                "note": (
+                    "Temporary legacy ACC primitive transform for a known "
+                    "database-redundant pure-translation ACC-P record."
+                ),
+            }
+        else:
+            acc_primitive_resolution_audit = {
+                "strategy": "legacy_acc_transform_without_identify_index",
+                "status": "identify_index_unavailable",
+                "identify_index": identify_info,
+                "selected_standard_setting": selected_standard_setting,
+                "note": (
+                    "identify-index database details are unavailable, so ACC P-table "
+                    "validation is skipped; non-ACC symmetry outputs remain available."
+                ),
+            }
     else:
         (
             acc_magnetic_primitive_cell,
@@ -7873,7 +8045,6 @@ def _find_spin_group_from_parsed(
         transformation_input_to_convention[1],
     )
 
-    KPOINTS = acc_primitive_output_ssg.KPOINTS
     SS =  acc_primitive_output_ssg.spin_polarizations
     SS_poscar = acc_primitive_output_ssg_in_poscar_spin_frame.spin_polarizations
     quasi_2d_diagnostics = build_quasi2d_diagnostics(
@@ -7904,6 +8075,14 @@ def _find_spin_group_from_parsed(
         msg_little_groups,
         acc_magnetic_primitive_cell,
         tol=tol_cfg.m_matrix_tol,
+    )
+    msg_spin_splittings = _get_spin_splitting_for_msg_little_groups(
+        msg_little_groups,
+        acc_magnetic_primitive_cell,
+        tol=tol_cfg.m_matrix_tol,
+    )
+    KPOINTS = acc_primitive_output_ssg.get_KPOINTS(
+        spin_splitting_w_soc=msg_spin_splittings
     )
     msg_spin_polarizations_poscar = _get_spin_constraint_for_msg_little_groups(
         msg_little_groups,
@@ -7975,6 +8154,7 @@ def _find_spin_group_from_parsed(
                 transformation_input_to_convention=transformation_input_to_convention,
                 tol=tol_cfg.m_matrix_tol,
                 calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
+                spin_texture_basis_max_order=spin_texture_basis_max_order,
             )
         )
     public_convention_cartesian_ssg = public_convention_oriented_ssg.transform_spin(
@@ -8072,6 +8252,66 @@ def _find_spin_group_from_parsed(
         input_oriented_msg_ops,
         input_lattice_col,
     )
+    convention_oriented_msg_payload = convention_oriented_msg_seitz_latex = None
+    convention_cartesian_msg_payload = convention_cartesian_msg_seitz_latex = None
+    acc_primitive_oriented_msg_payload = acc_primitive_oriented_msg_seitz_latex = None
+    acc_primitive_cartesian_msg_payload = acc_primitive_cartesian_msg_seitz_latex = None
+    input_oriented_msg_payload = input_oriented_msg_seitz_latex = None
+    input_cartesian_msg_payload = input_cartesian_msg_seitz_latex = None
+    if public_convention_oriented_ssg.conf == "Collinear":
+        (
+            convention_oriented_msg_payload,
+            convention_oriented_msg_seitz_latex,
+        ) = _collinear_msg_view_payload_from_oriented_ops(
+            convention_oriented_msg_ops,
+            classification_tol=public_convention_oriented_ssg.tol,
+            seitz_tol=public_convention_oriented_ssg.symbol_calibration_tol,
+        )
+        (
+            convention_cartesian_msg_payload,
+            convention_cartesian_msg_seitz_latex,
+        ) = _collinear_msg_view_payload_from_oriented_ops(
+            convention_oriented_msg_ops,
+            classification_tol=public_convention_oriented_ssg.tol,
+            seitz_tol=public_convention_oriented_ssg.symbol_calibration_tol,
+            spin_transform=convention_lattice_col,
+        )
+    if acc_primitive_ossg.conf == "Collinear":
+        (
+            acc_primitive_oriented_msg_payload,
+            acc_primitive_oriented_msg_seitz_latex,
+        ) = _collinear_msg_view_payload_from_oriented_ops(
+            acc_primitive_oriented_msg_ops,
+            classification_tol=acc_primitive_ossg.tol,
+            seitz_tol=acc_primitive_ossg.symbol_calibration_tol,
+        )
+        (
+            acc_primitive_cartesian_msg_payload,
+            acc_primitive_cartesian_msg_seitz_latex,
+        ) = _collinear_msg_view_payload_from_oriented_ops(
+            acc_primitive_oriented_msg_ops,
+            classification_tol=acc_primitive_ossg.tol,
+            seitz_tol=acc_primitive_ossg.symbol_calibration_tol,
+            spin_transform=acc_primitive_lattice_col,
+        )
+    if input_setting_ossg.conf == "Collinear":
+        (
+            input_oriented_msg_payload,
+            input_oriented_msg_seitz_latex,
+        ) = _collinear_msg_view_payload_from_oriented_ops(
+            input_oriented_msg_ops,
+            classification_tol=input_setting_ossg.tol,
+            seitz_tol=input_setting_ossg.symbol_calibration_tol,
+        )
+        (
+            input_cartesian_msg_payload,
+            input_cartesian_msg_seitz_latex,
+        ) = _collinear_msg_view_payload_from_oriented_ops(
+            input_oriented_msg_ops,
+            classification_tol=input_setting_ossg.tol,
+            seitz_tol=input_setting_ossg.symbol_calibration_tol,
+            spin_transform=input_lattice_col,
+        )
     operation_views = _build_operation_views(
         {
             "convention_cartesian": {
@@ -8082,6 +8322,8 @@ def _find_spin_group_from_parsed(
                 "spin_frame": "cartesian",
                 "generator_ops": convention_cartesian_generator_ops,
                 "msg_ops": convention_cartesian_msg_ops,
+                "msg_ops_payload": convention_cartesian_msg_payload,
+                "msg_seitz_latex": convention_cartesian_msg_seitz_latex,
                 "msg_indices": convention_msg_indices,
             },
             "convention_oriented": {
@@ -8092,6 +8334,8 @@ def _find_spin_group_from_parsed(
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": convention_oriented_generator_ops,
                 "msg_ops": convention_oriented_msg_ops,
+                "msg_ops_payload": convention_oriented_msg_payload,
+                "msg_seitz_latex": convention_oriented_msg_seitz_latex,
                 "msg_indices": convention_msg_indices,
             },
             "magnetic_primitive_cartesian": {
@@ -8102,6 +8346,8 @@ def _find_spin_group_from_parsed(
                 "spin_frame": "cartesian",
                 "generator_ops": acc_primitive_cartesian_generator_ops,
                 "msg_ops": acc_primitive_cartesian_msg_ops,
+                "msg_ops_payload": acc_primitive_cartesian_msg_payload,
+                "msg_seitz_latex": acc_primitive_cartesian_msg_seitz_latex,
                 "msg_indices": acc_primitive_msg_indices,
             },
             "magnetic_primitive_oriented": {
@@ -8112,6 +8358,8 @@ def _find_spin_group_from_parsed(
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": acc_primitive_oriented_generator_ops,
                 "msg_ops": acc_primitive_oriented_msg_ops,
+                "msg_ops_payload": acc_primitive_oriented_msg_payload,
+                "msg_seitz_latex": acc_primitive_oriented_msg_seitz_latex,
                 "msg_indices": acc_primitive_msg_indices,
             },
             "input_cartesian": {
@@ -8122,6 +8370,8 @@ def _find_spin_group_from_parsed(
                 "spin_frame": "cartesian",
                 "generator_ops": input_cartesian_generator_ops,
                 "msg_ops": input_cartesian_msg_ops,
+                "msg_ops_payload": input_cartesian_msg_payload,
+                "msg_seitz_latex": input_cartesian_msg_seitz_latex,
                 "msg_indices": input_msg_indices,
             },
             "input_oriented": {
@@ -8132,6 +8382,8 @@ def _find_spin_group_from_parsed(
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": input_oriented_generator_ops,
                 "msg_ops": input_oriented_msg_ops,
+                "msg_ops_payload": input_oriented_msg_payload,
+                "msg_seitz_latex": input_oriented_msg_seitz_latex,
                 "msg_indices": input_msg_indices,
             },
         }
@@ -8305,14 +8557,15 @@ def _find_spin_group_from_parsed(
         site_order=acc_primitive_wp_site_order,
     )
     acc_p_c_poscar = acc_primitive_output_poscar
-    spin_texture_config = _spin_texture_config_for_public_output(identify_info)
+    spin_texture_config_database = _spin_texture_config_for_public_output(identify_info)
     spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
         public_convention_oriented_ssg,
         convention_cell,
         tol=tol_cfg.m_matrix_tol,
         calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
-        reference=spin_texture_config,
+        reference=spin_texture_config_database,
         generator_ops=convention_oriented_generator_ops,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
     result = {
@@ -8326,7 +8579,7 @@ def _find_spin_group_from_parsed(
         'poscar_mp':acc_primitive_output_poscar,
         'acc':ssg_primitive.acc,
         'msg_acc': msg_acc,
-        'spin_texture_config': spin_texture_config,
+        'spin_texture_config_database': spin_texture_config_database,
         'spin_texture_config_no_soc': spin_texture_config_no_soc,
         'spin_texture_config_soc': spin_texture_config_soc,
         'KPOINTS':KPOINTS,
@@ -8382,7 +8635,7 @@ def _find_spin_group_from_parsed(
                 'magnetic_phase_modifier': magnetic_phase_modifier,
                 'magnetic_phase_spin_orbit_magnet': magnetic_phase_payload['spin_orbit_magnet_tag'],
                 'magnetic_phase_details': magnetic_phase_details,
-                'spin_texture_config': spin_texture_config,
+                'spin_texture_config_database': spin_texture_config_database,
                 'spin_texture_config_no_soc': spin_texture_config_no_soc,
                 'spin_texture_config_soc': spin_texture_config_soc,
                 'acc':ssg_primitive.acc,
@@ -8752,6 +9005,7 @@ def _find_spin_group_basic_from_parsed(
     moments,
     tol_cfg: Tolerances,
     input_spin_setting: str = "in_lattice",
+    spin_texture_basis_max_order: int | None = None,
 ) -> dict:
     input_cell = CrystalCell(
         lattice_factors,
@@ -9023,17 +9277,19 @@ def _find_spin_group_basic_from_parsed(
         msg_spin_space_setting=OSSG_ORIENTED_SPIN_FRAME_SETTING,
         tol=tol_cfg.m_matrix_tol,
     )
-    spin_texture_config = _spin_texture_config_for_public_output(identify_info)
+    spin_texture_config_database = _spin_texture_config_for_public_output(identify_info)
     spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
         selected_standard_ossg,
         selected_standard_cell,
         tol=tol_cfg.m_matrix_tol,
         calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
-        reference=spin_texture_config,
+        reference=spin_texture_config_database,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
     return {
         "index": identify_info,
+        "ossg_symbol_linear": selected_standard_ossg.international_symbol_linear_current_frame,
         "identify_index_details": identify_index_details,
         "g0_symbol": ssg_primitive.G0_symbol,
         "g0_number": int(ssg_primitive.G0_num),
@@ -9043,6 +9299,10 @@ def _find_spin_group_basic_from_parsed(
         "ik": int(ssg_primitive.ik),
         "nsspg": ssg_primitive.n_spin_part_point_group_symbol_hm,
         "sspg": ssg_primitive.spin_part_point_group_symbol_hm,
+        "nontrivial_spin_space_point_group_hm": ssg_primitive.n_spin_part_point_group_symbol_hm,
+        "nontrivial_spin_space_point_group_schoenflies": ssg_primitive.n_spin_part_point_group_symbol_s,
+        "spin_space_point_group_hm": ssg_primitive.spin_part_point_group_symbol_hm,
+        "spin_space_point_group_schoenflies": ssg_primitive.spin_part_point_group_symbol_s,
         "acc_symbol": ssg_primitive.acc,
         "acc_primitive_resolution_audit": acc_primitive_resolution_audit,
         "T_input_to_acc_primitive": (
@@ -9066,7 +9326,7 @@ def _find_spin_group_basic_from_parsed(
         "magnetic_phase_base": magnetic_phase_payload["base_phase"],
         "magnetic_phase_modifier": magnetic_phase_payload["modifier"],
         "magnetic_phase_details": magnetic_phase_details,
-        "spin_texture_config": spin_texture_config,
+        "spin_texture_config_database": spin_texture_config_database,
         "spin_texture_config_no_soc": spin_texture_config_no_soc,
         "spin_texture_config_soc": spin_texture_config_soc,
         "net_moment": magnetic_phase_details["net_moment"],
@@ -9110,6 +9370,7 @@ def _find_spin_group_acc_primitive_from_parsed(
     moments,
     tol_cfg: Tolerances,
     input_spin_setting: str = "in_lattice",
+    spin_texture_basis_max_order: int | None = None,
 ) -> dict:
     input_cell = CrystalCell(
         lattice_factors,
@@ -9379,6 +9640,26 @@ def _find_spin_group_acc_primitive_from_parsed(
         acc_primitive_oriented_msg_ops,
         acc_primitive_lattice_col,
     )
+    acc_primitive_oriented_msg_payload = acc_primitive_oriented_msg_seitz_latex = None
+    acc_primitive_cartesian_msg_payload = acc_primitive_cartesian_msg_seitz_latex = None
+    if acc_primitive_ossg.conf == "Collinear":
+        (
+            acc_primitive_oriented_msg_payload,
+            acc_primitive_oriented_msg_seitz_latex,
+        ) = _collinear_msg_view_payload_from_oriented_ops(
+            acc_primitive_oriented_msg_ops,
+            classification_tol=acc_primitive_ossg.tol,
+            seitz_tol=acc_primitive_ossg.symbol_calibration_tol,
+        )
+        (
+            acc_primitive_cartesian_msg_payload,
+            acc_primitive_cartesian_msg_seitz_latex,
+        ) = _collinear_msg_view_payload_from_oriented_ops(
+            acc_primitive_oriented_msg_ops,
+            classification_tol=acc_primitive_ossg.tol,
+            seitz_tol=acc_primitive_ossg.symbol_calibration_tol,
+            spin_transform=acc_primitive_lattice_col,
+        )
     operation_views = _build_operation_views(
         {
             "magnetic_primitive_cartesian": {
@@ -9388,6 +9669,8 @@ def _find_spin_group_acc_primitive_from_parsed(
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": "cartesian",
                 "msg_ops": acc_primitive_cartesian_msg_ops,
+                "msg_ops_payload": acc_primitive_cartesian_msg_payload,
+                "msg_seitz_latex": acc_primitive_cartesian_msg_seitz_latex,
                 "msg_indices": acc_primitive_msg_indices,
             },
             "magnetic_primitive_oriented": {
@@ -9397,6 +9680,8 @@ def _find_spin_group_acc_primitive_from_parsed(
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "msg_ops": acc_primitive_oriented_msg_ops,
+                "msg_ops_payload": acc_primitive_oriented_msg_payload,
+                "msg_seitz_latex": acc_primitive_oriented_msg_seitz_latex,
                 "msg_indices": acc_primitive_msg_indices,
             },
         }
@@ -9410,13 +9695,14 @@ def _find_spin_group_acc_primitive_from_parsed(
         mpg_identifier=selected_standard_ossg.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
     )
-    spin_texture_config = _spin_texture_config_for_public_output(identify_info)
+    spin_texture_config_database = _spin_texture_config_for_public_output(identify_info)
     spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
         selected_standard_ossg,
         selected_standard_cell,
         tol=tol_cfg.m_matrix_tol,
         calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
-        reference=spin_texture_config,
+        reference=spin_texture_config_database,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
     return {
@@ -9424,7 +9710,7 @@ def _find_spin_group_acc_primitive_from_parsed(
         "identify_index_details": identify_index_details,
         "acc_symbol": ssg_primitive.acc,
         "conf": ssg_primitive.conf,
-        "spin_texture_config": spin_texture_config,
+        "spin_texture_config_database": spin_texture_config_database,
         "spin_texture_config_no_soc": spin_texture_config_no_soc,
         "spin_texture_config_soc": spin_texture_config_soc,
         "quasi_2d": None,
@@ -9493,6 +9779,7 @@ def find_spin_group_from_data(
     matrix_tol = 0.01,
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
+    spin_texture_basis_max_order: int | None = None,
 ) -> MagSymmetryResult:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     return _find_spin_group_from_parsed(
@@ -9508,6 +9795,7 @@ def find_spin_group_from_data(
         input_spin_setting=input_spin_setting,
         calculation_mode=calculation_mode,
         vacuum_axis=vacuum_axis,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
 
@@ -9523,6 +9811,7 @@ def find_spin_group_basic_from_data(
     mtol=0.02,
     meigtol=0.00002,
     matrix_tol=0.01,
+    spin_texture_basis_max_order: int | None = None,
 ) -> dict:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     return _find_spin_group_basic_from_parsed(
@@ -9534,6 +9823,7 @@ def find_spin_group_basic_from_data(
         moments,
         tol_cfg,
         input_spin_setting=input_spin_setting,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
 
@@ -9549,6 +9839,7 @@ def find_spin_group_acc_primitive_from_data(
     mtol=0.02,
     meigtol=0.00002,
     matrix_tol=0.01,
+    spin_texture_basis_max_order: int | None = None,
 ) -> dict:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     return _find_spin_group_acc_primitive_from_parsed(
@@ -9560,6 +9851,7 @@ def find_spin_group_acc_primitive_from_data(
         moments,
         tol_cfg,
         input_spin_setting=input_spin_setting,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
 
@@ -9693,18 +9985,16 @@ def _find_spin_group_input_ssg_from_parsed(
         )
 
     input_poscar = None
-    if source_format != "poscar":
+    if source_format != "poscar" and not is_input_magnetic_primitive:
         input_poscar = _cell_to_poscar_preserving_lattice(
             identify_cell,
             Path(source_name).name,
         )
 
-    magnetic_primitive_poscar = None
-    if not is_input_magnetic_primitive:
-        magnetic_primitive_poscar = _cell_to_poscar_preserving_lattice(
-            input_magnetic_primitive_cell,
-            f"{Path(source_name).name}_magnetic_primitive"
-        )
+    magnetic_primitive_poscar = _cell_to_poscar_preserving_lattice(
+        input_magnetic_primitive_cell,
+        f"{Path(source_name).name}_magnetic_primitive",
+    )
 
     return {
         "summary": {
@@ -9754,6 +10044,7 @@ def find_spin_group(
     vacuum_axis: str | None = "c",
     poscar_allow_incar_magmom: bool = False,
     poscar_prefer_incar_magmom: bool = False,
+    spin_texture_basis_max_order: int | None = None,
 ) -> MagSymmetryResult:
     """
     Find the spin space group of a crystal structure given in a CIF file.
@@ -9795,6 +10086,7 @@ def find_spin_group(
         input_spin_setting=input_spin_setting,
         calculation_mode=calculation_mode,
         vacuum_axis=vacuum_axis,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
 
@@ -9807,6 +10099,7 @@ def find_spin_group_basic(
     parser_atol=0.02,
     poscar_allow_incar_magmom: bool = False,
     poscar_prefer_incar_magmom: bool = False,
+    spin_texture_basis_max_order: int | None = None,
 ) -> dict:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     parsed, _source_metadata = parse_structure_file(
@@ -9829,6 +10122,7 @@ def find_spin_group_basic(
         moments,
         tol_cfg,
         input_spin_setting=input_spin_setting,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
 
@@ -9841,6 +10135,7 @@ def find_spin_group_acc_primitive(
     parser_atol=0.02,
     poscar_allow_incar_magmom: bool = False,
     poscar_prefer_incar_magmom: bool = False,
+    spin_texture_basis_max_order: int | None = None,
 ) -> dict:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     parsed, _source_metadata = parse_structure_file(
@@ -9863,6 +10158,7 @@ def find_spin_group_acc_primitive(
         moments,
         tol_cfg,
         input_spin_setting=input_spin_setting,
+        spin_texture_basis_max_order=spin_texture_basis_max_order,
     )
 
 
@@ -9899,28 +10195,18 @@ def find_spin_group_input_ssg(
     frame before identification and export.
     """
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
-    path = Path(structure_file)
-    suffix = path.suffix.lower()
-    basename = path.name.lower()
-    if suffix in {".vasp", ".poscar"} or basename in {"poscar", "contcar"}:
-        lattice_factors, positions, elements, occupancies, labels, moments = parse_poscar_file(
-            structure_file,
-            allow_incar_magmom=poscar_allow_incar_magmom,
-            prefer_incar_magmom=poscar_prefer_incar_magmom,
-            require_embedded_magmom=not poscar_allow_incar_magmom,
-        )
-        source_format = "poscar"
-        input_spin_setting = "cartesian"
-    else:
-        parsed, source_metadata = parse_structure_file(
-            structure_file,
-            return_metadata=True,
-        )
-        lattice_factors, positions, elements, occupancies, labels, moments = parsed
-        source_format = "unknown" if source_metadata is None else source_metadata.get("source_format", "unknown")
-        input_spin_setting = (
-            "in_lattice" if source_metadata is None else source_metadata.get("spin_setting", "in_lattice")
-        )
+    parsed, source_metadata = parse_structure_file(
+        structure_file,
+        return_metadata=True,
+        poscar_allow_incar_magmom=poscar_allow_incar_magmom,
+        poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,
+        poscar_require_embedded_magmom=not poscar_allow_incar_magmom,
+    )
+    lattice_factors, positions, elements, occupancies, labels, moments = parsed
+    source_format = "unknown" if source_metadata is None else source_metadata.get("source_format", "unknown")
+    input_spin_setting = (
+        "in_lattice" if source_metadata is None else source_metadata.get("spin_setting", "in_lattice")
+    )
     return _find_spin_group_input_ssg_from_parsed(
         structure_file,
         lattice_factors,

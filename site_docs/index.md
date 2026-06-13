@@ -71,4 +71,5 @@ disk.
   magnetic phase, settings, and artifacts.
 - [Python API Reference](reference/python-api.md) - exact function signatures,
   parameters, returns, and examples.
-- [Output Fields](reference/output-fields.md) - field-by-field output meaning.
+- [Result Schemas](reference/result-schemas/index.md) - field-by-field output
+  meaning by returned object.

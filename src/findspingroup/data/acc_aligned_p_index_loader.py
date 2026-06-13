@@ -6,7 +6,11 @@ from functools import lru_cache
 from importlib.resources import files
 from typing import TypeAlias
 
-from findspingroup.spin_splitting import spin_texture_basis_latex
+from findspingroup.spin_splitting import (
+    _append_basis_remainder_ascii,
+    _append_basis_remainder_latex,
+    spin_texture_basis_latex,
+)
 
 
 Matrix: TypeAlias = tuple[tuple[Fraction, Fraction, Fraction], ...]
@@ -79,7 +83,15 @@ def _spin_texture_config_record(payload: dict) -> dict:
     legacy_type_key = "wave" + "_type"
     if legacy_type_key in record and "spin_texture_type" not in record:
         record["spin_texture_type"] = record.pop(legacy_type_key)
-    record.setdefault("basis_latex", spin_texture_basis_latex(record.get("basis")))
+    basis = record.get("basis")
+    order = record.get("order")
+    remainder_order = int(order) if order is not None else None
+    if basis and not any(" + o(" in str(expression) for expression in basis):
+        record["basis"] = _append_basis_remainder_ascii(basis, remainder_order)
+        basis_latex = spin_texture_basis_latex(basis)
+        record["basis_latex"] = _append_basis_remainder_latex(basis_latex, remainder_order)
+    else:
+        record.setdefault("basis_latex", spin_texture_basis_latex(record.get("basis")))
     return record
 
 

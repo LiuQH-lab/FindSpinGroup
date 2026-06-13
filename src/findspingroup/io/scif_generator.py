@@ -360,7 +360,7 @@ def _format_spinframe_transform_abc(
     )
     return (
         "_space_group_spin.transform_spinframe_P_abc  "
-        f"'{_format_basis_transform_rows(rows, ('a', 'b', 'c'), tol=10 ** (-coeff_precision))}'"
+        f"'{_format_basis_transform_rows(rows, ('a', 'b', 'c'), tol=max(1e-10, 10 ** (-coeff_precision)))}'"
     )
 
 

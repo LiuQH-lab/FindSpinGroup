@@ -31,7 +31,15 @@ python -m pip install -e ".[dev]"
 Run a compact identification from the command line:
 
 ```bash
+fsg path/to/structure.mcif
+```
+
+This prints a short human-readable summary. Use `--show` for selected fields or
+`--json` for the complete compact JSON payload:
+
+```bash
 fsg path/to/structure.mcif --show index --show magnetic_phase --show msg_symbol
+fsg path/to/structure.mcif --json
 ```
 
 Use the Python API when the result will be consumed by another program:
@@ -89,7 +97,8 @@ FindSpinGroup supports:
 - magnetic CIF / mCIF files;
 - ordinary CIF files when magnetic information is available in supported tags;
 - repo-generated SCIF files;
-- POSCAR-like files, including `POSCAR`, `CONTCAR`, `.vasp`, and `.poscar`.
+- POSCAR-like files, including `POSCAR`, `CONTCAR`, `.vasp`, `.poscar`, and
+  explicit ordinary filenames without a CIF/SCIF suffix.
 
 Magnetic moments must be present. For POSCAR-like files, the command-line tool
 is optimized for VASP working directories and prefers a sibling `INCAR` MAGMOM
@@ -99,7 +108,8 @@ reading is explicitly enabled, which keeps scripted calls reproducible.
 When no input file is given, the CLI auto-selects from the current directory in
 this order: SCIF, mCIF, CIF files with magnetic-moment tags, `POSCAR` with
 sibling `INCAR` MAGMOM, `POSCAR` with embedded MAGMOM, `.vasp` / `.poscar`
-files with embedded MAGMOM, and finally `CONTCAR`.
+files with embedded MAGMOM, and finally `CONTCAR`. Automatic discovery does not
+scan arbitrary ordinary filenames; pass those POSCAR-like files explicitly.
 
 ## Quasi-2D Calculations
 

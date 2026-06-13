@@ -1,15 +1,27 @@
-# MagSymmetryResult
+# MagSymmetryResult Reference
 
 `find_spin_group(...)` returns a `MagSymmetryResult` object. The object contains
-the full analysis result, generated artifacts, and diagnostics.
+the full analysis result, generated artifacts, and diagnostic details.
 
-## Recommended Accessors
+Use the accessor methods below before reaching for raw attributes.
 
-### `to_summary_dict()`
+## `to_summary_dict`
 
-Returns a compact dictionary with the most useful human-facing fields.
+### Signature
 
-Main contents:
+```python
+result.to_summary_dict() -> dict
+```
+
+### Purpose
+
+Return a compact, display-friendly summary from the full route.
+
+### Returns
+
+Type: `dict`
+
+Main fields:
 
 `index`
 Identified OSSG index.
@@ -21,44 +33,68 @@ Magnetic configuration class.
 Magnetic phase classification.
 
 `acc`
-Arithmetic crystal class.
+Spin arithmetic crystal class.
 
 `properties`
 Physical-property summary.
 
 `gspg`
-Compact GSPG summary and text payload.
+GSPG summary and compact text payload.
 
-`polar_axes_by_symmetry`
-Polar-axis information inferred by symmetry.
+`spin_texture_config_database`
+Spin-texture configuration summary loaded from the runtime database.
+
+`spin_texture_config_no_soc`
+Spin-texture configuration from the non-SOC route.
+
+`spin_texture_config_soc`
+Spin-texture configuration from the SOC-compatible route.
+
+`vector_constraints_by_symmetry`
+Symmetry constraints on vector quantities.
 
 `ferroelectric_switching`
-Symmetry-only ferroelectric switching payload.
+Symmetry-only ferroelectric-switching payload.
 
-### `to_structured_dict()`
+## `to_structured_dict`
 
-Returns the full result grouped by semantic layer. This is the preferred full
-output for new integrations.
+### Signature
 
-Top-level groups:
+```python
+result.to_structured_dict() -> dict
+```
+
+### Purpose
+
+Return the full result grouped by semantic layer. This is the recommended full
+output for new integrations because callers do not have to infer meaning from
+flat legacy attribute names.
+
+### Returns
+
+Type: `dict`
+
+Top-level fields:
 
 `summary`
-Identifiers, phase, tolerances, and source metadata.
+Identifiers, phase fields, spin-texture fields, tolerances, and source
+metadata.
 
 `groups`
-Input SG, G0, L0, spin point group, GSPG, OSSG, MSG, SSG-by-cell, MSG-by-cell,
-and little-group payloads.
+Input SG, G0, L0, spin point group, GSPG, OSSG, MSG, SSG-by-cell payloads,
+MSG-by-cell payloads, and little-group outputs.
 
 `cells`
 Input, input magnetic primitive, database standard, convention, ACC primitive,
 and ACC conventional cells.
 
 `transforms`
-Setting transforms and route audits.
+Setting transforms and route audit details.
 
 `properties`
-Magnetic phase, spin splitting, AHC, tensors, magnetic-site summary, quasi-2D,
-polar-axis, and ferroelectric-switching outputs.
+Magnetic phase details, spin splitting, AHC constraints, tensors, magnetic-site
+summary, quasi-2D diagnostics, vector constraints, and ferroelectric-switching
+outputs.
 
 `artifacts`
 Generated POSCAR, SCIF, and KPOINTS text.
@@ -66,18 +102,44 @@ Generated POSCAR, SCIF, and KPOINTS text.
 `legacy`
 Raw attribute dictionary for compatibility with older callers.
 
-### `to_scif(cell_mode=...)`
+The nested field tree is documented in
+[StructuredResult](result-schemas/structured-result.md). Use that page when you
+need the next layer below `summary`, `groups`, `cells`, `transforms`,
+`properties`, or `artifacts`.
 
-Returns generated SCIF text for the requested cell mode. See
-[SCIF Export](scif.md).
+## `to_scif`
 
-### `to_dict()`
+### Signature
 
-Returns the raw attribute dictionary. This is useful for compatibility and
+```python
+result.to_scif(cell_mode: str = "ssg_convention_oriented") -> str
+```
+
+### Purpose
+
+Return generated SCIF text for an explicit cell mode.
+
+See [SCIF Export](scif.md) for all cell modes and aliases.
+
+## `to_dict`
+
+### Signature
+
+```python
+result.to_dict() -> dict
+```
+
+### Purpose
+
+Return the raw attribute dictionary. This is useful for compatibility and
 debugging, but it is not the recommended starting point for new integrations.
-Prefer `to_summary_dict()` or `to_structured_dict()`.
+Use `to_summary_dict()` for compact display and `to_structured_dict()` for the
+complete structured contract.
 
 ## Common Direct Attributes
+
+Direct attributes are still available for interactive work and compatibility.
+The most commonly used ones are:
 
 `index`
 Final identified OSSG index.
@@ -92,7 +154,7 @@ High-level magnetic phase label.
 Corresponding MSG identifiers.
 
 `acc`
-Arithmetic crystal class.
+Spin arithmetic crystal class.
 
 `scif`
 Default SCIF text.

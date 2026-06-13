@@ -17,6 +17,7 @@ def parse_structure_file(
     *,
     poscar_allow_incar_magmom: bool = False,
     poscar_prefer_incar_magmom: bool = False,
+    poscar_require_embedded_magmom: bool = False,
 ):
     path = Path(filename)
     suffix = path.suffix.lower()
@@ -38,11 +39,20 @@ def parse_structure_file(
             )
             return parsed, enriched
         return parse_scif_file(filename, atol=atol)
-    if suffix in {'.vasp', '.poscar'} or basename in {'poscar', 'contcar'}:
+    if suffix in {'.cif', '.mcif'}:
+        if return_metadata:
+            parsed, metadata = parse_cif_file(filename, atol=atol, return_metadata=True)
+            enriched = {} if metadata is None else dict(metadata)
+            enriched.setdefault("source_format", "cif")
+            enriched.setdefault("spin_setting", "in_lattice")
+            return parsed, enriched
+        return parse_cif_file(filename, atol=atol)
+    if suffix in {'.vasp', '.poscar'} or basename in {'poscar', 'contcar'} or suffix not in {'.scif', '.cif', '.mcif'}:
         parsed = parse_poscar_file(
             filename,
             allow_incar_magmom=poscar_allow_incar_magmom,
             prefer_incar_magmom=poscar_prefer_incar_magmom,
+            require_embedded_magmom=poscar_require_embedded_magmom,
         )
         if return_metadata:
             return parsed, {
@@ -50,15 +60,10 @@ def parse_structure_file(
                 "spin_setting": "cartesian",
                 "poscar_allow_incar_magmom": poscar_allow_incar_magmom,
                 "poscar_prefer_incar_magmom": poscar_prefer_incar_magmom,
+                "poscar_require_embedded_magmom": poscar_require_embedded_magmom,
             }
         return parsed
-    if return_metadata:
-        parsed, metadata = parse_cif_file(filename, atol=atol, return_metadata=True)
-        enriched = {} if metadata is None else dict(metadata)
-        enriched.setdefault("source_format", "cif")
-        enriched.setdefault("spin_setting", "in_lattice")
-        return parsed, enriched
-    return parse_cif_file(filename, atol=atol)
+    raise ValueError(f"Unsupported structure file format for {filename!r}.")
 
 
 __all__ = [

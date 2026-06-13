@@ -50,12 +50,17 @@ and magnetic-phase fields.
 For your own magnetic structure file:
 
 ```bash
+fsg path/to/structure.mcif
+```
+
+The default `fsg` route runs the compact identification path and prints a short
+human-readable summary. Use `--show` for selected fields:
+
+```bash
 fsg path/to/structure.mcif --show index --show magnetic_phase --show msg_symbol
 ```
 
-The default `fsg` route runs the compact identification path. It prints JSON
-when multiple `--show` fields are requested and prints the single value when one
-field is requested.
+Use `--json` when another program needs the complete compact JSON payload.
 
 ## When The First Example Fails
 

@@ -13,15 +13,28 @@ nav:
       - Getting Started: guide/getting-started.md
       - Choosing an API: guide/choosing-an-api.md
       - Understanding Results: guide/understanding-results.md
+      - Concepts: guide/concepts.md
       - Input Formats: guide/input-formats.md
       - Examples: guide/examples.md
       - Troubleshooting: guide/troubleshooting.md
   - Reference:
       - Overview: reference/index.md
-      - Python API: reference/python-api.md
-      - MagSymmetryResult: reference/magsymmetry-result.md
+      - Python API:
+          - Overview: reference/python-api.md
+          - find_spin_group_basic: reference/api/find-spin-group-basic.md
+          - find_spin_group: reference/api/find-spin-group.md
+          - find_spin_group_input_ssg: reference/api/find-spin-group-input-ssg.md
+      - MagSymmetryResult Object: reference/magsymmetry-result.md
+      - Result Schemas:
+          - Overview: reference/result-schemas/index.md
+          - BasicResult: reference/result-schemas/basic-result.md
+          - SummaryResult: reference/result-schemas/summary-result.md
+          - StructuredResult: reference/result-schemas/structured-result.md
+          - InputSSGResult: reference/result-schemas/input-ssg-result.md
+          - Payload Definitions: reference/result-schemas/payload-definitions.md
+          - BatchExport: reference/result-schemas/batch-export.md
       - CLI: reference/cli.md
-      - Output Fields: reference/output-fields.md
+      - CLI Show Fields: reference/cli-show-fields.md
       - SCIF Export: reference/scif.md
   - Advanced Notes:
       - Overview: advanced/index.md

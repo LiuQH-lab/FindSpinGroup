@@ -5,14 +5,17 @@ import pytest
 
 from findspingroup import find_spin_group
 from findspingroup.data.POINT_GROUP_MATRIX import operations_hex
-from findspingroup.structure.group import SpinSpaceGroup
+from findspingroup.structure.group import SpinSpaceGroup, SpinSpaceGroupOperation
+from findspingroup.utils.international_symbol import (
+    _minimal_k_translation_generators,
+    _point_group_token_from_real_token,
+)
 from findspingroup.utils.seitz_symbol import (
     calibrated_symbol_tol,
     describe_point_operation,
     format_point_seitz_symbol_latex,
     format_translation_tau_latex,
 )
-from findspingroup.utils.international_symbol import _point_group_token_from_real_token
 
 
 @pytest.mark.parametrize(
@@ -70,6 +73,65 @@ def test_k_type_uses_minimal_translation_generators_in_linear_and_latex():
         "P 1|m 1|n 1|a : 2_{100}|(1/2,0,1/2) 2_{010}|(1/2,1/2,0)"
     )
     assert "^{2_{100}}(\\frac{1}{2},0,\\frac{1}{2}) ^{2_{010}}(\\frac{1}{2},\\frac{1}{2},0)" in ssg.international_symbol_latex
+
+
+def test_k_type_translation_generators_prefer_single_higher_order_closure():
+    identity = np.eye(3)
+    spin_c4 = np.array(
+        [
+            [0.0, -1.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    spin_c2 = spin_c4 @ spin_c4
+    spin_c4_inv = np.linalg.inv(spin_c4)
+
+    candidates = [
+        SpinSpaceGroupOperation(identity, identity, np.array([0.0, 0.0, 0.0])),
+        SpinSpaceGroupOperation(spin_c2, identity, np.array([0.0, 0.0, 0.5])),
+        SpinSpaceGroupOperation(spin_c4, identity, np.array([0.5, 0.5, 0.25])),
+        SpinSpaceGroupOperation(spin_c4_inv, identity, np.array([0.5, 0.5, 0.75])),
+    ]
+
+    selected = _minimal_k_translation_generators(candidates)
+
+    assert len(selected) == 1
+    assert np.allclose(selected[0].spin_rotation, spin_c4)
+    assert np.allclose(selected[0].translation, [0.5, 0.5, 0.25])
+
+
+def test_k_type_translation_generators_use_centering_closure():
+    identity = np.eye(3)
+    spin_inversion = -np.eye(3)
+    c_centering = SpinSpaceGroupOperation(
+        identity,
+        identity,
+        np.array([0.5, 0.5, 0.0]),
+    )
+    candidates = [
+        SpinSpaceGroupOperation(spin_inversion, identity, np.array([0.0, 0.5, 0.5])),
+        SpinSpaceGroupOperation(spin_inversion, identity, np.array([0.5, 0.0, 0.5])),
+    ]
+
+    selected = _minimal_k_translation_generators(
+        candidates,
+        free_generators=[c_centering],
+    )
+
+    assert len(selected) == 1
+    assert np.allclose(selected[0].spin_rotation, spin_inversion)
+    assert np.allclose(selected[0].translation, [0.0, 0.5, 0.5])
+
+
+def test_centered_k_type_symbol_uses_implicit_centering_translation():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.826_NdZnPO.mcif")
+
+    assert result.index == "12.12.2.1.L"
+    assert result.convention_ssg_international_linear.startswith(
+        "C 1|2/ 1|m : -1|(0,1/2,1/2)"
+    )
+    assert "-1|(1/2,0,1/2)" not in result.convention_ssg_international_linear
 
 
 def test_spin_only_suffix_is_appended_for_coplanar_case():
