@@ -83,8 +83,9 @@ From the CLI:
 fsg -w path/to/structure.mcif
 ```
 
-This writes `ssg_symm.json` and may write POSCAR helper files in the current
-directory.
+This writes `ssg_symm.json` and `magnetic_primitive_poscar.vasp` in the current
+directory. `input_poscar.vasp` is written only when a non-POSCAR input cell is
+distinct from the magnetic primitive cell.
 
 From Python:
 

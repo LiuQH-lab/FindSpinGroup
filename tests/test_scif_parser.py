@@ -433,6 +433,33 @@ def test_non_input_scif_uses_six_decimal_computed_cell_constants_for_324():
     )
 
 
+def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_221():
+    original = find_spin_group("tests/testset/mcif_241130_no2186/2.21_TbOOH.mcif")
+
+    for cell_mode in [
+        SCIF_CELL_MODE_INPUT_CARTESIAN,
+        SCIF_CELL_MODE_INPUT_ORIENTED,
+        SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN,
+        SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_ORIENTED,
+        SCIF_CELL_MODE_DATABASE_STANDARD_CARTESIAN,
+        SCIF_CELL_MODE_DATABASE_STANDARD_ORIENTED,
+        SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
+        SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
+    ]:
+        scif_text = original.to_scif(cell_mode=cell_mode)
+        roundtrip = _roundtrip_index_from_scif_text(
+            scif_text,
+            f"tbooh_221_{cell_mode}.scif",
+        )
+        assert roundtrip.index == original.index
+        assert roundtrip.conf == original.conf
+
+    oriented_metadata = parse_scif_metadata(
+        source_text=original.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED)
+    )
+    assert oriented_metadata["space_group_spin"]["transform_spinframe_P_abc"] == "a,b,c"
+
+
 def test_parse_scif_data_roundtrips_back_into_findspingroup_all_cell_modes_0396():
     original = find_spin_group("tests/testset/mcif_241130_no2186/0.396_MnPtGa.mcif")
 
@@ -1251,7 +1278,7 @@ def test_generated_scif_prefers_symbolic_sqrt_coefficients_for_1669():
     assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,0"]
 
 
-def test_generated_scif_roundtrip_does_not_fail_on_unresolved_msg_view_seitz_symbol():
+def test_generated_scif_roundtrip_resolves_msg_view_seitz_symbols():
     result = find_spin_group("tests/testset/mcif_241130_no2186/1.685_NiCr2O4.mcif")
     lattice_factors, positions, elements, occupancies, _labels, moments = parse_scif_text(result.scif)
 
@@ -1268,4 +1295,4 @@ def test_generated_scif_roundtrip_does_not_fail_on_unresolved_msg_view_seitz_sym
     assert roundtrip.conf == result.conf
     msg_view = roundtrip.operation_views["convention_oriented"]["views"]["msg"]
     assert len(msg_view["ops"]) == len(msg_view["seitz_latex"])
-    assert "?" in "\n".join(msg_view["seitz_latex"])
+    assert "?" not in "\n".join(msg_view["seitz_latex"])

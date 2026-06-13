@@ -46,6 +46,39 @@ def test_parse_structure_file_can_return_cif_metadata():
     assert metadata["cell_parameter_strings"]["_cell_length_a"] == "14.88540"
 
 
+def test_parse_structure_file_treats_plain_filename_as_poscar(tmp_path):
+    path = tmp_path / "magnetic_input"
+    path.write_text(
+        "\n".join(
+            [
+                "plain POSCAR filename",
+                "1.0",
+                "1 0 0",
+                "0 1 0",
+                "0 0 1",
+                "Fe",
+                "1",
+                "Direct",
+                "0 0 0",
+                "# MAGMOM= 0 0 1",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    parsed, metadata = parse_structure_file(path, return_metadata=True)
+    lattice_factors, positions, elements, occupancies, labels, moments = parsed
+
+    assert metadata["source_format"] == "poscar"
+    assert metadata["spin_setting"] == "cartesian"
+    assert np.allclose(lattice_factors, np.eye(3))
+    assert np.allclose(positions, [[0.0, 0.0, 0.0]])
+    assert elements == ["Fe"]
+    assert occupancies == [1.0]
+    assert labels == ["Fe_1"]
+    assert np.allclose(moments, [[0.0, 0.0, 1.0]])
+
+
 def test_parse_cif_file_accepts_plain_cif_symmetry_equiv_loop_for_p1_magnetic_input(tmp_path):
     cif_text = """# generated using pymatgen
 data_V2Te2O

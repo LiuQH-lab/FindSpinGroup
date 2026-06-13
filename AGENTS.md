@@ -14,3 +14,14 @@
   paired transform are part of the diagnostic signal.
 - Missing identify-index database records should remain visible errors unless
   the user explicitly asks for a temporary diagnostic shim.
+
+## Collaboration and GitHub Workflow
+
+- Do not merge pull requests automatically unless the user explicitly authorizes
+  the merge in the current turn. By default, push the branch, open or prepare
+  the PR page, share the link/content, and stop for the user to review and
+  confirm the merge manually.
+- For GitHub issues opened by others, prepare the technical reply and evidence,
+  but do not close the issue automatically. The user prefers to reply personally
+  first and close the issue only after that reply unless they explicitly
+  delegate the reply/close action.

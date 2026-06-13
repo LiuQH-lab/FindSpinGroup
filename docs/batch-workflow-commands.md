@@ -100,8 +100,15 @@ Current acceptance notes for the 2241 release suite:
   known dataset errors are the two malformed DyGa3 records
 - POSCAR roundtrip can still show the known fractional-occupancy POSCAR-loss
   mismatches for Sr2Ir/Sn and YBa/Fe/O mixed-occupancy cases
-- SCIF roundtrip currently has two tracked non-fractional roundtrip outliers:
-  `0.37_U3Al2Si3` and `2.21_TbOOH`
+- SCIF roundtrip currently has one tracked non-fractional compact-output
+  outlier: `0.37_U3Al2Si3`.  Its source structure still identifies as
+  `79.5.1.2.P2`, but compact SCIF writes representative moments plus
+  operations; re-expansion chooses a slightly different moment field and
+  re-identifies as `5.5.1.1.P`.  This is tagged for a future
+  structure-preserving SCIF mode.
+- `2.21_TbOOH` is kept as a regression sample for oriented spin-frame identity
+  formatting; it should no longer be counted as an accepted SCIF outlier after
+  the current formatter fix.
 - roundtrip jobs should be submitted with parallel workers for release testing;
   serial roundtrip jobs are no longer the intended pre-push path
 - local unit/smoke tests are still part of the release gate; clean cluster

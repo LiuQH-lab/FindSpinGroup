@@ -16,8 +16,10 @@ Repo-generated spinCIF-style files. Generated SCIF files can be parsed back
 through the public input path.
 
 POSCAR-like files
-Supported names and suffixes include `POSCAR`, `CONTCAR`, `.vasp`, and
-`.poscar`.
+Supported names and suffixes include `POSCAR`, `CONTCAR`, `.vasp`, `.poscar`,
+and explicit ordinary filenames without a CIF/SCIF suffix. In other words,
+when a file path is supplied explicitly, `.cif` and `.mcif` are parsed as CIF,
+`.scif` is parsed as SCIF, and other names are treated as POSCAR-like input.
 
 ## Magnetic Moments
 
@@ -60,5 +62,12 @@ a readable structure file in this order:
 5. `POSCAR` with embedded `MAGMOM`
 6. `.vasp` or `.poscar` files with embedded `MAGMOM`
 7. `CONTCAR`
+
+Automatic discovery intentionally does not scan arbitrary ordinary filenames;
+pass such POSCAR-like files explicitly:
+
+```bash
+fsg magnetic_input
+```
 
 When multiple candidates are found, the CLI reports which file it selected.

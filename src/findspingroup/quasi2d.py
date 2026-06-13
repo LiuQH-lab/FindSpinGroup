@@ -7,11 +7,11 @@ import numpy as np
 from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs
 from findspingroup.structure.group import (
     BrillouinZoneMatcher,
-    combine_parametric_solutions,
     find_uvw_whole_string,
+    solve_spin_constraint_from_stacked,
     write_kpoints,
 )
-from findspingroup.utils.matrix_utils import getNormInf, rref_with_tolerance
+from findspingroup.utils.matrix_utils import getNormInf
 
 
 AXIS_LABELS = ("a", "b", "c")
@@ -379,13 +379,7 @@ def _spin_splitting_for_little_group(little_group: list, *, tol: float) -> tuple
         tol=tol,
     )
     stacked = np.vstack(spin_matrices)
-    singular_values = np.linalg.svd(stacked.astype(np.float32))[1]
-    spin_splitting = (
-        "no spin splitting"
-        if all(abs(value) > 1e-3 for value in singular_values)
-        else "spin splitting"
-    )
-    return spin_splitting, combine_parametric_solutions(rref_with_tolerance(stacked))
+    return solve_spin_constraint_from_stacked(stacked)
 
 
 def _generic_in_plane_input_kpoint(vacuum_axis_index: int) -> np.ndarray:

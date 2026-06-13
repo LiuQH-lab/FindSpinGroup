@@ -108,6 +108,7 @@ from findspingroup.structure.cell import (
     SpaceToleranceDegeneracyError,
     change_cell_settings,
 )
+from findspingroup.version import __version__
 from findspingroup.structure.group import (
     SpinSpaceGroupOperation,
     _deduplicate_spin_space_ops,
@@ -198,8 +199,8 @@ def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
     assert payload["spin_texture_config_no_soc"]["basis_setting"] == "ossg_unit_cartesian"
     assert payload["spin_texture_config_soc"]["source"] == "ossg_unit_cartesian_msg_ops"
     assert payload["spin_texture_config_soc"]["basis_setting"] == "ossg_unit_cartesian"
-    assert payload["spin_texture_config"] == expected_spin_texture_config
-    assert "id" not in payload["spin_texture_config"]
+    assert payload["spin_texture_config_database"] == expected_spin_texture_config
+    assert "id" not in payload["spin_texture_config_database"]
     assert payload["quasi_2d"] is None
     assert payload["g0_number"] == 194
     assert payload["l0_number"] == 164
@@ -313,8 +314,8 @@ def test_find_spin_group_acc_primitive_skips_tensor_and_scif_generation(monkeypa
     assert payload["index"] == "194.164.1.1.L"
     assert payload["conf"] == "Collinear"
     assert payload["acc_symbol"] == "6/mmmP"
-    assert payload["spin_texture_config"] == expected_spin_texture_config
-    assert "id" not in payload["spin_texture_config"]
+    assert payload["spin_texture_config_database"] == expected_spin_texture_config
+    assert "id" not in payload["spin_texture_config_database"]
     assert payload["spin_texture_config_no_soc"]["source"] == "ossg_unit_cartesian_generators"
     assert payload["spin_texture_config_no_soc"]["basis_setting"] == "ossg_unit_cartesian"
     assert payload["spin_texture_config_no_soc"]["spin_texture_type"] == expected_spin_texture_config["spin_texture_type"]
@@ -458,10 +459,10 @@ def test_cli_without_explicit_file_prefers_mcif_over_poscar_and_runs_basic(monke
 
     cli_module.main()
     stdout = capsys.readouterr()
-    payload = json.loads(stdout.out)
 
-    assert payload["index"] == "194.164.1.1.L"
-    assert payload["acc_symbol"] == "6/mmmP"
+    assert "Index: 194.164.1.1.L" in stdout.out
+    assert "Spin arithmetic crystal class: 6/mmmP" in stdout.out
+    assert "Magnetic phase: AFM(Altermagnet)" in stdout.out
     assert "Using other.mcif" in stdout.err or "Auto-selected structure file: other.mcif" in stdout.err
 
 
@@ -578,6 +579,138 @@ def test_cli_all_show_filters_full_route_fields(monkeypatch, capsys):
     assert capsys.readouterr().out.strip() == "Cmcm"
 
 
+def test_cli_show_field_aliases_full_route(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    class _FakeResult:
+        def to_dict(self):
+            return {
+                "KPOINTS": "KPOINTS text\n",
+                "acc_primitive_magnetic_cell_poscar": "POSCAR text\n",
+            }
+
+    monkeypatch.setattr(cli_module, "find_spin_group", lambda *_args, **_kwargs: _FakeResult())
+    monkeypatch.setattr(sys, "argv", ["fsg", "--all", "--show", "kpoints", "dummy.mcif"])
+
+    cli_module.main()
+
+    assert capsys.readouterr().out == "KPOINTS text\n"
+
+
+def test_cli_show_formats_dict_fields_readably(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    class _FakeResult:
+        def to_dict(self):
+            return {
+                "spin_texture_config_no_soc": {
+                    "spin_texture_type": "d-wave",
+                    "momentum_space_spin_configuration": "coplanar",
+                    "order": 2,
+                    "basis": ["C1*kx*sigma_y"],
+                }
+            }
+
+    monkeypatch.setattr(cli_module, "find_spin_group", lambda *_args, **_kwargs: _FakeResult())
+    monkeypatch.setattr(sys, "argv", ["fsg", "--all", "--show", "spin-texture-no-soc", "dummy.mcif"])
+
+    cli_module.main()
+
+    output = capsys.readouterr().out
+    assert "spin_texture_type: d-wave" in output
+    assert "momentum_space_spin_configuration: coplanar" in output
+    assert "basis:" in output
+    assert "1. C1*kx*sigma_y" in output
+
+
+def test_cli_show_json_keeps_machine_readable_payload(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    class _FakeResult:
+        def to_dict(self):
+            return {"spin_texture_config_no_soc": {"basis": ["C1*kx*sigma_y"]}}
+
+    monkeypatch.setattr(cli_module, "find_spin_group", lambda *_args, **_kwargs: _FakeResult())
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "--all", "--json", "--show", "spin-texture-no-soc", "dummy.mcif"],
+    )
+
+    cli_module.main()
+
+    assert json.loads(capsys.readouterr().out) == {"basis": ["C1*kx*sigma_y"]}
+
+
+def test_cli_write_scif_and_poscar_kpoints_use_full_route_once(monkeypatch, capsys, tmp_path):
+    import findspingroup.cli as cli_module
+
+    calls = []
+
+    class _FakeResult:
+        index = "1.1.1.1.P1"
+        conf = "Collinear"
+        phase = "AFM"
+        magnetic_phase = "AFM"
+        KPOINTS_setting = "acc_primitive"
+        KPOINTS_real_space_setting = "acc_primitive"
+        acc_primitive_magnetic_cell_poscar = "POSCAR text\n"
+        KPOINTS = "KPOINTS text\n"
+
+        def to_scif(self, *, cell_mode):
+            return f"SCIF {cell_mode}\n"
+
+    def _fake_find_spin_group(path, **kwargs):
+        calls.append((path, kwargs))
+        return _FakeResult()
+
+    scif_path = tmp_path / "structure.scif"
+    vasp_dir = tmp_path / "vasp"
+    monkeypatch.setattr(cli_module, "find_spin_group", _fake_find_spin_group)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "fsg",
+            "--write-scif",
+            str(scif_path),
+            "--scif-cell-mode",
+            "magnetic_primitive_oriented",
+            "--write-poscar-kpoints",
+            str(vasp_dir),
+            "dummy.mcif",
+        ],
+    )
+
+    cli_module.main()
+
+    stdout = json.loads(capsys.readouterr().out)
+    assert len(calls) == 1
+    assert scif_path.read_text(encoding="utf-8") == "SCIF magnetic_primitive_oriented\n"
+    assert (vasp_dir / "POSCAR").read_text(encoding="utf-8") == "POSCAR text\n"
+    assert (vasp_dir / "KPOINTS").read_text(encoding="utf-8") == "KPOINTS text\n"
+    assert stdout["written_files"] == [str(scif_path), str(vasp_dir / "POSCAR"), str(vasp_dir / "KPOINTS")]
+    assert stdout["summary"]["index"] == "1.1.1.1.P1"
+    assert calls[0][1]["poscar_allow_incar_magmom"] is True
+    assert calls[0][1]["poscar_prefer_incar_magmom"] is True
+
+
+def test_cli_rejects_show_with_artifact_writer(monkeypatch, capsys, tmp_path):
+    import findspingroup.cli as cli_module
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "--write-scif", str(tmp_path / "out.scif"), "--show", "index", "dummy.mcif"],
+    )
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 1
+    assert "Write-artifact flags cannot be combined" in capsys.readouterr().err
+
+
 def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatch, capsys):
     import findspingroup.cli as cli_module
 
@@ -613,6 +746,8 @@ def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatc
             "quasi2d",
             "--vacuum-axis",
             "b",
+            "--spin-texture-basis-max-order",
+            "4",
             "dummy.mcif",
         ],
     )
@@ -629,6 +764,7 @@ def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatc
         "parser_atol": pytest.approx(0.05),
         "calculation_mode": "quasi2d",
         "vacuum_axis": "b",
+        "spin_texture_basis_max_order": 4,
         "poscar_allow_incar_magmom": True,
         "poscar_prefer_incar_magmom": True,
     }
@@ -642,7 +778,60 @@ def test_cli_default_route_forwards_basic_without_quasi2d_options(monkeypatch, c
     def _fake_find_spin_group_basic(path, **kwargs):
         captured["path"] = path
         captured.update(kwargs)
-        return {"index": "1.1.1.1.P1", "route": "basic"}
+        return {
+            "index": "1.1.1.1.P1",
+            "ossg_symbol_linear": "P 1",
+            "identify_index_details": {"t_index": 1, "k_index": 1},
+            "g0_number": 1,
+            "g0_symbol": "P1",
+            "l0_number": 1,
+            "l0_symbol": "P1",
+            "nsspg": "1",
+            "sspg": "1",
+            "nontrivial_spin_space_point_group_hm": "1",
+            "nontrivial_spin_space_point_group_schoenflies": "C1",
+            "spin_space_point_group_hm": "1",
+            "spin_space_point_group_schoenflies": "C1",
+            "conf": "Collinear",
+            "magnetic_phase": "AFM",
+            "msg_bns_number": "1.1",
+            "msg_og_number": "1.1.1",
+            "msg_type": 1,
+            "msg_symbol": "P1",
+            "acc_symbol": "1P",
+            "empg": "1",
+            "space_group_number": 1,
+            "space_group_symbol": "P1",
+            "net_moment": 0.0,
+            "zero_net_moment_tol": 0.04,
+            "properties": {"ss_wo_soc": "No", "ss_w_soc": "No", "ahc_wo_soc": "No", "ahc_w_soc": "No"},
+            "is_alter": "",
+            "is_som": "",
+            "sg_is_polar": False,
+            "sg_is_chiral": False,
+            "ssg_is_polar": False,
+            "ssg_is_chiral": False,
+            "msg_is_polar": False,
+            "msg_is_chiral": False,
+            "spin_texture_config_database": {"spin_texture_type": "forbidden"},
+            "spin_texture_config_no_soc": {"spin_texture_type": "s-wave", "basis": ["C1*sigma_z"]},
+            "spin_texture_config_soc": {"spin_texture_type": "p-wave", "basis": ["C1*kx*sigma_z"]},
+            "vector_constraints_by_symmetry": {
+                "sg": {
+                    "constraints": {
+                        "real_space_t_even_p_odd": {
+                            "free_dimension": 0,
+                            "allowed_axes": [],
+                        }
+                    }
+                }
+            },
+            "ferroelectric_switching": {
+                "status": "ordered_symmetry_nonpolar",
+                "switching_detected": False,
+                "polarity_status": "ordered_symmetry_nonpolar",
+            },
+        }
 
     monkeypatch.setattr(cli_module, "find_spin_group_basic", _fake_find_spin_group_basic)
     monkeypatch.setattr(
@@ -666,10 +855,25 @@ def test_cli_default_route_forwards_basic_without_quasi2d_options(monkeypatch, c
 
     cli_module.main()
 
-    assert json.loads(capsys.readouterr().out) == {
-        "index": "1.1.1.1.P1",
-        "route": "basic",
-    }
+    output = capsys.readouterr().out
+    assert "OSSG symbol: P 1" in output
+    assert "Index: 1.1.1.1.P1" in output
+    assert "G0: 1 P1; L0: 1 P1; t_index: 1; k_index: 1" in output
+    assert "Spin-space point group: HM=1; Schoenflies=C1" in output
+    assert "Nontrivial spin-space point group: HM=1; Schoenflies=C1" in output
+    assert "Configuration: Collinear" in output
+    assert "Magnetic phase: AFM; altermagnet=No; spin-orbit magnet=No" in output
+    assert "Magnetic space group: 1.1 P1 (type 1)" in output
+    assert "Spin arithmetic crystal class: 1P" in output
+    assert "EMPG: 1" in output
+    assert "Net moment: 0.0 (zero tol 0.04)" in output
+    assert "Spin texture database" not in output
+    assert "Spin texture w/o SOC: wave=s-wave; basis=C1*sigma_z" in output
+    assert "Spin texture w/ SOC: wave=p-wave; basis=C1*kx*sigma_z" in output
+    assert "Symmetry flags:" not in output
+    assert "SG: polar=No, chiral=No; T-even/P-odd real=0D none" in output
+    assert "Polar axes:" not in output
+    assert "Ferroelectric switching:" not in output
     assert captured == {
         "path": "dummy.mcif",
         "space_tol": pytest.approx(0.03),
@@ -677,11 +881,77 @@ def test_cli_default_route_forwards_basic_without_quasi2d_options(monkeypatch, c
         "meigtol": pytest.approx(0.0001),
         "matrix_tol": pytest.approx(0.02),
         "parser_atol": pytest.approx(0.05),
+        "spin_texture_basis_max_order": None,
         "poscar_allow_incar_magmom": True,
         "poscar_prefer_incar_magmom": True,
     }
     assert "calculation_mode" not in captured
     assert "vacuum_axis" not in captured
+
+
+def test_cli_default_route_json_flag_emits_complete_basic_payload(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    def _fake_find_spin_group_basic(path, **kwargs):
+        return {"index": "1.1.1.1.P1", "route": "basic", "extra": {"kept": True}}
+
+    monkeypatch.setattr(cli_module, "find_spin_group_basic", _fake_find_spin_group_basic)
+    monkeypatch.setattr(sys, "argv", ["fsg", "--json", "dummy.mcif"])
+
+    cli_module.main()
+
+    assert json.loads(capsys.readouterr().out) == {
+        "index": "1.1.1.1.P1",
+        "route": "basic",
+        "extra": {"kept": True},
+    }
+
+
+def test_cli_rejects_negative_spin_texture_basis_max_order(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "--spin-texture-basis-max-order", "-1", "dummy.mcif"],
+    )
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 1
+    assert "must be non-negative" in capsys.readouterr().err
+
+
+def test_cli_legacy_poscar_ssg_dispatches_poscar_route(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    captured = {}
+
+    def _fake_find_spin_group_poscar_ssg(path, **kwargs):
+        captured["path"] = path
+        captured.update(kwargs)
+        return {"route": "poscar-ssg"}
+
+    def _unexpected_input_ssg(*_args, **_kwargs):
+        raise AssertionError("input-ssg route should not be used for --mode poscar-ssg")
+
+    monkeypatch.setattr(cli_module, "find_spin_group_poscar_ssg", _fake_find_spin_group_poscar_ssg)
+    monkeypatch.setattr(cli_module, "find_spin_group_input_ssg", _unexpected_input_ssg)
+    monkeypatch.setattr(sys, "argv", ["fsg", "--mode", "poscar-ssg", "POSCAR"])
+
+    cli_module.main()
+
+    assert json.loads(capsys.readouterr().out) == {"route": "poscar-ssg"}
+    assert captured == {
+        "path": "POSCAR",
+        "space_tol": pytest.approx(0.02),
+        "mtol": pytest.approx(0.02),
+        "meigtol": pytest.approx(0.00002),
+        "matrix_tol": pytest.approx(0.01),
+        "poscar_allow_incar_magmom": True,
+        "poscar_prefer_incar_magmom": True,
+    }
 
 
 def test_cli_rejects_quasi2d_options_without_full_route(monkeypatch, capsys):
@@ -757,7 +1027,8 @@ def test_find_spin_group_poscar_ssg_reports_embedded_magnetic_primitive_case(tmp
     assert payload["summary"]["primitive_msg_num"] == primitive_ossg.msg_int_num
     assert payload["summary"]["primitive_msg_bns_number"] == primitive_ossg.msg_bns_num
     assert payload["input_poscar"] is None
-    assert payload["magnetic_primitive_poscar"] is None
+    assert payload["magnetic_primitive_poscar"]
+    assert "# MAGMOM=" in payload["magnetic_primitive_poscar"]
     assert payload["ssg"]["ops"]
     assert payload["msg"]["ops"]
 
@@ -812,12 +1083,13 @@ def test_find_spin_group_input_ssg_emits_input_poscar_for_mcif_input():
     assert payload["summary"]["input_ssg_index"] == "194.164.1.1.L"
     assert payload["quasi_2d"] is None
     assert payload["ssg"]["spin_frame_setting"] == "cartesian"
-    assert payload["input_poscar"]
-    assert "# MAGMOM=" in payload["input_poscar"]
     if payload["summary"]["is_input_magnetic_primitive"]:
-        assert payload["magnetic_primitive_poscar"] is None
+        assert payload["input_poscar"] is None
     else:
-        assert payload["magnetic_primitive_poscar"]
+        assert payload["input_poscar"]
+        assert "# MAGMOM=" in payload["input_poscar"]
+    assert payload["magnetic_primitive_poscar"]
+    assert "# MAGMOM=" in payload["magnetic_primitive_poscar"]
 
 
 def test_find_spin_group_input_ssg_rejects_cif_without_explicit_moments(tmp_path):
@@ -1832,6 +2104,7 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
         input_spin_setting=None,
         calculation_mode=None,
         vacuum_axis=None,
+        spin_texture_basis_max_order=None,
     ):
         captured["source_name"] = source_name
         captured["source_metadata"] = source_metadata
@@ -1839,6 +2112,7 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
         captured["input_spin_setting"] = input_spin_setting
         captured["calculation_mode"] = calculation_mode
         captured["vacuum_axis"] = vacuum_axis
+        captured["spin_texture_basis_max_order"] = spin_texture_basis_max_order
         return {"ok": True}
 
     monkeypatch.setattr(find_spin_group_module, "parse_structure_file", fake_parse_structure_file)
@@ -1860,6 +2134,7 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
     assert captured["input_spin_setting"] == "in_lattice"
     assert captured["calculation_mode"] == "3d"
     assert captured["vacuum_axis"] == "c"
+    assert captured["spin_texture_basis_max_order"] is None
 
 
 def test_find_transition_matrix_deterministic_error_suggests_pg_standardization_direction(monkeypatch):
@@ -1990,7 +2265,7 @@ def test_find_spin_group_exposes_main_flow_identify_result_for_collinear_case():
     assert result.identify_index_details["L0_id"] == 164
     assert result.identify_index_details["k_index"] == 1
     assert result.identify_index_details["equivalent_map_index"] == 1
-    assert result.spin_texture_config == expected_spin_texture_config
+    assert result.spin_texture_config_database == expected_spin_texture_config
     assert result.spin_texture_config_no_soc["source"] == "ossg_unit_cartesian_generators"
     assert result.spin_texture_config_no_soc["basis_setting"] == "ossg_unit_cartesian"
     assert result.spin_texture_config_no_soc["spin_texture_type"] == expected_spin_texture_config["spin_texture_type"]
@@ -1998,17 +2273,17 @@ def test_find_spin_group_exposes_main_flow_identify_result_for_collinear_case():
     assert result.spin_texture_config_no_soc["spin_rank"] == expected_spin_texture_config["spin_rank"]
     assert result.spin_texture_config_soc["source"] == "ossg_unit_cartesian_msg_ops"
     assert result.spin_texture_config_soc["spin_texture_type"] == "d-wave"
-    assert "id" not in result.spin_texture_config
-    assert result.to_summary_dict()["spin_texture_config"] == expected_spin_texture_config
+    assert "id" not in result.spin_texture_config_database
+    assert result.to_summary_dict()["spin_texture_config_database"] == expected_spin_texture_config
     assert result.to_summary_dict()["spin_texture_config_no_soc"] == result.spin_texture_config_no_soc
     assert result.to_summary_dict()["spin_texture_config_soc"] == result.spin_texture_config_soc
-    assert result.to_structured_dict()["summary"]["spin_texture_config"] == expected_spin_texture_config
+    assert result.to_structured_dict()["summary"]["spin_texture_config_database"] == expected_spin_texture_config
     assert (
         result.to_structured_dict()["summary"]["spin_texture_config_no_soc"]
         == result.spin_texture_config_no_soc
     )
     assert result.to_structured_dict()["summary"]["spin_texture_config_soc"] == result.spin_texture_config_soc
-    assert result.to_dict()["spin_texture_config"] == expected_spin_texture_config
+    assert result.to_dict()["spin_texture_config_database"] == expected_spin_texture_config
     assert result.to_dict()["spin_texture_config_no_soc"] == result.spin_texture_config_no_soc
     assert result.to_dict()["spin_texture_config_soc"] == result.spin_texture_config_soc
 
@@ -2507,9 +2782,9 @@ def test_acc_aligned_runtime_index_exposes_spin_texture_config_records():
     assert get_pair_id_for_ssg_label(label) == "A123_P02"
     assert get_spin_texture_config_id_for_ssg_label(label) == "W0043"
     assert get_spin_texture_config_for_ssg_label(label) == {
-        "basis": ["C1*((-ky^2*kz)*sigma_z + (kx^2*kz)*sigma_z)"],
+        "basis": ["C1*((-ky^2*kz)*sigma_z + (kx^2*kz)*sigma_z) + o(k^3)"],
         "basis_latex": [
-            r"C_{1}\left(-k_{y}^{2}k_{z}\,\sigma_{z} + k_{x}^{2}k_{z}\,\sigma_{z}\right)"
+            r"C_{1}\left(-k_{y}^{2}k_{z}\,\sigma_{z} + k_{x}^{2}k_{z}\,\sigma_{z}\right) + o(k^{3})"
         ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
@@ -3144,7 +3419,7 @@ def test_find_spin_group_basic_does_not_fallback_when_identify_database_entry_is
     assert payload["index"].startswith("not in identify-index database:")
     assert payload["identify_index_details"] is None
     assert payload["phase"]
-    assert payload["spin_texture_config"] is None
+    assert payload["spin_texture_config_database"] is None
     assert payload["acc_primitive_resolution_audit"]["status"] == "identify_index_unavailable"
 
 
@@ -4086,6 +4361,31 @@ def test_quasi2d_kpoint_plane_uses_raw_vacuum_component_for_forced_axis():
     assert "| GP ***" in quasi_2d["KPOINTS"]
 
 
+def test_kpoints_mark_spin_splitting_with_and_without_soc():
+    matcher = group_module.BrillouinZoneMatcher(
+        [
+            ("GAMMA", "(0,0,0)", (True, False)),
+            ("X", "(1/2,0,0)", (False, True)),
+            ("GP", "(u,0,0)", (True, True)),
+        ]
+    )
+    kpoints_text = group_module.write_kpoints(
+        {
+            "point_coords": {
+                "GAMMA": [0.0, 0.0, 0.0],
+                "X": [0.5, 0.0, 0.0],
+            },
+            "path": [("GAMMA", "X")],
+        },
+        matcher,
+    )
+
+    assert "(*** for spin splitting w/o SOC; ^^^ for spin splitting w/ SOC)" in kpoints_text
+    assert "Γ ***" in kpoints_text
+    assert "X ^^^" in kpoints_text
+    assert "| GP ***^^^" in kpoints_text
+
+
 def test_quasi2d_input_padding_expands_vacuum_axis_without_stretching_slab():
     lattice = np.diag([3.0, 3.0, 5.0])
     positions = np.array(
@@ -4924,6 +5224,9 @@ def test_mag_symmetry_result_exposes_core_group_identifiers():
     result = find_spin_group("examples/0.800_MnTe.mcif")
     payload = result.to_dict()
 
+    assert result.fsg_version == __version__
+    assert payload["fsg_version"] == __version__
+    assert next(iter(payload)) == "fsg_version"
     assert result.G0_symbol == "P6_3/mmc"
     assert result.G0_num == 194
     assert result.L0_symbol == "P-3m1"
@@ -5000,8 +5303,18 @@ def test_mag_symmetry_result_exposes_compact_operation_views():
         "index",
         "real_rotation",
         "spin_rotation",
+        "time_reversal",
         "translation",
     ]
+    for row in msg_view["ops"]:
+        real_rotation = np.asarray(row["real_rotation"], dtype=float)
+        spin_rotation = np.asarray(row["spin_rotation"], dtype=float)
+        expected_spin_rotation = (
+            int(row["time_reversal"])
+            * float(np.linalg.det(real_rotation))
+            * real_rotation
+        )
+        assert np.allclose(spin_rotation, expected_spin_rotation, atol=1e-6)
     for cartesian_key, oriented_key in (
         ("convention_cartesian", "convention_oriented"),
         ("magnetic_primitive_cartesian", "magnetic_primitive_oriented"),
@@ -5182,6 +5495,49 @@ def test_spin_splitting_numeric_classifies_gspg_generators_with_spin_only():
     assert payload["momentum_space_spin_configuration"] == "collinear"
     assert payload["basis_latex"]
     assert r"\sigma" in payload["basis_latex"][0]
+
+
+def test_spin_texture_basis_by_order_is_opt_in():
+    identity = np.eye(3)
+    operations = [
+        {
+            "real_rotation": identity,
+            "spin_rotation": identity,
+        }
+    ]
+
+    leading = classify_public_spin_texture_config(operations, source="test")
+    assert leading["order"] == 0
+    assert leading["basis"][0].endswith(" + o(1)")
+    assert "basis_by_order" not in leading
+
+    through_second = classify_public_spin_texture_config(
+        operations,
+        source="test",
+        basis_orders_through=2,
+    )
+    assert [payload["order"] for payload in through_second["basis_by_order"]] == [0, 1, 2]
+    assert through_second["basis_by_order"][1]["basis"][0].endswith(" + o(k)")
+    assert through_second["basis_by_order"][2]["basis"][0].endswith(" + o(k^2)")
+
+
+def test_spin_texture_basis_by_order_keeps_forbidden_orders():
+    result = find_spin_group("examples/0.800_MnTe.mcif")
+    operations = operation_pairs_from_gspg_ops(
+        list(result.gspg_generator_ops) + list(result.gspg_spin_only_ops)
+    )
+
+    payload = classify_public_spin_texture_config(
+        operations,
+        source="gspg_generators",
+        basis_orders_through=2,
+    )
+
+    assert payload["spin_texture_type"] == "forbidden"
+    assert payload["order"] is None
+    assert [order_payload["order"] for order_payload in payload["basis_by_order"]] == [0, 1, 2]
+    assert [order_payload["nullity"] for order_payload in payload["basis_by_order"]] == [0, 0, 0]
+    assert all(not order_payload["basis"] for order_payload in payload["basis_by_order"])
 
 
 def test_spin_texture_basis_expression_latex_formatter():

@@ -249,6 +249,51 @@ def spin_texture_basis_latex(basis: Sequence[str] | None) -> list[str]:
     return [basis_expression_to_latex(expression) for expression in basis]
 
 
+def _basis_remainder_ascii(order: int) -> str:
+    if order == 0:
+        return "o(1)"
+    if order == 1:
+        return "o(k)"
+    return f"o(k^{order})"
+
+
+def _basis_remainder_latex(order: int) -> str:
+    if order == 0:
+        return "o(1)"
+    if order == 1:
+        return "o(k)"
+    return rf"o(k^{{{order}}})"
+
+
+def _append_basis_remainder_ascii(basis: Sequence[str] | None, order: int | None) -> list[str]:
+    if not basis:
+        return []
+    if order is None:
+        return [str(expression) for expression in basis]
+    suffix = _basis_remainder_ascii(int(order))
+    return [f"{expression} + {suffix}" for expression in basis]
+
+
+def _append_basis_remainder_latex(basis_latex: Sequence[str] | None, order: int | None) -> list[str]:
+    if not basis_latex:
+        return []
+    if order is None:
+        return [str(expression) for expression in basis_latex]
+    suffix = _basis_remainder_latex(int(order))
+    return [rf"{expression} + {suffix}" for expression in basis_latex]
+
+
+def _resolve_basis_remainder_order(
+    leading_order: int | None,
+    basis_remainder_order: int | str | None,
+) -> int | None:
+    if basis_remainder_order is None or leading_order is None:
+        return None
+    if basis_remainder_order == "leading":
+        return int(leading_order)
+    return int(basis_remainder_order)
+
+
 @dataclass(frozen=True)
 class OperationPair:
     """One reciprocal/spin operation pair using d(Q k) = S d(k)."""
@@ -279,6 +324,8 @@ class SpinSplittingResult:
     spin_texture_type: str
     nullity: int
     basis: list[str]
+    basis_latex: list[str]
+    basis_by_order: list[dict[str, Any]] | None
     spin_rank: int
     momentum_space_spin_configuration: str
     allowed_orders: list[OrderDiagnostics]
@@ -700,10 +747,63 @@ def spin_rank_and_configuration_from_vectors(
     return 3, "noncoplanar"
 
 
+def _basis_payload_for_order(
+    *,
+    order: int,
+    basis: np.ndarray,
+    monomials: Sequence[tuple[int, ...]],
+    k_names: Sequence[str],
+    zero_tol: float,
+    rational_max_denominator: int,
+    radical_max_radicand: int,
+    radical_max_multiplier: int,
+    basis_remainder_order: int | str | None,
+) -> dict[str, Any]:
+    canonical = canonicalize_nullspace(basis, zero_tol=zero_tol)
+    expressions: list[str] = []
+    for index, vector in enumerate(canonical):
+        expression = basis_vector_expression_numeric(
+            vector,
+            monomials,
+            k_names=k_names,
+            zero_tol=zero_tol,
+            rational_max_denominator=rational_max_denominator,
+            radical_max_radicand=radical_max_radicand,
+            radical_max_multiplier=radical_max_multiplier,
+        )
+        expressions.append(f"C{index + 1}*({expression})")
+    spin_rank, spin_config = spin_rank_and_configuration_from_vectors(canonical, tol=zero_tol)
+    remainder_order = _resolve_basis_remainder_order(order, basis_remainder_order)
+    expressions_latex = spin_texture_basis_latex(expressions)
+    return {
+        "order": int(order),
+        "spin_texture_type": spin_texture_type_for_order(order),
+        "nullity": int(len(expressions)),
+        "spin_rank": int(spin_rank),
+        "momentum_space_spin_configuration": spin_config,
+        "basis": _append_basis_remainder_ascii(expressions, remainder_order),
+        "basis_latex": _append_basis_remainder_latex(expressions_latex, remainder_order),
+    }
+
+
+def _empty_basis_payload_for_order(order: int) -> dict[str, Any]:
+    return {
+        "order": int(order),
+        "spin_texture_type": spin_texture_type_for_order(order),
+        "nullity": 0,
+        "spin_rank": 0,
+        "momentum_space_spin_configuration": "zero",
+        "basis": [],
+        "basis_latex": [],
+    }
+
+
 def classify_spin_splitting_numeric(
     operations: Iterable[OperationPair | tuple[Any, Any] | dict[str, Any]],
     *,
     max_order: int = 6,
+    basis_orders_through: int | None = None,
+    basis_remainder_order: int | str | None = None,
     k_dimension: int | None = None,
     k_names: Sequence[str] | None = None,
     rtol: float = 1e-8,
@@ -732,6 +832,8 @@ def classify_spin_splitting_numeric(
     elif len(k_names) != k_dimension:
         raise ValueError(f"k_names length {len(k_names)} does not match k_dimension {k_dimension}")
     allowed_orders: list[OrderDiagnostics] = []
+    basis_by_order: list[dict[str, Any]] = []
+    leading_payload: dict[str, Any] | None = None
     for order in range(max_order + 1):
         matrix, monomials = constraint_matrix_for_order_numeric(
             pairs,
@@ -768,35 +870,59 @@ def classify_spin_splitting_numeric(
             )
         )
         if nullity:
-            canonical = canonicalize_nullspace(basis, zero_tol=zero_tol)
-            expressions: list[str] = []
-            for index, vector in enumerate(canonical):
-                expression = basis_vector_expression_numeric(
-                    vector,
-                    monomials,
-                    k_names=k_names,
-                    zero_tol=zero_tol,
-                    rational_max_denominator=rational_max_denominator,
-                    radical_max_radicand=radical_max_radicand,
-                    radical_max_multiplier=radical_max_multiplier,
-                )
-                expressions.append(f"C{index + 1}*({expression})")
-            spin_rank, spin_config = spin_rank_and_configuration_from_vectors(canonical, tol=zero_tol)
-            return SpinSplittingResult(
+            order_payload = _basis_payload_for_order(
                 order=order,
-                spin_texture_type=spin_texture_type_for_order(order),
-                nullity=nullity,
-                basis=expressions,
-                spin_rank=spin_rank,
-                momentum_space_spin_configuration=spin_config,
-                allowed_orders=allowed_orders,
+                basis=basis,
+                monomials=monomials,
+                k_names=k_names,
+                zero_tol=zero_tol,
+                rational_max_denominator=rational_max_denominator,
+                radical_max_radicand=radical_max_radicand,
+                radical_max_multiplier=radical_max_multiplier,
+                basis_remainder_order=basis_remainder_order,
             )
+            if basis_orders_through is not None and order <= int(basis_orders_through):
+                basis_by_order.append(order_payload)
+            if leading_payload is None:
+                leading_payload = order_payload
+            if basis_orders_through is None or order >= int(basis_orders_through):
+                return SpinSplittingResult(
+                    order=leading_payload["order"],
+                    spin_texture_type=leading_payload["spin_texture_type"],
+                    nullity=leading_payload["nullity"],
+                    basis=leading_payload["basis"],
+                    basis_latex=leading_payload["basis_latex"],
+                    basis_by_order=basis_by_order if basis_orders_through is not None else None,
+                    spin_rank=leading_payload["spin_rank"],
+                    momentum_space_spin_configuration=leading_payload[
+                        "momentum_space_spin_configuration"
+                    ],
+                    allowed_orders=allowed_orders,
+                )
+        elif basis_orders_through is not None and order <= int(basis_orders_through):
+            basis_by_order.append(_empty_basis_payload_for_order(order))
+    if leading_payload is not None:
+        return SpinSplittingResult(
+            order=leading_payload["order"],
+            spin_texture_type=leading_payload["spin_texture_type"],
+            nullity=leading_payload["nullity"],
+            basis=leading_payload["basis"],
+            basis_latex=leading_payload["basis_latex"],
+            basis_by_order=basis_by_order if basis_orders_through is not None else None,
+            spin_rank=leading_payload["spin_rank"],
+            momentum_space_spin_configuration=leading_payload[
+                "momentum_space_spin_configuration"
+            ],
+            allowed_orders=allowed_orders,
+        )
 
     return SpinSplittingResult(
         order=None,
         spin_texture_type="forbidden",
         nullity=0,
         basis=[],
+        basis_latex=[],
+        basis_by_order=basis_by_order if basis_orders_through is not None else None,
         spin_rank=0,
         momentum_space_spin_configuration="zero",
         allowed_orders=allowed_orders,
@@ -839,7 +965,10 @@ def result_to_jsonable(result: SpinSplittingResult, *, include_diagnostics: bool
         payload.pop("allowed_orders", None)
         payload.pop("engine", None)
         payload.pop("convention", None)
-    payload["basis_latex"] = spin_texture_basis_latex(payload.get("basis"))
+    if payload.get("basis_by_order") is None:
+        payload.pop("basis_by_order", None)
+    if "basis_latex" not in payload:
+        payload["basis_latex"] = spin_texture_basis_latex(payload.get("basis"))
     return payload
 
 
@@ -901,6 +1030,8 @@ def classify_public_spin_texture_config(
     *,
     source: str,
     max_order: int = 6,
+    basis_orders_through: int | None = None,
+    basis_remainder_order: int | str | None = "leading",
     k_dimension: int | None = None,
     k_names: Sequence[str] | None = None,
     include_diagnostics: bool = False,
@@ -908,9 +1039,12 @@ def classify_public_spin_texture_config(
     atol: float = 1e-10,
     zero_tol: float = 1e-8,
 ) -> dict[str, Any]:
+    effective_max_order = int(basis_orders_through) if basis_orders_through is not None else max_order
     result = classify_spin_splitting_numeric(
         operations,
-        max_order=max_order,
+        max_order=effective_max_order,
+        basis_orders_through=basis_orders_through,
+        basis_remainder_order=basis_remainder_order,
         k_dimension=k_dimension,
         k_names=k_names,
         rtol=rtol,
