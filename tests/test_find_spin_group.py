@@ -2374,7 +2374,7 @@ def test_identify_transformations_send_167_tmptin_to_database_symbol_with_spin_t
     )
 
 
-def test_scif_chen_transform_contract_for_167_tmptin_uses_current_lattice_scaled_spin_rows():
+def test_scif_chen_transform_contract_for_167_tmptin_omits_lattice_scaled_spin_rows():
     result = find_spin_group("tests/testset/mcif_241130_no2186/1.67_TmPtIn.mcif")
     metadata = parse_scif_metadata(source_text=result.scif)
 
@@ -2382,9 +2382,7 @@ def test_scif_chen_transform_contract_for_167_tmptin_uses_current_lattice_scaled
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] == (
         "P 1|m 2_{100}|m 1|2 : (2_{010},1,2_{010}) m_{010}|1"
     )
-    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == (
-        "1/2b,-2a,c;0,1/2,0;26.098542cs,-13.049617bs,22.602as"
-    )
+    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == "1/2b,-2a,c;0,1/2,0;cs,-bs,as"
 
 
 @pytest.mark.parametrize(

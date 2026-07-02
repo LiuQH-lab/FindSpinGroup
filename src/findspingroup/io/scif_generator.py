@@ -310,13 +310,13 @@ def _format_basis_transform_component(value: float, symbol: str, *, tol: float =
     numeric = float(value)
     if abs(numeric) <= tol:
         return ""
-    fraction = Fraction(numeric).limit_denominator(12)
-    if abs(float(fraction) - numeric) > 1e-9:
-        coeff = f"{numeric:.6f}".rstrip("0").rstrip(".")
-    elif fraction.denominator == 1:
-        coeff = str(fraction.numerator)
-    else:
-        coeff = f"{fraction.numerator}/{fraction.denominator}"
+    coeff = format_symbolic_scalar(
+        numeric,
+        zero_tol=tol,
+        rational_tol=1e-9,
+        sqrt_tol=5e-6,
+        max_denominator=12,
+    )
     if coeff == "1":
         return symbol
     if coeff == "-1":
@@ -551,6 +551,7 @@ def _resolve_transform_chen_parts(
     basis_tag_transforms: dict[str, tuple[np.ndarray, np.ndarray]],
     ssg_primitive: SpinSpaceGroup,
     identify_index_details: dict | None,
+    strip_spin_lattice_lengths: bool = True,
 ):
     if identify_index_details is None:
         return None
@@ -573,7 +574,12 @@ def _resolve_transform_chen_parts(
     if abs(np.linalg.det(space_matrix)) < 1e-8:
         return None
 
-    lattice_col = np.asarray(cell_G0.lattice_matrix, dtype=float).T
+    lattice_rows = np.asarray(cell_G0.lattice_matrix, dtype=float)
+    lattice_lengths = np.linalg.norm(lattice_rows, axis=1)
+    if np.any(lattice_lengths < 1e-12):
+        return None
+    lattice_col = lattice_rows.T
+    strip_lattice_lengths = np.diag(1.0 / lattice_lengths)
     if ssg.conf == "Collinear":
         spin_basis_rows = _build_collinear_chen_spin_basis_rows(
             lattice_col=lattice_col,
@@ -586,12 +592,32 @@ def _resolve_transform_chen_parts(
         )
         identify_spin_map = np.asarray(point_group_transformation, dtype=float)
         spin_basis_rows = identify_spin_map @ spin_standardization @ lattice_col
+    if strip_spin_lattice_lengths:
+        # The public Chen/Liu tag is a setting transform. Remove material
+        # lattice lengths from the spin-basis relation while preserving the
+        # orientation chosen by the metric-aware point-group standardization.
+        strip_lattice_lengths = np.diag(1.0 / lattice_lengths)
+        spin_basis_rows = _remove_common_chen_spin_basis_scale(
+            spin_basis_rows @ strip_lattice_lengths,
+        )
 
     return {
         "space_matrix": space_matrix,
         "space_shift": space_shift,
         "spin_basis_rows": spin_basis_rows,
     }
+
+
+def _remove_common_chen_spin_basis_scale(spin_basis_rows: np.ndarray) -> np.ndarray:
+    rows = np.asarray(spin_basis_rows, dtype=float)
+    row_norms = np.linalg.norm(rows, axis=1)
+    nonzero_norms = row_norms[row_norms > 1e-12]
+    if len(nonzero_norms) == 0:
+        return rows
+    common_norm = float(nonzero_norms[0])
+    if np.allclose(nonzero_norms, common_norm, atol=1e-8, rtol=1e-8):
+        return rows / common_norm
+    return rows
 
 
 def _build_collinear_chen_spin_basis_rows(
@@ -674,6 +700,7 @@ def _build_chen_linear_name(
         basis_tag_transforms=basis_tag_transforms,
         ssg_primitive=ssg_primitive,
         identify_index_details=identify_index_details,
+        strip_spin_lattice_lengths=False,
     )
     return _chen_linear_name_from_transform_parts(source_name, ssg, transform_parts)
 
@@ -1183,11 +1210,19 @@ def generate_scif(
         ssg_primitive=ssg_primitive,
         identify_index_details=identify_index_details,
     )
+    chen_symbol_transform_parts = _resolve_transform_chen_parts(
+        cell_G0=cell_G0,
+        ssg=ssg,
+        basis_tag_transforms=basis_tag_transforms,
+        ssg_primitive=ssg_primitive,
+        identify_index_details=identify_index_details,
+        strip_spin_lattice_lengths=False,
+    )
     chen_number = spin_space_group_index
     chen_name = (
         spin_space_group_name_chen
         if spin_space_group_name_chen is not None
-        else _chen_linear_name_from_transform_parts(filename, ssg, chen_transform_parts)
+        else _chen_linear_name_from_transform_parts(filename, ssg, chen_symbol_transform_parts)
     )
     latex_name = spin_space_group_name_latex
     oriented_linear_name = spin_space_group_name_linear
