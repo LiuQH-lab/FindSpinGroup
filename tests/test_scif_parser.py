@@ -1119,7 +1119,7 @@ def test_generated_scif_uses_cif_legal_fsg_tags_and_full_precision_operations():
     assert "_space_group_spin.fsg_transform_to_parent_space_group_Pp" not in result.scif
     assert (
         "_space_group_spin.transform_Chen_Liu_Pp_abcs  "
-        "'a,b,c;0,0,0;-25.782269as+25.782269bs-6.445567cs,-25.782269bs-6.445567cs,25.782269as-6.445567cs'"
+        "'a,b,c;0,0,0;-sqrt(6)/2as+sqrt(6)/2bs-cs,-sqrt(6)/2bs-cs,sqrt(6)/2as-cs'"
         in result.scif
     )
     assert "1/3u-1/3w,2/3u-v-1/6w,-8/3u-1/3w" in result.scif
@@ -1153,23 +1153,23 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
             "C m_{001}|2/ m_{001}|m : (1,1,-1;-1)",
             (
                 "a,b,a+c;0,0,0;"
-                "-18.693448as-6.71236cs,37.228851as-31.879564cs,-15.45099bs"
+                "-0.769566as-0.353349cs,1.532627as-1.67819cs,-5*sqrt(2)/4bs"
             ),
         ),
         (
             "tests/testset/mcif_241130_no2186/1.526_LiCoF4.mcif",
             "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{001}m|1",
-            "a,b,-a+c;0,0,0;5.48785as+0.248568cs,4.6462bs,-0.736873as+9.957271cs",
+            "a,b,-a+c;0,0,0;0.991105as+0.024956cs,bs,-0.133079as+0.999689cs",
         ),
         (
             "examples/2.116_Na3Co2SbO6.mcif",
             "P 2_{001}|2/ 2_{001}|m : (1,2_{010},2_{010}) m_{010}|1",
-            "a,b,a+c;0,1/4,0;32.178386bs,-9.282213as+18.564426cs,-3.117679as-12.369292cs",
+            "a,b,a+c;0,1/4,0;sqrt(3)bs,-1.641911as+1.441404cs,-0.551479as-0.960393cs",
         ),
         (
             "tests/testset/mcif_241130_no2186/1.570_La3OsO7.mcif",
             "P 1|2_{1}/ 1|c : -1|(0,0,1/2) ∞_{001}m|1",
-            "a+2c,-b,1/2a;0,1/2,0;-5.573532as-2.739924cs,-7.6198bs,-3.782505as+13.190119cs",
+            "a+2c,-b,1/2a;0,1/2,0;-0.827444as-0.203384cs,-bs,-0.561549as+0.979099cs",
         ),
     ],
 )
@@ -1197,8 +1197,18 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_mnte():
         "P -1|6_{3}/ -1|m 1|m -1|c ∞_{001}m|1"
     )
     assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == (
-        "a,b,c;0,0,0;3.59184as-3.59184bs,-6.71cs,2.07375as+2.07375bs"
+        "a,b,c;0,0,0;sqrt(3)/2as-sqrt(3)/2bs,-cs,1/2as+1/2bs"
     )
+
+
+def test_generated_input_oriented_scif_transform_chen_omits_lattice_lengths_for_fe2wo6():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.812_Fe2WO6.mcif")
+    metadata = parse_scif_metadata(
+        source_text=result.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_ORIENTED)
+    )
+
+    assert metadata["space_group_spin"]["transform_spinframe_P_abc"] == "a,b,c"
+    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == "a,b,c;0,0,0;as,-cs,bs"
 
 
 def test_generated_scif_uses_solver_derived_symmform_uvw_for_mn3sn():
