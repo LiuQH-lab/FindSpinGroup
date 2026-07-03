@@ -672,6 +672,10 @@ ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING = "acc_primitive_poscar_spin_frame"
 OSSG_ORIENTED_SPIN_FRAME_SETTING = "ossg_oriented_spin_frame"
 G0_STANDARD_SETTING = "G0std"
 L0_STANDARD_SETTING = "L0std"
+# Temporary production bridge for known redundant pure-translation ACC-P
+# records in the current identify-index database. Remove this fallback and
+# restore strict ACC-P resolution after the refreshed database covers these
+# labels.
 TEMPORARY_DATABASE_REDUNDANT_P_FALLBACK_LABELS = {
     "12.6.4.11.P",
     "13.1.4.20.P",
