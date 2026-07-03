@@ -135,6 +135,18 @@ def _latex_coefficient_token(token: str) -> str:
 
 def _latex_factor(factor: str) -> tuple[int, str]:
     factor = _strip_outer_parentheses(factor)
+    polynomial_terms = _split_signed_terms(factor)
+    if len(polynomial_terms) > 1:
+        pieces: list[str] = []
+        for i, (term_sign, term) in enumerate(polynomial_terms):
+            factor_sign, factor_latex = _latex_factor(term)
+            sign = term_sign * factor_sign
+            if i == 0:
+                pieces.append(factor_latex if sign > 0 else rf"-{factor_latex}")
+            else:
+                pieces.append((" + " if sign > 0 else " - ") + factor_latex)
+        return 1, rf"\left({''.join(pieces)}\right)"
+
     sign = 1
     if factor.startswith("-"):
         sign = -1
@@ -197,23 +209,155 @@ def _split_signed_terms(text: str) -> list[tuple[int, str]]:
     return terms
 
 
-def basis_expression_to_latex(expression: str) -> str:
-    """Convert the public ASCII spin-texture basis expression to LaTeX."""
+def _split_basis_remainder_suffix(text: str) -> tuple[str, str]:
+    marker = " + o("
+    index = text.rfind(marker)
+    if index < 0:
+        return text, ""
+    return text[:index], text[index:]
+
+
+def _basis_remainder_suffix_to_latex(suffix: str) -> str:
+    if not suffix:
+        return ""
+    marker = " + o("
+    if not (suffix.startswith(marker) and suffix.endswith(")")):
+        return suffix
+    body = suffix[len(marker):-1]
+    if body == "1":
+        return " + o(1)"
+    if body == "k":
+        return " + o(k)"
+    if body.startswith("k^"):
+        return rf" + o(k^{{{body[2:]}}})"
+    return suffix
+
+
+def _split_basis_coefficient(text: str) -> tuple[str | None, str]:
+    if "*(" not in text or not text.endswith(")"):
+        return None, text
+    prefix, maybe_inner = text.split("*(", 1)
+    if prefix.startswith("C") and prefix[1:].isdigit():
+        return prefix, maybe_inner[:-1]
+    return None, text
+
+
+def _parse_sigma_term(term: str) -> tuple[str, int, str] | None:
+    term = term.strip()
+    if term in SIGMA_NAMES:
+        return term, 1, "1"
+    if "*sigma_" not in term:
+        return None
+    factor, sigma = term.rsplit("*", 1)
+    sigma = sigma.strip()
+    if sigma not in SIGMA_NAMES:
+        return None
+    factor = _strip_outer_parentheses(factor.strip())
+    if len(_split_signed_terms(factor)) > 1:
+        return sigma, 1, factor or "1"
+    sign = 1
+    if factor.startswith("-"):
+        sign = -1
+        factor = factor[1:].strip()
+    elif factor.startswith("+"):
+        factor = factor[1:].strip()
+    factor = _strip_outer_parentheses(factor)
+    return sigma, sign, factor or "1"
+
+
+def _render_signed_factor_sum(terms: Sequence[tuple[int, str]]) -> str:
+    pieces: list[str] = []
+    for i, (sign, factor) in enumerate(terms):
+        body = factor.strip() or "1"
+        if i == 0:
+            pieces.append(body if sign > 0 else f"-{body}")
+        else:
+            pieces.append((" + " if sign > 0 else " - ") + body)
+    return "".join(pieces)
+
+
+def _render_signed_expression_terms(terms: Sequence[tuple[int, str]]) -> str:
+    pieces: list[str] = []
+    for i, (sign, body) in enumerate(terms):
+        body = body.strip()
+        if i == 0:
+            pieces.append(body if sign > 0 else f"-{body}")
+        else:
+            pieces.append((" + " if sign > 0 else " - ") + body)
+    return "".join(pieces)
+
+
+def _combine_spin_texture_inner_terms(inner: str) -> str:
+    grouped: dict[str, list[tuple[int, str]]] = {sigma: [] for sigma in SIGMA_NAMES}
+    passthrough: list[tuple[int, str]] = []
+
+    for term_sign, term in _split_signed_terms(inner):
+        parsed = _parse_sigma_term(term)
+        if parsed is None:
+            passthrough.append((term_sign, term))
+            continue
+        sigma, factor_sign, factor = parsed
+        grouped[sigma].append((term_sign * factor_sign, factor))
+
+    rendered_terms: list[tuple[int, str]] = []
+    for sigma in SIGMA_NAMES:
+        factors = grouped[sigma]
+        if not factors:
+            continue
+        if len(factors) == 1:
+            sign, factor = factors[0]
+            if factor == "1":
+                rendered_terms.append((sign, sigma))
+            else:
+                rendered_terms.append((sign, f"({factor})*{sigma}"))
+            continue
+        rendered_terms.append((1, f"({_render_signed_factor_sum(factors)})*{sigma}"))
+
+    rendered_terms.extend(passthrough)
+    return _render_signed_expression_terms(rendered_terms)
+
+
+def combine_spin_texture_basis_expression(expression: str) -> str:
+    """Group public spin-texture basis terms by sigma component."""
 
     text = str(expression).strip()
     if text in {"", "0"}:
+        return text
+
+    main, remainder = _split_basis_remainder_suffix(text)
+    coefficient, inner = _split_basis_coefficient(main)
+    combined_inner = _combine_spin_texture_inner_terms(inner)
+    if coefficient is None:
+        return f"{combined_inner}{remainder}"
+    return f"{coefficient}*({combined_inner}){remainder}"
+
+
+def combine_spin_texture_basis(basis: Sequence[str] | None) -> list[str]:
+    if not basis:
+        return []
+    return [combine_spin_texture_basis_expression(expression) for expression in basis]
+
+
+def basis_expression_to_latex(expression: str) -> str:
+    """Convert the public ASCII spin-texture basis expression to LaTeX."""
+
+    text = combine_spin_texture_basis_expression(str(expression).strip())
+    if text in {"", "0"}:
         return "0"
+    text, remainder = _split_basis_remainder_suffix(text)
 
     coefficient = None
     inner = text
-    if "*(" in text and text.endswith(")"):
-        prefix, maybe_inner = text.split("*(", 1)
-        if prefix.startswith("C") and prefix[1:].isdigit():
-            coefficient = rf"C_{{{prefix[1:]}}}"
-            inner = maybe_inner[:-1]
+    prefix, maybe_inner = _split_basis_coefficient(text)
+    if prefix is not None:
+        coefficient = rf"C_{{{prefix[1:]}}}"
+        inner = maybe_inner
 
     latex_terms: list[tuple[int, str]] = []
     for term_sign, term in _split_signed_terms(inner):
+        if term.strip() in SIGMA_NAMES:
+            latex_terms.append((term_sign, _latex_symbol(term.strip())))
+            continue
         if "*sigma_" not in term:
             latex_terms.append((term_sign, term))
             continue
@@ -239,8 +383,8 @@ def basis_expression_to_latex(expression: str) -> str:
         body = "".join(pieces)
 
     if coefficient is None:
-        return body
-    return rf"{coefficient}\left({body}\right)"
+        return body + _basis_remainder_suffix_to_latex(remainder)
+    return rf"{coefficient}\left({body}\right)" + _basis_remainder_suffix_to_latex(remainder)
 
 
 def spin_texture_basis_latex(basis: Sequence[str] | None) -> list[str]:
@@ -772,6 +916,7 @@ def _basis_payload_for_order(
             radical_max_multiplier=radical_max_multiplier,
         )
         expressions.append(f"C{index + 1}*({expression})")
+    expressions = combine_spin_texture_basis(expressions)
     spin_rank, spin_config = spin_rank_and_configuration_from_vectors(canonical, tol=zero_tol)
     remainder_order = _resolve_basis_remainder_order(order, basis_remainder_order)
     expressions_latex = spin_texture_basis_latex(expressions)

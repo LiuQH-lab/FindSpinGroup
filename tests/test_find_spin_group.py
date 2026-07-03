@@ -31,6 +31,7 @@ from findspingroup.find_spin_group import _expand_magnetic_indices_by_sg_orbit
 from findspingroup.spin_splitting import (
     basis_expression_to_latex,
     classify_public_spin_texture_config,
+    combine_spin_texture_basis_expression,
     operation_pairs_from_gspg_ops,
 )
 from findspingroup.core.identify_index.functions import (
@@ -2780,9 +2781,9 @@ def test_acc_aligned_runtime_index_exposes_spin_texture_config_records():
     assert get_pair_id_for_ssg_label(label) == "A123_P02"
     assert get_spin_texture_config_id_for_ssg_label(label) == "W0043"
     assert get_spin_texture_config_for_ssg_label(label) == {
-        "basis": ["C1*((-ky^2*kz)*sigma_z + (kx^2*kz)*sigma_z) + o(k^3)"],
+        "basis": ["C1*((-ky^2*kz + kx^2*kz)*sigma_z) + o(k^3)"],
         "basis_latex": [
-            r"C_{1}\left(-k_{y}^{2}k_{z}\,\sigma_{z} + k_{x}^{2}k_{z}\,\sigma_{z}\right) + o(k^{3})"
+            r"C_{1}\left(\left(-k_{y}^{2}k_{z} + k_{x}^{2}k_{z}\right)\,\sigma_{z}\right) + o(k^{3})"
         ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
@@ -5539,6 +5540,12 @@ def test_spin_texture_basis_by_order_keeps_forbidden_orders():
 
 
 def test_spin_texture_basis_expression_latex_formatter():
+    assert combine_spin_texture_basis_expression(
+        "C1*((kx*ky)*sigma_x + (ky*kz)*sigma_x)"
+    ) == "C1*((kx*ky + ky*kz)*sigma_x)"
+    assert combine_spin_texture_basis_expression(
+        "C1*((kx*ky)*sigma_x - (ky*kz)*sigma_x)"
+    ) == "C1*((kx*ky - ky*kz)*sigma_x)"
     assert basis_expression_to_latex(
         "C1*((kx*ky*kz)*sigma_x - (sqrt(3)/3*kx*ky*kz)*sigma_z)"
     ) == (
@@ -5548,8 +5555,8 @@ def test_spin_texture_basis_expression_latex_formatter():
     assert basis_expression_to_latex(
         "C1*((-2/3*ky^3)*sigma_z + (kx*ky^2)*sigma_z)"
     ) == (
-        r"C_{1}\left(-\frac{2}{3}k_{y}^{3}\,\sigma_{z} + "
-        r"k_{x}k_{y}^{2}\,\sigma_{z}\right)"
+        r"C_{1}\left(\left(-\frac{2}{3}k_{y}^{3} + "
+        r"k_{x}k_{y}^{2}\right)\,\sigma_{z}\right)"
     )
 
 
