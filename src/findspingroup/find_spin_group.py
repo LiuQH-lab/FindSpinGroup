@@ -2715,7 +2715,7 @@ def _cell_to_poscar_in_snapshot_order(
     information = filename + f'#FINDSPINGROUP(version{__version__})'
     scale = '1'
     lattice = '\n'.join(
-        ' '.join(map(str, np.asarray(row, dtype=float).round(6)))
+        ' '.join(f'{value:.9f}' for value in np.asarray(row, dtype=float))
         for row in snapshot["lattice"]
     )
     positions = '\n'.join(
@@ -5300,7 +5300,7 @@ def _cell_to_poscar_preserving_lattice(cell: CrystalCell, filename: str) -> str:
         [
             filename + f"#FINDSPINGROUP(version{__version__})",
             "1",
-            *(" ".join(f"{value:.10f}" for value in row) for row in np.asarray(lattice, dtype=float)),
+            *(" ".join(f"{value:.9f}" for value in row) for row in np.asarray(lattice, dtype=float)),
             " ".join(atom_name[1:]),
             " ".join(map(str, count[1:])),
             "direct",

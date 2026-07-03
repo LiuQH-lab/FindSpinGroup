@@ -182,6 +182,40 @@ def _assert_setting_transform_chain(first, second, target):
     assert np.allclose(residual_shift, np.zeros(3), atol=1e-8)
 
 
+def test_generated_poscar_lattice_vectors_use_nine_decimals():
+    cell = cell_module.CrystalCell(
+        lattice=np.array(
+            [
+                [1.2345678912, 0.0, 0.0],
+                [0.0, 2.0, 0.0],
+                [0.1, 0.2, 3.3333333333],
+            ]
+        ),
+        positions=np.array([[0.0, 0.0, 0.0], [0.25, 0.5, 0.75]]),
+        occupancies=[1.0, 1.0],
+        elements=["Fe", "O"],
+        moments=np.array([[1.0, 0.0, 0.0], [-1.0, 0.0, 0.0]]),
+    )
+    expected_lattice = [
+        "1.234567891 0.000000000 0.000000000",
+        "0.000000000 2.000000000 0.000000000",
+        "0.100000000 0.200000000 3.333333333",
+    ]
+
+    poscar_outputs = [
+        cell.to_poscar("case"),
+        find_spin_group_module._cell_to_poscar_in_snapshot_order(
+            cell,
+            "case",
+            site_order=[0, 1],
+        ),
+        find_spin_group_module._cell_to_poscar_preserving_lattice(cell, "case"),
+    ]
+
+    for poscar in poscar_outputs:
+        assert poscar.splitlines()[2:5] == expected_lattice
+
+
 def test_find_spin_group_basic_skips_tensor_and_scif_generation(monkeypatch):
     def _unexpected(*args, **kwargs):
         raise AssertionError("unexpected heavy-route call")

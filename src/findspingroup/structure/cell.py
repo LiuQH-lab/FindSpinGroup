@@ -1014,7 +1014,7 @@ class CrystalCell:
 
         information = filename + f'#FINDSPINGROUP(version{__version__})'
         scale = '1'
-        lattice = '\n'.join(' '.join(map(str, i.round(6))) for i in cell[0])
+        lattice = '\n'.join(' '.join(f'{value:.9f}' for value in row) for row in cell[0])
         species = ' '.join(atom_name[1:])
         atom_number = ' '.join(map(str, count[1:]))
         cartesian = 'direct'
