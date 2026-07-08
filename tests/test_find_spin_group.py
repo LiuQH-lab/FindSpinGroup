@@ -30,6 +30,7 @@ from findspingroup import (
 from findspingroup.find_spin_group import _expand_magnetic_indices_by_sg_orbit
 from findspingroup.spin_splitting import (
     basis_expression_to_latex,
+    canonicalize_nullspace,
     classify_public_spin_texture_config,
     combine_spin_texture_basis_expression,
     operation_pairs_from_gspg_ops,
@@ -2323,6 +2324,18 @@ def test_find_spin_group_exposes_main_flow_identify_result_for_collinear_case():
     assert result.to_dict()["spin_texture_config_soc"] == result.spin_texture_config_soc
 
 
+def test_full_result_phase_alias_preserves_altermagnet_modifier():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.1008_Sr2ErRuO6.mcif")
+    payload = result.to_dict()
+
+    assert result.index == "14.2.1.1.L"
+    assert result.phase == "AFM(Altermagnet)\n(SOM)"
+    assert result.phase == result.magnetic_phase
+    assert payload["phase"] == payload["magnetic_phase"]
+    assert payload["is_alter"] == "(Altermagnet)"
+    assert result.magnetic_phase_details["spin_splitting_without_soc"] == "k-dependent"
+
+
 def test_spin_space_group_index_is_lazy_identify_index_not_legacy_shorthand(monkeypatch):
     result = find_spin_group("examples/0.800_MnTe.mcif")
     ssg = SpinSpaceGroup(
@@ -4157,6 +4170,66 @@ def test_find_spin_group_reports_quasi2d_diagnostics_without_changing_3d_fields(
     assert result.quasi_2d["kpoint_projection_summary"]["by_plane_count"]["mixed"] > 0
 
 
+def test_quasi2d_auto_mode_does_not_report_not_applicable_magnetic_phase():
+    result = find_spin_group(
+        "tests/testset/mcif_241130_no2186/0.1008_Sr2ErRuO6.mcif",
+        calculation_mode="auto",
+    )
+
+    assert result.index == "14.2.1.1.L"
+    assert result.magnetic_phase == "AFM(Altermagnet)\n(SOM)"
+    assert result.quasi_2d["status"] == "not_applicable"
+    assert result.quasi_2d["dimension"] == "3d_or_unknown"
+    assert "magnetic_phase" not in result.quasi_2d
+
+
+def test_quasi2d_magnetic_phase_uses_generated_generic_point_after_vacuum_padding():
+    result = find_spin_group(
+        "tests/testset/mcif_241130_no2186/0.105_ErVO3.mcif",
+        calculation_mode="quasi2d",
+        vacuum_axis="c",
+    )
+
+    quasi_2d = result.quasi_2d
+    assert quasi_2d["geometry"]["vacuum_padding"]["applied"] is True
+    assert quasi_2d["generic_point_2d"]["label"] == "GP"
+    assert quasi_2d["generic_point_2d"]["role"] == "generic_point_2d"
+    assert quasi_2d["generic_point_2d"]["source"] == "generated"
+    assert quasi_2d["generic_point_2d"]["display_k_symbol"] == "GP:(u,v,0)"
+    assert quasi_2d["generic_point_2d"]["display_setting"] == "input_reciprocal"
+    assert quasi_2d["generic_point_2d"]["matched_acc_label"] is None
+    assert quasi_2d["generic_point_2d"]["spin_splitting"] == "spin splitting"
+    assert quasi_2d["generic_point_2d"]["little_group_order"] == 2
+    required_display_fields = {
+        "role",
+        "label",
+        "display_k_symbol",
+        "display_setting",
+        "source",
+        "ssg_little_group_symbol_2d",
+        "spin_polarizations",
+        "msg_little_group_symbol_2d",
+        "msg_spin_polarization_2d",
+    }
+    assert required_display_fields <= set(quasi_2d["display_kpoints"][0])
+    assert quasi_2d["generic_point_2d"] == quasi_2d["display_kpoints"][0]
+    assert quasi_2d["display_kpoints"][0]["role"] == "generic_point_2d"
+    assert quasi_2d["display_kpoints"][0]["display_k_symbol"] == "GP:(u,v,0)"
+    assert quasi_2d["display_kpoints"][0]["ssg_little_group_symbol_2d"] is not None
+    assert quasi_2d["display_kpoints"][0]["spin_polarizations"] == ["0", "0", "Sz"]
+    assert quasi_2d["display_kpoints"][0]["msg_little_group_symbol_2d"] == "1"
+    assert quasi_2d["display_kpoints"][0]["msg_spin_polarization_2d"] == ["Sx", "Sy", "Sz"]
+    assert quasi_2d["diagnostic_points"][0]["label"] == "GP"
+    assert quasi_2d["diagnostic_points"][0]["kind"] == "generated_in_plane_generic_probe"
+    assert quasi_2d["diagnostic_points"][0]["plane_classification"] == "in_plane"
+    assert quasi_2d["diagnostic_points"][0]["spin_splitting"] == "spin splitting"
+    assert quasi_2d["generic_point_comparison"]["gp_2d"]["spin_splitting"] == "spin splitting"
+    assert quasi_2d["interpretation"] == "in_plane_k_dependent"
+    assert quasi_2d["spin_splitting_2d"] == "spin splitting"
+    assert quasi_2d["is_alter_2d"] == "(Altermagnet)"
+    assert quasi_2d["magnetic_phase"] == "AFM(Altermagnet)\n(SOM)"
+
+
 def test_v2se2o_quasi2d_case_study_uses_final_acc_primitive_transform_chain():
     result = find_spin_group(
         "tests/testset/V2Se2O_2d.mcif",
@@ -4236,6 +4309,36 @@ def test_v2se2o_quasi2d_case_study_uses_final_acc_primitive_transform_chain():
     assert quasi_2d["diagnostic_points"][0]["spin_splitting"] == "spin splitting"
     assert quasi_2d["diagnostic_points"][0]["matched_acc_label"] == "D"
     assert quasi_2d["diagnostic_points"][0]["matched_acc_k_symbol_2d"] == "D:(u,v,0)"
+    assert quasi_2d["generic_point_2d"]["label"] == "GP"
+    assert quasi_2d["generic_point_2d"]["role"] == "generic_point_2d"
+    assert quasi_2d["generic_point_2d"]["source"] == "acc_table"
+    assert quasi_2d["generic_point_2d"]["display_k_symbol"] == "GP:(u,v,0)"
+    assert quasi_2d["generic_point_2d"]["input_k_symbol"] == "GP:(u,v,0)"
+    assert quasi_2d["generic_point_2d"]["acc_primitive_k_symbol"] == "D:(u,v,0)"
+    assert quasi_2d["generic_point_2d"]["matched_acc_label"] == "D"
+    assert quasi_2d["generic_point_2d"]["spin_splitting"] == "spin splitting"
+    assert quasi_2d["display_kpoints"][0]["role"] == "generic_point_2d"
+    assert quasi_2d["display_kpoints"][0]["source"] == "acc_table"
+    assert quasi_2d["display_kpoints"][0]["display_k_symbol"] == "GP:(u,v,0)"
+    required_display_fields = {
+        "role",
+        "label",
+        "display_k_symbol",
+        "display_setting",
+        "source",
+        "ssg_little_group_symbol_2d",
+        "spin_polarizations",
+        "msg_little_group_symbol_2d",
+        "msg_spin_polarization_2d",
+    }
+    assert quasi_2d["generic_point_2d"] == quasi_2d["display_kpoints"][0]
+    assert required_display_fields <= set(quasi_2d["display_kpoints"][0])
+    assert required_display_fields <= set(quasi_2d["display_kpoints"][1])
+    assert quasi_2d["display_kpoints"][0]["spin_polarizations"] == ["Sx", "0", "0"]
+    assert quasi_2d["display_kpoints"][0]["msg_spin_polarization_2d"] == ["Sx", "Sy", "0"]
+    assert quasi_2d["display_kpoints"][1]["role"] == "path_point"
+    assert quasi_2d["display_kpoints"][1]["source"] == "acc_table"
+    assert quasi_2d["display_kpoints"][1]["msg_spin_polarization_2d"] == result.msg_spin_polarizations[1]
     assert quasi_2d["generic_point_comparison"]["gp_3d"]["label"] == "GP"
     assert quasi_2d["generic_point_comparison"]["gp_3d"]["plane_classification"] == "mixed"
     assert quasi_2d["generic_point_comparison"]["gp_2d"]["label"] == "GP"
@@ -5592,6 +5695,26 @@ def test_spin_texture_basis_expression_latex_formatter():
         r"C_{1}\left(\left(-\frac{2}{3}k_{y}^{3} + "
         r"k_{x}k_{y}^{2}\right)\,\sigma_{z}\right)"
     )
+
+
+def test_spin_texture_canonical_nullspace_does_not_amplify_near_zero_pivots():
+    basis = np.array(
+        [
+            [1e-7, 0.0],
+            [1.0, 0.0],
+            [0.0, 1e-7],
+            [0.0, 1.0],
+        ],
+        dtype=float,
+    )
+
+    canonical = canonicalize_nullspace(basis, zero_tol=1e-8)
+
+    assert len(canonical) == 2
+    assert all(np.max(np.abs(vector)) == pytest.approx(1.0) for vector in canonical)
+    assert all(np.all(np.abs(vector) <= 1.0) for vector in canonical)
+    assert np.allclose(canonical[0], [0.0, 1.0, 0.0, 0.0])
+    assert np.allclose(canonical[1], [0.0, 0.0, 0.0, 1.0])
 
 
 @pytest.mark.parametrize(

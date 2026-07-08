@@ -23,6 +23,7 @@ SPIN_TEXTURE_TYPE_NAMES = {
     9: "l-wave",
     10: "m-wave",
 }
+CANONICAL_BASIS_RELATIVE_ZERO_TOL = 1e-6
 
 
 def _split_top_level(text: str, delimiter: str) -> list[str]:
@@ -713,19 +714,30 @@ def svd_nullspace(
     return rank, [float(value) for value in singular_values], threshold, min_nonzero, max_zero, confidence, basis
 
 
+def _canonical_basis_vector(vector: np.ndarray, *, zero_tol: float) -> np.ndarray:
+    vector = np.asarray(vector, dtype=np.float64).copy()
+    if vector.size == 0:
+        return vector
+    max_abs = float(np.max(np.abs(vector)))
+    if max_abs <= zero_tol:
+        return np.zeros_like(vector)
+
+    vector = vector / max_abs
+    vector[np.abs(vector) < max(zero_tol, CANONICAL_BASIS_RELATIVE_ZERO_TOL)] = 0.0
+    first_index = next(
+        (index for index, value in enumerate(vector) if abs(value) > zero_tol),
+        None,
+    )
+    if first_index is not None and vector[first_index] < 0:
+        vector = -vector
+    return vector
+
+
 def canonicalize_nullspace(basis: np.ndarray, *, zero_tol: float) -> list[np.ndarray]:
     if basis.shape[1] == 0:
         return []
     if basis.shape[1] == 1:
-        vector = basis[:, 0].copy()
-        pivot = int(np.argmax(np.abs(vector)))
-        scale = vector[pivot]
-        if abs(scale) > zero_tol:
-            vector = vector / scale
-        if vector[pivot] < 0:
-            vector = -vector
-        vector[np.abs(vector) < zero_tol] = 0.0
-        return [vector]
+        return [_canonical_basis_vector(basis[:, 0], zero_tol=zero_tol)]
 
     selected: list[int] = []
     current = np.zeros((0, basis.shape[1]), dtype=np.float64)
@@ -737,18 +749,16 @@ def canonicalize_nullspace(basis: np.ndarray, *, zero_tol: float) -> list[np.nda
             if len(selected) == basis.shape[1]:
                 break
     if len(selected) != basis.shape[1]:
-        return [basis[:, index] for index in range(basis.shape[1])]
+        return [
+            _canonical_basis_vector(basis[:, index], zero_tol=zero_tol)
+            for index in range(basis.shape[1])
+        ]
 
     pivot_block = basis[selected, :]
     canonical = basis @ np.linalg.inv(pivot_block)
     out: list[np.ndarray] = []
     for index in range(canonical.shape[1]):
-        vector = canonical[:, index].copy()
-        vector[np.abs(vector) < zero_tol] = 0.0
-        first = next((value for value in vector if abs(value) > zero_tol), None)
-        if first is not None and first < 0:
-            vector = -vector
-        out.append(vector)
+        out.append(_canonical_basis_vector(canonical[:, index], zero_tol=zero_tol))
     return out
 
 
