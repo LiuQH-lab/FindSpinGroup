@@ -9,7 +9,9 @@ from typing import TypeAlias
 from findspingroup.spin_splitting import (
     _append_basis_remainder_ascii,
     _append_basis_remainder_latex,
+    _split_basis_remainder_suffix,
     combine_spin_texture_basis,
+    combine_spin_texture_basis_span,
     spin_texture_basis_latex,
 )
 
@@ -88,8 +90,14 @@ def _spin_texture_config_record(payload: dict) -> dict:
     order = record.get("order")
     remainder_order = int(order) if order is not None else None
     if basis:
-        basis = combine_spin_texture_basis(basis)
-        record["basis"] = _append_basis_remainder_ascii(basis, remainder_order)
+        basis_vectors = [
+            _split_basis_remainder_suffix(expression)[0]
+            for expression in combine_spin_texture_basis(basis)
+        ]
+        record["basis_vectors"] = basis_vectors
+        record["basis_vectors_latex"] = spin_texture_basis_latex(basis_vectors)
+        basis_span = combine_spin_texture_basis_span(basis_vectors)
+        record["basis"] = _append_basis_remainder_ascii(basis_span, remainder_order)
         basis_latex = spin_texture_basis_latex(record["basis"])
         record["basis_latex"] = _append_basis_remainder_latex(basis_latex, remainder_order)
     else:

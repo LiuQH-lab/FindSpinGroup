@@ -118,6 +118,20 @@ def _latex_coefficient_token(token: str) -> str:
     token = token.strip()
     if not token:
         return ""
+    if token.startswith("C") and token[1:].isdigit():
+        return rf"C_{{{token[1:]}}}"
+    stripped = _strip_outer_parentheses(token)
+    polynomial_terms = _split_signed_terms(stripped)
+    if len(polynomial_terms) > 1:
+        pieces: list[str] = []
+        for i, (term_sign, term) in enumerate(polynomial_terms):
+            factor_sign, factor_latex = _latex_factor(term)
+            sign = term_sign * factor_sign
+            if i == 0:
+                pieces.append(factor_latex if sign > 0 else rf"-{factor_latex}")
+            else:
+                pieces.append((" + " if sign > 0 else " - ") + factor_latex)
+        return rf"\left({''.join(pieces)}\right)"
     try:
         numeric = float(token)
     except ValueError:
@@ -130,7 +144,9 @@ def _latex_coefficient_token(token: str) -> str:
         numerator, denominator = token.split("/", 1)
         return rf"\frac{{{_latex_coefficient_token(numerator)}}}{{{_latex_coefficient_token(denominator)}}}"
     if "*" in token:
-        return "".join(_latex_coefficient_token(part) for part in _split_top_level(token, "*"))
+        parts = _split_top_level(token, "*")
+        if len(parts) > 1:
+            return "".join(_latex_coefficient_token(part) for part in parts)
     return _latex_radical_token(token)
 
 
@@ -326,6 +342,55 @@ def _combine_spin_texture_inner_terms(inner: str) -> str:
     return _render_signed_expression_terms(rendered_terms)
 
 
+def _prefix_basis_coefficient(coefficient: str | None, factor: str) -> str:
+    factor = _strip_outer_parentheses(factor.strip())
+    if coefficient is None:
+        return factor or "1"
+    if factor in {"", "1"}:
+        return coefficient
+    if len(_split_signed_terms(factor)) > 1:
+        return f"{coefficient}*({factor})"
+    return f"{coefficient}*{factor}"
+
+
+def _combine_spin_texture_basis_span_inner(expressions: Sequence[str]) -> str:
+    grouped: dict[str, list[tuple[int, str]]] = {sigma: [] for sigma in SIGMA_NAMES}
+    passthrough: list[tuple[int, str]] = []
+
+    for expression in expressions:
+        main, _ = _split_basis_remainder_suffix(str(expression))
+        coefficient, inner = _split_basis_coefficient(main)
+        if coefficient is None:
+            passthrough.append((1, _combine_spin_texture_inner_terms(inner)))
+            continue
+        for term_sign, term in _split_signed_terms(inner):
+            parsed = _parse_sigma_term(term)
+            if parsed is None:
+                passthrough.append((term_sign, f"{coefficient}*({term})"))
+                continue
+            sigma, factor_sign, factor = parsed
+            grouped[sigma].append(
+                (
+                    term_sign * factor_sign,
+                    _prefix_basis_coefficient(coefficient, factor),
+                )
+            )
+
+    rendered_terms: list[tuple[int, str]] = []
+    for sigma in SIGMA_NAMES:
+        factors = grouped[sigma]
+        if not factors:
+            continue
+        if len(factors) == 1:
+            sign, factor = factors[0]
+            rendered_terms.append((sign, sigma if factor == "1" else f"({factor})*{sigma}"))
+            continue
+        rendered_terms.append((1, f"({_render_signed_factor_sum(factors)})*{sigma}"))
+
+    rendered_terms.extend(passthrough)
+    return _render_signed_expression_terms(rendered_terms)
+
+
 def combine_spin_texture_basis_expression(expression: str) -> str:
     """Group public spin-texture basis terms by sigma component."""
 
@@ -345,6 +410,19 @@ def combine_spin_texture_basis(basis: Sequence[str] | None) -> list[str]:
     if not basis:
         return []
     return [combine_spin_texture_basis_expression(expression) for expression in basis]
+
+
+def combine_spin_texture_basis_span(basis: Sequence[str] | None) -> list[str]:
+    """Render a basis span as one public expression with shared coefficients."""
+
+    if not basis:
+        return []
+    normalized = combine_spin_texture_basis(basis)
+    if len(normalized) <= 1:
+        return normalized
+    _, remainder = _split_basis_remainder_suffix(normalized[0])
+    combined_inner = _combine_spin_texture_basis_span_inner(normalized)
+    return [f"{combined_inner}{remainder}"]
 
 
 def basis_expression_to_latex(expression: str) -> str:
@@ -485,6 +563,8 @@ class SpinSplittingResult:
     nullity: int
     basis: list[str]
     basis_latex: list[str]
+    basis_vectors: list[str]
+    basis_vectors_latex: list[str]
     basis_by_order: list[dict[str, Any]] | None
     spin_rank: int
     momentum_space_spin_configuration: str
@@ -941,18 +1021,22 @@ def _basis_payload_for_order(
             radical_max_multiplier=radical_max_multiplier,
         )
         expressions.append(f"C{index + 1}*({expression})")
-    expressions = combine_spin_texture_basis(expressions)
+    basis_vectors = combine_spin_texture_basis(expressions)
+    expressions = combine_spin_texture_basis_span(basis_vectors)
     spin_rank, spin_config = spin_rank_and_configuration_from_vectors(canonical, tol=zero_tol)
     remainder_order = _resolve_basis_remainder_order(order, basis_remainder_order)
+    basis_vectors_latex = spin_texture_basis_latex(basis_vectors)
     expressions_latex = spin_texture_basis_latex(expressions)
     return {
         "order": int(order),
         "spin_texture_type": spin_texture_type_for_order(order),
-        "nullity": int(len(expressions)),
+        "nullity": int(len(basis_vectors)),
         "spin_rank": int(spin_rank),
         "momentum_space_spin_configuration": spin_config,
         "basis": _append_basis_remainder_ascii(expressions, remainder_order),
         "basis_latex": _append_basis_remainder_latex(expressions_latex, remainder_order),
+        "basis_vectors": basis_vectors,
+        "basis_vectors_latex": basis_vectors_latex,
     }
 
 
@@ -965,6 +1049,8 @@ def _empty_basis_payload_for_order(order: int) -> dict[str, Any]:
         "momentum_space_spin_configuration": "zero",
         "basis": [],
         "basis_latex": [],
+        "basis_vectors": [],
+        "basis_vectors_latex": [],
     }
 
 
@@ -1062,6 +1148,8 @@ def classify_spin_splitting_numeric(
                     nullity=leading_payload["nullity"],
                     basis=leading_payload["basis"],
                     basis_latex=leading_payload["basis_latex"],
+                    basis_vectors=leading_payload["basis_vectors"],
+                    basis_vectors_latex=leading_payload["basis_vectors_latex"],
                     basis_by_order=basis_by_order if basis_orders_through is not None else None,
                     spin_rank=leading_payload["spin_rank"],
                     momentum_space_spin_configuration=leading_payload[
@@ -1078,6 +1166,8 @@ def classify_spin_splitting_numeric(
             nullity=leading_payload["nullity"],
             basis=leading_payload["basis"],
             basis_latex=leading_payload["basis_latex"],
+            basis_vectors=leading_payload["basis_vectors"],
+            basis_vectors_latex=leading_payload["basis_vectors_latex"],
             basis_by_order=basis_by_order if basis_orders_through is not None else None,
             spin_rank=leading_payload["spin_rank"],
             momentum_space_spin_configuration=leading_payload[
@@ -1092,6 +1182,8 @@ def classify_spin_splitting_numeric(
         nullity=0,
         basis=[],
         basis_latex=[],
+        basis_vectors=[],
+        basis_vectors_latex=[],
         basis_by_order=basis_by_order if basis_orders_through is not None else None,
         spin_rank=0,
         momentum_space_spin_configuration="zero",
