@@ -1528,6 +1528,7 @@ class MagSymmetryResult:
         self.index = symmetry['index']
         self.conf = symmetry['configuration']
         self.magnetic_phase = symmetry['magnetic_phase']
+        self.phase = self.magnetic_phase
         self.magnetic_phase_base = symmetry.get('magnetic_phase_base', self.magnetic_phase)
         self.magnetic_phase_modifier = symmetry.get('magnetic_phase_modifier', '')
         self.magnetic_phase_spin_orbit_magnet = symmetry.get('magnetic_phase_spin_orbit_magnet', '')
@@ -2494,6 +2495,23 @@ def _spin_splitting_wo_soc_quasi2d(magnetic_phase_base: str, spin_splitting_2d: 
     return 'unknown'
 
 
+def _spin_splitting_wo_soc_quasi2d_from_payload(
+    magnetic_phase_base: str,
+    quasi_2d: dict,
+) -> str:
+    interpretation = quasi_2d.get("interpretation")
+    if magnetic_phase_base in FM_LIKE_BASE_PHASES:
+        return 'Zeeman'
+    if interpretation == "in_plane_k_dependent":
+        return 'k-dependent'
+    if interpretation in {"in_plane_no_spin_splitting", "in_plane_k_independent"}:
+        return 'No'
+    return _spin_splitting_wo_soc_quasi2d(
+        magnetic_phase_base,
+        quasi_2d.get('spin_splitting_2d'),
+    )
+
+
 def _build_quasi2d_magnetic_phase(
     *,
     parent_magnetic_phase_payload: dict,
@@ -2501,9 +2519,10 @@ def _build_quasi2d_magnetic_phase(
 ) -> str | None:
     if not isinstance(quasi_2d, dict):
         return None
+    if quasi_2d.get("dimension") != "2d":
+        return None
     base_phase = parent_magnetic_phase_payload['base_phase']
-    spin_splitting_2d = quasi_2d.get('spin_splitting_2d')
-    ss_wo_soc_2d = _spin_splitting_wo_soc_quasi2d(base_phase, spin_splitting_2d)
+    ss_wo_soc_2d = _spin_splitting_wo_soc_quasi2d_from_payload(base_phase, quasi_2d)
     alter_tag_2d = is_alter(
         parent_magnetic_phase_payload['details'].get('conf'),
         base_phase,
@@ -5835,6 +5854,125 @@ def _get_ssg_little_groups(ssg: SpinSpaceGroup, *, tol: float) -> list[list[Spin
     return little_groups
 
 
+def _get_ssg_little_group_for_primitive_kpoint(
+    ssg: SpinSpaceGroup,
+    kpoint,
+    *,
+    tol: float,
+) -> list[SpinSpaceGroupOperation]:
+    kpoint_array = np.asarray(kpoint, dtype=float)
+    ops = list(ssg.ops)
+    effective_ops = [
+        np.linalg.det(op.spin_rotation) * np.linalg.inv(np.asarray(op.rotation, dtype=float)).T
+        for op in ops
+    ]
+    if ssg.cptrans is None or np.allclose(ssg.cptrans, np.eye(3), atol=tol):
+        return [
+            op
+            for op, effective_op in zip(ops, effective_ops)
+            if getNormInf(kpoint_array % 1, effective_op @ kpoint_array % 1) < tol
+        ]
+
+    cptrans = np.asarray(ssg.cptrans, dtype=float)
+    cptrans_inv = np.linalg.inv(cptrans)
+    conjugated_effective_ops = [
+        cptrans_inv @ effective_op @ cptrans
+        for effective_op in effective_ops
+    ]
+    if ssg.is_primitive:
+        return [
+            op
+            for op, effective_op in zip(ops, effective_ops)
+            if getNormInf(kpoint_array % 1, effective_op @ kpoint_array % 1) < tol
+        ]
+
+    primitive_kpoint = cptrans.T @ kpoint_array % 1
+    return [
+        op
+        for op, conjugated_effective_op in zip(ops, conjugated_effective_ops)
+        if getNormInf(primitive_kpoint, conjugated_effective_op @ primitive_kpoint % 1) < tol
+    ]
+
+
+def _ssg_little_group_symbol(
+    little_group: list[SpinSpaceGroupOperation],
+    *,
+    conf: str,
+    tol: float,
+    label: str,
+) -> str | None:
+    if not little_group:
+        return "1"
+    try:
+        spin_part = deduplicate_matrix_pairs([np.asarray(op[0], dtype=float) for op in little_group])
+        real_part = deduplicate_matrix_pairs([np.asarray(op[1], dtype=float) for op in little_group])
+        spin_info = _resolve_point_group_info(
+            spin_part,
+            tol=max(float(tol), 1e-6),
+            label=f"spin little group {label}",
+        )
+        real_info = _resolve_point_group_info(
+            real_part,
+            tol=max(float(tol), 1e-6),
+            label=f"real little group {label}",
+        )
+        if conf == 'Collinear':
+            t_count = sum(
+                1
+                for op in little_group
+                if np.allclose(np.asarray(op[1], dtype=float), np.eye(3), atol=tol)
+            )
+            spin_only_symbol_by_count = {
+                2: '^{\\infty }1',
+                4: '^{\\infty m}1',
+                8: '^{\\infty /mm}1',
+            }
+            spin_only_symbol = spin_only_symbol_by_count.get(t_count, '')
+        else:
+            general_spin_only = [
+                np.asarray(op[0], dtype=float)
+                for op in little_group
+                if np.allclose(np.asarray(op[1], dtype=float), np.eye(3), atol=tol)
+            ]
+            pg_info = _resolve_point_group_info(
+                general_spin_only,
+                tol=max(float(tol), 1e-6),
+                label=f"spin-only little group {label}",
+            )
+            pg_symbol = pg_info[0]
+            spin_only_symbol = f"^{{{pg_symbol}}}1" if pg_symbol != '1' else ''
+
+        spin_generators = []
+        for index_g in real_info[3]:
+            for op in little_group:
+                if np.allclose(np.asarray(op[1], dtype=float), real_info[1][index_g][0], atol=tol):
+                    spin_generators.append(op[0])
+                    break
+
+        spin_generators_symbols = []
+        for spin_op in spin_generators:
+            for op in spin_info[1]:
+                if np.allclose(np.asarray(op[0], dtype=float), spin_op, atol=tol):
+                    spin_generators_symbols.append(op[2])
+                    break
+
+        latex = ''
+        if bool(re.search(r'/', real_info[0])):
+            count = 0
+            for i, index_g in enumerate(real_info[3]):
+                if count == 1:
+                    latex += '/' + '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
+                else:
+                    latex += '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
+                count += 1
+        else:
+            for i, index_g in enumerate(real_info[3]):
+                latex += '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
+        return latex + spin_only_symbol
+    except Exception:
+        return None
+
+
 def _get_spin_constraint_for_msg_little_groups(
     little_groups: list[list[list]],
     cell: CrystalCell,
@@ -5949,13 +6087,104 @@ def _build_quasi2d_little_group_payload(
     *,
     quasi_2d: dict | None,
     acc_primitive_ssg: SpinSpaceGroup,
+    acc_primitive_cell: CrystalCell,
     ssg_little_groups: list[list[SpinSpaceGroupOperation]],
     msg_little_groups: list[list[list]],
     msg_little_group_symbols: list[str | None],
     msg_spin_polarizations: list[list[str]],
+    msg_spin_frame_rotation: np.ndarray | None,
     tol: float,
 ) -> dict:
+    if not isinstance(quasi_2d, dict):
+        return {}
+
     indices = _quasi2d_in_plane_acc_kpoint_indices(quasi_2d)
+    ssg_little_group_symbols = list(acc_primitive_ssg.little_groups_symbols)
+    ssg_little_groups_2d = _select_indices(ssg_little_groups, indices)
+    msg_little_groups_2d = _select_indices(msg_little_groups, indices)
+    ssg_little_group_symbol_2d = _select_indices(ssg_little_group_symbols, indices)
+    msg_little_group_symbol_2d = _select_indices(msg_little_group_symbols, indices)
+    msg_spin_polarization_2d = _select_indices(msg_spin_polarizations, indices)
+    ssg_little_group_ops_2d = _serialize_ssg_little_group_ops(ssg_little_groups_2d)
+    ssg_little_group_seitz_latex_2d = _serialize_ssg_little_group_seitz_latex(
+        ssg_little_groups_2d,
+        tol=tol,
+    )
+    msg_little_group_ops_2d = _serialize_msg_little_group_ops(msg_little_groups_2d)
+    msg_little_group_seitz_latex_2d = _serialize_msg_little_group_seitz_latex(
+        msg_little_groups_2d,
+        tol=tol,
+    )
+
+    display_kpoints = [dict(row) for row in (quasi_2d.get("display_kpoints") or [])]
+    primitive_msg_ops = None
+    path_row_index = 0
+    for row in display_kpoints:
+        if row.get("role") == "generic_point_2d":
+            k_acc = row.get("k_acc_primitive")
+            if k_acc is None:
+                row.setdefault("ssg_little_group_symbol_2d", None)
+                row.setdefault("msg_little_group_symbol_2d", None)
+                row.setdefault("msg_spin_polarization_2d", [])
+                continue
+            ssg_group = _get_ssg_little_group_for_primitive_kpoint(
+                acc_primitive_ssg,
+                k_acc,
+                tol=tol,
+            )
+            row["ssg_little_group_symbol_2d"] = _ssg_little_group_symbol(
+                ssg_group,
+                conf=acc_primitive_ssg.conf,
+                tol=tol,
+                label="2D generic point",
+            )
+            if primitive_msg_ops is None:
+                primitive_msg_ops = _primitive_msg_ops_from_ssg(
+                    acc_primitive_ssg.msg_ops,
+                    tol=tol,
+                    time_reversal_resolver=acc_primitive_ssg.classify_magnetic_operation,
+                )
+            msg_group = _get_magnetic_little_group(k_acc, primitive_msg_ops, tol=tol)
+            if not msg_group:
+                row["msg_little_group_symbol_2d"] = "1"
+                row["msg_spin_polarization_2d"] = []
+            else:
+                msg_info = get_magnetic_space_group_from_operations(msg_group)
+                row["msg_little_group_symbol_2d"] = (
+                    None if msg_info is None else msg_info["mpg_symbol"]
+                )
+                row["msg_spin_polarization_2d"] = _get_spin_constraint_for_msg_little_groups(
+                    [msg_group],
+                    cell=acc_primitive_cell,
+                    tol=tol,
+                    spin_frame_rotation=msg_spin_frame_rotation,
+                )[0]
+            continue
+
+        if row.get("role") == "path_point":
+            row["ssg_little_group_symbol_2d"] = (
+                ssg_little_group_symbol_2d[path_row_index]
+                if path_row_index < len(ssg_little_group_symbol_2d)
+                else None
+            )
+            row["msg_little_group_symbol_2d"] = (
+                msg_little_group_symbol_2d[path_row_index]
+                if path_row_index < len(msg_little_group_symbol_2d)
+                else None
+            )
+            row["msg_spin_polarization_2d"] = (
+                msg_spin_polarization_2d[path_row_index]
+                if path_row_index < len(msg_spin_polarization_2d)
+                else []
+            )
+            path_row_index += 1
+
+    generic_point_2d = (
+        dict(display_kpoints[0])
+        if display_kpoints and display_kpoints[0].get("role") == "generic_point_2d"
+        else quasi_2d.get("generic_point_2d")
+    )
+
     if not indices:
         return {
             "ssg_little_group_symbol_2d": [],
@@ -5965,25 +6194,20 @@ def _build_quasi2d_little_group_payload(
             "ssg_little_group_seitz_latex_2d": [],
             "msg_little_group_ops_2d": [],
             "msg_little_group_seitz_latex_2d": [],
+            "generic_point_2d": generic_point_2d,
+            "display_kpoints": display_kpoints,
         }
 
-    ssg_little_group_symbols = list(acc_primitive_ssg.little_groups_symbols)
-    ssg_little_groups_2d = _select_indices(ssg_little_groups, indices)
-    msg_little_groups_2d = _select_indices(msg_little_groups, indices)
     return {
-        "ssg_little_group_symbol_2d": _select_indices(ssg_little_group_symbols, indices),
-        "msg_little_group_symbol_2d": _select_indices(msg_little_group_symbols, indices),
-        "msg_spin_polarization_2d": _select_indices(msg_spin_polarizations, indices),
-        "ssg_little_group_ops_2d": _serialize_ssg_little_group_ops(ssg_little_groups_2d),
-        "ssg_little_group_seitz_latex_2d": _serialize_ssg_little_group_seitz_latex(
-            ssg_little_groups_2d,
-            tol=tol,
-        ),
-        "msg_little_group_ops_2d": _serialize_msg_little_group_ops(msg_little_groups_2d),
-        "msg_little_group_seitz_latex_2d": _serialize_msg_little_group_seitz_latex(
-            msg_little_groups_2d,
-            tol=tol,
-        ),
+        "ssg_little_group_symbol_2d": ssg_little_group_symbol_2d,
+        "msg_little_group_symbol_2d": msg_little_group_symbol_2d,
+        "msg_spin_polarization_2d": msg_spin_polarization_2d,
+        "ssg_little_group_ops_2d": ssg_little_group_ops_2d,
+        "ssg_little_group_seitz_latex_2d": ssg_little_group_seitz_latex_2d,
+        "msg_little_group_ops_2d": msg_little_group_ops_2d,
+        "msg_little_group_seitz_latex_2d": msg_little_group_seitz_latex_2d,
+        "generic_point_2d": generic_point_2d,
+        "display_kpoints": display_kpoints,
     }
 
 
@@ -8099,10 +8323,12 @@ def _find_spin_group_from_parsed(
             _build_quasi2d_little_group_payload(
                 quasi_2d=quasi_2d_diagnostics,
                 acc_primitive_ssg=acc_primitive_output_ssg,
+                acc_primitive_cell=acc_magnetic_primitive_cell,
                 ssg_little_groups=ssg_little_groups,
                 msg_little_groups=msg_little_groups,
                 msg_little_group_symbols=msg_little_group_symbols,
                 msg_spin_polarizations=msg_spin_polarizations_poscar,
+                msg_spin_frame_rotation=acc_real_cartesian_to_poscar_spin_frame,
                 tol=tol_cfg.m_matrix_tol,
             )
         )

@@ -12,6 +12,7 @@ from findspingroup.structure.group import (
     write_kpoints,
 )
 from findspingroup.utils.matrix_utils import getNormInf
+from findspingroup.utils.symbolic_format import format_symbolic_scalar
 
 
 AXIS_LABELS = ("a", "b", "c")
@@ -398,6 +399,62 @@ def _generic_in_plane_acc_kpoint(
     return np.linalg.solve(input_to_acc_matrix.T, k_input)
 
 
+def _generic_input_symbol_components(vacuum_axis_index: int) -> tuple[list[str], dict[str, str]]:
+    variables = ("u", "v")
+    in_plane_axes = [axis for axis in range(3) if axis != vacuum_axis_index]
+    components = ["0", "0", "0"]
+    variable_labels = {}
+    for variable, axis_index in zip(variables, in_plane_axes):
+        components[axis_index] = variable
+        variable_labels[variable] = f"input reciprocal {AXIS_LABELS[axis_index]}*"
+    return components, variable_labels
+
+
+def _format_generic_input_k_symbol(vacuum_axis_index: int) -> tuple[str, dict[str, str]]:
+    components, variable_labels = _generic_input_symbol_components(vacuum_axis_index)
+    return f"GP:({','.join(components)})", variable_labels
+
+
+def _format_symbolic_linear_component(
+    coeffs,
+    variables: tuple[str, ...] = ("u", "v"),
+    *,
+    tol: float = 1e-10,
+) -> str:
+    terms = []
+    for coeff, variable in zip(np.asarray(coeffs, dtype=float).reshape(-1), variables):
+        if abs(float(coeff)) <= tol:
+            continue
+        magnitude = abs(float(coeff))
+        if abs(magnitude - 1.0) <= tol:
+            term = variable
+        else:
+            term = f"{format_symbolic_scalar(magnitude)}*{variable}"
+        sign = "-" if coeff < 0 else "+"
+        terms.append((sign, term))
+    if not terms:
+        return "0"
+    first_sign, first_term = terms[0]
+    expression = f"-{first_term}" if first_sign == "-" else first_term
+    for sign, term in terms[1:]:
+        expression += f"{sign}{term}"
+    return expression
+
+
+def _format_generic_acc_k_symbol(
+    input_to_acc_matrix: np.ndarray,
+    vacuum_axis_index: int,
+) -> str:
+    in_plane_axes = [axis for axis in range(3) if axis != vacuum_axis_index]
+    input_symbolic_basis = np.eye(3)[:, in_plane_axes]
+    acc_symbolic_basis = np.linalg.solve(input_to_acc_matrix.T, input_symbolic_basis)
+    components = [
+        _format_symbolic_linear_component(acc_symbolic_basis[row, :])
+        for row in range(3)
+    ]
+    return f"GP:({','.join(components)})"
+
+
 def _format_k_symbol(label: str, kpoint_string: str | None) -> str | None:
     if not kpoint_string:
         return None
@@ -568,6 +625,84 @@ def _match_acc_table_row_for_kpoint(acc_primitive_ssg, k_acc, rows: list[dict]) 
     )
 
 
+def _build_generic_point_2d(
+    *,
+    generic_row: dict,
+    matched_row: dict | None,
+    input_to_acc_matrix: np.ndarray,
+    vacuum_axis_index: int,
+    little_group_order: int | None,
+) -> dict:
+    input_k_symbol, input_variable_labels = _format_generic_input_k_symbol(vacuum_axis_index)
+    generated_acc_symbol = _format_generic_acc_k_symbol(input_to_acc_matrix, vacuum_axis_index)
+    matched_acc_symbol = None if matched_row is None else matched_row.get("k_symbol_2d")
+    source = "generated" if matched_row is None else "acc_table"
+    return {
+        "label": "GP",
+        "role": "generic_point_2d",
+        "source": source,
+        "method": "symbolic_in_plane_generic_probe",
+        "display_k_symbol": input_k_symbol,
+        "display_setting": "input_reciprocal",
+        "input_k_symbol": input_k_symbol,
+        "input_k_setting": "input_reciprocal",
+        "input_k_variable_labels": input_variable_labels,
+        "acc_primitive_k_symbol": matched_acc_symbol or generated_acc_symbol,
+        "acc_primitive_generated_k_symbol": generated_acc_symbol,
+        "acc_primitive_sample_k_symbol": generic_row.get("k_symbol_2d"),
+        "acc_primitive_setting": "acc_primitive",
+        "k_acc_primitive": generic_row.get("k_acc_primitive"),
+        "k_input_reciprocal": generic_row.get("k_input_reciprocal"),
+        "k_input_reciprocal_raw": generic_row.get("k_input_reciprocal_raw"),
+        "plane_classification": generic_row.get("plane_classification"),
+        "vacuum_component_distance_to_zero": generic_row.get(
+            "vacuum_component_distance_to_zero"
+        ),
+        "vacuum_component_distance_to_integer": generic_row.get(
+            "vacuum_component_distance_to_integer"
+        ),
+        "spin_splitting": generic_row.get("spin_splitting"),
+        "spin_polarizations": generic_row.get("spin_polarizations", []),
+        "little_group_order": little_group_order,
+        "matched_acc_label": None if matched_row is None else matched_row.get("label"),
+        "matched_acc_k_symbol": matched_acc_symbol,
+        "matched_acc_k_acc_primitive": None
+        if matched_row is None
+        else matched_row.get("k_acc_primitive"),
+    }
+
+
+def _build_quasi2d_display_kpoints(
+    generic_point_2d: dict | None,
+    kpoint_rows: list[dict],
+) -> list[dict]:
+    display_rows = []
+    if isinstance(generic_point_2d, dict):
+        display_rows.append(dict(generic_point_2d))
+    for row in kpoint_rows:
+        if row.get("kind") != "acc_table" or row.get("plane_classification") != "in_plane":
+            continue
+        if row.get("label") == "GP":
+            continue
+        display_rows.append(
+            {
+                "label": row.get("label"),
+                "role": "path_point",
+                "source": "acc_table",
+                "display_k_symbol": row.get("k_symbol_2d"),
+                "display_setting": "acc_primitive",
+                "acc_primitive_k_symbol": row.get("k_symbol_2d"),
+                "acc_primitive_setting": "acc_primitive",
+                "k_acc_primitive": row.get("k_acc_primitive"),
+                "k_input_reciprocal": row.get("k_input_reciprocal"),
+                "plane_classification": row.get("plane_classification"),
+                "spin_splitting": row.get("spin_splitting"),
+                "spin_polarizations": row.get("spin_polarizations", []),
+            }
+        )
+    return display_rows
+
+
 def _wrapped_k_delta(target, source) -> np.ndarray:
     target_array = np.asarray(target, dtype=float).reshape(3)
     source_array = np.asarray(source, dtype=float).reshape(3)
@@ -629,7 +764,16 @@ def _generic_point_comparison(kpoint_rows: list[dict], gp2d_row: dict | None, *,
     }
 
 
-def _interpret_2d_spin_splitting(kpoint_rows: list[dict]) -> tuple[str, str]:
+def _interpret_2d_spin_splitting(
+    kpoint_rows: list[dict],
+    generic_point_2d: dict | None = None,
+) -> tuple[str, str]:
+    if isinstance(generic_point_2d, dict):
+        generic_spin_splitting = generic_point_2d.get("spin_splitting")
+        if generic_spin_splitting == "spin splitting":
+            return "in_plane_k_dependent", "spin splitting"
+        if generic_spin_splitting == "no spin splitting":
+            return "in_plane_no_spin_splitting", "no spin splitting"
     in_plane_rows = [row for row in kpoint_rows if row["plane_classification"] == "in_plane"]
     if any(row["spin_splitting"] == "spin splitting" for row in in_plane_rows):
         return "in_plane_k_dependent", "spin splitting"
@@ -719,6 +863,8 @@ def build_quasi2d_diagnostics(
             "non_in_plane_labels": [],
         },
         "diagnostic_points": [],
+        "generic_point_2d": None,
+        "display_kpoints": [],
         "generic_point_comparison": {
             "status": "not_applicable",
             "gp_3d": None,
@@ -751,6 +897,7 @@ def build_quasi2d_diagnostics(
 
     rows = []
     diagnostic_row = None
+    generic_point_2d = None
     kpoints = list(acc_primitive_ssg.kpoints_primitive)
     labels = list(acc_primitive_ssg.kpoints_label)
     kpoint_strings = list(acc_primitive_ssg.kpoints_primitive_string)
@@ -780,20 +927,18 @@ def build_quasi2d_diagnostics(
     try:
         diagnostic_k_acc = _generic_in_plane_acc_kpoint(input_to_acc_matrix, vacuum_axis_index)
         gp2d_row = _match_acc_table_row_for_kpoint(acc_primitive_ssg, diagnostic_k_acc, rows)
+        diagnostic_little_group = _little_group_for_primitive_kpoint(
+            acc_primitive_ssg,
+            diagnostic_k_acc,
+            tol=tol,
+        )
+        diagnostic_spin_splitting, diagnostic_spin_polarizations = _spin_splitting_for_little_group(
+            diagnostic_little_group,
+            tol=tol,
+        )
         if gp2d_row is None:
-            diagnostic_little_group = _little_group_for_primitive_kpoint(
-                acc_primitive_ssg,
-                diagnostic_k_acc,
-                tol=tol,
-            )
-            diagnostic_spin_splitting, diagnostic_spin_polarizations = _spin_splitting_for_little_group(
-                diagnostic_little_group,
-                tol=tol,
-            )
             diagnostic_source = "computed_probe"
         else:
-            diagnostic_spin_splitting = gp2d_row.get("spin_splitting")
-            diagnostic_spin_polarizations = gp2d_row.get("spin_polarizations", [])
             diagnostic_source = "matched_acc_table"
         diagnostic_row = _serialize_kpoint_analysis(
             label="GP",
@@ -807,6 +952,7 @@ def build_quasi2d_diagnostics(
             k_symbol_2d=_format_numeric_k_symbol("GP", diagnostic_k_acc),
         )
         diagnostic_row["source"] = diagnostic_source
+        diagnostic_row["spin_splitting_source"] = "computed_little_group"
         diagnostic_row["matched_acc_label"] = None if gp2d_row is None else gp2d_row.get("label")
         diagnostic_row["matched_acc_k_symbol_2d"] = (
             None if gp2d_row is None else gp2d_row.get("k_symbol_2d")
@@ -814,11 +960,24 @@ def build_quasi2d_diagnostics(
         diagnostic_row["matched_acc_k_acc_primitive"] = (
             None if gp2d_row is None else gp2d_row.get("k_acc_primitive")
         )
-        if gp2d_row is None:
-            diagnostic_row["little_group_order"] = len(diagnostic_little_group)
+        diagnostic_row["little_group_order"] = len(diagnostic_little_group)
+        generic_point_2d = _build_generic_point_2d(
+            generic_row=diagnostic_row,
+            matched_row=gp2d_row,
+            input_to_acc_matrix=input_to_acc_matrix,
+            vacuum_axis_index=vacuum_axis_index,
+            little_group_order=len(diagnostic_little_group),
+        )
         base_payload["diagnostic_points"] = [diagnostic_row]
     except np.linalg.LinAlgError:
         diagnostic_row = None
+        generic_point_2d = {
+            "label": "GP",
+            "role": "generic_point_2d",
+            "source": "generated",
+            "status": "error",
+            "error": "singular_input_to_acc_reciprocal_transform",
+        }
         base_payload["diagnostic_points"] = [
             {
                 "label": "GP",
@@ -827,9 +986,10 @@ def build_quasi2d_diagnostics(
             }
         ]
 
-    interpretation, spin_splitting_2d = _interpret_2d_spin_splitting(rows)
+    interpretation, spin_splitting_2d = _interpret_2d_spin_splitting(rows, generic_point_2d)
     projection_summary = _kpoint_projection_summary(rows)
     generic_point_comparison = _generic_point_comparison(rows, diagnostic_row, tol=tol)
+    display_kpoints = _build_quasi2d_display_kpoints(generic_point_2d, rows)
     kpoints_status = "ok"
     kpoints_error = None
     try:
@@ -859,6 +1019,8 @@ def build_quasi2d_diagnostics(
             "KPOINTS_status": kpoints_status,
             "KPOINTS_error": kpoints_error,
             "kpoints": rows,
+            "generic_point_2d": generic_point_2d,
+            "display_kpoints": display_kpoints,
             "kpoint_projection_summary": projection_summary,
             "generic_point_comparison": generic_point_comparison,
             "spin_splitting_2d": spin_splitting_2d,
