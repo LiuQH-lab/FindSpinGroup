@@ -212,10 +212,18 @@ def _split_signed_terms(text: str) -> list[tuple[int, str]]:
 
 def _split_basis_remainder_suffix(text: str) -> tuple[str, str]:
     marker = " + o("
-    index = text.rfind(marker)
-    if index < 0:
-        return text, ""
-    return text[:index], text[index:]
+    text = str(text).strip()
+    suffix = ""
+    while True:
+        index = text.rfind(marker)
+        if index < 0:
+            return text, suffix
+        candidate_suffix = text[index:]
+        if not candidate_suffix.endswith(")"):
+            return text, suffix
+        if not suffix:
+            suffix = candidate_suffix
+        text = text[:index].rstrip()
 
 
 def _basis_remainder_suffix_to_latex(suffix: str) -> str:
@@ -413,10 +421,14 @@ def _basis_remainder_latex(order: int) -> str:
 def _append_basis_remainder_ascii(basis: Sequence[str] | None, order: int | None) -> list[str]:
     if not basis:
         return []
+    normalized_basis = [combine_spin_texture_basis_expression(str(expression)) for expression in basis]
     if order is None:
-        return [str(expression) for expression in basis]
+        return normalized_basis
     suffix = _basis_remainder_ascii(int(order))
-    return [f"{expression} + {suffix}" for expression in basis]
+    return [
+        f"{_split_basis_remainder_suffix(expression)[0]} + {suffix}"
+        for expression in normalized_basis
+    ]
 
 
 def _append_basis_remainder_latex(basis_latex: Sequence[str] | None, order: int | None) -> list[str]:
@@ -425,7 +437,10 @@ def _append_basis_remainder_latex(basis_latex: Sequence[str] | None, order: int 
     if order is None:
         return [str(expression) for expression in basis_latex]
     suffix = _basis_remainder_latex(int(order))
-    return [rf"{expression} + {suffix}" for expression in basis_latex]
+    return [
+        rf"{_split_basis_remainder_suffix(str(expression))[0]} + {suffix}"
+        for expression in basis_latex
+    ]
 
 
 def _resolve_basis_remainder_order(
