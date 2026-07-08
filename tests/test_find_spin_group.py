@@ -12,6 +12,7 @@ import findspingroup.core.identify_spin_space_group as identify_spin_space_group
 import findspingroup.structure.cell as cell_module
 import findspingroup.structure.group as group_module
 from findspingroup.data.acc_aligned_p_index_loader import (
+    _spin_texture_config_record,
     get_pair_id_for_ssg_label,
     get_ssg_conventional_kpoint_symbols_for_label,
     get_spin_texture_config_for_ssg_label,
@@ -29,11 +30,14 @@ from findspingroup import (
 )
 from findspingroup.find_spin_group import _expand_magnetic_indices_by_sg_orbit
 from findspingroup.spin_splitting import (
+    _append_basis_remainder_ascii,
+    _append_basis_remainder_latex,
     basis_expression_to_latex,
     canonicalize_nullspace,
     classify_public_spin_texture_config,
     combine_spin_texture_basis_expression,
     operation_pairs_from_gspg_ops,
+    spin_texture_basis_latex,
 )
 from findspingroup.core.identify_index.functions import (
     find_stand_gen_maps,
@@ -5695,6 +5699,51 @@ def test_spin_texture_basis_expression_latex_formatter():
         r"C_{1}\left(\left(-\frac{2}{3}k_{y}^{3} + "
         r"k_{x}k_{y}^{2}\right)\,\sigma_{z}\right)"
     )
+    suffixed_expression = (
+        "C1*((kx*ky)*sigma_x + (ky*kz)*sigma_x) + o(k^2) + o(k^2)"
+    )
+    assert combine_spin_texture_basis_expression(suffixed_expression) == (
+        "C1*((kx*ky + ky*kz)*sigma_x) + o(k^2)"
+    )
+    assert _append_basis_remainder_ascii([suffixed_expression], 2) == [
+        "C1*((kx*ky + ky*kz)*sigma_x) + o(k^2)"
+    ]
+    assert _append_basis_remainder_ascii(
+        ["C1*((kx*ky)*sigma_x + (ky*kz)*sigma_x) + o(k)"],
+        2,
+    ) == ["C1*((kx*ky + ky*kz)*sigma_x) + o(k^2)"]
+    suffixed_latex = spin_texture_basis_latex([suffixed_expression])
+    assert _append_basis_remainder_latex(suffixed_latex, 2) == [
+        r"C_{1}\left(\left(k_{x}k_{y} + k_{y}k_{z}\right)\,\sigma_{x}\right) + o(k^{2})"
+    ]
+    assert _append_basis_remainder_latex(
+        [
+            r"C_{1}\left(\left(k_{x}k_{y} + k_{y}k_{z}\right)\,\sigma_{x}\right) + o(k)"
+        ],
+        2,
+    ) == [
+        r"C_{1}\left(\left(k_{x}k_{y} + k_{y}k_{z}\right)\,\sigma_{x}\right) + o(k^{2})"
+    ]
+
+
+def test_spin_texture_runtime_record_keeps_single_remainder_after_grouping():
+    record = _spin_texture_config_record(
+        {
+            "spin_texture_type": "d-wave",
+            "momentum_space_spin_configuration": "collinear",
+            "spin_rank": 1,
+            "nullity": 1,
+            "order": 2,
+            "basis": [
+                "C1*((kx*ky)*sigma_x + (ky*kz)*sigma_x) + o(k^2)",
+            ],
+        }
+    )
+
+    assert record["basis"] == ["C1*((kx*ky + ky*kz)*sigma_x) + o(k^2)"]
+    assert record["basis_latex"] == [
+        r"C_{1}\left(\left(k_{x}k_{y} + k_{y}k_{z}\right)\,\sigma_{x}\right) + o(k^{2})"
+    ]
 
 
 def test_spin_texture_canonical_nullspace_does_not_amplify_near_zero_pivots():
