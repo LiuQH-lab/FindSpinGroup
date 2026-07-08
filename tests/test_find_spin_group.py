@@ -36,6 +36,7 @@ from findspingroup.spin_splitting import (
     canonicalize_nullspace,
     classify_public_spin_texture_config,
     combine_spin_texture_basis_expression,
+    combine_spin_texture_basis_span,
     operation_pairs_from_gspg_ops,
     spin_texture_basis_latex,
 )
@@ -2835,6 +2836,10 @@ def test_acc_aligned_runtime_index_exposes_spin_texture_config_records():
         "basis": ["C1*((-ky^2*kz + kx^2*kz)*sigma_z) + o(k^3)"],
         "basis_latex": [
             r"C_{1}\left(\left(-k_{y}^{2}k_{z} + k_{x}^{2}k_{z}\right)\,\sigma_{z}\right) + o(k^{3})"
+        ],
+        "basis_vectors": ["C1*((-ky^2*kz + kx^2*kz)*sigma_z)"],
+        "basis_vectors_latex": [
+            r"C_{1}\left(\left(-k_{y}^{2}k_{z} + k_{x}^{2}k_{z}\right)\,\sigma_{z}\right)"
         ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
@@ -5724,6 +5729,12 @@ def test_spin_texture_basis_expression_latex_formatter():
     ) == [
         r"C_{1}\left(\left(k_{x}k_{y} + k_{y}k_{z}\right)\,\sigma_{x}\right) + o(k^{2})"
     ]
+    assert combine_spin_texture_basis_span(
+        [
+            "C1*((ky*kz)*sigma_z)",
+            "C2*((kx*ky)*sigma_z)",
+        ]
+    ) == ["(C1*ky*kz + C2*kx*ky)*sigma_z"]
 
 
 def test_spin_texture_runtime_record_keeps_single_remainder_after_grouping():
@@ -5743,6 +5754,33 @@ def test_spin_texture_runtime_record_keeps_single_remainder_after_grouping():
     assert record["basis"] == ["C1*((kx*ky + ky*kz)*sigma_x) + o(k^2)"]
     assert record["basis_latex"] == [
         r"C_{1}\left(\left(k_{x}k_{y} + k_{y}k_{z}\right)\,\sigma_{x}\right) + o(k^{2})"
+    ]
+    assert record["basis_vectors"] == ["C1*((kx*ky + ky*kz)*sigma_x)"]
+
+    multi_basis_record = _spin_texture_config_record(
+        {
+            "spin_texture_type": "d-wave",
+            "momentum_space_spin_configuration": "collinear",
+            "spin_rank": 1,
+            "nullity": 2,
+            "order": 2,
+            "basis": [
+                "C1*((ky*kz)*sigma_z)",
+                "C2*((kx*ky)*sigma_z)",
+            ],
+        }
+    )
+
+    assert multi_basis_record["nullity"] == 2
+    assert multi_basis_record["basis"] == [
+        "(C1*ky*kz + C2*kx*ky)*sigma_z + o(k^2)"
+    ]
+    assert multi_basis_record["basis_latex"] == [
+        r"\left(C_{1}k_{y}k_{z} + C_{2}k_{x}k_{y}\right)\,\sigma_{z} + o(k^{2})"
+    ]
+    assert multi_basis_record["basis_vectors"] == [
+        "C1*((ky*kz)*sigma_z)",
+        "C2*((kx*ky)*sigma_z)",
     ]
 
 
