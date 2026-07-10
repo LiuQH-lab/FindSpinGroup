@@ -1073,12 +1073,14 @@ def write_scif_atoms(
         "_atom_site_symmetry_multiplicity"
     ])
     element_counts = {}
+    site_label_by_representative = {}
 
     for eq in eq_classes:
         rep_idx = eq["representative_index"]
         symbol = element_symbols[rep_idx]
         element_counts[symbol] = element_counts.get(symbol, 0) + 1
         label = f"{symbol}{element_counts[symbol]}"
+        site_label_by_representative[rep_idx] = label
         x, y, z = [
             _stabilize_fractional_boundary_value(value)
             for value in coords[rep_idx]
@@ -1103,7 +1105,6 @@ def write_scif_atoms(
         "_atom_site_spin_moment.symmform_rel_uvw",
         "_atom_site_spin_moment.magnitude"
     ])
-    element_counts = {}
     constraint_map = {}
     if symmetry_constraints is not None:
         constraint_map = {
@@ -1112,9 +1113,7 @@ def write_scif_atoms(
         }
     for eq in eq_classes_spin:
         rep_idx = eq["representative_index"]
-        symbol = element_symbols[rep_idx]
-        element_counts[symbol] = element_counts.get(symbol, 0) + 1
-        label = f"{symbol}{element_counts[symbol]}"
+        label = site_label_by_representative[rep_idx]
         x, y, z = spins[rep_idx]
         symmform_uvw = (
             _solver_constraints_to_absolute_symmform(constraint_map[rep_idx], ssg_cell[0])
