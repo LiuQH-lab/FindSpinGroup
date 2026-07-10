@@ -105,7 +105,12 @@ from findspingroup.find_spin_group import (
     _translations_equivalent_mod_pure_translations,
     combine_parametric_solutions,
 )
-from findspingroup.io import parse_cif_file, parse_poscar_file, parse_scif_metadata
+from findspingroup.io import (
+    parse_cif_file,
+    parse_poscar_file,
+    parse_scif_metadata,
+    parse_scif_text,
+)
 from findspingroup.io.scif_generator import write_scif_spin_only
 from findspingroup.quasi2d import prepare_quasi2d_input_cell
 from findspingroup.structure import SpinSpaceGroup
@@ -6333,6 +6338,76 @@ def test_wp_chain_uses_crystallographic_orbits_for_sg_multiplicity():
     assert {
         row["msg_wyckoff_with_dof"] for row in magnetic_wp_rows
     } == {"2d(0)", "4f(3)"}
+
+    for scif_text in result.scif_outputs.values():
+        metadata = parse_scif_metadata(source_text=scif_text)
+        atom_labels = set(metadata["raw_scif_tags"]["_atom_site_label"])
+        spin_moments = metadata["atom_site_spin_moment"]
+        spin_labels = spin_moments["label"]
+        assert set(spin_labels) <= atom_labels
+        assert spin_labels == ["Fe1", "Fe3"]
+        zero_rows = [
+            index
+            for index, components in enumerate(
+                zip(
+                    spin_moments["axis_u"],
+                    spin_moments["axis_v"],
+                    spin_moments["axis_w"],
+                )
+            )
+            if np.linalg.norm(np.asarray(components, dtype=float)) < 1e-12
+        ]
+        assert len(zero_rows) == 1
+        zero_index = zero_rows[0]
+        assert spin_labels[zero_index].startswith("Fe")
+        assert spin_moments["symmform_uvw"][zero_index] == "0,0,0"
+        assert spin_moments["symmform_rel_uvw"][zero_index] == "0,0,0"
+        assert float(spin_moments["magnitude"][zero_index]) == pytest.approx(0.0)
+
+
+def test_scif_includes_zero_moment_sites_from_magnetic_parent_sg_orbit():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.353_SmNiO3.mcif")
+
+    assert result.magnetic_site_summary["zero_moment_magnetic_atom_count"] == 4
+    for cell_mode, scif_text in result.scif_outputs.items():
+        metadata = parse_scif_metadata(source_text=scif_text)
+        atom_labels = set(metadata["raw_scif_tags"]["_atom_site_label"])
+        spin_moments = metadata["atom_site_spin_moment"]
+        spin_labels = spin_moments["label"]
+        assert set(spin_labels) <= atom_labels, cell_mode
+        assert spin_labels == ["Ni1", "Sm1", "Sm2"], cell_mode
+        assert len(spin_labels) == 3, cell_mode
+
+        zero_rows = [
+            index
+            for index, components in enumerate(
+                zip(
+                    spin_moments["axis_u"],
+                    spin_moments["axis_v"],
+                    spin_moments["axis_w"],
+                )
+            )
+            if np.linalg.norm(np.asarray(components, dtype=float)) < 1e-12
+        ]
+        assert len(zero_rows) == 1, cell_mode
+        zero_index = zero_rows[0]
+        assert spin_labels[zero_index].startswith("Sm"), cell_mode
+        assert spin_moments["symmform_uvw"][zero_index] == "0,0,0", cell_mode
+        assert spin_moments["symmform_rel_uvw"][zero_index] == "0,0,0", cell_mode
+        assert float(spin_moments["magnitude"][zero_index]) == pytest.approx(0.0)
+
+    lattice, positions, elements, occupancies, _labels, moments = parse_scif_text(result.scif)
+    roundtrip = find_spin_group_from_data(
+        "1.353_SmNiO3.scif",
+        lattice,
+        positions,
+        elements,
+        occupancies,
+        moments,
+    )
+    assert roundtrip.index == result.index
+    assert roundtrip.conf == result.conf
+    assert roundtrip.magnetic_site_summary["zero_moment_magnetic_atom_count"] == 4
 
 
 def test_magnetic_site_selection_expands_to_parent_sg_orbit():

@@ -5587,6 +5587,7 @@ def _build_scif_export_targets(
         return cell_mode, {
             "export_cell": base_cell.transform_spin(moment_transform, moment_setting),
             "export_ssg": base_ssg.transform_spin(spin_transform),
+            "real_space_cache_key": id(base_cell),
             "transform_input_to_export": transformation_input_to_export,
             "basis_tag_transforms": _basis_tag_transforms_for_export(
                 transformation_input_to_export,
@@ -5692,9 +5693,24 @@ def _identify_parent_space_group_for_export_cell(
             "input_IT_number": (
                 None if source_parent_space_group is None else source_parent_space_group.get("IT_number")
             ),
-        }
+        }, None
     if dataset.number in SG_HALL_MAPPING:
         dataset = get_symmetry_dataset(cell, symprec=symprec, hall_number=SG_HALL_MAPPING[dataset.number])
+        if dataset is None:
+            return None, {
+                "status": "generation_failed",
+                "matches_input": None,
+                "input_name_H_M_alt": (
+                    None
+                    if source_parent_space_group is None
+                    else source_parent_space_group.get("name_H_M_alt")
+                ),
+                "input_IT_number": (
+                    None
+                    if source_parent_space_group is None
+                    else source_parent_space_group.get("IT_number")
+                ),
+            }, None
 
     generated = {
         "name_H_M_alt": str(dataset.international),
@@ -5777,7 +5793,7 @@ def _identify_parent_space_group_for_export_cell(
         "input_IT_number": (
             None if source_parent_space_group is None else source_parent_space_group.get("IT_number")
         ),
-    }
+    }, dataset
 
 
 def _primitive_msg_ops_from_ssg(ssg_ops, tol: float, time_reversal_resolver=None) -> list[list]:
@@ -8705,6 +8721,10 @@ def _find_spin_group_from_parsed(
         identify_index_details,
     )
 
+    source_parent_space_group = (
+        None if source_metadata is None else source_metadata.get("parent_space_group")
+    )
+    scif_real_space_cache = {}
     scif_outputs = {}
     for cell_mode, export_target in scif_export_targets.items():
         export_cell = export_target["export_cell"]
@@ -8723,17 +8743,54 @@ def _find_spin_group_from_parsed(
             "identify_index_details",
             identify_index_details,
         )
-        export_wyckoff = get_spin_wyckoff(export_cell, export_ssg.ops)
-        source_parent_space_group = (
-            None if source_metadata is None else source_metadata.get("parent_space_group")
-        )
-        generated_parent_space_group, parent_space_group_comparison = (
-            _identify_parent_space_group_for_export_cell(
+        real_space_cache_key = export_target["real_space_cache_key"]
+        if real_space_cache_key not in scif_real_space_cache:
+            (
+                generated_parent_space_group,
+                parent_space_group_comparison,
+                parent_sg_dataset,
+            ) = _identify_parent_space_group_for_export_cell(
                 export_cell,
                 symprec=tol_cfg.space,
                 source_parent_space_group=source_parent_space_group,
                 reuse_source_transforms=is_input_like_scif,
             )
+            nonzero_moment_indices = (
+                []
+                if export_cell.magnetic_atom_indices is None
+                else list(export_cell.magnetic_atom_indices)
+            )
+            if parent_sg_dataset is None:
+                warnings.warn(
+                    "Unable to expand SCIF magnetic sites by parent-SG orbit because "
+                    f"the parent space group could not be identified for {cell_mode}; "
+                    "only nonzero-moment sites will be written.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                magnetic_indices = nonzero_moment_indices
+            else:
+                magnetic_indices, _magnetic_selection = _expand_magnetic_indices_by_sg_orbit(
+                    parent_sg_dataset,
+                    nonzero_moment_indices,
+                    len(export_cell.positions),
+                )
+            scif_real_space_cache[real_space_cache_key] = (
+                generated_parent_space_group,
+                parent_space_group_comparison,
+                magnetic_indices,
+            )
+        else:
+            (
+                generated_parent_space_group,
+                parent_space_group_comparison,
+                magnetic_indices,
+            ) = scif_real_space_cache[real_space_cache_key]
+        export_wyckoff = get_spin_wyckoff(
+            export_cell,
+            export_ssg.ops,
+            atol=tol_cfg.m_matrix_tol,
+            magnetic_indices=magnetic_indices,
         )
         source_cell_parameter_strings = (
             None

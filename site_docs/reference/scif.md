@@ -81,3 +81,22 @@ Type-k results use the raw `L0std` setting.
 
 Generated SCIF text records the emitted real-space basis and spin-frame
 convention with repo-local `_space_group_spin.fsg_*` tags.
+
+## Magnetic Sites With Zero Moment
+
+The `_atom_site_spin_moment` loop includes every site orbit that belongs to a
+magnetic crystallographic orbit of the parent nonmagnetic space group. The
+selection starts from sites with nonzero moments and closes their parent-space-
+group crystallographic orbits. Consequently, a spin-space-group orbit whose
+reported moment is zero is still written when it split from the same parent
+space-group orbit as a nonzero-moment site.
+
+For such a row, `axis_u`, `axis_v`, `axis_w`, and `magnitude` describe the
+reported zero moment. The `symmform_uvw` and `symmform_rel_uvw` fields retain
+the site-symmetry constraint: `0,0,0` means the zero moment is symmetry-forced,
+while a nonzero symbolic form with zero magnitude means symmetry permits a
+moment but the reported model sets it to zero.
+
+Zero-moment sites from unrelated parent-space-group orbits are not inferred to
+be magnetic. An input format must preserve an explicit magnetic-site marker to
+distinguish such a site from an ordinary nonmagnetic site.
