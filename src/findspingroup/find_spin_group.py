@@ -3045,7 +3045,7 @@ def _serialize_gspg_xyz_uvw_ops(
 
 def _format_gspg_xyz_uvw_text(rows: list[dict]) -> list[str]:
     return [
-        f"{row['index']} {row['xyzt']} {row['uvw']}"
+        f"{row['index']} {row['xyzt']},{row['uvw']}"
         for row in rows
     ]
 
@@ -3183,10 +3183,16 @@ def _build_gspg_text(
     effective_mpg_symbol: str,
     real_space_setting: str,
     spin_frame_setting: str,
+    spin_only_direction: str,
     generator_rows: list[str],
     operation_rows: list[str],
     spin_only_rows: list[str],
 ) -> str:
+    display_spin_frame_setting = (
+        "oriented"
+        if spin_frame_setting == OSSG_ORIENTED_SPIN_FRAME_SETTING
+        else spin_frame_setting
+    )
     spin_space_point_group_symbol = spin_space_point_group_symbol_hm or ""
     if spin_space_point_group_symbol_s:
         spin_space_point_group_symbol = (
@@ -3199,7 +3205,8 @@ def _build_gspg_text(
         f"Spin-space point group symbol: {spin_space_point_group_symbol}",
         f"Effective MPG: {effective_mpg_symbol}",
         f"Real-space setting: {real_space_setting}",
-        f"Spin-frame setting: {spin_frame_setting}",
+        f"Spin-frame setting: {display_spin_frame_setting}",
+        f"Spin-only direction: {spin_only_direction or 'None'}",
         "",
         "generators (excluding spin-only):",
         *generator_rows,
@@ -3902,6 +3909,7 @@ def _build_gspg_payload(
         effective_mpg_symbol=empg_symbol,
         real_space_setting=real_space_setting,
         spin_frame_setting=spin_frame_setting,
+        spin_only_direction=_format_spin_only_direction(ssg.sog_direction),
         generator_rows=_gspg_text_rows_for_indices(presented_xyz_uvw, generator_indices),
         operation_rows=_format_gspg_xyz_uvw_text(presented_xyz_uvw),
         spin_only_rows=_format_gspg_spin_only_text(
