@@ -5562,7 +5562,25 @@ def test_find_spin_group_exposes_explicit_gspg_payload_for_coplanar_case():
     assert result.gspg_raw_ops == _serialize_gspg_pairs(oriented_ssg.gspg.raw_ops)
     assert result.gspg_symbol_linear == "1|m 2_{001}|m 2_{001}|2 m|1"
     assert result.gspg_collinear_axis is None
-    assert "spin only:\n1 x,y,z,+1 u,v,w\n2 x,y,z,-1 -u,v,w" in result.gspg_text
+    expected_direction = find_spin_group_module._format_spin_only_direction(
+        oriented_ssg.sog_direction
+    )
+    assert f"Spin-only direction: {expected_direction}" in result.gspg_text
+    assert "spin only:\n1 x,y,z,+1,u,v,w\n2 x,y,z,-1,-u,v,w" in result.gspg_text
+
+
+def test_gspg_text_uses_stensor_compatible_xyz_uvw_separator():
+    rows = [
+        {
+            "index": 10,
+            "xyzt": "-x,y,-z,-1",
+            "uvw": "-u,v,-2u+w",
+        }
+    ]
+
+    assert find_spin_group_module._format_gspg_xyz_uvw_text(rows) == [
+        "10 -x,y,-z,-1,-u,v,-2u+w"
+    ]
 
 
 def test_find_spin_group_reports_collinear_gspg_as_nssg_times_spin_only():
@@ -5606,12 +5624,13 @@ def test_find_spin_group_exposes_gspg_text_payload_from_public_ossg():
     )
 
     assert isinstance(result.gspg_text, str)
-    assert result.gspg_text.splitlines()[:5] == [
+    assert result.gspg_text.splitlines()[:6] == [
         f"GSPG linear symbol: {result.gspg_symbol_linear}",
         f"Spin-space point group symbol: {result.SSPG_symbol_hm} ({result.SSPG_symbol_s})",
         f"Effective MPG: {result.gspg_effective_mpg_symbol}",
         f"Real-space setting: {result.convention_ssg_setting}",
-        "Spin-frame setting: ossg_oriented_spin_frame",
+        "Spin-frame setting: oriented",
+        f"Spin-only direction: {expected_direction}",
     ]
     assert summary_gspg["spin_space_point_group_symbol_hm"] == result.SSPG_symbol_hm
     assert summary_gspg["spin_space_point_group_symbol_s"] == result.SSPG_symbol_s
@@ -5621,7 +5640,7 @@ def test_find_spin_group_exposes_gspg_text_payload_from_public_ossg():
     assert result.gspg_generator_indices
     assert len(result.gspg_generator_ops) == len(result.gspg_generator_ops_xyz_uvw)
     assert len(result.gspg_generator_ops) == len(result.gspg_generator_indices)
-    assert "\noperations:\n1 x,y,z,+1 u,v,w" in result.gspg_text
+    assert "\noperations:\n1 x,y,z,+1,u,v,w" in result.gspg_text
     assert "xyzt=" not in result.gspg_text
     assert f"\nspin only:\nCollinear direction: {expected_direction}" in result.gspg_text
     assert summary_gspg["text"] == result.gspg_text
@@ -5876,8 +5895,9 @@ def test_find_spin_group_gspg_text_uses_identity_spin_only_for_noncoplanar_case(
 
     assert result.conf == "Noncoplanar"
     assert result.gspg_spin_only_component_symbol_s == "C1"
+    assert "Spin-only direction: None" in result.gspg_text
     assert result.gspg_text.rsplit("spin only:\n", 1)[1].splitlines() == [
-        "1 x,y,z,+1 u,v,w"
+        "1 x,y,z,+1,u,v,w"
     ]
 
 
