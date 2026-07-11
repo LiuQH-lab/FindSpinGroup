@@ -1578,10 +1578,19 @@ class MagSymmetryResult:
         self.conf = symmetry['configuration']
         self.magnetic_phase = symmetry['magnetic_phase']
         self.phase = self.magnetic_phase
+        self.magnetic_phase_family = symmetry.get(
+            'magnetic_phase_family',
+            (symmetry.get('magnetic_phase_details') or {}).get('symmetry_family'),
+        )
         self.magnetic_phase_base = symmetry.get('magnetic_phase_base', self.magnetic_phase)
         self.magnetic_phase_modifier = symmetry.get('magnetic_phase_modifier', '')
         self.magnetic_phase_spin_orbit_magnet = symmetry.get('magnetic_phase_spin_orbit_magnet', '')
         self.magnetic_phase_details = symmetry.get('magnetic_phase_details', None)
+        self.magnetic_atom_orbit_count_ssg = (
+            None
+            if self.magnetic_phase_details is None
+            else self.magnetic_phase_details.get('magnetic_atom_orbit_count_ssg')
+        )
         self.spin_texture_config_database = symmetry.get(
             'spin_texture_config_database',
             symmetry.get('spin_texture_config', None),
@@ -2162,6 +2171,9 @@ class MagSymmetryResult:
             'index': self.index,
             'conf': self.conf,
             'phase': self.magnetic_phase,
+            'magnetic_phase_family': self.magnetic_phase_family,
+            'magnetic_phase_base': self.magnetic_phase_base,
+            'magnetic_atom_orbit_count_ssg': self.magnetic_atom_orbit_count_ssg,
             'acc': self.acc,
             'properties': self.properties_summary(),
             'gspg': self.gspg_summary(),
@@ -2218,7 +2230,9 @@ class MagSymmetryResult:
                 'index': self.index,
                 'conf': self.conf,
                 'phase': self.magnetic_phase,
+                'phase_family': self.magnetic_phase_family,
                 'phase_base': self.magnetic_phase_base,
+                'magnetic_atom_orbit_count_ssg': self.magnetic_atom_orbit_count_ssg,
                 'phase_modifier': self.magnetic_phase_modifier,
                 'acc': self.acc,
                 'msg_acc': self.msg_acc,
@@ -2434,6 +2448,7 @@ class MagSymmetryResult:
             'properties': {
                 'magnetic_phase': {
                     'phase': self.magnetic_phase,
+                    'family': self.magnetic_phase_family,
                     'base': self.magnetic_phase_base,
                     'modifier': self.magnetic_phase_modifier,
                     'spin_orbit_magnet_tag': self.magnetic_phase_spin_orbit_magnet,
@@ -2511,7 +2526,13 @@ class MagSymmetryResult:
 
 
 AFM_LIKE_BASE_PHASES = {"AFM"}
-FM_LIKE_BASE_PHASES = {"FM/FiM", "Compensated FiM"}
+FM_LIKE_BASE_PHASES = {
+    "FM/FiM",
+    "FM",
+    "FiM",
+    "Compensated FiM",
+    "FM-class (zero-moment undetermined)",
+}
 
 
 def is_alter(condition, magnetic_phase_base, spinsplitting):
@@ -6648,6 +6669,7 @@ def classify_magnetic_phase(
     mpg_identifier,
     is_ss_gp,
     net_moment_tol=None,
+    magnetic_atom_orbit_analysis=None,
 ):
     net_moment_value = float(net_moment)
     zero_net_moment_tol = float(
@@ -6659,12 +6681,42 @@ def classify_magnetic_phase(
         full_spin_part_point_group_s,
     )
     som_by_mpg = mpg_identifier in MSGMPG_DB.FMMPG_INTlist if mpg_identifier is not None else False
+    orbit_analysis = (
+        magnetic_atom_orbit_analysis
+        if isinstance(magnetic_atom_orbit_analysis, dict)
+        else None
+    )
+    magnetic_atom_orbit_count_ssg = (
+        None if orbit_analysis is None else int(orbit_analysis.get("count", 0))
+    )
 
     if fm_like_by_spin_point_group:
-        base_phase = 'Compensated FiM' if zero_net_moment else 'FM/FiM'
-        classification_rule = 'fm_like_spin_point_group'
+        symmetry_family = "FM-class"
+        if magnetic_atom_orbit_count_ssg == 1:
+            if zero_net_moment:
+                base_phase = "FM-class (zero-moment undetermined)"
+                classification_rule = "fm_class_single_orbit_zero_net_moment"
+                order_type_status = "undetermined"
+            else:
+                base_phase = "FM"
+                classification_rule = "fm_class_single_ssg_magnetic_atom_orbit"
+                order_type_status = "resolved"
+        elif magnetic_atom_orbit_count_ssg is not None and magnetic_atom_orbit_count_ssg > 1:
+            base_phase = "Compensated FiM" if zero_net_moment else "FiM"
+            classification_rule = (
+                "fm_class_multiple_ssg_magnetic_atom_orbits_zero_net_moment"
+                if zero_net_moment
+                else "fm_class_multiple_ssg_magnetic_atom_orbits"
+            )
+            order_type_status = "resolved"
+        else:
+            base_phase = "Compensated FiM" if zero_net_moment else "FM/FiM"
+            classification_rule = "fm_like_spin_point_group_orbit_analysis_unavailable"
+            order_type_status = "unavailable"
     else:
+        symmetry_family = "AFM-class"
         base_phase = 'AFM'
+        order_type_status = "resolved"
         classification_rule = (
             'afm_with_spin_orbit_magnet'
             if som_by_mpg
@@ -6680,6 +6732,7 @@ def classify_magnetic_phase(
 
     return {
         'phase': phase,
+        'family': symmetry_family,
         'base_phase': base_phase,
         'modifier': alter_tag,
         'spin_orbit_magnet_tag': som_tag,
@@ -6692,6 +6745,11 @@ def classify_magnetic_phase(
             'zero_net_moment_tol': zero_net_moment_tol,
             'zero_net_moment': zero_net_moment,
             'fm_like_by_spin_point_group': fm_like_by_spin_point_group,
+            'symmetry_family': symmetry_family,
+            'order_type': base_phase,
+            'order_type_status': order_type_status,
+            'magnetic_atom_orbit_count_ssg': magnetic_atom_orbit_count_ssg,
+            'magnetic_atom_orbit_analysis': orbit_analysis,
             'som_by_mpg': som_by_mpg,
             'classification_rule': classification_rule,
             'base_phase': base_phase,
@@ -6715,6 +6773,7 @@ def get_magnetic_phase(
     conf=None,
     is_ss_gp=None,
     net_moment_tol=None,
+    magnetic_atom_orbit_analysis=None,
 ):
     if conf is None or is_ss_gp is None:
         hm_symbol = full_spin_part_point_group_hm
@@ -6730,6 +6789,7 @@ def get_magnetic_phase(
             net_moment_tol=net_moment_tol,
             mpg_identifier=mpg,
             is_ss_gp='spin splitting',
+            magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
         )['base_phase']
 
     return classify_magnetic_phase(
@@ -6740,6 +6800,7 @@ def get_magnetic_phase(
         net_moment_tol=net_moment_tol,
         mpg_identifier=mpg,
         is_ss_gp=is_ss_gp,
+        magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
     )['base_phase']
 
 
@@ -6833,27 +6894,12 @@ def calculate_freedom_degree(matrices : list[np.ndarray],tol=0.01):
     constraints = combine_parametric_solutions(rref_with_tolerance(stack_matrices))
     return 3 - np.linalg.matrix_rank(stack_matrices,tol=tol), constraints
 
-def get_spin_wyckoff(
+def _spin_space_site_orbits(
     ssg_cell: CrystalCell,
     ssg_ops,
     atol=0.001,
     magnetic_indices: list[int] | None = None,
-) -> (list, list):
-    """
-    Calculate spin Wyckoff positions information.
-
-    Parameters:
-        ssg_cell_spglib (list): A list containing cell information.
-                         - ssg_cell[1]: Atomic positions (numpy array).
-                         - ssg_cell[3]: Magnetic moments (numpy array).
-        ssg_ops (list): A list of symmetry operations, where each operation is a np list (Rs ||Rr | t).
-
-    Returns:
-        Tuple[dict, dict]:
-            - magnetic_index: A dictionary mapping magnetic atom indices to their multiplicities.
-            - magnetic_index_site_symmetry: A dictionary mapping magnetic atom indices to their site symmetry operations.
-    """
-
+) -> tuple[list[int], list[dict], list[dict]]:
     if not ssg_cell or not ssg_ops:
         raise ValueError("Input ssg_cell and ssg_ops cannot be empty.")
     ssg_cell_spglib = ssg_cell.to_spglib(mag=True)
@@ -6945,7 +6991,24 @@ def get_spin_wyckoff(
                 "class_indices": class_i,
                 "site_symmetry_ops": site_symmetry_ops
             })
-        # print(class_i)
+    return magnetic_index, equivalence_classes, equivalence_classes_spin
+
+
+def get_spin_wyckoff(
+    ssg_cell: CrystalCell,
+    ssg_ops,
+    atol=0.001,
+    magnetic_indices: list[int] | None = None,
+) -> tuple[list, list, dict, list, list]:
+    """Calculate spin Wyckoff orbits and magnetic-site constraints."""
+    magnetic_index, equivalence_classes, equivalence_classes_spin = (
+        _spin_space_site_orbits(
+            ssg_cell,
+            ssg_ops,
+            atol=atol,
+            magnetic_indices=magnetic_indices,
+        )
+    )
 
     # Calculate site symmetry of representative magnetic atoms
 
@@ -7023,6 +7086,80 @@ def _expand_magnetic_indices_by_sg_orbit(
         "source_nonzero_moment_indices": source_indices,
         "included_zero_moment_indices": included_zero_moment_indices,
         "parent_sg_orbit_labels": parent_orbit_labels,
+    }
+
+
+def _analyze_ssg_magnetic_atom_orbits(
+    cell: CrystalCell,
+    ssg: SpinSpaceGroup,
+    tol_cfg: Tolerances,
+    *,
+    dataset_memo=None,
+) -> dict:
+    """Resolve magnetic-atom orbits under the complete SSG in a primitive cell."""
+    sg_dataset = _symmetry_dataset_for_analysis(
+        cell,
+        tol_cfg.space,
+        memo=dataset_memo,
+    )
+    site_count = len(cell.positions)
+    nonzero_indices = (
+        [] if cell.magnetic_atom_indices is None else list(cell.magnetic_atom_indices)
+    )
+    magnetic_indices, selection = _expand_magnetic_indices_by_sg_orbit(
+        sg_dataset,
+        nonzero_indices,
+        site_count,
+    )
+    _indices, _all_orbits, magnetic_orbits = _spin_space_site_orbits(
+        cell,
+        ssg.ops,
+        atol=tol_cfg.space,
+        magnetic_indices=magnetic_indices,
+    )
+
+    magnetic_index_set = set(magnetic_indices)
+    nonzero_index_set = set(nonzero_indices)
+    moments = np.asarray(cell.moments_cartesian, dtype=float)
+    rows = []
+    for orbit_id, orbit in enumerate(magnetic_orbits, start=1):
+        site_indices = sorted(
+            magnetic_index_set.intersection(int(index) for index in orbit["class_indices"])
+        )
+        if not site_indices:
+            continue
+        moment_sum = np.sum(moments[site_indices], axis=0)
+        element_symbols = sorted(
+            {
+                str(cell.atom_types_to_symbol[int(cell.atom_types[index])])
+                for index in site_indices
+            }
+        )
+        rows.append(
+            {
+                "orbit_id": int(orbit_id),
+                "representative_index": int(orbit["representative_index"]),
+                "site_indices": [int(index) for index in site_indices],
+                "site_count": len(site_indices),
+                "elements": element_symbols,
+                "nonzero_moment_site_count": sum(
+                    index in nonzero_index_set for index in site_indices
+                ),
+                "zero_moment_site_count": sum(
+                    index not in nonzero_index_set for index in site_indices
+                ),
+                "moment_sum_cartesian": np.asarray(moment_sum, dtype=float).tolist(),
+                "moment_sum_magnitude": float(np.linalg.norm(moment_sum)),
+            }
+        )
+
+    return {
+        "setting": "magnetic_primitive",
+        "definition": "complete_ssg_action_on_magnetic_atoms",
+        "count": len(rows),
+        "magnetic_atom_indices": [int(index) for index in magnetic_indices],
+        "magnetic_atom_selection": selection,
+        "orbits": rows,
     }
 
 
@@ -7999,6 +8136,11 @@ def _find_spin_group_from_parsed(
         ssg_primitive,
         magnetic_primitive_cell,
     )
+    magnetic_atom_orbit_analysis = _analyze_ssg_magnetic_atom_orbits(
+        magnetic_primitive_cell,
+        ssg_primitive,
+        tol_cfg,
+    )
 
     magnetic_phase_payload = classify_magnetic_phase(
         conf=ssg_primitive.conf,
@@ -8008,6 +8150,7 @@ def _find_spin_group_from_parsed(
         net_moment_tol=tol_cfg.moment,
         mpg_identifier=primitive_ossg_for_phase.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
+        magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
     )
     magnetic_phase = magnetic_phase_payload['phase']
     magnetic_phase_base = magnetic_phase_payload['base_phase']
@@ -9241,6 +9384,7 @@ def _find_spin_group_from_parsed(
     symmetry = {'index':identify_info,
                 'configuration':ssg_primitive.conf,
                 'magnetic_phase':magnetic_phase,
+                'magnetic_phase_family': magnetic_phase_payload['family'],
                 'magnetic_phase_base': magnetic_phase_base,
                 'magnetic_phase_modifier': magnetic_phase_modifier,
                 'magnetic_phase_spin_orbit_magnet': magnetic_phase_payload['spin_orbit_magnet_tag'],
@@ -9598,6 +9742,7 @@ def _find_spin_group_from_parsed(
         'ahc_wo_soc':ahc_wo_soc,
         'is_alter':alter,
         'is_spin_orbit_magnet': magnetic_phase_payload['is_spin_orbit_magnet'],
+        'magnetic_phase_family': magnetic_phase_payload['family'],
         'magnetic_phase_base': magnetic_phase_base,
         'magnetic_phase_modifier': magnetic_phase_modifier,
         'tensor_outputs': tensor_outputs,
@@ -9668,6 +9813,11 @@ def _find_spin_group_basic_from_parsed(
         ssg_primitive,
         magnetic_primitive_cell,
     )
+    magnetic_atom_orbit_analysis = _analyze_ssg_magnetic_atom_orbits(
+        magnetic_primitive_cell,
+        ssg_primitive,
+        tol_cfg,
+    )
 
     magnetic_phase_payload = classify_magnetic_phase(
         conf=ssg_primitive.conf,
@@ -9677,6 +9827,7 @@ def _find_spin_group_basic_from_parsed(
         net_moment_tol=tol_cfg.moment,
         mpg_identifier=primitive_ossg_for_phase.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
+        magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
     )
     ss_w_soc = spin_splitting_w_soc(ssg_primitive)
     ahc_w_soc = is_ahc(primitive_ossg_for_phase.mpg_num)
@@ -9933,9 +10084,13 @@ def _find_spin_group_basic_from_parsed(
         "conf": ssg_primitive.conf,
         "phase": magnetic_phase_payload["phase"],
         "magnetic_phase": magnetic_phase_payload["phase"],
+        "magnetic_phase_family": magnetic_phase_payload["family"],
         "magnetic_phase_base": magnetic_phase_payload["base_phase"],
         "magnetic_phase_modifier": magnetic_phase_payload["modifier"],
         "magnetic_phase_details": magnetic_phase_details,
+        "magnetic_atom_orbit_count_ssg": magnetic_phase_details[
+            "magnetic_atom_orbit_count_ssg"
+        ],
         "spin_texture_config_database": spin_texture_config_database,
         "spin_texture_config_no_soc": spin_texture_config_no_soc,
         "spin_texture_config_soc": spin_texture_config_soc,
@@ -9948,6 +10103,7 @@ def _find_spin_group_basic_from_parsed(
             "ahc_wo_soc": ahc_wo_soc,
             "is_alter": magnetic_phase_payload["is_alter"],
             "is_spin_orbit_magnet": magnetic_phase_payload["is_spin_orbit_magnet"],
+            "magnetic_phase_family": magnetic_phase_payload["family"],
             "magnetic_phase_base": magnetic_phase_payload["base_phase"],
             "magnetic_phase_modifier": magnetic_phase_payload["modifier"],
         },
@@ -10296,6 +10452,11 @@ def _find_spin_group_acc_primitive_from_parsed(
             },
         }
     )
+    magnetic_atom_orbit_analysis = _analyze_ssg_magnetic_atom_orbits(
+        magnetic_primitive_cell,
+        ssg_primitive,
+        tol_cfg,
+    )
     magnetic_phase_payload = classify_magnetic_phase(
         conf=ssg_primitive.conf,
         full_spin_part_point_group_hm=ssg_primitive.spin_part_point_group_symbol_hm,
@@ -10304,6 +10465,7 @@ def _find_spin_group_acc_primitive_from_parsed(
         net_moment_tol=tol_cfg.moment,
         mpg_identifier=selected_standard_ossg.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
+        magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
     )
     spin_texture_config_database = _spin_texture_config_for_public_output(identify_info)
     spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
@@ -10320,6 +10482,13 @@ def _find_spin_group_acc_primitive_from_parsed(
         "identify_index_details": identify_index_details,
         "acc_symbol": ssg_primitive.acc,
         "conf": ssg_primitive.conf,
+        "magnetic_phase": magnetic_phase_payload["phase"],
+        "magnetic_phase_family": magnetic_phase_payload["family"],
+        "magnetic_phase_base": magnetic_phase_payload["base_phase"],
+        "magnetic_phase_details": magnetic_phase_payload["details"],
+        "magnetic_atom_orbit_count_ssg": magnetic_phase_payload["details"][
+            "magnetic_atom_orbit_count_ssg"
+        ],
         "spin_texture_config_database": spin_texture_config_database,
         "spin_texture_config_no_soc": spin_texture_config_no_soc,
         "spin_texture_config_soc": spin_texture_config_soc,
@@ -10580,14 +10749,20 @@ def _find_spin_group_input_ssg_from_parsed(
             identify_info = _handle_missing_identify_index(source_name, exc)
 
     input_ossg = _ossg_oriented_spin_frame_ssg(input_ssg, identify_cell)
+    magnetic_atom_orbit_analysis = _analyze_ssg_magnetic_atom_orbits(
+        input_magnetic_primitive_cell,
+        primitive_ssg,
+        tol_cfg,
+    )
     magnetic_phase_payload = classify_magnetic_phase(
-        conf=input_ssg.conf,
-        full_spin_part_point_group_hm=input_ssg.spin_part_point_group_symbol_hm,
-        full_spin_part_point_group_s=input_ssg.spin_part_point_group_symbol_s,
-        net_moment=identify_cell.net_moment,
+        conf=primitive_ssg.conf,
+        full_spin_part_point_group_hm=primitive_ssg.spin_part_point_group_symbol_hm,
+        full_spin_part_point_group_s=primitive_ssg.spin_part_point_group_symbol_s,
+        net_moment=input_magnetic_primitive_cell.net_moment,
         net_moment_tol=tol_cfg.moment,
-        mpg_identifier=input_ossg.mpg_num,
-        is_ss_gp=input_ssg.is_spinsplitting[-1],
+        mpg_identifier=primitive_ossg.mpg_num,
+        is_ss_gp=primitive_ssg.is_spinsplitting[-1],
+        magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
     )
     warning = None
     if not is_input_magnetic_primitive:
@@ -10615,6 +10790,11 @@ def _find_spin_group_input_ssg_from_parsed(
             "input_conf": input_ssg.conf,
             "input_spin_only_direction": _format_spin_only_direction(input_ossg.sog_direction),
             "input_magnetic_phase": magnetic_phase_payload["phase"],
+            "input_magnetic_phase_family": magnetic_phase_payload["family"],
+            "input_magnetic_phase_base": magnetic_phase_payload["base_phase"],
+            "input_magnetic_atom_orbit_count_ssg": magnetic_phase_payload["details"][
+                "magnetic_atom_orbit_count_ssg"
+            ],
             "input_ssg_database_symbol": input_ssg.international_symbol_linear,
             "input_msg_num": input_ossg.msg_int_num,
             "primitive_msg_num": primitive_ossg.msg_int_num,

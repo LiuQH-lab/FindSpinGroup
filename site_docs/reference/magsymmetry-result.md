@@ -153,6 +153,12 @@ Public convention OSSG symbol.
 `magnetic_phase`
 High-level magnetic phase label.
 
+`magnetic_phase_family`, `magnetic_phase_base`
+Primary FM/AFM symmetry family and its refined order type.
+
+`magnetic_atom_orbit_count_ssg`
+Number of complete-SSG magnetic-atom orbits in the magnetic primitive cell.
+
 `msg_symbol`, `msg_bns_number`, `msg_og_number`
 Corresponding MSG identifiers.
 

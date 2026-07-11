@@ -66,6 +66,13 @@ Linear oriented spin space group symbol in the selected convention setting.
 `magnetic_phase`
 High-level magnetic phase classification. Example: `AFM(Altermagnet)`.
 
+`magnetic_phase_family`
+Primary symmetry family, `FM-class` or `AFM-class`.
+
+`magnetic_atom_orbit_count_ssg`
+Magnetic-atom orbit count under the complete SSG in the magnetic primitive
+cell. This count refines `FM-class` into FM, FiM, or compensated FiM.
+
 `msg_bns_number`
 BNS number of the corresponding magnetic space group.
 
@@ -142,8 +149,9 @@ Modifier appended to the base phase.
 `magnetic_phase_details`
 Classifier evidence and diagnostic details. Important keys include `conf`,
 `net_moment`, `zero_net_moment`, `classification_rule`, `base_phase`,
-`modifier`, `spin_splitting_without_soc`, `is_altermagnet`, and
-`is_spin_orbit_magnet`.
+`symmetry_family`, `order_type_status`, `magnetic_atom_orbit_count_ssg`,
+`magnetic_atom_orbit_analysis`, `modifier`, `spin_splitting_without_soc`,
+`is_altermagnet`, and `is_spin_orbit_magnet`.
 
 `net_moment`
 Magnitude of the magnetic-cell moment sum used by the classifier, in μB.
@@ -164,6 +172,7 @@ Compact physical-property summary.
     "ahc_wo_soc": str,
     "is_alter": str,
     "is_spin_orbit_magnet": str,
+    "magnetic_phase_family": str,
     "magnetic_phase_base": str,
     "magnetic_phase_modifier": str,
 }
