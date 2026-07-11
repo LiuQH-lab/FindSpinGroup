@@ -39,6 +39,7 @@ from findspingroup.io import parse_poscar_file, parse_structure_file
 from findspingroup.io.scif_generator import (
     _build_chen_linear_name,
     _format_scif_symbolic_scalar,
+    _resolve_scif_operation_loops,
     affine_matrix_to_xyz_expression,
     generate_scif,
 )
@@ -6427,6 +6428,17 @@ def _space_operation_sequence_key(space_group_operations) -> tuple:
     )
 
 
+def _ssg_operation_sequence_key(ssg: SpinSpaceGroup) -> tuple:
+    return tuple(
+        (
+            _exact_array_key(operation.spin_rotation),
+            _exact_array_key(operation.rotation),
+            _exact_array_key(operation.translation),
+        )
+        for operation in ssg.ops
+    )
+
+
 def _spglib_cell_for_analysis(cell: CrystalCell, *, magnetic: bool, memo=None):
     return _request_memoized(
         memo,
@@ -8965,6 +8977,7 @@ def _find_spin_group_from_parsed(
         None if source_metadata is None else source_metadata.get("parent_space_group")
     )
     scif_real_space_cache = {}
+    scif_operation_loop_cache = {}
     scif_outputs = {}
     for cell_mode, export_target in (
         scif_export_targets.items() if scif_enabled else ()
@@ -9039,6 +9052,12 @@ def _find_spin_group_from_parsed(
             if source_metadata is None or not is_input_like_scif
             else source_metadata.get("cell_parameter_strings")
         )
+        operation_loop_key = _ssg_operation_sequence_key(export_ssg)
+        operation_loops = _request_memoized(
+            scif_operation_loop_cache,
+            operation_loop_key,
+            lambda: _resolve_scif_operation_loops(export_ssg),
+        )
         scif_outputs[cell_mode] = generate_scif(
             source_name,
             export_cell,
@@ -9068,6 +9087,7 @@ def _find_spin_group_from_parsed(
             real_space_setting=export_target.get("setting_name"),
             spin_frame_setting=export_target.get("spin_frame"),
             quasi_2d=quasi_2d_diagnostics,
+            operation_loops=operation_loops,
         )
 
     scif = scif_outputs.get(SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED)
