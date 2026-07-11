@@ -6407,21 +6407,95 @@ def _get_wp_for_original_sites(dataset, site_count: int):
     return get_wp_from_dataset(dataset, max=False)[:site_count]
 
 
+def _request_memoized(memo, key, factory):
+    if memo is None:
+        return factory()
+    if key not in memo:
+        memo[key] = factory()
+    return memo[key]
+
+
+def _exact_array_key(value) -> tuple[tuple[int, ...], bytes]:
+    array = np.ascontiguousarray(np.asarray(value, dtype=np.float64))
+    return array.shape, array.tobytes()
+
+
+def _space_operation_sequence_key(space_group_operations) -> tuple:
+    return tuple(
+        (_exact_array_key(operation[0]), _exact_array_key(operation[1]))
+        for operation in space_group_operations
+    )
+
+
+def _spglib_cell_for_analysis(cell: CrystalCell, *, magnetic: bool, memo=None):
+    return _request_memoized(
+        memo,
+        ("spglib_cell", id(cell), bool(magnetic)),
+        lambda: cell.to_spglib(mag=magnetic),
+    )
+
+
+def _symmetry_dataset_for_analysis(cell: CrystalCell, symprec: float, *, memo=None):
+    spglib_cell = _spglib_cell_for_analysis(cell, magnetic=False, memo=memo)
+    return _request_memoized(
+        memo,
+        ("symmetry_dataset", id(cell), float(symprec)),
+        lambda: get_symmetry_dataset(spglib_cell, symprec=symprec),
+    )
+
+
+def _g0_dataset_for_analysis(
+    space_group_operations,
+    cell: CrystalCell,
+    symprec: float,
+    *,
+    memo=None,
+):
+    space_group_operations = tuple(space_group_operations)
+    operation_key = _space_operation_sequence_key(space_group_operations)
+    spglib_cell = _spglib_cell_for_analysis(cell, magnetic=True, memo=memo)
+    return _request_memoized(
+        memo,
+        ("g0_dataset", id(cell), float(symprec), operation_key),
+        lambda: get_G0_dataset_for_cell(space_group_operations, spglib_cell, symprec),
+    )
+
+
 def _build_wp_chain_payload_and_site_order(
     g0_cell: CrystalCell,
     g0_ssg: SpinSpaceGroup,
     tol_cfg: Tolerances,
     *,
     annotate_magnetic_site_dof: bool = False,
+    dataset_memo=None,
 ):
-    sg_dataset = get_symmetry_dataset(g0_cell.to_spglib(), symprec=tol_cfg.space)
+    sg_dataset = _symmetry_dataset_for_analysis(
+        g0_cell,
+        tol_cfg.space,
+        memo=dataset_memo,
+    )
     oriented_ssg = _ossg_oriented_spin_frame_ssg(g0_ssg, g0_cell)
     msg_ops = [[op[1], op[2]] for op in oriented_ssg.msg_ops]
     if not msg_ops:
         return [], None
-    msg_dataset = get_G0_dataset_for_cell(msg_ops, g0_cell.to_spglib(mag=True), tol_cfg.space)
-    ssg_dataset = get_G0_dataset_for_cell(g0_ssg.G0_ops, g0_cell.to_spglib(mag=True), tol_cfg.space)
-    site_count = len(g0_cell.to_spglib(mag=True)[1])
+    msg_dataset = _g0_dataset_for_analysis(
+        msg_ops,
+        g0_cell,
+        tol_cfg.space,
+        memo=dataset_memo,
+    )
+    ssg_dataset = _g0_dataset_for_analysis(
+        g0_ssg.G0_ops,
+        g0_cell,
+        tol_cfg.space,
+        memo=dataset_memo,
+    )
+    magnetic_cell = _spglib_cell_for_analysis(
+        g0_cell,
+        magnetic=True,
+        memo=dataset_memo,
+    )
+    site_count = len(magnetic_cell[1])
     wp_extended_sg = get_wp_from_dataset(sg_dataset, max=False)
     wp_extended_ssg = _get_wp_for_original_sites(ssg_dataset, site_count)
     wp_extended_msg = _get_wp_for_original_sites(msg_dataset, site_count)
@@ -6432,12 +6506,13 @@ def _build_wp_chain_payload_and_site_order(
             g0_cell,
             g0_ssg,
             tol_cfg,
+            dataset_memo=dataset_memo,
         )
     return _make_wp_chain_and_site_order(
         wp_extended_sg,
         wp_extended_ssg,
         wp_extended_msg,
-        g0_cell.to_spglib(mag=True),
+        magnetic_cell,
         g0_cell.atom_types_to_symbol,
         ssg_dof_by_site=ssg_dof_by_site,
         msg_dof_by_site=msg_dof_by_site,
@@ -6453,9 +6528,17 @@ def _magnetic_site_dof_maps_for_cell(
     cell: CrystalCell,
     ssg: SpinSpaceGroup,
     tol_cfg: Tolerances,
+    *,
+    dataset_memo=None,
 ) -> tuple[dict[int, int], dict[int, int]]:
-    sg_dataset = get_symmetry_dataset(cell.to_spglib(), symprec=tol_cfg.space)
-    site_count = len(cell.to_spglib(mag=True)[1])
+    sg_dataset = _symmetry_dataset_for_analysis(
+        cell,
+        tol_cfg.space,
+        memo=dataset_memo,
+    )
+    site_count = len(
+        _spglib_cell_for_analysis(cell, magnetic=True, memo=dataset_memo)[1]
+    )
     nonzero_moment_indices = [] if cell.magnetic_atom_indices is None else list(cell.magnetic_atom_indices)
     magnetic_indices, _selection = _expand_magnetic_indices_by_sg_orbit(
         sg_dataset,
@@ -7055,29 +7138,41 @@ def _build_magnetic_site_summary(
     tol_cfg: Tolerances,
     *,
     setting: str,
+    dataset_memo=None,
 ):
-    sg_dataset = get_symmetry_dataset(cell.to_spglib(), symprec=tol_cfg.space)
-    site_count = len(cell.to_spglib(mag=True)[1])
+    sg_dataset = _symmetry_dataset_for_analysis(
+        cell,
+        tol_cfg.space,
+        memo=dataset_memo,
+    )
+    cell_spglib = _spglib_cell_for_analysis(
+        cell,
+        magnetic=True,
+        memo=dataset_memo,
+    )
+    site_count = len(cell_spglib[1])
     nonzero_moment_indices = [] if cell.magnetic_atom_indices is None else list(cell.magnetic_atom_indices)
     magnetic_indices, magnetic_atom_selection = _expand_magnetic_indices_by_sg_orbit(
         sg_dataset,
         nonzero_moment_indices,
         site_count,
     )
-    ssg_dataset = get_G0_dataset_for_cell(
+    ssg_dataset = _g0_dataset_for_analysis(
         ssg.G0_ops,
-        cell.to_spglib(mag=True),
+        cell,
         tol_cfg.space,
+        memo=dataset_memo,
     )
     oriented_ssg = _ossg_oriented_spin_frame_ssg(ssg, cell)
     msg_ops = list(oriented_ssg.msg_ops)
 
     msg_dataset = None
     if msg_ops:
-        msg_dataset = get_G0_dataset_for_cell(
+        msg_dataset = _g0_dataset_for_analysis(
             [[op[1], op[2]] for op in msg_ops],
-            cell.to_spglib(mag=True),
+            cell,
             tol_cfg.space,
+            memo=dataset_memo,
         )
 
     _ssg_magnetic_indices, _ssg_classes, ssg_dof, ssg_spin_classes, ssg_constraints = (
@@ -7118,7 +7213,6 @@ def _build_magnetic_site_summary(
     wp_extended_sg = get_wp_from_dataset(sg_dataset, max=False)
     wp_extended_ssg = _get_wp_for_original_sites(ssg_dataset, site_count)
     wp_extended_msg = [] if msg_dataset is None else _get_wp_for_original_sites(msg_dataset, site_count)
-    cell_spglib = cell.to_spglib(mag=True)
     if wp_extended_msg:
         magnetic_wp_dof_rows = _build_magnetic_wp_dof_rows(
             wp_extended_sg,
@@ -8803,11 +8897,13 @@ def _find_spin_group_from_parsed(
                 "suppress_repo_local_summary": input_setting_index_differs,
             }
         )
+    wyckoff_dataset_memo = {}
     wp_chain, g0std_wp_site_order = _build_wp_chain_payload_and_site_order(
         G0std_cell,
         G0std_ssg,
         tol_cfg,
         annotate_magnetic_site_dof=True,
+        dataset_memo=wyckoff_dataset_memo,
     )
     (
         acc_primitive_wp_chain,
@@ -8817,6 +8913,7 @@ def _find_spin_group_from_parsed(
         acc_primitive_output_ssg,
         tol_cfg,
         annotate_magnetic_site_dof=True,
+        dataset_memo=wyckoff_dataset_memo,
     )
     input_wp_site_order = None
     if input_setting_matches_true_ssg:
@@ -8825,6 +8922,7 @@ def _find_spin_group_from_parsed(
             input_setting_ssg,
             tol_cfg,
             annotate_magnetic_site_dof=True,
+            dataset_memo=wyckoff_dataset_memo,
         )
     else:
         input_wp_chain = None
@@ -8835,6 +8933,7 @@ def _find_spin_group_from_parsed(
             identify_info,
             tol_cfg,
             setting=ACC_PRIMITIVE_SETTING,
+            dataset_memo=wyckoff_dataset_memo,
         )
     except Exception as exc:
         magnetic_site_summary = {
