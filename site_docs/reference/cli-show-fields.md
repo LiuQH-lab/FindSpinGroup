@@ -35,6 +35,8 @@ fsg structure.mcif --show FIELD
 | `msg_type` | Which MSG type? | Integer |
 | `conf` | Collinear, coplanar, or noncoplanar moments? | String |
 | `magnetic_phase` | How does the classifier label the supplied order? | String |
+| `magnetic_phase_family` | Does SSG symmetry place it in the FM or AFM family? | `FM-class` or `AFM-class` |
+| `magnetic_atom_orbit_count_ssg` | How many magnetic-atom orbits exist under the complete SSG? | Integer |
 | `net_moment` | Magnitude of the magnetic-cell moment sum? | Scalar, μB |
 | `zero_net_moment_tol` | Threshold used for a zero-net-moment decision? | Scalar, μB |
 | `magnetic_phase_details` | Why was the phase label chosen? | Dictionary with classifier evidence/booleans |
@@ -45,6 +47,7 @@ Useful nested classifier booleans:
 magnetic_phase_details.is_altermagnet
 magnetic_phase_details.is_spin_orbit_magnet
 magnetic_phase_details.zero_net_moment
+magnetic_phase_details.magnetic_atom_orbit_count_ssg
 magnetic_phase_details.classification_rule
 ```
 

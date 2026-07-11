@@ -70,9 +70,11 @@ the two is physically meaningful; it is not a duplicate calculation.
 - `Coplanar`: moments span a plane;
 - `Noncoplanar`: moments span three spin-space directions.
 
-`magnetic_phase` combines symmetry information, the spin point group, the net
-moment, and classification rules. For example, a collinear structure can be
-FM-like, AFM-like, or a compensated ferrimagnet.
+`magnetic_phase` uses two levels. First, the spin-space point group determines
+`FM-class` versus `AFM-class` by whether it permits net spin magnetization.
+Second, an `FM-class` structure is refined using the number of magnetic-atom
+orbits under the complete SSG: one orbit is FM; multiple orbits are FiM when
+the net moment is nonzero and compensated FiM when it is zero.
 
 `net_moment` is the magnitude of the vector sum of moments in the analyzed
 magnetic cell. The zero/nonzero decision uses `zero_net_moment_tol`, which is
@@ -80,8 +82,10 @@ derived from `mtol`. A phase label near that threshold is tolerance-sensitive.
 
 The reliable boolean classifier evidence is stored under
 `magnetic_phase_details`, including `is_altermagnet` and
-`is_spin_orbit_magnet`. Top-level `is_alter` and `is_som` are display strings
-and may be empty rather than `False`.
+`is_spin_orbit_magnet`. It also records `symmetry_family`,
+`magnetic_atom_orbit_count_ssg`, and the per-orbit magnetic-atom audit.
+Top-level `is_alter` and `is_som` are display strings and may be empty rather
+than `False`.
 
 ## Spin Splitting
 

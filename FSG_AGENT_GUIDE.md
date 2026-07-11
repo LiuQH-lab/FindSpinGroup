@@ -271,6 +271,10 @@ An agent MUST apply these meanings:
   FM/AFM label.
 - `magnetic_phase`: rule- and tolerance-dependent classification; not a phase
   diagram or energetic stability result.
+- `magnetic_phase_family`: the SSG-enforced FM/AFM dichotomy. Within
+  `FM-class`, `magnetic_atom_orbit_count_ssg` refines one complete-SSG magnetic
+  orbit to FM and multiple orbits to FiM or compensated FiM according to the
+  supplied net moment.
 - `net_moment`: total-moment scalar magnitude of the analyzed magnetic cell in
   `mu_B`, compared with `zero_net_moment_tol`; not a three-component vector,
   per-atom value, or per-formula-unit value. Do not normalize it silently.

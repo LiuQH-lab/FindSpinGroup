@@ -346,6 +346,9 @@
         "text": "GSPG linear symbol: -1|6/ -1|m 1|m -1|m ∞_{110}m|1\nSpin-space point group symbol: ∞/mm (D∞h)\nEffective MPG: 6/mmm1'\nReal-space setting: G0std\nSpin-frame setting: oriented\nSpin-only direction: sqrt(2)/2,sqrt(2)/2,0\n\ngenerators (excluding spin-only):\n2 x-y,x,z,-1,-u,-v,-w\n4 -y,-x,z,+1,u,v,w\n5 x,y,-z,-1,-u,-v,-w\n\noperations:\n1 x,y,z,+1,u,v,w\n2 x-y,x,z,-1,-u,-v,-w\n3 y,-x+y,z,-1,-u,-v,-w\n4 -y,-x,z,+1,u,v,w\n5 x,y,-z,-1,-u,-v,-w\n6 y,x,z,-1,-u,-v,-w\n7 x,x-y,z,+1,u,v,w\n8 -x+y,y,z,+1,u,v,w\n9 x-y,-y,z,-1,-u,-v,-w\n10 -x,-x+y,z,-1,-u,-v,-w\n11 x-y,x,-z,+1,u,v,w\n12 y,-x+y,-z,+1,u,v,w\n13 -y,x-y,z,+1,u,v,w\n14 -x+y,-x,z,+1,u,v,w\n15 y,x,-z,+1,u,v,w\n16 -x,-y,z,-1,-u,-v,-w\n17 -y,-x,-z,-1,-u,-v,-w\n18 x-y,-y,-z,+1,u,v,w\n19 -x,-x+y,-z,+1,u,v,w\n20 -x+y,y,-z,-1,-u,-v,-w\n21 x,x-y,-z,-1,-u,-v,-w\n22 -x+y,-x,-z,-1,-u,-v,-w\n23 -y,x-y,-z,-1,-u,-v,-w\n24 -x,-y,-z,+1,u,v,w\n\nspin only:\nCollinear direction: sqrt(2)/2,sqrt(2)/2,0"
       },
       "index": "194.164.1.1.L",
+      "magnetic_atom_orbit_count_ssg": 1,
+      "magnetic_phase_base": "AFM",
+      "magnetic_phase_family": "AFM-class",
       "phase": "AFM(Altermagnet)",
       "properties": {
         "ahc_w_soc": "No",
@@ -991,6 +994,9 @@
         "text": "GSPG linear symbol: 2_{100}|6/ -1|m m_{100}|m -1|m 3|1\nSpin-space point group symbol: -3m (D3d)\nEffective MPG: 6/m'm'm'\nReal-space setting: G0std\nSpin-frame setting: oriented\nSpin-only direction: None\n\ngenerators (excluding spin-only):\n4 y,-x+y,z,+1,u-v,-v,-w\n5 y,-x+y,z,+1,v,u,-w\n10 -y,-x,z,-1,-u+v,v,w\n13 x,y,-z,-1,-u,-v,-w\n\noperations:\n1 x,y,z,+1,u,v,w\n2 x,y,z,+1,-v,u-v,w\n3 x,y,z,+1,-u+v,-u,w\n4 y,-x+y,z,+1,u-v,-v,-w\n5 y,-x+y,z,+1,v,u,-w\n6 y,-x+y,z,+1,-u,-u+v,-w\n7 x-y,x,z,+1,u-v,-v,-w\n8 x-y,x,z,+1,v,u,-w\n9 x-y,x,z,+1,-u,-u+v,-w\n10 -y,-x,z,-1,-u+v,v,w\n11 -y,-x,z,-1,-v,-u,w\n12 -y,-x,z,-1,u,u-v,w\n13 x,y,-z,-1,-u,-v,-w\n14 y,x,z,-1,-u,-v,-w\n15 x,y,-z,-1,v,-u+v,-w\n16 y,x,z,-1,v,-u+v,-w\n17 x,y,-z,-1,u-v,u,-w\n18 y,x,z,-1,u-v,u,-w\n19 -x+y,y,z,-1,-u+v,v,w\n20 x,x-y,z,-1,-u+v,v,w\n21 -x+y,y,z,-1,-v,-u,w\n22 x,x-y,z,-1,-v,-u,w\n23 -x+y,y,z,-1,u,u-v,w\n24 x,x-y,z,-1,u,u-v,w\n25 x-y,-y,z,-1,-u,-v,-w\n26 -x,-x+y,z,-1,-u,-v,-w\n27 x-y,-y,z,-1,v,-u+v,-w\n28 -x,-x+y,z,-1,v,-u+v,-w\n29 x-y,-y,z,-1,u-v,u,-w\n30 -x,-x+y,z,-1,u-v,u,-w\n31 -x+y,-x,z,+1,u,v,w\n32 -y,x-y,z,+1,u,v,w\n33 y,-x+y,-z,-1,-u+v,v,w\n34 x-y,x,-z,-1,-u+v,v,w\n35 y,-x+y,-z,-1,-v,-u,w\n36 x-y,x,-z,-1,-v,-u,w\n37 -y,x-y,z,+1,-v,u-v,w\n38 -x+y,-x,z,+1,-v,u-v,w\n39 y,-x+y,-z,-1,u,u-v,w\n40 x-y,x,-z,-1,u,u-v,w\n41 -y,x-y,z,+1,-u+v,-u,w\n42 -x+y,-x,z,+1,-u+v,-u,w\n43 y,x,-z,+1,u,v,w\n44 y,x,-z,+1,-v,u-v,w\n45 y,x,-z,+1,-u+v,-u,w\n46 -y,-x,-z,+1,u-v,-v,-w\n47 -x,-y,z,+1,u-v,-v,-w\n48 -y,-x,-z,+1,v,u,-w\n49 -x,-y,z,+1,v,u,-w\n50 -x,-y,z,+1,-u,-u+v,-w\n51 -y,-x,-z,+1,-u,-u+v,-w\n52 x-y,-y,-z,+1,u,v,w\n53 -x,-x+y,-z,+1,u,v,w\n54 x-y,-y,-z,+1,-v,u-v,w\n55 -x,-x+y,-z,+1,-v,u-v,w\n56 x-y,-y,-z,+1,-u+v,-u,w\n57 -x,-x+y,-z,+1,-u+v,-u,w\n58 -x+y,y,-z,+1,u-v,-v,-w\n59 x,x-y,-z,+1,u-v,-v,-w\n60 -x+y,y,-z,+1,v,u,-w\n61 x,x-y,-z,+1,v,u,-w\n62 -x+y,y,-z,+1,-u,-u+v,-w\n63 x,x-y,-z,+1,-u,-u+v,-w\n64 -x+y,-x,-z,-1,-u,-v,-w\n65 -y,x-y,-z,-1,-u,-v,-w\n66 -x+y,-x,-z,-1,v,-u+v,-w\n67 -y,x-y,-z,-1,v,-u+v,-w\n68 -x+y,-x,-z,-1,u-v,u,-w\n69 -y,x-y,-z,-1,u-v,u,-w\n70 -x,-y,-z,-1,-u+v,v,w\n71 -x,-y,-z,-1,-v,-u,w\n72 -x,-y,-z,-1,u,u-v,w\n\nspin only:\n1 x,y,z,+1,u,v,w"
       },
       "index": "194.149.3.3",
+      "magnetic_atom_orbit_count_ssg": 1,
+      "magnetic_phase_base": "AFM",
+      "magnetic_phase_family": "AFM-class",
       "phase": "AFM\n(SOM)",
       "properties": {
         "ahc_w_soc": "Yes",
@@ -1413,8 +1419,8 @@
         "ferroelectric_altermagnet_screening": {
           "evidence": {
             "is_altermagnet": false,
-            "magnetic_phase": "FM/FiM",
-            "magnetic_phase_base": "FM/FiM",
+            "magnetic_phase": "FiM",
+            "magnetic_phase_base": "FiM",
             "polarity_status": "magnetically_induced_polar_candidate",
             "spin_splitting_without_soc": "Zeeman"
           },
@@ -1702,7 +1708,10 @@
         "text": "GSPG linear symbol: 1|m 2_{001}|m 2_{001}|2 m|1\nSpin-space point group symbol: mm2 (C2v)\nEffective MPG: mm21'\nReal-space setting: G0std\nSpin-frame setting: oriented\nSpin-only direction: 1,0,0\n\ngenerators (excluding spin-only):\n3 -x,y,z,+1,u,v,w\n4 -x,y,z,-1,-u,v,w\n5 x,-y,z,-1,u,-v,w\n\noperations:\n1 x,y,z,+1,u,v,w\n2 x,y,z,-1,-u,v,w\n3 -x,y,z,+1,u,v,w\n4 -x,y,z,-1,-u,v,w\n5 x,-y,z,-1,u,-v,w\n6 x,-y,z,+1,-u,-v,w\n7 -x,-y,z,-1,u,-v,w\n8 -x,-y,z,+1,-u,-v,w\n\nspin only:\n1 x,y,z,+1,u,v,w\n2 x,y,z,-1,-u,v,w"
       },
       "index": "38.6.1.2.P2",
-      "phase": "FM/FiM",
+      "magnetic_atom_orbit_count_ssg": 2,
+      "magnetic_phase_base": "FiM",
+      "magnetic_phase_family": "FM-class",
+      "phase": "FiM",
       "properties": {
         "ahc_w_soc": "Yes",
         "ahc_wo_soc": "No",

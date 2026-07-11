@@ -172,6 +172,17 @@ A compact legacy phase label.
 The user-facing magnetic phase summary. It can include tags such as
 altermagnetism or spin-orbit magnet behavior.
 
+`magnetic_phase_family`
+The article-level FM/AFM dichotomy. `AFM-class` means the spin-space point
+group forces the net spin magnetization to zero; `FM-class` means it permits a
+net spin magnetization.
+
+`magnetic_atom_orbit_count_ssg`
+Number of magnetic-atom orbits in the magnetic primitive cell under the
+complete SSG. This is not the number of `G0` Wyckoff orbits. Within `FM-class`,
+one orbit gives `FM`, whereas multiple orbits give `FiM` or `Compensated FiM`
+depending on the actual net moment.
+
 `net_moment`
 The magnitude of the vector sum of magnetic moments in the analyzed magnetic
 cell, reported as a scalar in μB.
@@ -181,9 +192,13 @@ The tolerance used to decide whether the net moment is treated as zero for
 magnetic phase classification.
 
 `compensated FiM`
-A ferrimagnetic configuration whose net moment is treated as zero under the
-configured magnetic-moment tolerance. The classification depends on the same
-tolerance contract used by the rest of the magnetic symmetry route.
+An `FM-class` configuration with multiple SSG magnetic-atom orbits whose net
+moment is treated as zero under the configured magnetic-moment tolerance.
+
+`FM-class (zero-moment undetermined)`
+The boundary case in which the SSG permits net spin magnetization, the magnetic
+atoms form one SSG orbit, but the supplied moment sum is zero. It is not labelled
+as compensated ferrimagnetism without multiple inequivalent magnetic orbits.
 
 ## K Points And Spin Texture
 

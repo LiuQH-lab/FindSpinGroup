@@ -2842,7 +2842,7 @@ def test_find_spin_group_exposes_total_coplanar_222_spin_transform(source_path, 
 @pytest.mark.parametrize(
     ("source_path", "expected_index", "expected_suffix", "expected_phase"),
     [
-        ("tests/testset/mcif_241130_no2186/0.1000_Fe4O5.mcif", "36.8.1.2.P2", "P2", "FM/FiM"),
+        ("tests/testset/mcif_241130_no2186/0.1000_Fe4O5.mcif", "36.8.1.2.P2", "P2", "FiM"),
         ("tests/testset/mcif_241130_no2186/0.188_CeMnAsO.mcif", "59.25.1.2.P1", "P1", "AFM"),
         ("tests/testset/mcif_241130_no2186/0.196_Co4Nb2O9.mcif", "165.158.1.2.P1", "P1", "AFM"),
     ],
@@ -3940,11 +3940,15 @@ def test_find_spin_group_preserves_historical_identify_index_for_ndco2():
 
     assert result.index == "227.227.1.1.L"
     assert result.spin_part_point_group == "∞m"
-    assert result.magnetic_phase == "FM/FiM"
-    assert result.magnetic_phase_base == "FM/FiM"
+    assert result.magnetic_phase == "FiM"
+    assert result.magnetic_phase_family == "FM-class"
+    assert result.magnetic_phase_base == "FiM"
+    assert result.magnetic_atom_orbit_count_ssg == 2
     assert result.magnetic_phase_modifier == ""
     assert result.is_spin_orbit_magnet == ""
-    assert result.magnetic_phase_details["classification_rule"] == "fm_like_spin_point_group"
+    assert result.magnetic_phase_details["classification_rule"] == (
+        "fm_class_multiple_ssg_magnetic_atom_orbits"
+    )
     assert result.magnetic_phase_details["fm_like_by_spin_point_group"] is True
     assert result.identify_index_details["equivalent_map_index"] == 1
     assert result.identify_index_details["configuration_suffix"] == "L"
@@ -3954,16 +3958,22 @@ def test_find_spin_group_exposes_compensated_fim_classification_details():
     result = find_spin_group("tests/testset/mcif_241130_no2186/0.103_Mn2GeO4.mcif")
 
     assert result.magnetic_phase == "Compensated FiM"
+    assert result.magnetic_phase_family == "FM-class"
     assert result.magnetic_phase_base == "Compensated FiM"
     assert result.magnetic_phase_modifier == ""
     assert result.is_spin_orbit_magnet == ""
-    assert result.magnetic_phase_details["classification_rule"] == "fm_like_spin_point_group"
+    assert result.magnetic_phase_details["classification_rule"] == (
+        "fm_class_multiple_ssg_magnetic_atom_orbits_zero_net_moment"
+    )
+    assert result.magnetic_atom_orbit_count_ssg == 3
+    assert len(result.magnetic_phase_details["magnetic_atom_orbit_analysis"]["orbits"]) == 3
     assert result.magnetic_phase_details["zero_net_moment"] is True
     assert result.magnetic_phase_details["zero_net_moment_tol"] == pytest.approx(0.02)
     assert result.tolerances["mtol"] == pytest.approx(0.02)
 
 
 def test_compensated_fim_zero_net_moment_uses_magnetic_tolerance():
+    orbit_analysis = {"count": 2, "orbits": []}
     default_payload = classify_magnetic_phase(
         conf="Collinear",
         full_spin_part_point_group_hm=None,
@@ -3971,6 +3981,7 @@ def test_compensated_fim_zero_net_moment_uses_magnetic_tolerance():
         net_moment=1e-3,
         mpg_identifier=None,
         is_ss_gp="spin splitting",
+        magnetic_atom_orbit_analysis=orbit_analysis,
     )
     strict_payload = classify_magnetic_phase(
         conf="Collinear",
@@ -3980,6 +3991,7 @@ def test_compensated_fim_zero_net_moment_uses_magnetic_tolerance():
         net_moment_tol=1e-4,
         mpg_identifier=None,
         is_ss_gp="spin splitting",
+        magnetic_atom_orbit_analysis=orbit_analysis,
     )
     relaxed_payload = classify_magnetic_phase(
         conf="Collinear",
@@ -3989,12 +4001,13 @@ def test_compensated_fim_zero_net_moment_uses_magnetic_tolerance():
         net_moment_tol=0.02,
         mpg_identifier=None,
         is_ss_gp="spin splitting",
+        magnetic_atom_orbit_analysis=orbit_analysis,
     )
 
     assert default_payload["base_phase"] == "Compensated FiM"
     assert default_payload["details"]["zero_net_moment"] is True
     assert default_payload["details"]["zero_net_moment_tol"] == pytest.approx(DEFAULT_TOL.moment)
-    assert strict_payload["base_phase"] == "FM/FiM"
+    assert strict_payload["base_phase"] == "FiM"
     assert strict_payload["details"]["zero_net_moment"] is False
     assert strict_payload["details"]["zero_net_moment_tol"] == pytest.approx(1e-4)
     assert relaxed_payload["base_phase"] == "Compensated FiM"
@@ -4003,10 +4016,25 @@ def test_compensated_fim_zero_net_moment_uses_magnetic_tolerance():
 
 
 def test_get_magnetic_phase_accepts_net_moment_tolerance():
-    strict_phase = get_magnetic_phase(None, "∞m", 1e-3, None, net_moment_tol=1e-4)
-    relaxed_phase = get_magnetic_phase(None, "∞m", 1e-3, None, net_moment_tol=0.02)
+    orbit_analysis = {"count": 2, "orbits": []}
+    strict_phase = get_magnetic_phase(
+        None,
+        "∞m",
+        1e-3,
+        None,
+        net_moment_tol=1e-4,
+        magnetic_atom_orbit_analysis=orbit_analysis,
+    )
+    relaxed_phase = get_magnetic_phase(
+        None,
+        "∞m",
+        1e-3,
+        None,
+        net_moment_tol=0.02,
+        magnetic_atom_orbit_analysis=orbit_analysis,
+    )
 
-    assert strict_phase == "FM/FiM"
+    assert strict_phase == "FiM"
     assert relaxed_phase == "Compensated FiM"
 
 
@@ -4019,9 +4047,42 @@ def test_get_magnetic_phase_returns_base_phase_when_full_context_is_supplied():
         conf="Collinear",
         is_ss_gp="spin splitting",
         net_moment_tol=0.02,
+        magnetic_atom_orbit_analysis={"count": 2, "orbits": []},
     )
 
     assert phase == "Compensated FiM"
+
+
+def test_fm_class_single_magnetic_atom_orbit_distinguishes_fm_and_zero_boundary():
+    common = {
+        "conf": "Collinear",
+        "full_spin_part_point_group_hm": None,
+        "full_spin_part_point_group_s": "∞m",
+        "mpg_identifier": None,
+        "is_ss_gp": "spin splitting",
+        "net_moment_tol": 0.02,
+        "magnetic_atom_orbit_analysis": {"count": 1, "orbits": []},
+    }
+
+    fm = classify_magnetic_phase(net_moment=1.0, **common)
+    zero_boundary = classify_magnetic_phase(net_moment=0.0, **common)
+
+    assert fm["family"] == "FM-class"
+    assert fm["base_phase"] == "FM"
+    assert fm["details"]["order_type_status"] == "resolved"
+    assert zero_boundary["family"] == "FM-class"
+    assert zero_boundary["base_phase"] == "FM-class (zero-moment undetermined)"
+    assert zero_boundary["details"]["order_type_status"] == "undetermined"
+    assert zero_boundary["spin_splitting_without_soc"] == "Zeeman"
+
+
+def test_find_spin_group_classifies_single_ssg_magnetic_atom_orbit_as_fm():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.1048_HoGa.mcif")
+
+    assert result.magnetic_phase_family == "FM-class"
+    assert result.magnetic_phase == "FM"
+    assert result.magnetic_atom_orbit_count_ssg == 1
+    assert result.spinsplitting_wo_soc == "Zeeman"
 
 
 def test_find_spin_group_basic_reports_classification_tolerances():
