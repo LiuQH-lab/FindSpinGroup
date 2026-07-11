@@ -112,7 +112,10 @@ from findspingroup.io import (
     parse_scif_text,
 )
 from findspingroup.io.scif_generator import write_scif_spin_only
-from findspingroup.quasi2d import prepare_quasi2d_input_cell
+from findspingroup.quasi2d import (
+    prepare_quasi2d_input_cell,
+    resolve_quasi2d_preprocessing,
+)
 from findspingroup.structure import SpinSpaceGroup
 from findspingroup.structure.cell import (
     AtomicSite,
@@ -1298,9 +1301,9 @@ def test_tensor_output_display_snaps_common_sqrt_coefficients():
         r"\sigma_{xz} = -sqrt(3)/3\sigma_{yz} = -\sigma_{zx} = sqrt(3)/3\sigma_{zy}"
     ]
     assert components == [
-        ["0", "0", r"sqrt(3)/3\sigma_{zy}"],
-        ["0", "0", r"-\sigma_{zy}"],
-        [r"-sqrt(3)/3\sigma_{zy}", r"\sigma_{zy}", "0"],
+        ["0", "0", r"-sqrt(3)/3\sigma_{yz}"],
+        ["0", "0", r"\sigma_{yz}"],
+        [r"sqrt(3)/3\sigma_{yz}", r"-\sigma_{yz}", "0"],
     ]
 
 
@@ -2151,6 +2154,7 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
         calculation_mode=None,
         vacuum_axis=None,
         spin_texture_basis_max_order=None,
+        components=None,
     ):
         captured["source_name"] = source_name
         captured["source_metadata"] = source_metadata
@@ -2159,6 +2163,7 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
         captured["calculation_mode"] = calculation_mode
         captured["vacuum_axis"] = vacuum_axis
         captured["spin_texture_basis_max_order"] = spin_texture_basis_max_order
+        captured["components"] = components
         return {"ok": True}
 
     monkeypatch.setattr(find_spin_group_module, "parse_structure_file", fake_parse_structure_file)
@@ -2181,6 +2186,7 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
     assert captured["calculation_mode"] == "3d"
     assert captured["vacuum_axis"] == "c"
     assert captured["spin_texture_basis_max_order"] is None
+    assert captured["components"] is None
 
 
 def test_find_transition_matrix_deterministic_error_suggests_pg_standardization_direction(monkeypatch):
@@ -4197,6 +4203,59 @@ def test_quasi2d_auto_mode_does_not_report_not_applicable_magnetic_phase():
     assert "magnetic_phase" not in result.quasi_2d
 
 
+def test_quasi2d_preprocessing_resolves_heuristic_axis_before_padding():
+    lattice = np.diag([3.0, 3.0, 6.0])
+    positions = np.array([[0.0, 0.0, 0.45], [0.5, 0.5, 0.55]])
+
+    mode, axis = resolve_quasi2d_preprocessing(
+        lattice,
+        positions,
+        calculation_mode="quasi2d",
+        vacuum_axis=None,
+    )
+    padded_lattice, _, padding = prepare_quasi2d_input_cell(
+        lattice,
+        positions,
+        calculation_mode=mode,
+        vacuum_axis=axis,
+    )
+
+    assert mode == "quasi2d"
+    assert axis == "c"
+    assert padding["applied"] is True
+    assert np.isclose(np.linalg.norm(padded_lattice[2]), 20.0)
+
+    auto_mode, auto_axis = resolve_quasi2d_preprocessing(
+        lattice,
+        positions,
+        calculation_mode="auto",
+        vacuum_axis=None,
+    )
+    assert auto_mode == "auto"
+    assert auto_axis is None
+
+
+@pytest.mark.parametrize(
+    ("calculation_mode", "vacuum_axis", "message"),
+    [
+        ("unknown", "c", "Unknown calculation_mode"),
+        ("quasi2d", "unknown", "Unknown vacuum_axis"),
+    ],
+)
+def test_quasi2d_preprocessing_rejects_unknown_runtime_parameters(
+    calculation_mode,
+    vacuum_axis,
+    message,
+):
+    with pytest.raises(ValueError, match=message):
+        resolve_quasi2d_preprocessing(
+            np.diag([3.0, 3.0, 20.0]),
+            np.array([[0.0, 0.0, 0.5]]),
+            calculation_mode=calculation_mode,
+            vacuum_axis=vacuum_axis,
+        )
+
+
 def test_quasi2d_magnetic_phase_uses_generated_generic_point_after_vacuum_padding():
     result = find_spin_group(
         "tests/testset/mcif_241130_no2186/0.105_ErVO3.mcif",
@@ -4439,6 +4498,44 @@ def test_quasi2d_spin_texture_config_honors_explicit_a_vacuum_axis():
     assert quasi_2d["spin_texture_config_no_soc"]["operation_audit"][
         "non_plane_preserving_operation_count"
     ] == 0
+
+
+def test_quasi2d_spin_texture_honors_full_route_component_selection():
+    result = find_spin_group(
+        "tests/testset/V2Se2O_2d.mcif",
+        calculation_mode="quasi2d",
+        vacuum_axis="c",
+        components=(),
+    )
+
+    quasi_2d = result.quasi_2d
+    assert quasi_2d["spin_texture_config_no_soc"] is None
+    assert quasi_2d["spin_texture_config_soc"] is None
+    assert quasi_2d["spin_texture_config_basis"] is None
+    assert quasi_2d["magnetic_phase"] == "AFM(Altermagnet)\n(SOM)"
+    assert quasi_2d["display_kpoints"][0]["role"] == "generic_point_2d"
+
+
+def test_quasi2d_little_group_symbols_do_not_materialize_all_3d_symbols(monkeypatch):
+    def _unexpected_all_symbols(_self):
+        raise AssertionError("quasi-2D should identify only displayed in-plane symbols")
+
+    monkeypatch.setattr(
+        group_module.SpinSpaceGroup,
+        "little_groups_symbols",
+        property(_unexpected_all_symbols),
+    )
+
+    result = find_spin_group(
+        "tests/testset/V2Se2O_2d.mcif",
+        calculation_mode="quasi2d",
+        vacuum_axis="c",
+        components=(),
+    )
+
+    symbols = result.quasi_2d["ssg_little_group_symbol_2d"]
+    assert symbols
+    assert all(symbol is not None for symbol in symbols)
 
 
 def test_quasi2d_spin_texture_config_preserves_free_variable_names():

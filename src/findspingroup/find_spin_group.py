@@ -43,7 +43,11 @@ from findspingroup.io.scif_generator import (
     affine_matrix_to_xyz_expression,
     generate_scif,
 )
-from findspingroup.quasi2d import build_quasi2d_diagnostics, prepare_quasi2d_input_cell
+from findspingroup.quasi2d import (
+    build_quasi2d_diagnostics,
+    prepare_quasi2d_input_cell,
+    resolve_quasi2d_preprocessing,
+)
 from findspingroup.spin_splitting import (
     classify_public_spin_texture_config,
     collinear_axis_constraint_operation,
@@ -6042,6 +6046,7 @@ def _ssg_little_group_symbol(
     conf: str,
     tol: float,
     label: str,
+    raise_on_error: bool = False,
 ) -> str | None:
     if not little_group:
         return "1"
@@ -6069,7 +6074,13 @@ def _ssg_little_group_symbol(
                 4: '^{\\infty m}1',
                 8: '^{\\infty /mm}1',
             }
-            spin_only_symbol = spin_only_symbol_by_count.get(t_count, '')
+            spin_only_symbol = spin_only_symbol_by_count.get(t_count)
+            if spin_only_symbol is None:
+                if raise_on_error:
+                    raise ValueError(
+                        f"Wrong spin translation group of k little group {label}"
+                    )
+                spin_only_symbol = ''
         else:
             general_spin_only = [
                 np.asarray(op[0], dtype=float)
@@ -6112,6 +6123,8 @@ def _ssg_little_group_symbol(
                 latex += '^{' + spin_generators_symbols[i] + '}' + real_info[1][index_g][2]
         return latex + spin_only_symbol
     except Exception:
+        if raise_on_error:
+            raise
         return None
 
 
@@ -6241,10 +6254,23 @@ def _build_quasi2d_little_group_payload(
         return {}
 
     indices = _quasi2d_in_plane_acc_kpoint_indices(quasi_2d)
-    ssg_little_group_symbols = list(acc_primitive_ssg.little_groups_symbols)
     ssg_little_groups_2d = _select_indices(ssg_little_groups, indices)
     msg_little_groups_2d = _select_indices(msg_little_groups, indices)
-    ssg_little_group_symbol_2d = _select_indices(ssg_little_group_symbols, indices)
+    kpoint_symbols = list(acc_primitive_ssg.kpoints_symbol_primitive)
+    ssg_little_group_symbol_2d = [
+        _ssg_little_group_symbol(
+            little_group,
+            conf=acc_primitive_ssg.conf,
+            tol=acc_primitive_ssg.tol,
+            label=(
+                kpoint_symbols[index]
+                if 0 <= index < len(kpoint_symbols)
+                else f"index {index}"
+            ),
+            raise_on_error=True,
+        )
+        for index, little_group in zip(indices, ssg_little_groups_2d)
+    ]
     msg_little_group_symbol_2d = _select_indices(msg_little_group_symbols, indices)
     msg_spin_polarization_2d = _select_indices(msg_spin_polarizations, indices)
     ssg_little_group_ops_2d = _serialize_ssg_little_group_ops(ssg_little_groups_2d)
@@ -7912,6 +7938,15 @@ def _find_spin_group_from_parsed(
             calculate_vector_coordinates_from_latticefactors(a, b, c, alpha, beta, gamma),
             dtype=float,
         )
+    normalized_calculation_mode, preprocessing_vacuum_axis = resolve_quasi2d_preprocessing(
+        input_lattice_matrix,
+        positions,
+        calculation_mode=calculation_mode,
+        vacuum_axis=vacuum_axis,
+    )
+    preprocessing_mode = (
+        "quasi2d" if preprocessing_vacuum_axis is not None else "3d"
+    )
     (
         quasi2d_lattice_for_cell,
         quasi2d_positions_for_cell,
@@ -7919,8 +7954,8 @@ def _find_spin_group_from_parsed(
     ) = prepare_quasi2d_input_cell(
         input_lattice_matrix,
         positions,
-        calculation_mode=calculation_mode,
-        vacuum_axis=vacuum_axis,
+        calculation_mode=preprocessing_mode,
+        vacuum_axis=preprocessing_vacuum_axis,
     )
     if quasi2d_vacuum_padding is not None:
         input_lattice_for_cell = quasi2d_lattice_for_cell
@@ -8530,7 +8565,7 @@ def _find_spin_group_from_parsed(
         acc_primitive_ssg=acc_primitive_output_ssg,
         base_is_alter=alter,
         tol=tol_cfg.m_matrix_tol,
-        calculation_mode=calculation_mode,
+        calculation_mode=normalized_calculation_mode,
         vacuum_axis=vacuum_axis,
         vacuum_padding=quasi2d_vacuum_padding,
     )
@@ -8629,17 +8664,26 @@ def _find_spin_group_from_parsed(
             real_space_metric=public_ossg_ssg.real_space_metric,
         )
     if quasi_2d_diagnostics is not None:
-        quasi_2d_diagnostics.update(
-            _quasi2d_spin_texture_config_from_ossg_convention(
-                quasi_2d=quasi_2d_diagnostics,
-                convention_ossg=public_convention_oriented_ssg,
-                convention_cell=convention_cell,
-                transformation_input_to_convention=transformation_input_to_convention,
-                tol=tol_cfg.m_matrix_tol,
-                calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
-                spin_texture_basis_max_order=spin_texture_basis_max_order,
+        if "spin_texture" in enabled_components:
+            quasi_2d_diagnostics.update(
+                _quasi2d_spin_texture_config_from_ossg_convention(
+                    quasi_2d=quasi_2d_diagnostics,
+                    convention_ossg=public_convention_oriented_ssg,
+                    convention_cell=convention_cell,
+                    transformation_input_to_convention=transformation_input_to_convention,
+                    tol=tol_cfg.m_matrix_tol,
+                    calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
+                    spin_texture_basis_max_order=spin_texture_basis_max_order,
+                )
             )
-        )
+        else:
+            quasi_2d_diagnostics.update(
+                {
+                    "spin_texture_config_no_soc": None,
+                    "spin_texture_config_soc": None,
+                    "spin_texture_config_basis": None,
+                }
+            )
     public_convention_cartesian_ssg = public_convention_oriented_ssg.transform_spin(
         _lattice_column_matrix(convention_cell)
     )
