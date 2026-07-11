@@ -1,92 +1,108 @@
-# Choosing an API
+# Choose A Workflow
 
-Most users should choose one of three routes.
+Choose from the scientific task, not from an internal object name.
 
-## Quick Identification
+## Decision Table
 
-Use `find_spin_group_basic(...)` in Python or `fsg file.mcif` on the command
-line when you need the identified OSSG, corresponding MSG, and magnetic-phase
-summary.
+| Your task | CLI | Python | Cost and output |
+| --- | --- | --- | --- |
+| Identify OSSG/MSG, magnetic phase, spin splitting, AHC, and leading spin texture | `fsg FILE` | `find_spin_group_basic(FILE)` | Quick analysis; compact dictionary |
+| Screen many files with stable JSON fields | `fsg FILE --json` or `fsg-batch` | loop over `find_spin_group_basic` | Quick analysis; machine-readable |
+| Inspect SSG/MSG operations or cell settings | `fsg --full FILE --show operation-views` | `find_spin_group(FILE)` | Full analysis |
+| Generate matched VASP POSCAR and KPOINTS | `fsg FILE --write-poscar-kpoints DIR` | attributes on `find_spin_group(FILE)` | Full analysis; writes files |
+| Export SCIF in a chosen setting | `fsg FILE --write-scif OUT` | `result.to_scif(...)` | Full analysis |
+| Analyze a slab as quasi-2D | `fsg --full --calculation-mode quasi2d --vacuum-axis c FILE --show quasi_2d` | `find_spin_group(..., calculation_mode="quasi2d")` | Full analysis with quasi-2D interpretation payload |
+| Export operations in exactly the input cell | `fsg -w FILE` | `find_spin_group_input_ssg(FILE)` | Specialized operation export |
 
-Choose this route when:
+## Quick Analysis: The Default
 
-- you are screening many structures;
-- you only need labels and summary classification;
-- you want a JSON-serializable dictionary;
-- you do not need generated SCIF, POSCAR, KPOINTS, or operation text.
+Use quick analysis for most identification and screening work:
 
-Python:
+```bash
+fsg structure.mcif
+```
 
 ```python
 from findspingroup import find_spin_group_basic
 
-summary = find_spin_group_basic("path/to/structure.mcif")
-print(summary["index"])
-print(summary["magnetic_phase"])
+result = find_spin_group_basic("structure.mcif")
 ```
 
-CLI:
+Read these fields first:
 
-```bash
-fsg path/to/structure.mcif
+```python
+result["index"]
+result["msg_bns_number"], result["msg_symbol"]
+result["conf"], result["magnetic_phase"]
+result["properties"]
+result["spin_texture_config_no_soc"]
+result["spin_texture_config_soc"]
 ```
 
-The default CLI output is a short summary. Use `--show` for selected fields and
-`--json` for the complete compact JSON payload.
+Quick analysis is enough when you do not need explicit operation matrices,
+multiple cell settings, generated structure files, tensor components, or
+detailed route audits.
 
-## Full Analysis
-
-Use `find_spin_group(...)` in Python or `fsg --all file.mcif` when you need the
-full `MagSymmetryResult`.
-
-Choose this route when:
-
-- you need generated SCIF text;
-- you need POSCAR or KPOINTS output;
-- you need SSG or MSG operations in named settings;
-- you need tensor, magnetic-site, quasi-2D, or ferroelectric-switching outputs;
-- you need route diagnostics for debugging or validation.
-
-Python:
+## Full Analysis: Ask For A Specific Product
 
 ```python
 from findspingroup import find_spin_group
 
-result = find_spin_group("path/to/structure.mcif")
-summary = result.to_summary_dict()
-structured = result.to_structured_dict()
+result = find_spin_group("structure.mcif")
 ```
 
-Prefer `to_summary_dict()` for a compact human-facing summary and
-`to_structured_dict()` when another program needs the full result grouped by
-meaning. Treat `to_dict()` as the raw compatibility surface.
+Do not begin a new integration by recursively exploring `result.to_dict()`.
+Choose the narrowest accessor for your task:
 
-## Input-Cell Operations
+| Need | Use |
+| --- | --- |
+| Compact full-route summary | `result.to_summary_dict()` |
+| Complete Python result grouped by meaning | `result.to_structured_dict()` |
+| SCIF text in an explicit setting | `result.to_scif(cell_mode=...)` |
+| Matched ACC-primitive VASP inputs | `result.acc_primitive_magnetic_cell_poscar` and `result.KPOINTS` |
+| Raw compatibility fields | `result.to_dict()` only when maintaining an existing integration |
 
-Use `find_spin_group_input_ssg(...)` in Python or `fsg -w file.mcif` when a
-downstream tool needs explicit operations in the input-cell setting.
+The structured result separates `summary`, `groups`, `cells`, `transforms`,
+`properties`, and `artifacts`. This prevents a cell transform or diagnostic
+field from being mistaken for a physics result. It is a Python navigation view,
+not a directly JSON-serializable contract.
 
-Choose this route when:
+## Input-Cell Operation Export: Check The Warning
 
-- you want operations in the cell supplied by the user;
-- you want `ssg_symm.json` written by the CLI;
-- you need the relation between the input cell and the input magnetic primitive
-  cell;
-- you need helper POSCAR text for the magnetic primitive cell.
+```python
+from findspingroup import find_spin_group_input_ssg
 
-CLI:
+payload = find_spin_group_input_ssg("structure.mcif")
+summary = payload["summary"]
 
-```bash
-fsg -w path/to/structure.mcif
+print(summary["is_input_magnetic_primitive"])
+print(summary["warning"])
 ```
 
-This writes `ssg_symm.json` and `magnetic_primitive_poscar.vasp`.
-`input_poscar.vasp` is written only when a non-POSCAR input cell is distinct
-from the magnetic primitive cell.
+If the input cell is not magnetic primitive, its operation list can represent
+an incomplete subgroup of the primitive-cell symmetry. Before consuming
+`payload["ssg"]["ops"]`, read:
 
-## Advanced Routes
+- `is_input_magnetic_primitive`;
+- `input_ssg_may_be_incomplete`;
+- `warning`;
+- both `input_ssg_index` and `primitive_ssg_index`.
 
-The package also exposes `find_spin_group_acc_primitive(...)`,
-`find_spin_group_poscar_ssg(...)`, and `*_from_data` variants. These are useful
-for specialized integration and development workflows, but they are not the
-recommended starting points for new users.
+Use this route because a downstream program requires the input setting, not as
+a shortcut to the canonical OSSG identification.
+
+## File Path Or Parsed Arrays?
+
+The three functions above accept a structure-file path. Use the corresponding
+`*_from_data` variants only when another program already owns the lattice,
+positions, species, occupancies, and moments as arrays. The same tolerance,
+coordinate-frame, and magnetic-moment assumptions still apply.
+
+## Common Mistakes
+
+- Running full analysis only to read `index` and `magnetic_phase`.
+- Treating `to_dict()` as a curated stable schema.
+- Mixing operations from one setting with coordinates from another.
+- Treating an input-cell subgroup as the primitive-cell OSSG.
+- Interpreting symmetry-allowed AHC or spin splitting as a calculated nonzero
+  magnitude.

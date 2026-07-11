@@ -1,378 +1,262 @@
-# CLI Reference
+# CLI By Task
 
-The package installs single-case and batch command-line entry points.
+`fsg` is the main single-structure command. It uses progressive disclosure:
 
-## Single-Case Commands
+1. `fsg FILE` prints the short scientific answer;
+2. `--details` expands the human-readable answer;
+3. `--show` selects an exact field;
+4. `--json` produces machine-readable quick-analysis output;
+5. `--full` computes operations, cells, tensors, sites, and artifacts.
 
-Equivalent entry points:
-
-`fsg`
-Primary short command.
-
-`findspingroup`
-Long package-name command.
-
-`findspin`
-Compatibility command.
-
-## Default Route
+Check that the executable and manual version match:
 
 ```bash
-fsg path/to/structure.mcif
+fsg --version
 ```
 
-Runs the compact identification route and prints a short human-readable summary.
+If `--version` itself is unavailable, the executable predates this CLI. Check
+which `fsg` is on `PATH`, then install the matching package/manual version.
 
-The default summary includes:
-
-- identification: OSSG symbol and index, G0/L0 components, identify
-  `t_index`/`k_index`, spin-space point group and nontrivial spin-space point
-  group in HM and Schoenflies notation, space group, magnetic space group, spin
-  arithmetic crystal class, and EMPG;
-- magnetic phase and properties: configuration, phase, net moment, spin
-  splitting, AHC, altermagnet / spin-orbit-magnet flags, and no-SOC / SOC spin
-  texture wave and basis summaries;
-- vector constraints: polar/chiral flags plus compact vector-constraint
-  summaries by SG, OSSG/G0, and MSG.
-
-Use `--json` when another program needs the complete compact JSON payload:
+## Identify A Magnetic Structure
 
 ```bash
-fsg path/to/structure.mcif --json
+fsg structure.mcif
 ```
 
-Use `--show` to print selected fields:
+The default output answers:
+
+- which OSSG was identified;
+- which MSG is compatible with SOC;
+- whether the moments are collinear/coplanar/noncoplanar;
+- the magnetic-phase classification and net moment;
+- whether spin splitting and AHC are symmetry-allowed;
+- the leading no-SOC and SOC spin-texture wave types.
+
+It intentionally omits G0/L0 decomposition, point-group notation variants,
+full basis polynomials, and vector-constraint tables.
+
+## Expand The Human-Readable Summary
 
 ```bash
-fsg path/to/structure.mcif --show index --show magnetic_phase
+fsg structure.mcif --details
 ```
 
-Plain `--show` prints human-readable output. Scalars are printed directly,
-operation views are shown as tables, spin-texture dictionaries are shown as
-short labeled blocks, and long text artifacts such as SCIF, POSCAR, KPOINTS,
-and GSPG text are printed as text.
+Use this when you intentionally want the group components, spin point groups,
+ACC/EMPG labels, complete leading spin-texture expressions, and vector
+constraints.
 
-Use `--json --show FIELD` when a script needs the selected field as JSON.
-
-`--show` accepts dot paths when the payload is nested. It also accepts built-in
-aliases for common fields and artifacts.
-
-Built-in aliases:
-
-| Alias | Resolved field | Route | Output |
-| --- | --- | --- | --- |
-| `kpoints`, `kpoints_text` | `KPOINTS` | full | KPOINTS text |
-| `poscar`, `primitive_poscar`, `primitive-poscar` | `acc_primitive_magnetic_cell_poscar` | full | ACC magnetic primitive POSCAR text |
-| `acc_primitive_poscar`, `acc-primitive-poscar` | `acc_primitive_magnetic_cell_poscar` | full | ACC magnetic primitive POSCAR text |
-| `scif_default`, `default_scif` | `scif` | full | default SCIF text |
-| `gspg` | `gspg_text` | full | GSPG text block |
-| `operation-views`, `ops` | `operation_views` | full | operation-view summary table |
-| `wp-chain`, `wyckoff-chain` | `wp_chain` | full | Wyckoff-chain rows |
-| `spin-texture-no-soc` | `spin_texture_config_no_soc` | basic or full | spin-texture block |
-| `spin-texture-soc` | `spin_texture_config_soc` | basic or full | spin-texture block |
-
-For the complete route-specific field list, see
-[CLI Show Fields](cli-show-fields.md).
-
-Common direct fields:
-
-| Field | Route | Output |
-| --- | --- | --- |
-| `index` | basic or full | OSSG index |
-| `ossg_symbol_linear` | basic or full | linear OSSG symbol |
-| `conf` | basic or full | magnetic configuration class |
-| `magnetic_phase` | basic or full | magnetic phase |
-| `empg` | basic or full | effective magnetic point group symbol |
-| `msg_symbol` | basic or full | BNS MSG symbol |
-| `msg_bns_number` | basic or full | BNS MSG number as text |
-| `properties` | basic or full | compact property block |
-| `vector_constraints_by_symmetry` | basic or full | vector constraints by SG/OSSG/MSG |
-| `magnetic_site_summary` | full | magnetic-site orbit and DOF summary |
-| `quasi_2d` | full quasi-2D | quasi-2D diagnostics |
-| `scif_outputs.<mode>` | full | one SCIF text artifact |
-| `operation_views.<setting>.views.<view>` | full | one operation view table |
-
-Examples:
+## Show Only What You Need
 
 ```bash
-fsg examples/0.800_MnTe.mcif --show index --show magnetic_phase
+fsg structure.mcif \
+  --show index \
+  --show magnetic_phase \
+  --show msg_bns_number \
+  --show msg_symbol
 ```
 
-Output:
-
-```text
-## index
-194.164.1.1.L
-
-## magnetic_phase
-AFM(Altermagnet)
-```
-
-Spin-texture example:
+One selected scalar prints directly. Multiple fields print labeled sections.
+Nested dictionaries use dot paths:
 
 ```bash
-fsg --all examples/0.800_MnTe.mcif --show spin-texture-no-soc
+fsg structure.mcif --show properties.ss_wo_soc
+fsg structure.mcif --show magnetic_phase_details.is_altermagnet
 ```
 
-Output:
+Useful quick-analysis fields:
 
-```text
-spin_texture_type: g-wave
-momentum_space_spin_configuration: collinear
-spin_rank: 1
-nullity: 1
-order: 4
-source: ossg_unit_cartesian_generators
-basis_setting: ossg_unit_cartesian
-basis:
-  1. C1*((-sqrt(3)/9*ky^3*kz)*sigma_x + (sqrt(3)/3*kx^2*ky*kz)*sigma_x - (1/3*ky^3*kz)*sigma_y + (kx^2*ky*kz)*sigma_y) + o(k^4)
-basis_latex:
-  1. C_{1}\left(-\frac{\sqrt{3}}{9}k_{y}^{3}k_{z}\,\sigma_{x} + \frac{\sqrt{3}}{3}k_{x}^{2}k_{y}k_{z}\,\sigma_{x} - \frac{1}{3}k_{y}^{3}k_{z}\,\sigma_{y} + k_{x}^{2}k_{y}k_{z}\,\sigma_{y}\right) + o(k^{4})
-classifier_tolerances:
-  rtol: 1e-08
-  atol: 1e-10
-  zero_tol: 1e-08
-```
+| Question | Field |
+| --- | --- |
+| OSSG identity | `index`, `ossg_symbol_linear` |
+| SOC-compatible MSG | `msg_bns_number`, `msg_symbol`, `msg_type` |
+| Moment geometry and phase | `conf`, `magnetic_phase`, `magnetic_phase_details` |
+| Spin splitting and AHC | `properties` or its nested fields |
+| Leading spin texture | `spin-texture-no-soc`, `spin-texture-soc` |
+| Polar/vector constraints | `vector_constraints_by_symmetry` |
+| Numerical thresholds | `tolerances` |
 
-Operation-view summary example:
+The complete inventory is in [CLI Field Guide](cli-show-fields.md).
+
+An unknown or unavailable field is an error and exits nonzero. A field may
+require full analysis; retry with `--full` when the error says so.
+
+## Machine-Readable Output
+
+Complete quick-analysis JSON:
 
 ```bash
-fsg --all examples/0.800_MnTe.mcif --show operation-views
+fsg structure.mcif --json
 ```
 
-Output excerpt:
-
-```text
-Setting                      | Default | View              | Ops | Label
------------------------------+---------+-------------------+-----+------------------
-convention_cartesian         |         | all               | 24  | All operations
-convention_cartesian         | yes     | nssg              | 24  | nSSG operations
-convention_cartesian         |         | generators        | 4   | Symbol generators
-convention_cartesian         |         | pure_translations | 1   | Pure translations
-convention_cartesian         |         | spin_translations | 1   | Spin translations
-...
-```
-
-Single operation view example:
+One selected field as JSON:
 
 ```bash
-fsg --all examples/0.800_MnTe.mcif --show operation_views.convention_oriented.views.msg
+fsg structure.mcif --json --show properties
 ```
 
-Output excerpt:
+Results are written to stdout. Auto-selection notices and errors are written to
+stderr, so scripts can redirect them independently.
 
-```text
-MSG operations
-operation_count: 8
-indices: 1, 2, 3, 4, 5, 6, 7, 8
+## Full Analysis
 
-No. | Spin Rotation                      | Space Rotation                     | Space Translation | Seitz Symbol
-----+------------------------------------+------------------------------------+-------------------+-------------
-1   | [[1, 0, 0]; [0, 1, 0]; [0, 0, 1]]  | [[1, 0, 0]; [0, 1, 0]; [0, 0, 1]]  | [0, 0, 0]         | \left\{ 1 \,\middle\|\, 1 \,\middle|\, 0,0,0 \right\}
-2   | [[0, 1, 0]; [1, 0, 0]; [0, 0, -1]] | [[0, -1, 0]; [-1, 0, 0]; [0, 0, 1]] | [0, 0, 0]         | \left\{ 2_{110} \,\middle\|\, m_{110} \,\middle|\, 0,0,0 \right\}
-...
-```
-
-Long text artifact example:
+Use `--full` (alias: `--all`) only when the requested field/product needs it:
 
 ```bash
-fsg --all examples/0.800_MnTe.mcif --show kpoints
+fsg --full structure.mcif --show operation-views
+fsg --full structure.mcif --show magnetic_site_summary
+fsg --full slab.mcif --calculation-mode quasi2d --vacuum-axis c --show quasi_2d
 ```
 
-Output excerpt:
+`--full` requires at least one `--show FIELD`. A bare full result is both too
+large for a useful terminal answer and not a stable JSON contract. In Python,
+prefer
+`MagSymmetryResult.to_structured_dict()` to navigate the complete result by
+meaning; it is a Python view rather than a directly JSON-serializable contract.
 
-```text
-Generated by seekpath and findspingroup v0.15.6 (*** for spin splitting w/o SOC; ^^^ for spin splitting w/ SOC)
- 40
-Line-mode
-Reciprocal
-  0.000000   0.000000   0.000000 ! Γ
-  0.500000   0.000000   0.000000 ! M ^^^     | Σ ^^^
-```
+Common full-only aliases:
 
-## Full Route
+| Alias | Product |
+| --- | --- |
+| `operation-views`, `ops` | Operation-view summary |
+| `kpoints` | Generated KPOINTS text |
+| `poscar` | ACC-primitive magnetic POSCAR text |
+| `scif_default` | Default generated SCIF text |
+| `gspg` | Compact GSPG text |
+| `wp-chain` | Wyckoff-chain rows |
+
+## Inspect Spin Texture
 
 ```bash
-fsg --all path/to/structure.mcif
+fsg structure.mcif --show spin-texture-no-soc
+fsg structure.mcif --show spin-texture-soc
 ```
 
-Runs the full `MagSymmetryResult` route and prints the serialized payload.
+The output includes the leading wave/order, basis, nullity, spin rank, and
+coordinate setting. The free coefficients are not fitted material parameters.
 
-## Write SCIF
+Request per-order bases only when needed:
 
 ```bash
-fsg path/to/structure.mcif --write-scif output.scif
+fsg structure.mcif \
+  --spin-texture-basis-max-order 4 \
+  --show spin_texture_config_no_soc.basis_by_order
 ```
 
-Runs the full route once and writes a SCIF file. The default SCIF mode is
-`ssg_convention_oriented`.
+This option sets the search/output ceiling; it is not only a display toggle.
 
-Choose another available SCIF setting with `--scif-cell-mode`:
+## Generate Matched VASP Inputs
 
 ```bash
-fsg path/to/structure.mcif \
+fsg structure.mcif --write-poscar-kpoints calculation_inputs
+```
+
+Writes:
+
+- `calculation_inputs/POSCAR`;
+- `calculation_inputs/KPOINTS`.
+
+Both use the same ACC-primitive real-space setting. Existing same-named files
+are replaced, so choose a fresh output directory or preserve earlier files.
+
+## Export SCIF
+
+```bash
+fsg structure.mcif --write-scif output.scif
+```
+
+The default setting is `ssg_convention_oriented`. Choose another explicit
+cell/spin-frame mode when required:
+
+```bash
+fsg structure.mcif \
   --write-scif magnetic_primitive.scif \
   --scif-cell-mode magnetic_primitive_oriented
 ```
 
-Common `--scif-cell-mode` values:
+Use [SCIF Export](scif.md) to choose among convention, magnetic-primitive,
+database-standard, and input settings. An existing output file is replaced.
 
-- `ssg_convention_oriented`
-- `ssg_convention_cartesian`
-- `magnetic_primitive_oriented`
-- `magnetic_primitive_cartesian`
-- `database_standard_oriented`
-- `database_standard_cartesian`
-- `input_oriented`
-- `input_cartesian`
-
-Legacy aliases `magnetic_primitive`, `database_standard`, and
-`input_identified` are also accepted.
-
-## Write POSCAR And KPOINTS
+## Export Input-Cell Operations
 
 ```bash
-fsg path/to/structure.mcif --write-poscar-kpoints calc_inputs
+fsg -w structure.mcif
 ```
 
-Runs the full route once and writes:
+Writes `ssg_symm.json` and magnetic-primitive POSCAR text in the current
+directory. This specialized route exists for downstream programs that require
+the supplied cell setting.
 
-`calc_inputs/POSCAR`
-ACC magnetic primitive POSCAR.
+Before using a non-primitive input-cell operation list, inspect the written
+summary fields:
 
-`calc_inputs/KPOINTS`
-KPOINTS in the same acc-primitive real-space setting.
+- `is_input_magnetic_primitive`;
+- `input_ssg_may_be_incomplete`;
+- `warning`;
+- `primitive_ssg_index`.
 
-`--write-scif` and `--write-poscar-kpoints` can be used in one command; the
-structure is still analyzed only once.
+Existing same-named files are replaced.
 
-## Write Input-Cell Files
+## Quasi-2D Analysis
 
 ```bash
-fsg -w path/to/structure.mcif
+fsg --full structure.mcif \
+  --calculation-mode quasi2d \
+  --vacuum-axis c \
+  --show quasi_2d
 ```
 
-Runs the input-SSG route and writes files in the current directory.
+The vacuum axis is an input-cell axis. The quasi-2D workflow can adjust
+insufficient vacuum before its interpretation path, so inspect its returned
+cell/plane diagnostics rather than assuming a simple label change.
 
-Written files:
+## POSCAR And INCAR
 
-`ssg_symm.json`
-Input-cell SSG and MSG operation payload.
+For POSCAR-like inputs, the CLI allows and prefers `MAGMOM` from a sibling
+`INCAR`. If both embedded POSCAR moments and `INCAR` moments exist, the CLI uses
+the `INCAR` values.
 
-`input_poscar.vasp`
-Written for non-POSCAR inputs when the input cell is distinct from the magnetic
-primitive cell.
+The Python API defaults are deliberately different: sibling `INCAR` reading is
+off unless explicitly enabled. See [Input Formats](../guide/input-formats.md).
 
-`magnetic_primitive_poscar.vasp`
-Written for the magnetic primitive cell. If the input cell is already magnetic
-primitive, `input_poscar.vasp` is omitted to avoid a duplicate.
+## Numerical Tolerances
 
-## Quasi-2D Diagnostics
-
-```bash
-fsg --all --calculation-mode quasi2d --vacuum-axis c path/to/slab.mcif
+```text
+--space-tol 0.02
+--mtol 0.02
+--meigtol 0.00002
+--matrix-tol 0.01
+--parser-atol 0.02
 ```
 
-`--calculation-mode` requests additive quasi-2D diagnostics.
+Do not tune all values together. Read
+[Parameters And Reliability](../guide/reliability-and-tolerances.md) for the
+physical/numerical effect of each parameter.
 
-`--vacuum-axis` names the input-cell axis normal to the slab plane and is
-interpreted only for quasi-2D diagnostics.
+## Auto-Select An Input
 
-## Spin-Texture Basis Order
+With no `STRUCTURE` argument, `fsg` searches the current directory in this
+priority order:
 
-```bash
-fsg --all path/to/structure.mcif --spin-texture-basis-max-order 4 \
-  --show spin_texture_config_no_soc.basis_by_order
-```
+1. SCIF;
+2. mCIF;
+3. CIF with magnetic-moment tags;
+4. `POSCAR` with sibling `INCAR` `MAGMOM`;
+5. `POSCAR` with embedded `MAGMOM`;
+6. `.vasp`/`.poscar` with embedded `MAGMOM`;
+7. `CONTCAR`.
 
-By default, the CLI prints only the leading allowed spin-texture basis. Set
-`--spin-texture-basis-max-order N` to include `basis_by_order` entries from
-order 0 through order `N` in the computed no-SOC and SOC spin-texture
-configuration fields. This option is mainly for diagnostics and can increase
-runtime on large or high-symmetry cases.
+The selected file is reported on stderr. For reproducible scripts, pass the
+path explicitly.
 
-## Tolerance Flags
+## Batch Analysis
 
-`--space-tol`, `--space_tol`
-Spatial tolerance.
+Use `fsg-batch` for multiple structures. Batch runs write JSONL records and can
+compare against baselines or export selected fields. The operational batch
+workflow is documented separately in the repository's batch guide; do not use
+`fsg --full` as though `--full` meant “all files.”
 
-`--mtol`
-Magnetic-moment tolerance.
+## Legacy Options
 
-`--meigtol`
-Point-group eigenvalue tolerance.
-
-`--matrix-tol`, `--matrix_tol`
-Point-group standardization tolerance.
-
-`--parser-atol`, `--parser_atol`
-CIF and SCIF parser expansion tolerance.
-
-## Legacy Mode Selector
-
-`--mode {full,basic,acc-primitive,poscar-ssg,input-ssg}`
-Legacy route selector. New CLI usage should prefer the default route, `--all`,
-and `-w`.
-
-## Batch Commands
-
-Equivalent entry points:
-
-`fsg-batch`
-
-`findspingroup-batch`
-
-`findspin-batch`
-
-Minimal example:
-
-```bash
-fsg-batch tests/testset/mcif_241130_no2186 \
-  --output-dir /tmp/findspingroup_batch_smoke \
-  --limit 5
-```
-
-Export selected fields:
-
-```bash
-fsg-batch tests/testset/mcif_241130_no2186 \
-  --route basic \
-  --output-dir /tmp/findspingroup_basic \
-  --export-txt selected.txt \
-  --export-field index \
-  --export-field phase
-```
-
-`--export-field` accepts the same dot-path style used by `--show`. The selected
-fields are written into the text export for quick inspection.
-
-The batch JSONL files keep the complete per-case payloads:
-
-`records.jsonl`
-One record per processed input, including status, duration, error metadata, and
-compact result fields.
-
-`full_results.jsonl`
-Serialized result payloads. Use this when a field is not part of the compact
-record schema.
-
-Excel exports are produced by `scripts/export_mcif_results_to_excel.py`. The
-stable column contract lives in `src/findspingroup/output_schema.py`; the script
-extracts those fields from `full_results.jsonl`, formats nested payloads, and
-adds auxiliary sheets such as magnetic-site orbit details when available.
-
-## Python API Equivalents
-
-Use the Python API when another program should consume structured results
-directly:
-
-```python
-from findspingroup import find_spin_group_basic, find_spin_group
-
-basic = find_spin_group_basic("path/to/structure.mcif")
-full = find_spin_group("path/to/structure.mcif")
-
-scif = full.to_scif(cell_mode="ssg_convention_oriented")
-poscar = full.acc_primitive_magnetic_cell_poscar
-kpoints = full.KPOINTS
-```
+`--mode`, `--write-ssg-matrices`, `--write-symmetry-dat`, and
+`--ssg-matrix-setting` remain for compatibility. New user documentation uses
+quick analysis, `--full`, `--show`, explicit artifact writers, and `-w`.

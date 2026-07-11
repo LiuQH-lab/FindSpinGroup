@@ -18,7 +18,7 @@ display-friendly object.
     "conf": str,
     "phase": str,
     "acc": str,
-    "properties": BasicProperties,
+    "properties": SummaryProperties,
     "gspg": GSPGSummary,
     "spin_texture_config_database": dict | None,
     "spin_texture_config_no_soc": dict | None,
@@ -43,8 +43,23 @@ Magnetic phase classification.
 Spin arithmetic crystal class.
 
 `properties`
-Physical-property summary. It uses the same compact shape documented in
-[BasicResult](basic-result.md#properties).
+Six-field display summary:
+
+```python
+{
+    "ss_w_soc": str,
+    "ss_wo_soc": str,
+    "ahc_w_soc": str,
+    "ahc_wo_soc": str,
+    "is_alter": str,
+    "is_spin_orbit_magnet": str,
+}
+```
+
+This is narrower than `BasicResult["properties"]`: it does not include
+`magnetic_phase_base` or `magnetic_phase_modifier`. Use the structured
+`properties.magnetic_phase` layer or direct full-result attributes when those
+two fields are needed.
 
 ## `gspg`
 

@@ -1,63 +1,165 @@
-# Troubleshooting
+# Troubleshooting By Symptom
 
-This page answers common user questions that come up before reading the full
-reference.
+Start from the symptom and inspect the narrowest relevant output. Avoid changing
+several tolerances at once.
 
-## Which Function Should I Use?
+## “No Magnetic Moments Were Found”
 
-Use `find_spin_group_basic(...)` for the identified OSSG, MSG, and magnetic
-phase.
+FindSpinGroup requires a magnetic configuration.
 
-Use `find_spin_group(...)` for generated artifacts, operation payloads, quasi-2D
-diagnostics, tensor outputs, and audit information.
+- For mCIF/CIF/SCIF, confirm that supported magnetic-moment fields are present.
+- For POSCAR-like input, add embedded magnetic moments or run the CLI in a VASP
+  directory with a sibling `INCAR` containing `MAGMOM`.
+- Remember that Python does not read sibling `INCAR` files unless
+  `poscar_allow_incar_magmom=True`.
 
-Use `find_spin_group_input_ssg(...)` when another program needs input-cell SSG
-or MSG operations.
+See [Input Formats](input-formats.md).
 
-## Why Is The Full Output So Large?
+## The Identified Group Is Unexpected
 
-`find_spin_group(...)` returns `MagSymmetryResult`, which contains summary
-fields, multiple cell settings, operation outputs, generated files, physical
-properties, and diagnostics.
+First inspect the classification context:
 
-Use `result.to_summary_dict()` first. Use `result.to_structured_dict()` when
-you need the full result grouped by meaning. Use `result.to_dict()` only when
-you need the raw compatibility surface.
+```bash
+fsg structure.mcif \
+  --show index \
+  --show conf \
+  --show net_moment \
+  --show tolerances \
+  --show identify_index_details
+```
 
-## Why Do I Get A Missing Magnetic Moment Error?
+Then check:
 
-FindSpinGroup identifies magnetic symmetry. The input must contain magnetic
-moments in a supported format.
+1. moment coordinate frame and units;
+2. whether the file contains the intended magnetic cell/configuration;
+3. near-duplicate atomic positions or occupancies;
+4. moments close to zero or close to a collinear/coplanar boundary;
+5. sensitivity to one justified tolerance at a time.
 
-For POSCAR-like inputs, add embedded `MAGMOM` information or use the CLI from a
-VASP directory with a sibling `INCAR` that contains `MAGMOM`.
+Do not loosen every tolerance until the expected label appears. Follow
+[Parameters And Reliability](reliability-and-tolerances.md).
 
-## Why Does CLI POSCAR Behavior Differ From Python?
+## The Magnetic Phase Looks Wrong
 
-The CLI is optimized for VASP working directories and prefers a sibling `INCAR`
-`MAGMOM` when present.
+`magnetic_phase` is FindSpinGroup's rule-based symmetry classification, not a
+literature-name lookup. Inspect:
 
-Python calls read only the POSCAR content unless you opt into INCAR reading with
-`poscar_allow_incar_magmom=True`.
+```bash
+fsg structure.mcif --show magnetic_phase_details
+```
 
-## Does Quasi-2D Change The 3D SSG?
+Pay particular attention to:
 
-No. Quasi-2D analysis is an additive diagnostic layer. The ordinary 3D
-identification remains the base result.
+- `classification_rule`;
+- `net_moment` and `zero_net_moment_tol`;
+- `fm_like_by_spin_point_group`;
+- `spin_splitting_without_soc`;
+- the boolean altermagnet/SOM evidence.
 
-## Which Operation Setting Should I Use?
+A net moment near the `mtol`-derived threshold is intrinsically sensitive.
 
-Use convention-setting outputs for public OSSG symbols and display.
+## The Output Is Too Large
 
-Use input-cell outputs when a downstream tool expects the user-supplied cell.
+Use the default quick summary or select fields:
 
-Use ACC primitive outputs for downstream POSCAR and Brillouin-zone workflows.
+```bash
+fsg structure.mcif
+fsg structure.mcif --show properties
+fsg --full structure.mcif --show operation-views
+```
 
-Use database-standard outputs only when you need identify-index setting
-diagnostics or exact database-standard SCIF export.
+`--details` intentionally expands the quick summary. `--full` requires at
+least one `--show FIELD`; this prevents a huge raw compatibility payload from
+burying the result you actually need.
 
-## Should I Change Tolerances?
+In Python, start with `find_spin_group_basic(...)`. After full analysis, use
+`to_summary_dict()` or `to_structured_dict()` rather than printing
+`to_dict()`.
 
-Start with the defaults. Tighten tolerances only when your input structure is
-numerically clean enough. Loosen tolerances only when small structural or
-magnetic-moment noise prevents a physically expected match.
+## A `--show` Field Is Unknown Or Unavailable
+
+The command exits nonzero so scripts cannot silently accept `None`.
+
+- Check spelling and case in the [CLI Field Guide](../reference/cli-show-fields.md).
+- Add `--full` for a full-only field such as `operation_views` or generated
+  artifacts.
+- Do not mix BasicResult names with `SummaryResult` or raw full-result names.
+
+## POSCAR Results Differ Between CLI And Python
+
+The CLI allows and prefers sibling `INCAR` `MAGMOM`. Python file-path calls use
+embedded POSCAR moments unless explicitly opted into INCAR reading.
+
+To reproduce CLI behavior in Python:
+
+```python
+find_spin_group_basic(
+    "POSCAR",
+    poscar_allow_incar_magmom=True,
+    poscar_prefer_incar_magmom=True,
+)
+```
+
+## Input-Cell And Primitive OSSG Labels Differ
+
+This can be expected when the supplied cell is not magnetic primitive. For the
+input-cell export route, read:
+
+```text
+summary.is_input_magnetic_primitive
+summary.input_ssg_may_be_incomplete
+summary.warning
+summary.input_ssg_index
+summary.primitive_ssg_index
+```
+
+The input-cell operation set can be an incomplete subgroup. Use the primitive
+label as the complete reference and the input-cell operations only for a
+downstream setting requirement.
+
+## Which Cell Or Operation Setting Should I Use?
+
+- Convention setting: public OSSG symbol/presentation.
+- Input setting: only when a downstream tool expects the supplied cell.
+- ACC primitive: matched POSCAR/KPOINTS and common downstream reciprocal-space
+  workflows.
+- Database standard: identify-index validation and exact database-setting
+  export.
+
+Never combine coordinates from one setting with operations from another.
+
+## Quasi-2D Results Are Unexpected
+
+Confirm that `vacuum_axis` names the normal axis in the **input cell**:
+
+```bash
+fsg --full slab.mcif \
+  --calculation-mode quasi2d \
+  --vacuum-axis c \
+  --show quasi_2d
+```
+
+The quasi-2D workflow may regularize/extend insufficient vacuum before its
+interpretation path. Inspect plane, axis, and cell diagnostics rather than
+assuming it only edits the 3D output label.
+
+## A Parser Expansion Reports Inconsistent Moments
+
+This usually means symmetry expansion produced the same site with incompatible
+moments beyond `parser_atol`.
+
+1. Check the SCIF operation/spin-lattice data and moment precision.
+2. Regenerate the file from a trusted source when possible.
+3. Adjust `parser_atol` only if the discrepancy is known rounding noise.
+4. Do not change `space_tol`, `meigtol`, and `matrix_tol` as a substitute for a
+   parser-specific problem.
+
+## Generated Files Would Overwrite Existing Files
+
+Current artifact writers replace their target files. Use a fresh output path or
+move the existing files before running:
+
+```bash
+fsg structure.mcif --write-scif new/output.scif
+fsg structure.mcif --write-poscar-kpoints new/calc_inputs
+```

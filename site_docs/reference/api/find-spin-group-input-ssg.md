@@ -1,9 +1,11 @@
 # `find_spin_group_input_ssg`
 
-Input-cell operation route.
+Export SSG and MSG operations in the **user-supplied cell setting** for
+interoperability with another program.
 
-Use this function when a downstream tool needs SSG or MSG operations in the
-input-cell setting.
+This is not a competing canonical identification route. If the supplied cell
+is not magnetic primitive, its operation list can be incomplete relative to the
+primitive-cell symmetry.
 
 ## Signature
 
@@ -19,20 +21,42 @@ find_spin_group_input_ssg(
 ) -> dict
 ```
 
+## Safe Use Pattern
+
+```python
+from findspingroup import find_spin_group_input_ssg
+
+payload = find_spin_group_input_ssg("structure.mcif")
+summary = payload["summary"]
+
+if summary["input_ssg_may_be_incomplete"]:
+    print(summary["warning"])
+    print("input-cell label:", summary["input_ssg_index"])
+    print("primitive reference:", summary["primitive_ssg_index"])
+
+ssg_operations = payload["ssg"]["ops"]
+msg_operations = payload["msg"]["ops"]
+```
+
+Read the warning before consuming the operations. For a non-primitive input,
+`input_ssg_index` can be the label of an incomplete input-cell subgroup and can
+differ from `primitive_ssg_index`.
+
 ## Parameters
 
-`structure_file`
-Path to the input structure file.
+| Parameter | Default | Meaning |
+| --- | ---: | --- |
+| `structure_file` | required | Magnetic structure path. |
+| `space_tol` | `0.02` | Shared spatial matching and symmetry-detection tolerance. |
+| `mtol` | `0.02 μB` | Magnetic-moment matching and zero-moment tolerance. |
+| `meigtol` | `2e-5` | Spin point-group eigenvalue tolerance. |
+| `matrix_tol` | `0.01` | Matrix/standardization tolerance. |
+| `poscar_allow_incar_magmom` | `False` | Allow a sibling `INCAR` to provide `MAGMOM`. |
+| `poscar_prefer_incar_magmom` | `False` | Prefer sibling `INCAR` moments over embedded POSCAR moments. |
 
-`space_tol`, `mtol`, `meigtol`, `matrix_tol`
-Tolerance controls.
+## Return Value
 
-`poscar_allow_incar_magmom`, `poscar_prefer_incar_magmom`
-POSCAR / INCAR magnetic-moment controls.
-
-## Returns
-
-Returns an [InputSSGResult](../result-schemas/input-ssg-result.md) dictionary.
+Returns [`InputSSGResult`](../result-schemas/input-ssg-result.md):
 
 ```python
 {
@@ -46,96 +70,58 @@ Returns an [InputSSGResult](../result-schemas/input-ssg-result.md) dictionary.
 }
 ```
 
-## Returned Fields
+### Summary guard fields
 
-### `summary`
+| Field | Meaning |
+| --- | --- |
+| `is_input_magnetic_primitive` | Whether the supplied cell is already magnetic primitive. |
+| `input_ssg_may_be_incomplete` | Whether the input-cell operation set can omit primitive-cell symmetries. |
+| `warning` | Human-readable consequence and recommended interpretation. |
+| `input_ssg_index` | Label found from the input-cell operation set. |
+| `primitive_ssg_index` | Complete magnetic-primitive reference label. |
 
-`input_ssg_index`
-Identified SSG index for the input-cell setting.
+### Operation convention
 
-`primitive_ssg_index`
-Identified SSG index for the input magnetic primitive cell.
+An SSG operation acts as
 
-`input_conf`
-Input-cell magnetic configuration class.
-
-`input_magnetic_phase`
-Magnetic phase classification for the input-cell result.
-
-`input_msg_bns_number`, `input_msg_symbol`
-Input-cell MSG identifiers.
-
-`is_input_magnetic_primitive`
-Whether the supplied input cell is already magnetic primitive.
-
-`input_ssg_may_be_incomplete`
-Whether input-cell operations may miss primitive-cell symmetry operations.
-
-`warning`
-Explanation when the input-cell payload needs caution.
-
-### `ssg`
-
-Input-cell SSG operation payload.
-
-`setting`
-Real-space setting.
-
-`spin_frame_setting`
-Spin-frame setting.
-
-`ops`
-Input-cell SSG operations.
-
-Each item is an
-[SSGOperation](../result-schemas/payload-definitions.md#ssgoperation).
-
-### `msg`
-
-Input-cell oriented MSG operation payload.
-
-`setting`
-Real-space setting.
-
-`spin_frame_setting`
-Spin-frame setting.
-
-`ops`
-Input-cell oriented MSG operations.
-
-Each item is an
-[MSGOperation](../result-schemas/payload-definitions.md#msgoperation).
-
-### `primitive_relation`
-
-`T_input_to_input_magnetic_primitive`
-Transform from input cell to input magnetic primitive cell.
-
-See [TransformPayload](../result-schemas/payload-definitions.md#transformpayload).
-
-`determinant`
-Determinant of the transform.
-
-## Example
-
-```python
-from findspingroup import find_spin_group_input_ssg
-
-payload = find_spin_group_input_ssg("path/to/structure.mcif")
-
-print(payload["summary"]["input_ssg_index"])
-print(payload["summary"]["primitive_ssg_index"])
-print(payload["ssg"]["ops"])
+```text
+r' = R r + t
+m' = S m
 ```
 
-## Notes
+where `real_rotation = R` and fractional `translation = t` use the payload's
+real-space `setting`, while `spin_rotation = S` uses its
+`spin_frame_setting`.
 
-The CLI equivalent is:
+An MSG operation stores `real_rotation`, fractional `translation`, and
+`time_reversal`:
+
+- `time_reversal = +1`: ordinary operation;
+- `time_reversal = -1`: operation containing time reversal.
+
+For axial magnetic moments, the associated spin action follows the route's MSG
+convention based on `time_reversal * det(R) * R`.
+
+### Primitive relation
+
+`T_input_to_input_magnetic_primitive` maps input fractional coordinates to the
+input magnetic primitive cell (modulo lattice translations). The absolute
+determinant is the input-cell volume multiple relative to the magnetic
+primitive cell; a value near one indicates that the input is magnetic
+primitive.
+
+## CLI Equivalent
 
 ```bash
-fsg -w path/to/structure.mcif
+fsg -w structure.mcif
 ```
 
-This writes `ssg_symm.json`. It also writes `magnetic_primitive_poscar.vasp`;
-`input_poscar.vasp` is written only when a non-POSCAR input cell is distinct
-from the magnetic primitive cell.
+This writes:
+
+- `ssg_symm.json`;
+- `magnetic_primitive_poscar.vasp`;
+- `input_poscar.vasp` when a distinct input-cell POSCAR representation is
+  useful.
+
+The command writes into the current directory; move existing files first if
+they must not be replaced.

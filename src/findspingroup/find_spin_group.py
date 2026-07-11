@@ -100,6 +100,12 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if isinstance(obj, SpinSpaceGroupOperation):
+            return {
+                "spin_rotation": np.asarray(obj.spin_rotation, dtype=float).tolist(),
+                "real_rotation": np.asarray(obj.rotation, dtype=float).tolist(),
+                "translation": np.asarray(obj.translation, dtype=float).tolist(),
+            }
         return super(NumpyEncoder, self).default(obj)
 
 
@@ -10653,19 +10659,32 @@ def find_spin_group(
     spin_texture_basis_max_order: int | None = None,
     components=None,
 ) -> MagSymmetryResult:
-    """
-    Find the spin space group of a crystal structure given in a CIF file.
+    """Run full spin-space-symmetry analysis for a magnetic structure.
 
-    Parameters:
-    cif (str): Path to the CIF file.
-    space_tol (float): Tolerance for space group determination.
-    mtol (float): Tolerance for magnetic moment determination.
-    meigtol (float): Tolerance for eigenvalue determination.
-    matrix_tol (float): Tolerance for point-group standardization matrices.
-    parser_atol (float): Parsing tolerance for CIF / SCIF structure expansion.
+    Use this route when explicit operations, cell settings, tensor/site
+    constraints, quasi-2D interpretation, or generated SCIF/POSCAR/KPOINTS are
+    required. For identification and screening, prefer
+    :func:`find_spin_group_basic`.
 
-    Returns:
-    dict: A dictionary containing the spin space group information and related data.
+    ``space_tol`` controls shared spatial matching, ``mtol`` controls magnetic
+    moment equivalence and the zero-net-moment decision, ``meigtol`` controls
+    spin point-group eigenvalue decisions, and ``matrix_tol`` controls matrix
+    and standardization comparisons. ``parser_atol`` is primarily a
+    parser-side expanded-moment consistency tolerance.
+
+    Set ``calculation_mode="quasi2d"`` with the intended input-cell
+    ``vacuum_axis`` for slab interpretation. Python does not read a sibling
+    INCAR for POSCAR moments unless ``poscar_allow_incar_magmom`` is enabled.
+    ``spin_texture_basis_max_order`` sets the spin-texture search/output
+    ceiling and includes per-order bases through that degree.
+
+    Returns
+    -------
+    MagSymmetryResult
+        Full analysis object. Use ``to_structured_dict()`` to navigate the
+        complete result by semantic layer in Python and ``to_summary_dict()``
+        for compact display. The structured view retains operation/domain
+        objects and is not a directly JSON-serializable contract.
     """
 
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
@@ -10709,6 +10728,24 @@ def find_spin_group_basic(
     poscar_prefer_incar_magmom: bool = False,
     spin_texture_basis_max_order: int | None = None,
 ) -> dict:
+    """Run the recommended quick identification and screening analysis.
+
+    The returned dictionary contains the OSSG/MSG identifiers, moment geometry,
+    magnetic-phase classification, symmetry permission for spin splitting and
+    AHC, leading no-SOC/SOC spin textures, vector constraints, and numerical
+    context. ``Yes``/``No`` property values are symmetry statements, not
+    calculated response magnitudes.
+
+    Numerical and input-source parameters have the same meaning as in
+    :func:`find_spin_group`. ``spin_texture_basis_max_order`` sets the search
+    and output ceiling for per-order spin-texture bases.
+
+    Returns
+    -------
+    dict
+        JSON-serializable BasicResult. Read ``index``, ``msg_bns_number``,
+        ``msg_symbol``, ``conf``, ``magnetic_phase``, and ``properties`` first.
+    """
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     parsed, _source_metadata = parse_structure_file(
         cif,

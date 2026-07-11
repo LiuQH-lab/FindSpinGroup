@@ -14,7 +14,11 @@ fsg path/to/structure.mcif
 
 Use `BasicResult` for compact identification and screening.
 
-## Shape
+## Selected Shape
+
+The following block shows the main fields, not every compatibility or
+diagnostic key. Use the sections below and the live dictionary keys when
+maintaining a complete integration.
 
 ```python
 {
@@ -105,10 +109,12 @@ Spin arithmetic crystal class symbol.
 `empg`
 Effective magnetic point-group symbol.
 
-## Input SG And MSG
+## Spatial SG And MSG
 
 `space_group_symbol`, `space_group_number`
-Input real-space group symbol and number.
+Ordinary real-space group symbol and number detected on the route's magnetic
+cell after moment directions are ignored. Do not assume that this label alone
+describes the unreduced input-cell setting.
 
 `sg_is_polar`, `sg_is_chiral`
 Polar and chiral flags for the input space group.
@@ -140,7 +146,7 @@ Classifier evidence and diagnostic details. Important keys include `conf`,
 `is_spin_orbit_magnet`.
 
 `net_moment`
-Net magnetic moment magnitude used by the classifier.
+Magnitude of the magnetic-cell moment sum used by the classifier, in μB.
 
 `zero_net_moment_tol`
 Tolerance used for zero-net-moment decisions.
@@ -199,8 +205,9 @@ Diagnostic payload from the identify-index route.
 Diagnostic payload describing how the ACC primitive route was resolved.
 
 `tolerances`
-Effective tolerance values: `space_tol`, `mtol`, `meigtol`, `matrix_tol`, and
-`parser_atol`.
+Effective core tolerance values: `space_tol`, `mtol`, `meigtol`, and
+`matrix_tol`. `parser_atol` is a call/input-parser setting and is not serialized
+inside this BasicResult mapping.
 
 `quasi_2d`
 `None` for the basic public 3D route.

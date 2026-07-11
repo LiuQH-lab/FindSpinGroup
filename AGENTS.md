@@ -1,5 +1,11 @@
 ## FindSpinGroup Local Guardrails
 
+For tasks that use or interpret FindSpinGroup rather than modify its internal
+algorithms, read and follow [`FSG_AGENT_GUIDE.md`](FSG_AGENT_GUIDE.md) before
+choosing a CLI route, Python API, output interpretation, or setting transform.
+The guide is an AI execution protocol; the guardrails below remain authoritative
+for code changes.
+
 - Do not add silent fallback candidates in the G0std/no-fraction or
   identify-index ACC-P standard-cell selection path. If the selected
   standard-cell transform cannot carry the paired `(cell, SSG)` through the

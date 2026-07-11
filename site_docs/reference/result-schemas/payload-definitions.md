@@ -3,8 +3,11 @@
 These reusable payloads appear inside `BasicResult`, `SummaryResult`,
 `StructuredResult`, and `InputSSGResult`.
 
-Use this page when a schema says a field is an `SSGPayload`, `MSGOperation`,
-`CellPayload`, or another nested object.
+Use this page when a schema says a field is an `SSGPayload`, serialized
+`SSGOperation`, `CellPayload`, or another nested object. Pay attention to the
+operation representation: JSON-facing routes use dictionaries, while
+`to_structured_dict()` currently retains Python operation objects and raw MSG
+triples.
 
 ## `SSGPayload`
 
@@ -14,7 +17,7 @@ Spin space group operations in one named cell setting.
 {
     "setting": str,
     "spin_frame_setting": str | None,
-    "ops": list[SSGOperation] | None,
+    "ops": list[SpinSpaceGroupOperation] | None,
     "seitz": list[str] | None,
     "seitz_latex": list[str] | None,
     "seitz_descriptions": list[SeitzDescription] | None,
@@ -33,7 +36,16 @@ Spin-frame setting used by `spin_rotation`. `None` means the payload does not
 need a separate spin-frame label or the value was not recorded for that route.
 
 `ops`
-One-based list of spin space group operation matrices. See `SSGOperation`.
+Ordered Python list of `SpinSpaceGroupOperation` objects. Each object exposes
+`.spin_rotation`, `.rotation`, and `.translation` NumPy arrays and a `.tolist()`
+method returning `[spin_rotation, real_rotation, translation]`. List positions
+align with the corresponding `seitz`, `seitz_latex`, and
+`seitz_descriptions` positions.
+
+This field is **not** the serialized dictionary shape below and is not directly
+JSON serializable. Use an `operation_views` payload or
+`find_spin_group_input_ssg(...)` when a downstream program requires serialized
+operation dictionaries.
 
 `seitz`
 Linear Seitz-style symbols for the same operations in `ops`.
@@ -58,7 +70,9 @@ SSG type or route-specific type label when available.
 
 ## `SSGOperation`
 
-One spin space group operation.
+One JSON-facing spin space group operation. This is the representation used by
+`InputSSGResult["ssg"]["ops"]` and operation-view payloads, not by
+`StructuredResult["groups"]["ssg_by_cell"][...]["ops"]`.
 
 ```python
 {
@@ -70,8 +84,7 @@ One spin space group operation.
 ```
 
 `index`
-One-based operation index. The same index aligns with `seitz`,
-`seitz_latex`, and `seitz_descriptions` when those lists are present.
+One-based display index.
 
 `spin_rotation`
 `3 x 3` spin-space rotation matrix in the payload's spin frame.
@@ -91,7 +104,7 @@ Magnetic space group operations in one named cell setting.
 {
     "setting": str,
     "spin_frame_setting": str | None,
-    "ops": list[MSGOperation] | None,
+    "ops": list[list] | None,
 }
 ```
 
@@ -102,11 +115,22 @@ Real-space cell setting used by the MSG operation matrices and translations.
 Spin-frame label used by the route that produced the oriented MSG payload.
 
 `ops`
-One-based list of magnetic space group operations. See `MSGOperation`.
+Ordered Python list of raw triples:
+
+```python
+[time_reversal, real_rotation, translation]
+```
+
+`time_reversal` is `+1` for an ordinary operation and `-1` for an operation
+containing time reversal. The two matrix/vector values are NumPy arrays in the
+payload's reported setting. This raw representation is not the serialized
+dictionary shape below.
 
 ## `MSGOperation`
 
-One magnetic space group operation.
+One JSON-facing magnetic space group operation. This is the representation
+used by `InputSSGResult["msg"]["ops"]` and operation-view payloads, not by
+`StructuredResult["groups"]["msg_by_cell"][...]["ops"]`.
 
 ```python
 {
@@ -121,7 +145,8 @@ One magnetic space group operation.
 One-based operation index.
 
 `time_reversal`
-`0` for an ordinary operation and `1` for an anti-time-reversal operation.
+`+1` for an ordinary operation and `-1` for an operation containing time
+reversal.
 
 `real_rotation`
 `3 x 3` real-space rotation matrix in the payload's real-space setting.

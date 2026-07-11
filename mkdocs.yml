@@ -1,5 +1,5 @@
-site_name: findspingroup
-site_description: Spin space group symmetry analysis toolkit for magnetic materials
+site_name: FindSpinGroup
+site_description: FindSpinGroup spin space group symmetry analysis for magnetic materials
 site_url: https://findspingroup.readthedocs.io/
 repo_url: https://github.com/LiuQH-lab/FindSpinGroup
 repo_name: LiuQH-lab/FindSpinGroup
@@ -8,22 +8,23 @@ theme:
   name: readthedocs
 nav:
   - Home: index.md
-  - Guide:
-      - Overview: guide/index.md
-      - Getting Started: guide/getting-started.md
-      - Choosing an API: guide/choosing-an-api.md
-      - Understanding Results: guide/understanding-results.md
-      - Concepts: guide/concepts.md
-      - Input Formats: guide/input-formats.md
-      - Examples: guide/examples.md
-      - Troubleshooting: guide/troubleshooting.md
-  - Reference:
-      - Overview: reference/index.md
-      - Python API:
-          - Overview: reference/python-api.md
-          - find_spin_group_basic: reference/api/find-spin-group-basic.md
-          - find_spin_group: reference/api/find-spin-group.md
-          - find_spin_group_input_ssg: reference/api/find-spin-group-input-ssg.md
+  - Quickstart: guide/getting-started.md
+  - Interpret Your Result: guide/understanding-results.md
+  - Choose A Workflow: guide/choosing-an-api.md
+  - Parameters And Reliability: guide/reliability-and-tolerances.md
+  - Input Formats: guide/input-formats.md
+  - CLI By Task: reference/cli.md
+  - Python API:
+      - Choose A Function: reference/python-api.md
+      - find_spin_group_basic: reference/api/find-spin-group-basic.md
+      - find_spin_group: reference/api/find-spin-group.md
+      - find_spin_group_input_ssg: reference/api/find-spin-group-input-ssg.md
+  - Examples: guide/examples.md
+  - Troubleshooting: guide/troubleshooting.md
+  - Concepts And Settings: guide/concepts.md
+  - Complete Reference:
+      - Reference Overview: reference/index.md
+      - CLI Field Guide: reference/cli-show-fields.md
       - MagSymmetryResult Object: reference/magsymmetry-result.md
       - Result Schemas:
           - Overview: reference/result-schemas/index.md
@@ -33,8 +34,6 @@ nav:
           - InputSSGResult: reference/result-schemas/input-ssg-result.md
           - Payload Definitions: reference/result-schemas/payload-definitions.md
           - BatchExport: reference/result-schemas/batch-export.md
-      - CLI: reference/cli.md
-      - CLI Show Fields: reference/cli-show-fields.md
       - SCIF Export: reference/scif.md
   - Advanced Notes:
       - Overview: advanced/index.md

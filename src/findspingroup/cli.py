@@ -25,6 +25,7 @@ from .find_spin_group import (
     write_poscar_ssg_symmetry_dat,
     write_ssg_operation_matrices,
 )
+from .version import __version__
 
 
 _AUTO_INPUT_EXTENSIONS = {".scif", ".mcif", ".cif", ".vasp", ".poscar"}
@@ -403,6 +404,14 @@ def _format_generic_list(value: list, *, indent: int = 0) -> str:
     if not value:
         return f"{prefix}(empty)"
     if all(isinstance(item, dict) for item in value):
+        if all("basis" in item for item in value):
+            lines = []
+            for index, item in enumerate(value, start=1):
+                label = item.get("order")
+                heading = f"order {label}" if label is not None else f"entry {index}"
+                lines.append(f"{prefix}{heading}:")
+                lines.append(_format_show_value(item, indent=indent + 2))
+            return "\n".join(lines)
         scalar_keys = []
         for key in value[0].keys():
             if all(not isinstance(item.get(key), (dict, list)) for item in value):
@@ -472,7 +481,11 @@ def _emit_payload(payload, show_paths: list[str] | None, *, output_json: bool = 
             missing.append(path)
 
     if missing:
-        print(f"[fsg] Missing fields: {', '.join(missing)}", file=sys.stderr)
+        names = ", ".join(repr(path) for path in missing)
+        raise ValueError(
+            f"Unknown or unavailable --show field(s): {names}. "
+            "The field may require --full; see `fsg --help` or the CLI field guide."
+        )
 
     if output_json:
         if len(show_paths) == 1:
@@ -538,7 +551,35 @@ def _format_spin_texture_wave_basis(payload: dict | None) -> str:
         basis_text = "; ".join(str(item) for item in basis) if basis else "none"
     else:
         basis_text = str(basis)
-    return f"wave={_format_optional(wave)}; basis={basis_text}"
+    parts = [f"wave={_format_optional(wave)}"]
+    if payload.get("basis_setting"):
+        parts.append(f"setting={payload['basis_setting']}")
+    parts.append(f"basis={basis_text}")
+    return "; ".join(parts)
+
+
+def _format_symmetry_permission(value) -> str:
+    if value == "Yes":
+        return "allowed"
+    if value == "No":
+        return "forbidden"
+    return _format_optional(value)
+
+
+def _format_spin_texture_headline(payload: dict | None) -> str:
+    if not isinstance(payload, dict):
+        return "not available"
+    wave = payload.get("spin_texture_type") or payload.get("wave_type")
+    if wave is None:
+        return "not available"
+    details = []
+    if payload.get("order") is not None:
+        details.append(f"order {payload['order']}")
+    configuration = payload.get("momentum_space_spin_configuration")
+    if configuration and configuration != "zero":
+        details.append(str(configuration))
+    suffix = f" ({', '.join(details)})" if details else ""
+    return f"{wave}{suffix}"
 
 
 def _format_net_moment(payload: dict) -> str:
@@ -546,9 +587,9 @@ def _format_net_moment(payload: dict) -> str:
     tol = payload.get("zero_net_moment_tol")
     if value is None and tol is None:
         return "-"
-    text = _format_optional(value)
+    text = f"{_format_optional(value)} μB"
     if tol is not None:
-        text += f" (zero tol {tol})"
+        text += f" (zero tol {tol} μB)"
     return text
 
 
@@ -605,10 +646,13 @@ _VECTOR_CONSTRAINT_ORDER = tuple(_VECTOR_CONSTRAINT_LABELS)
 def _format_vector_constraint_entry(key: str, payload: dict) -> str:
     label = _VECTOR_CONSTRAINT_LABELS.get(key, key)
     free_dimension = payload.get("free_dimension")
-    axes = _format_axes(payload.get("allowed_axes"))
+    allowed_axes = payload.get("allowed_axes")
+    axes = _format_axes(allowed_axes)
+    setting = payload.get("allowed_axes_setting")
+    setting_suffix = f" @ {setting}" if allowed_axes and setting else ""
     if free_dimension is None:
-        return f"{label}={axes}"
-    return f"{label}={free_dimension}D {axes}"
+        return f"{label}={axes}{setting_suffix}"
+    return f"{label}={free_dimension}D {axes}{setting_suffix}"
 
 
 def _format_vector_constraint_scope(scope_payload: dict | None) -> str:
@@ -643,6 +687,43 @@ def _format_vector_constraint_scope_with_flags(
 
 
 def _emit_basic_summary(payload: dict, *, source: str | None = None) -> None:
+    properties = payload.get("properties") or {}
+    phase = payload.get("magnetic_phase") or payload.get("phase")
+    phase_text = _format_optional(phase)
+    if phase_text != "-":
+        phase_text = " ".join(phase_text.splitlines())
+    lines = ["FindSpinGroup result"]
+    if source:
+        lines.append(f"Input: {source}")
+    lines.extend(
+        [
+            f"OSSG: {_format_optional(payload.get('index'))}",
+            f"MSG with SOC: {_format_msg_summary(payload)}",
+            "Magnetic order: "
+            f"{_format_optional(payload.get('conf'))}; {phase_text}",
+            "Net moment: "
+            f"{_format_number(payload.get('net_moment'))} μB "
+            f"(zero threshold: {_format_number(payload.get('zero_net_moment_tol'))} μB)",
+            "",
+            "Symmetry-allowed responses:",
+            "  Spin splitting: "
+            f"without SOC {_format_symmetry_permission(properties.get('ss_wo_soc'))}; "
+            f"with SOC {_format_symmetry_permission(properties.get('ss_w_soc'))}",
+            "  AHC: "
+            f"without SOC {_format_symmetry_permission(properties.get('ahc_wo_soc'))}; "
+            f"with SOC {_format_symmetry_permission(properties.get('ahc_w_soc'))}",
+            "  Leading spin texture: "
+            f"without SOC {_format_spin_texture_headline(payload.get('spin_texture_config_no_soc'))}; "
+            f"with SOC {_format_spin_texture_headline(payload.get('spin_texture_config_soc'))}",
+            "",
+            "Interpretation: allowed/forbidden are symmetry statements, not calculated magnitudes.",
+            "More: `--details`, `--show FIELD`, `--json`, or `fsg --help`.",
+        ]
+    )
+    print("\n".join(lines))
+
+
+def _emit_detailed_basic_summary(payload: dict, *, source: str | None = None) -> None:
     properties = payload.get("properties") or {}
     vector_constraints = payload.get("vector_constraints_by_symmetry")
     lines = []
@@ -790,27 +871,52 @@ def _validate_route_options(args) -> None:
         raise ValueError("`--spin-texture-basis-max-order` must be non-negative.")
 
     artifact_writes = bool(args.write_scif or args.write_poscar_kpoints)
+    if args.details and (
+        args.mode is not None
+        or args.all
+        or args.write
+        or artifact_writes
+        or args.show
+        or args.json
+    ):
+        raise ValueError(
+            "`--details` expands the default quick summary and cannot be combined "
+            "with another analysis/output selector."
+        )
     if args.mode is not None:
         if args.all or args.write or args.show or artifact_writes:
             raise ValueError(
-                "Use either legacy `--mode` or the new `--all/--show/-w/write-artifact` flags, not both."
+                "Use either legacy `--mode` or the new `--full/--show/-w/write-artifact` flags, not both."
             )
     elif args.all and (args.write or artifact_writes):
-        raise ValueError("`--all` cannot be combined with `-w/--write` or write-artifact flags.")
+        raise ValueError("`--full/--all` cannot be combined with `-w/--write` or write-artifact flags.")
     elif args.write and artifact_writes:
         raise ValueError("`-w/--write` cannot be combined with write-artifact flags.")
+    elif args.write and (args.show or args.json):
+        raise ValueError("`-w/--write` cannot be combined with `--show` or `--json`.")
     elif artifact_writes and (args.show or args.json):
         raise ValueError("Write-artifact flags cannot be combined with `--show` or `--json`.")
 
+    if args.all and not args.show:
+        raise ValueError(
+            "`--full/--all` requires at least one `--show FIELD`; the raw full result "
+            "is too large and is not a stable JSON contract. Example: "
+            "`fsg --full FILE --show operation-views`."
+        )
+
     if args.write_ssg_matrices and args.mode != "acc-primitive":
         raise ValueError("`--write-ssg-matrices` is only valid with `--mode acc-primitive`.")
+    if args.ssg_matrix_setting is not None and not args.write_ssg_matrices:
+        raise ValueError("`--ssg-matrix-setting` requires `--write-ssg-matrices`.")
     if args.write_symmetry_dat and args.mode not in {"input-ssg", "poscar-ssg"}:
         raise ValueError("`--write-symmetry-dat` is only valid with `--mode input-ssg` or `--mode poscar-ssg`.")
+    if args.scif_cell_mode is not None and not args.write_scif:
+        raise ValueError("`--scif-cell-mode` requires `--write-scif`.")
 
     if args.calculation_mode != "3d" and not _uses_full_route(args):
-        raise ValueError("`--calculation-mode` is only supported by the full route; use `--all` or `--mode full`.")
+        raise ValueError("`--calculation-mode` requires full analysis; use `--full`.")
     if args.vacuum_axis != "c" and not _uses_full_route(args):
-        raise ValueError("`--vacuum-axis` is only supported by the full route; use `--all` or `--mode full`.")
+        raise ValueError("`--vacuum-axis` requires full analysis; use `--full`.")
 
 
 def _legacy_mode_payload(args):
@@ -841,9 +947,10 @@ def _legacy_mode_payload(args):
             **poscar_magmom_kwargs,
         )
         if args.write_ssg_matrices:
+            matrix_setting = args.ssg_matrix_setting or "acc-primitive"
             key = (
                 "acc_primitive_ssg_operation_matrices"
-                if args.ssg_matrix_setting == "acc-primitive"
+                if matrix_setting == "acc-primitive"
                 else "acc_primitive_poscar_spin_frame_ssg_operation_matrices"
             )
             write_ssg_operation_matrices(args.write_ssg_matrices, payload[key])
@@ -888,117 +995,164 @@ def _legacy_mode_payload(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Calculate Spin Space Groups from magnetic structure files.")
-    parser.epilog = (
-        "For POSCAR-like inputs, the CLI prefers MAGMOM from a sibling INCAR "
-        "when present. Direct Python calls read only embedded POSCAR MAGMOM "
-        "unless explicitly opted into INCAR reading."
+    parser = argparse.ArgumentParser(
+        prog="fsg",
+        usage="fsg [OPTIONS] [STRUCTURE]",
+        description=(
+            "Identify spin-space symmetry and symmetry-allowed physical responses\n"
+            "from a structure containing magnetic moments."
+        ),
+        epilog=(
+            "Examples:\n"
+            "  fsg structure.mcif\n"
+            "  fsg structure.mcif --show index --show magnetic_phase\n"
+            "  fsg structure.mcif --show properties\n"
+            "  fsg --full structure.mcif --show operation-views\n"
+            "  fsg structure.mcif --write-poscar-kpoints calc_inputs\n\n"
+            "Without STRUCTURE, fsg searches the current directory for a magnetic\n"
+            "SCIF, mCIF, CIF, or POSCAR-like input. For POSCAR-like inputs the CLI\n"
+            "prefers MAGMOM from a sibling INCAR when present.\n\n"
+            "Results go to stdout; auto-selection messages and errors go to stderr."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("structure_file", nargs="?", help="Path to the magnetic structure file")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument(
-        "--mode",
-        choices=["full", "basic", "acc-primitive", "poscar-ssg", "input-ssg"],
-        default=None,
-        help="Legacy route selector. Prefer the default/basic flow, `--all`, or `-w` for new usage.",
+        "structure_file",
+        nargs="?",
+        metavar="STRUCTURE",
+        help="Magnetic .mcif/.cif/.scif or POSCAR-like file; omit to auto-detect.",
     )
-    parser.add_argument("--all", action="store_true", help="Run the full MagSymmetryResult route.")
-    parser.add_argument(
+
+    output_group = parser.add_argument_group("analysis level and output")
+    output_group.add_argument(
+        "--full",
+        "--all",
+        dest="all",
+        action="store_true",
+        help="Run full analysis for selected --show fields; requires at least one --show FIELD.",
+    )
+    output_group.add_argument(
+        "--details",
+        action="store_true",
+        help="Expand the default quick summary with group components, bases, and vector constraints.",
+    )
+    output_group.add_argument(
         "--json",
         action="store_true",
-        help="Print the complete JSON payload for the selected route. The default basic route prints a short summary.",
+        help="Print the selected analysis payload as machine-readable JSON.",
     )
-    parser.add_argument(
+    output_group.add_argument(
         "--show",
         action="append",
         default=[],
         metavar="FIELD",
-        help="Show only selected field(s). Supports dot paths like `summary.input_ssg_index`.",
+        help="Print one field; repeat as needed. Supports dot paths such as properties.ss_wo_soc.",
     )
-    parser.add_argument(
+
+    export_group = parser.add_argument_group("file export")
+    export_group.add_argument(
         "-w",
         "--write",
         action="store_true",
-        help="Run the input-SSG route and write `ssg_symm.json` plus optional POSCAR files to the current directory.",
+        help="Write input-cell operations and magnetic-primitive POSCAR files to the current directory.",
     )
-    parser.add_argument(
+    export_group.add_argument(
         "--write-scif",
         metavar="PATH",
-        help="Run the full route and write a SCIF file to PATH.",
+        help="Run full analysis and write SCIF to PATH (replaces an existing file).",
     )
-    parser.add_argument(
+    export_group.add_argument(
         "--scif-cell-mode",
         choices=_SCIF_CELL_MODE_CHOICES,
-        default=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
-        help=(
-            "Cell/spin-frame setting for --write-scif. "
-            "Default: ssg_convention_oriented."
-        ),
+        default=None,
+        help="Cell/spin-frame setting for --write-scif (default: ssg_convention_oriented).",
     )
-    parser.add_argument(
+    export_group.add_argument(
         "--write-poscar-kpoints",
         metavar="DIR",
-        help="Run the full route and write acc-primitive POSCAR and KPOINTS files into DIR.",
+        help="Write matched ACC-primitive POSCAR and KPOINTS into DIR (replaces same-named files).",
     )
-    parser.add_argument(
-        "--write-ssg-matrices",
-        help="When used with --mode acc-primitive, write the selected SSG operation matrices to a JSON file.",
+
+    interpretation_group = parser.add_argument_group("physical interpretation")
+    interpretation_group.add_argument(
+        "--calculation-mode",
+        choices=["auto", "quasi2d", "2d", "3d", "bulk", "slab", "layer"],
+        default="3d",
+        help="Use quasi2d/2d/slab/layer for slab interpretation; default: 3d.",
     )
-    parser.add_argument(
-        "--write-symmetry-dat",
-        help="Legacy single-file writer for --mode input-ssg/poscar-ssg.",
+    interpretation_group.add_argument(
+        "--vacuum-axis",
+        choices=["a", "b", "c", "x", "y", "z", "0", "1", "2"],
+        default="c",
+        help="Input-cell axis normal to the slab for quasi-2D analysis; default: c.",
     )
-    parser.add_argument(
-        "--ssg-matrix-setting",
-        choices=["acc-primitive", "poscar-spin-frame"],
-        default="acc-primitive",
-        help="Which SSG setting to export when --write-ssg-matrices is used.",
+    interpretation_group.add_argument(
+        "--spin-texture-basis-max-order",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Set the spin-texture search/output ceiling and emit basis_by_order through degree N.",
     )
-    parser.add_argument(
+
+    tolerance_group = parser.add_argument_group("advanced numerical tolerances")
+    tolerance_group.add_argument(
         "--space-tol",
         "--space_tol",
         dest="space_tol",
         type=float,
         default=0.02,
-        help="Spatial tolerance",
+        help="Shared spatial matching tolerance; default: 0.02.",
     )
-    parser.add_argument("--mtol", type=float, default=0.02, help="Magnetic tolerance")
-    parser.add_argument("--meigtol", type=float, default=0.00002, help="Point-group eigenvalue tolerance")
-    parser.add_argument(
+    tolerance_group.add_argument(
+        "--mtol",
+        type=float,
+        default=0.02,
+        help="Magnetic-moment and zero-net-moment tolerance in μB; default: 0.02.",
+    )
+    tolerance_group.add_argument(
+        "--meigtol",
+        type=float,
+        default=0.00002,
+        help="Spin point-group eigenvalue tolerance; default: 2e-5.",
+    )
+    tolerance_group.add_argument(
         "--matrix-tol",
         "--matrix_tol",
         dest="matrix_tol",
         type=float,
         default=0.01,
-        help="Point-group standardization tolerance",
+        help="Matrix/standardization tolerance; default: 0.01.",
     )
-    parser.add_argument(
+    tolerance_group.add_argument(
         "--parser-atol",
         "--parser_atol",
         dest="parser_atol",
         type=float,
         default=0.02,
-        help="CIF/SCIF parser expansion tolerance",
+        help="Parser-side expanded-moment consistency tolerance; default: 0.02.",
     )
-    parser.add_argument(
-        "--calculation-mode",
-        choices=["auto", "quasi2d", "2d", "3d", "bulk", "slab", "layer"],
-        default="3d",
-        help="Quasi-2D interpretation mode for additive diagnostics.",
-    )
-    parser.add_argument(
-        "--vacuum-axis",
-        choices=["a", "b", "c", "x", "y", "z", "0", "1", "2"],
-        default="c",
-        help="Input-cell vacuum axis for --calculation-mode quasi2d/2d.",
-    )
-    parser.add_argument(
-        "--spin-texture-basis-max-order",
-        type=int,
+
+    legacy_group = parser.add_argument_group("legacy and specialized compatibility")
+    legacy_group.add_argument(
+        "--mode",
+        choices=["full", "basic", "acc-primitive", "poscar-ssg", "input-ssg"],
         default=None,
-        help=(
-            "If set, include spin-texture basis_by_order from order 0 through this order. "
-            "Default emits only the leading allowed basis."
-        ),
+        help="Legacy route selector; prefer quick analysis, --full, or -w.",
+    )
+    legacy_group.add_argument(
+        "--write-ssg-matrices",
+        help="When used with --mode acc-primitive, write the selected SSG operation matrices to a JSON file.",
+    )
+    legacy_group.add_argument(
+        "--write-symmetry-dat",
+        help="Legacy single-file writer for --mode input-ssg/poscar-ssg.",
+    )
+    legacy_group.add_argument(
+        "--ssg-matrix-setting",
+        choices=["acc-primitive", "poscar-spin-frame"],
+        default=None,
+        help="Which SSG setting to export when --write-ssg-matrices is used.",
     )
 
     args = parser.parse_args()
@@ -1044,7 +1198,10 @@ def main():
                     _write_scif_file(
                         Path(args.write_scif),
                         result,
-                        cell_mode=args.scif_cell_mode,
+                        cell_mode=(
+                            args.scif_cell_mode
+                            or SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED
+                        ),
                     )
                 )
             if args.write_poscar_kpoints:
@@ -1076,6 +1233,8 @@ def main():
 
         if args.show or args.json or args.all:
             _emit_payload(payload, args.show, output_json=args.json)
+        elif args.details:
+            _emit_detailed_basic_summary(payload, source=args.structure_file)
         else:
             _emit_basic_summary(payload, source=args.structure_file)
     except Exception as e:

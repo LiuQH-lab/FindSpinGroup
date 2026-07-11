@@ -15,9 +15,9 @@ Returned by `MagSymmetryResult.to_summary_dict()`. Use it when you ran the full
 route but only need a display-friendly summary.
 
 `StructuredResult`
-Returned by `MagSymmetryResult.to_structured_dict()`. Use it for full
-programmatic integrations that need groups, cells, transforms, properties, and
-artifacts.
+Returned by `MagSymmetryResult.to_structured_dict()`. Use it to navigate groups,
+cells, transforms, properties, and artifacts by meaning in Python. It retains
+operation/domain objects and is not a complete JSON serialization contract.
 
 `InputSSGResult`
 Returned by `find_spin_group_input_ssg(...)` and written by `fsg -w`. Use it
