@@ -343,7 +343,7 @@
         "symbol_linear": "-1|6/ -1|m 1|m -1|m ∞_{110}m|1",
         "symbol_mode": "npg_x_spin_only",
         "tentative_symbol_s": "Ci x C∞v",
-        "text": "GSPG linear symbol: -1|6/ -1|m 1|m -1|m ∞_{110}m|1\nSpin-space point group symbol: ∞/mm (D∞h)\nEffective MPG: 6/mmm1'\nReal-space setting: G0std\nSpin-frame setting: ossg_oriented_spin_frame\n\ngenerators (excluding spin-only):\n2 x-y,x,z,-1 -u,-v,-w\n4 -y,-x,z,+1 u,v,w\n5 x,y,-z,-1 -u,-v,-w\n\noperations:\n1 x,y,z,+1 u,v,w\n2 x-y,x,z,-1 -u,-v,-w\n3 y,-x+y,z,-1 -u,-v,-w\n4 -y,-x,z,+1 u,v,w\n5 x,y,-z,-1 -u,-v,-w\n6 y,x,z,-1 -u,-v,-w\n7 x,x-y,z,+1 u,v,w\n8 -x+y,y,z,+1 u,v,w\n9 x-y,-y,z,-1 -u,-v,-w\n10 -x,-x+y,z,-1 -u,-v,-w\n11 x-y,x,-z,+1 u,v,w\n12 y,-x+y,-z,+1 u,v,w\n13 -y,x-y,z,+1 u,v,w\n14 -x+y,-x,z,+1 u,v,w\n15 y,x,-z,+1 u,v,w\n16 -x,-y,z,-1 -u,-v,-w\n17 -y,-x,-z,-1 -u,-v,-w\n18 x-y,-y,-z,+1 u,v,w\n19 -x,-x+y,-z,+1 u,v,w\n20 -x+y,y,-z,-1 -u,-v,-w\n21 x,x-y,-z,-1 -u,-v,-w\n22 -x+y,-x,-z,-1 -u,-v,-w\n23 -y,x-y,-z,-1 -u,-v,-w\n24 -x,-y,-z,+1 u,v,w\n\nspin only:\nCollinear direction: sqrt(2)/2,sqrt(2)/2,0"
+        "text": "GSPG linear symbol: -1|6/ -1|m 1|m -1|m ∞_{110}m|1\nSpin-space point group symbol: ∞/mm (D∞h)\nEffective MPG: 6/mmm1'\nReal-space setting: G0std\nSpin-frame setting: oriented\nSpin-only direction: sqrt(2)/2,sqrt(2)/2,0\n\ngenerators (excluding spin-only):\n2 x-y,x,z,-1,-u,-v,-w\n4 -y,-x,z,+1,u,v,w\n5 x,y,-z,-1,-u,-v,-w\n\noperations:\n1 x,y,z,+1,u,v,w\n2 x-y,x,z,-1,-u,-v,-w\n3 y,-x+y,z,-1,-u,-v,-w\n4 -y,-x,z,+1,u,v,w\n5 x,y,-z,-1,-u,-v,-w\n6 y,x,z,-1,-u,-v,-w\n7 x,x-y,z,+1,u,v,w\n8 -x+y,y,z,+1,u,v,w\n9 x-y,-y,z,-1,-u,-v,-w\n10 -x,-x+y,z,-1,-u,-v,-w\n11 x-y,x,-z,+1,u,v,w\n12 y,-x+y,-z,+1,u,v,w\n13 -y,x-y,z,+1,u,v,w\n14 -x+y,-x,z,+1,u,v,w\n15 y,x,-z,+1,u,v,w\n16 -x,-y,z,-1,-u,-v,-w\n17 -y,-x,-z,-1,-u,-v,-w\n18 x-y,-y,-z,+1,u,v,w\n19 -x,-x+y,-z,+1,u,v,w\n20 -x+y,y,-z,-1,-u,-v,-w\n21 x,x-y,-z,-1,-u,-v,-w\n22 -x+y,-x,-z,-1,-u,-v,-w\n23 -y,x-y,-z,-1,-u,-v,-w\n24 -x,-y,-z,+1,u,v,w\n\nspin only:\nCollinear direction: sqrt(2)/2,sqrt(2)/2,0"
       },
       "index": "194.164.1.1.L",
       "phase": "AFM(Altermagnet)",
@@ -362,6 +362,12 @@
         "basis_latex": [
           "C_{1}\\left(\\left(-\\frac{2}{3}k_{y}^{3}k_{z} - k_{x}k_{y}^{2}k_{z} + k_{x}^{2}k_{y}k_{z} + \\frac{2}{3}k_{x}^{3}k_{z}\\right)\\,\\sigma_{z}\\right) + o(k^{4})"
         ],
+        "basis_vectors": [
+          "C1*((-0.6666666667*ky^3*kz - kx*ky^2*kz + kx^2*ky*kz + 0.6666666667*kx^3*kz)*sigma_z)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(\\left(-\\frac{2}{3}k_{y}^{3}k_{z} - k_{x}k_{y}^{2}k_{z} + k_{x}^{2}k_{y}k_{z} + \\frac{2}{3}k_{x}^{3}k_{z}\\right)\\,\\sigma_{z}\\right)"
+        ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
         "order": 4,
@@ -370,12 +376,18 @@
       },
       "spin_texture_config_no_soc": {
         "basis": [
-          "C1*((-sqrt(3)/9*ky^3*kz + sqrt(3)/3*kx^2*ky*kz)*sigma_x + (-1/3*ky^3*kz + kx^2*ky*kz)*sigma_y) + o(k^4)"
+          "C1*((sqrt(3)/9*ky^3*kz - sqrt(3)/3*kx^2*ky*kz)*sigma_x + (1/3*ky^3*kz - kx^2*ky*kz)*sigma_y) + o(k^4)"
         ],
         "basis_latex": [
-          "C_{1}\\left(\\left(-\\frac{\\sqrt{3}}{9}k_{y}^{3}k_{z} + \\frac{\\sqrt{3}}{3}k_{x}^{2}k_{y}k_{z}\\right)\\,\\sigma_{x} + \\left(-\\frac{1}{3}k_{y}^{3}k_{z} + k_{x}^{2}k_{y}k_{z}\\right)\\,\\sigma_{y}\\right) + o(k^{4})"
+          "C_{1}\\left(\\left(\\frac{\\sqrt{3}}{9}k_{y}^{3}k_{z} - \\frac{\\sqrt{3}}{3}k_{x}^{2}k_{y}k_{z}\\right)\\,\\sigma_{x} + \\left(\\frac{1}{3}k_{y}^{3}k_{z} - k_{x}^{2}k_{y}k_{z}\\right)\\,\\sigma_{y}\\right) + o(k^{4})"
         ],
         "basis_setting": "ossg_unit_cartesian",
+        "basis_vectors": [
+          "C1*((sqrt(3)/9*ky^3*kz - sqrt(3)/3*kx^2*ky*kz)*sigma_x + (1/3*ky^3*kz - kx^2*ky*kz)*sigma_y)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(\\left(\\frac{\\sqrt{3}}{9}k_{y}^{3}k_{z} - \\frac{\\sqrt{3}}{3}k_{x}^{2}k_{y}k_{z}\\right)\\,\\sigma_{x} + \\left(\\frac{1}{3}k_{y}^{3}k_{z} - k_{x}^{2}k_{y}k_{z}\\right)\\,\\sigma_{y}\\right)"
+        ],
         "classifier_tolerances": {
           "atol": 1e-10,
           "rtol": 1e-08,
@@ -390,16 +402,22 @@
       },
       "spin_texture_config_soc": {
         "basis": [
-          "C1*((ky*kz)*sigma_x - (kx*kz)*sigma_y) + o(k^2)",
-          "C2*((kx*kz)*sigma_x + (-ky*kz + sqrt(12)/3*kx*kz)*sigma_y) + o(k^2)",
-          "C3*((ky^2 - sqrt(12)/3*kx*ky - kx^2)*sigma_z) + o(k^2)"
+          "(C1*ky*kz + C2*sqrt(3)/2*kx*kz)*sigma_x + (-C1*kx*kz + C2*(-sqrt(3)/2*ky*kz + kx*kz))*sigma_y + (C3*(sqrt(3)/2*ky^2 - kx*ky - sqrt(3)/2*kx^2))*sigma_z + o(k^2)"
         ],
         "basis_latex": [
-          "C_{1}\\left(k_{y}k_{z}\\,\\sigma_{x} - k_{x}k_{z}\\,\\sigma_{y}\\right) + o(k^{2})",
-          "C_{2}\\left(k_{x}k_{z}\\,\\sigma_{x} + \\left(-k_{y}k_{z} + \\frac{\\sqrt{12}}{3}k_{x}k_{z}\\right)\\,\\sigma_{y}\\right) + o(k^{2})",
-          "C_{3}\\left(\\left(k_{y}^{2} - \\frac{\\sqrt{12}}{3}k_{x}k_{y} - k_{x}^{2}\\right)\\,\\sigma_{z}\\right) + o(k^{2})"
+          "\\left(C_{1}k_{y}k_{z} + C_{2}\\frac{\\sqrt{3}}{2}k_{x}k_{z}\\right)\\,\\sigma_{x} + \\left(-C_{1}k_{x}k_{z} + C_{2}\\left(-\\frac{\\sqrt{3}}{2}k_{y}k_{z} + k_{x}k_{z}\\right)\\right)\\,\\sigma_{y} + C_{3}\\left(\\frac{\\sqrt{3}}{2}k_{y}^{2} - k_{x}k_{y} - \\frac{\\sqrt{3}}{2}k_{x}^{2}\\right)\\,\\sigma_{z} + o(k^{2})"
         ],
         "basis_setting": "ossg_unit_cartesian",
+        "basis_vectors": [
+          "C1*((ky*kz)*sigma_x - (kx*kz)*sigma_y)",
+          "C2*((sqrt(3)/2*kx*kz)*sigma_x + (-sqrt(3)/2*ky*kz + kx*kz)*sigma_y)",
+          "C3*((sqrt(3)/2*ky^2 - kx*ky - sqrt(3)/2*kx^2)*sigma_z)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(k_{y}k_{z}\\,\\sigma_{x} - k_{x}k_{z}\\,\\sigma_{y}\\right)",
+          "C_{2}\\left(\\frac{\\sqrt{3}}{2}k_{x}k_{z}\\,\\sigma_{x} + \\left(-\\frac{\\sqrt{3}}{2}k_{y}k_{z} + k_{x}k_{z}\\right)\\,\\sigma_{y}\\right)",
+          "C_{3}\\left(\\left(\\frac{\\sqrt{3}}{2}k_{y}^{2} - k_{x}k_{y} - \\frac{\\sqrt{3}}{2}k_{x}^{2}\\right)\\,\\sigma_{z}\\right)"
+        ],
         "classifier_tolerances": {
           "atol": 1e-10,
           "rtol": 1e-08,
@@ -970,7 +988,7 @@
         "symbol_linear": "2_{100}|6/ -1|m m_{100}|m -1|m 3|1",
         "symbol_mode": "point_part_and_spin_only",
         "tentative_symbol_s": null,
-        "text": "GSPG linear symbol: 2_{100}|6/ -1|m m_{100}|m -1|m 3|1\nSpin-space point group symbol: -3m (D3d)\nEffective MPG: 6/m'm'm'\nReal-space setting: G0std\nSpin-frame setting: ossg_oriented_spin_frame\n\ngenerators (excluding spin-only):\n4 y,-x+y,z,+1 u-v,-v,-w\n5 y,-x+y,z,+1 v,u,-w\n10 -y,-x,z,-1 -u+v,v,w\n13 x,y,-z,-1 -u,-v,-w\n\noperations:\n1 x,y,z,+1 u,v,w\n2 x,y,z,+1 -v,u-v,w\n3 x,y,z,+1 -u+v,-u,w\n4 y,-x+y,z,+1 u-v,-v,-w\n5 y,-x+y,z,+1 v,u,-w\n6 y,-x+y,z,+1 -u,-u+v,-w\n7 x-y,x,z,+1 u-v,-v,-w\n8 x-y,x,z,+1 v,u,-w\n9 x-y,x,z,+1 -u,-u+v,-w\n10 -y,-x,z,-1 -u+v,v,w\n11 -y,-x,z,-1 -v,-u,w\n12 -y,-x,z,-1 u,u-v,w\n13 x,y,-z,-1 -u,-v,-w\n14 y,x,z,-1 -u,-v,-w\n15 x,y,-z,-1 v,-u+v,-w\n16 y,x,z,-1 v,-u+v,-w\n17 x,y,-z,-1 u-v,u,-w\n18 y,x,z,-1 u-v,u,-w\n19 -x+y,y,z,-1 -u+v,v,w\n20 x,x-y,z,-1 -u+v,v,w\n21 -x+y,y,z,-1 -v,-u,w\n22 x,x-y,z,-1 -v,-u,w\n23 -x+y,y,z,-1 u,u-v,w\n24 x,x-y,z,-1 u,u-v,w\n25 x-y,-y,z,-1 -u,-v,-w\n26 -x,-x+y,z,-1 -u,-v,-w\n27 x-y,-y,z,-1 v,-u+v,-w\n28 -x,-x+y,z,-1 v,-u+v,-w\n29 x-y,-y,z,-1 u-v,u,-w\n30 -x,-x+y,z,-1 u-v,u,-w\n31 -x+y,-x,z,+1 u,v,w\n32 -y,x-y,z,+1 u,v,w\n33 y,-x+y,-z,-1 -u+v,v,w\n34 x-y,x,-z,-1 -u+v,v,w\n35 y,-x+y,-z,-1 -v,-u,w\n36 x-y,x,-z,-1 -v,-u,w\n37 -y,x-y,z,+1 -v,u-v,w\n38 -x+y,-x,z,+1 -v,u-v,w\n39 y,-x+y,-z,-1 u,u-v,w\n40 x-y,x,-z,-1 u,u-v,w\n41 -y,x-y,z,+1 -u+v,-u,w\n42 -x+y,-x,z,+1 -u+v,-u,w\n43 y,x,-z,+1 u,v,w\n44 y,x,-z,+1 -v,u-v,w\n45 y,x,-z,+1 -u+v,-u,w\n46 -y,-x,-z,+1 u-v,-v,-w\n47 -x,-y,z,+1 u-v,-v,-w\n48 -y,-x,-z,+1 v,u,-w\n49 -x,-y,z,+1 v,u,-w\n50 -x,-y,z,+1 -u,-u+v,-w\n51 -y,-x,-z,+1 -u,-u+v,-w\n52 x-y,-y,-z,+1 u,v,w\n53 -x,-x+y,-z,+1 u,v,w\n54 x-y,-y,-z,+1 -v,u-v,w\n55 -x,-x+y,-z,+1 -v,u-v,w\n56 x-y,-y,-z,+1 -u+v,-u,w\n57 -x,-x+y,-z,+1 -u+v,-u,w\n58 -x+y,y,-z,+1 u-v,-v,-w\n59 x,x-y,-z,+1 u-v,-v,-w\n60 -x+y,y,-z,+1 v,u,-w\n61 x,x-y,-z,+1 v,u,-w\n62 -x+y,y,-z,+1 -u,-u+v,-w\n63 x,x-y,-z,+1 -u,-u+v,-w\n64 -x+y,-x,-z,-1 -u,-v,-w\n65 -y,x-y,-z,-1 -u,-v,-w\n66 -x+y,-x,-z,-1 v,-u+v,-w\n67 -y,x-y,-z,-1 v,-u+v,-w\n68 -x+y,-x,-z,-1 u-v,u,-w\n69 -y,x-y,-z,-1 u-v,u,-w\n70 -x,-y,-z,-1 -u+v,v,w\n71 -x,-y,-z,-1 -v,-u,w\n72 -x,-y,-z,-1 u,u-v,w\n\nspin only:\n1 x,y,z,+1 u,v,w"
+        "text": "GSPG linear symbol: 2_{100}|6/ -1|m m_{100}|m -1|m 3|1\nSpin-space point group symbol: -3m (D3d)\nEffective MPG: 6/m'm'm'\nReal-space setting: G0std\nSpin-frame setting: oriented\nSpin-only direction: None\n\ngenerators (excluding spin-only):\n4 y,-x+y,z,+1,u-v,-v,-w\n5 y,-x+y,z,+1,v,u,-w\n10 -y,-x,z,-1,-u+v,v,w\n13 x,y,-z,-1,-u,-v,-w\n\noperations:\n1 x,y,z,+1,u,v,w\n2 x,y,z,+1,-v,u-v,w\n3 x,y,z,+1,-u+v,-u,w\n4 y,-x+y,z,+1,u-v,-v,-w\n5 y,-x+y,z,+1,v,u,-w\n6 y,-x+y,z,+1,-u,-u+v,-w\n7 x-y,x,z,+1,u-v,-v,-w\n8 x-y,x,z,+1,v,u,-w\n9 x-y,x,z,+1,-u,-u+v,-w\n10 -y,-x,z,-1,-u+v,v,w\n11 -y,-x,z,-1,-v,-u,w\n12 -y,-x,z,-1,u,u-v,w\n13 x,y,-z,-1,-u,-v,-w\n14 y,x,z,-1,-u,-v,-w\n15 x,y,-z,-1,v,-u+v,-w\n16 y,x,z,-1,v,-u+v,-w\n17 x,y,-z,-1,u-v,u,-w\n18 y,x,z,-1,u-v,u,-w\n19 -x+y,y,z,-1,-u+v,v,w\n20 x,x-y,z,-1,-u+v,v,w\n21 -x+y,y,z,-1,-v,-u,w\n22 x,x-y,z,-1,-v,-u,w\n23 -x+y,y,z,-1,u,u-v,w\n24 x,x-y,z,-1,u,u-v,w\n25 x-y,-y,z,-1,-u,-v,-w\n26 -x,-x+y,z,-1,-u,-v,-w\n27 x-y,-y,z,-1,v,-u+v,-w\n28 -x,-x+y,z,-1,v,-u+v,-w\n29 x-y,-y,z,-1,u-v,u,-w\n30 -x,-x+y,z,-1,u-v,u,-w\n31 -x+y,-x,z,+1,u,v,w\n32 -y,x-y,z,+1,u,v,w\n33 y,-x+y,-z,-1,-u+v,v,w\n34 x-y,x,-z,-1,-u+v,v,w\n35 y,-x+y,-z,-1,-v,-u,w\n36 x-y,x,-z,-1,-v,-u,w\n37 -y,x-y,z,+1,-v,u-v,w\n38 -x+y,-x,z,+1,-v,u-v,w\n39 y,-x+y,-z,-1,u,u-v,w\n40 x-y,x,-z,-1,u,u-v,w\n41 -y,x-y,z,+1,-u+v,-u,w\n42 -x+y,-x,z,+1,-u+v,-u,w\n43 y,x,-z,+1,u,v,w\n44 y,x,-z,+1,-v,u-v,w\n45 y,x,-z,+1,-u+v,-u,w\n46 -y,-x,-z,+1,u-v,-v,-w\n47 -x,-y,z,+1,u-v,-v,-w\n48 -y,-x,-z,+1,v,u,-w\n49 -x,-y,z,+1,v,u,-w\n50 -x,-y,z,+1,-u,-u+v,-w\n51 -y,-x,-z,+1,-u,-u+v,-w\n52 x-y,-y,-z,+1,u,v,w\n53 -x,-x+y,-z,+1,u,v,w\n54 x-y,-y,-z,+1,-v,u-v,w\n55 -x,-x+y,-z,+1,-v,u-v,w\n56 x-y,-y,-z,+1,-u+v,-u,w\n57 -x,-x+y,-z,+1,-u+v,-u,w\n58 -x+y,y,-z,+1,u-v,-v,-w\n59 x,x-y,-z,+1,u-v,-v,-w\n60 -x+y,y,-z,+1,v,u,-w\n61 x,x-y,-z,+1,v,u,-w\n62 -x+y,y,-z,+1,-u,-u+v,-w\n63 x,x-y,-z,+1,-u,-u+v,-w\n64 -x+y,-x,-z,-1,-u,-v,-w\n65 -y,x-y,-z,-1,-u,-v,-w\n66 -x+y,-x,-z,-1,v,-u+v,-w\n67 -y,x-y,-z,-1,v,-u+v,-w\n68 -x+y,-x,-z,-1,u-v,u,-w\n69 -y,x-y,-z,-1,u-v,u,-w\n70 -x,-y,-z,-1,-u+v,v,w\n71 -x,-y,-z,-1,-v,-u,w\n72 -x,-y,-z,-1,u,u-v,w\n\nspin only:\n1 x,y,z,+1,u,v,w"
       },
       "index": "194.149.3.3",
       "phase": "AFM\n(SOM)",
@@ -989,6 +1007,12 @@
         "basis_latex": [
           "C_{1}\\left(\\left(-\\frac{2}{3}k_{y}^{3} - k_{x}k_{y}^{2} + k_{x}^{2}k_{y} + \\frac{2}{3}k_{x}^{3}\\right)\\,\\sigma_{z}\\right) + o(k^{3})"
         ],
+        "basis_vectors": [
+          "C1*((-0.6666666667*ky^3 - kx*ky^2 + kx^2*ky + 0.6666666667*kx^3)*sigma_z)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(\\left(-\\frac{2}{3}k_{y}^{3} - k_{x}k_{y}^{2} + k_{x}^{2}k_{y} + \\frac{2}{3}k_{x}^{3}\\right)\\,\\sigma_{z}\\right)"
+        ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
         "order": 3,
@@ -1003,6 +1027,12 @@
           "C_{1}\\left(\\left(k_{x}k_{y}^{2} - \\frac{1}{3}k_{x}^{3}\\right)\\,\\sigma_{z}\\right) + o(k^{3})"
         ],
         "basis_setting": "ossg_unit_cartesian",
+        "basis_vectors": [
+          "C1*((kx*ky^2 - 1/3*kx^3)*sigma_z)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(\\left(k_{x}k_{y}^{2} - \\frac{1}{3}k_{x}^{3}\\right)\\,\\sigma_{z}\\right)"
+        ],
         "classifier_tolerances": {
           "atol": 1e-10,
           "rtol": 1e-08,
@@ -1023,6 +1053,12 @@
           "C_{1}\\left(\\sigma_{z}\\right) + o(1)"
         ],
         "basis_setting": "ossg_unit_cartesian",
+        "basis_vectors": [
+          "C1*(sigma_z)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(\\sigma_{z}\\right)"
+        ],
         "classifier_tolerances": {
           "atol": 1e-10,
           "rtol": 1e-08,
@@ -1663,7 +1699,7 @@
         "symbol_linear": "1|m 2_{001}|m 2_{001}|2 m|1",
         "symbol_mode": "npg_x_spin_only",
         "tentative_symbol_s": "C2 x Cs",
-        "text": "GSPG linear symbol: 1|m 2_{001}|m 2_{001}|2 m|1\nSpin-space point group symbol: mm2 (C2v)\nEffective MPG: mm21'\nReal-space setting: G0std\nSpin-frame setting: ossg_oriented_spin_frame\n\ngenerators (excluding spin-only):\n3 -x,y,z,+1 u,v,w\n4 -x,y,z,-1 -u,v,w\n5 x,-y,z,-1 u,-v,w\n\noperations:\n1 x,y,z,+1 u,v,w\n2 x,y,z,-1 -u,v,w\n3 -x,y,z,+1 u,v,w\n4 -x,y,z,-1 -u,v,w\n5 x,-y,z,-1 u,-v,w\n6 x,-y,z,+1 -u,-v,w\n7 -x,-y,z,-1 u,-v,w\n8 -x,-y,z,+1 -u,-v,w\n\nspin only:\n1 x,y,z,+1 u,v,w\n2 x,y,z,-1 -u,v,w"
+        "text": "GSPG linear symbol: 1|m 2_{001}|m 2_{001}|2 m|1\nSpin-space point group symbol: mm2 (C2v)\nEffective MPG: mm21'\nReal-space setting: G0std\nSpin-frame setting: oriented\nSpin-only direction: 1,0,0\n\ngenerators (excluding spin-only):\n3 -x,y,z,+1,u,v,w\n4 -x,y,z,-1,-u,v,w\n5 x,-y,z,-1,u,-v,w\n\noperations:\n1 x,y,z,+1,u,v,w\n2 x,y,z,-1,-u,v,w\n3 -x,y,z,+1,u,v,w\n4 -x,y,z,-1,-u,v,w\n5 x,-y,z,-1,u,-v,w\n6 x,-y,z,+1,-u,-v,w\n7 -x,-y,z,-1,u,-v,w\n8 -x,-y,z,+1,-u,-v,w\n\nspin only:\n1 x,y,z,+1,u,v,w\n2 x,y,z,-1,-u,v,w"
       },
       "index": "38.6.1.2.P2",
       "phase": "FM/FiM",
@@ -1682,6 +1718,12 @@
         "basis_latex": [
           "C_{1}\\left(\\sigma_{z}\\right) + o(1)"
         ],
+        "basis_vectors": [
+          "C1*(sigma_z)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(\\sigma_{z}\\right)"
+        ],
         "momentum_space_spin_configuration": "collinear",
         "nullity": 1,
         "order": 0,
@@ -1696,6 +1738,12 @@
           "C_{1}\\left(\\sigma_{z}\\right) + o(1)"
         ],
         "basis_setting": "ossg_unit_cartesian",
+        "basis_vectors": [
+          "C1*(sigma_z)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(\\sigma_{z}\\right)"
+        ],
         "classifier_tolerances": {
           "atol": 1e-10,
           "rtol": 1e-08,
@@ -1716,6 +1764,12 @@
           "C_{1}\\left(\\sigma_{z}\\right) + o(1)"
         ],
         "basis_setting": "ossg_unit_cartesian",
+        "basis_vectors": [
+          "C1*(sigma_z)"
+        ],
+        "basis_vectors_latex": [
+          "C_{1}\\left(\\sigma_{z}\\right)"
+        ],
         "classifier_tolerances": {
           "atol": 1e-10,
           "rtol": 1e-08,

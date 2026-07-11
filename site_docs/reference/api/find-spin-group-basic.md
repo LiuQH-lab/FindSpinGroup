@@ -1,9 +1,7 @@
 # `find_spin_group_basic`
 
-Compact identification route.
-
-Use this function when you need the identified OSSG, corresponding MSG,
-magnetic phase, and compact property flags.
+Run the recommended quick analysis for identification, screening, and the main
+physics-facing symmetry constraints.
 
 ## Signature
 
@@ -21,137 +19,104 @@ find_spin_group_basic(
 ) -> dict
 ```
 
+## When To Use It
+
+Use this function when you need:
+
+- the OSSG index and symbol;
+- the corresponding SOC-compatible MSG;
+- moment geometry and magnetic-phase classification;
+- symmetry permission for spin splitting and AHC;
+- leading no-SOC and SOC spin textures;
+- compact vector/polar/chiral constraints for screening.
+
+Use [`find_spin_group`](find-spin-group.md) instead for operation matrices,
+multiple cell settings, tensor details, magnetic-site analysis, quasi-2D
+diagnostics, or generated SCIF/POSCAR/KPOINTS.
+
 ## Parameters
 
-`cif`
-Path to the input structure file. Supported inputs include mCIF, CIF with
-magnetic-moment data, repo-generated SCIF, and POSCAR-like files.
+### Input
 
-`space_tol`
-Tolerance for real-space position and lattice matching.
+| Parameter | Meaning |
+| --- | --- |
+| `cif` | Path to mCIF, magnetic CIF, FindSpinGroup SCIF, or POSCAR-like input containing magnetic moments. The historical parameter name does not restrict the input to CIF. |
 
-`mtol`
-Tolerance for magnetic-moment matching and zero-net-moment classification.
+### Numerical controls
 
-`meigtol`
-Tolerance for point-group eigenvalue decisions.
+| Parameter | Default | Controls | User guidance |
+| --- | ---: | --- | --- |
+| `space_tol` | `0.02` | Shared spatial matching and space-group detection tolerance | Keep default first; scan a small range for noisy/nearly symmetric structures |
+| `mtol` | `0.02 μB` | Moment equivalence, magnetic symmetry, and zero-net-moment classification | Most physically important tolerance; changing it can change both group and phase |
+| `meigtol` | `2e-5` | Spin point-group eigenvalue decisions | Advanced diagnostic, not a normal first adjustment |
+| `matrix_tol` | `0.01` | Matrix equivalence, standardization, and transform checks | Change only for an identified matrix/transform numerical issue |
+| `parser_atol` | `0.02` | Parser-side consistency of expanded moments, especially SCIF same-site checks | Tune for a parser-expansion error, not to force a symmetry label |
 
-`matrix_tol`
-Tolerance for point-group standardization and transform matrix checks.
+Read [Parameters and Reliability](../../guide/reliability-and-tolerances.md) for
+directional effects and a sensitivity-study recipe.
 
-`parser_atol`
-Tolerance used while expanding and validating CIF or SCIF input.
+### Input-source and spin-texture controls
 
-`poscar_allow_incar_magmom`
-Allow a POSCAR-like Python call to read magnetic moments from a sibling `INCAR`.
-The default is `False`.
+| Parameter | Default | Meaning |
+| --- | ---: | --- |
+| `poscar_allow_incar_magmom` | `False` | Allow a sibling `INCAR` to provide `MAGMOM`. |
+| `poscar_prefer_incar_magmom` | `False` | Prefer sibling `INCAR` moments when embedded POSCAR moments also exist. Effective only when INCAR reading is allowed. |
+| `spin_texture_basis_max_order` | `None` | Set the spin-texture search/output ceiling and include `basis_by_order` from degree 0 through this degree. The default searches the normal classifier range and returns only the leading basis. |
 
-`poscar_prefer_incar_magmom`
-Prefer the sibling `INCAR` `MAGMOM` over embedded POSCAR magnetic moments when
-both are available. This only has an effect when
-`poscar_allow_incar_magmom=True`.
+## Return Value
 
-`spin_texture_basis_max_order`
-When set, include `basis_by_order` entries for computed spin-texture
-configuration fields from order 0 through this order. The default `None` emits
-only the leading allowed basis.
+Returns a JSON-serializable
+[`BasicResult`](../result-schemas/basic-result.md) dictionary.
 
-## Returns
-
-Returns a [BasicResult](../result-schemas/basic-result.md) dictionary.
+Read these fields first:
 
 ```python
 {
     "index": str,
-    "magnetic_phase": str,
+    "ossg_symbol_linear": str,
     "msg_bns_number": str | None,
     "msg_symbol": str | None,
     "conf": str,
+    "magnetic_phase": str,
     "properties": dict,
+    "spin_texture_config_no_soc": dict,
+    "spin_texture_config_soc": dict,
+    "magnetic_phase_details": dict,
     "tolerances": dict,
     ...
 }
 ```
 
-## Returned Fields
+`tolerances` on this surface reports the effective core identification values
+(`space_tol`, `mtol`, `meigtol`, and `matrix_tol`). Record a non-default
+`parser_atol` from the call configuration separately.
 
-### Main result
-
-`index`
-Final identified oriented spin space group index.
-
-`magnetic_phase`
-High-level magnetic phase classification.
-
-`msg_bns_number`, `msg_symbol`
-Corresponding magnetic space group identifiers.
-
-`conf`
-Magnetic configuration class.
-
-### SSG components
-
-`g0_symbol`, `g0_number`
-Real-space group component of the identified SSG.
-
-`l0_symbol`, `l0_number`
-Spin-lattice group component of the identified SSG.
-
-`it`, `ik`
-Translation-index and k-index components.
-
-`nsspg`, `sspg`
-Nontrivial and full spin-part point-group symbols.
-
-`acc_symbol`
-Spin arithmetic crystal class symbol.
-
-### Physical properties
-
-`properties`
-Compact property summary: spin splitting with and without SOC, AHC constraints,
-and altermagnet / spin-orbit-magnet display tags.
-
-`spin_texture_config_database`, `spin_texture_config_no_soc`, `spin_texture_config_soc`
-Spin-texture configuration summaries. The database field is the runtime-index
-reference; the no-SOC and SOC fields are computed from OSSG and MSG symmetry.
-
-`vector_constraints_by_symmetry`
-Vector constraints grouped by `sg`, `ossg`, and `msg`.
-
-### Diagnostics
-
-`identify_index_details`
-Identify-index route details.
-
-`acc_primitive_resolution_audit`
-ACC primitive resolution details.
-
-`tolerances`
-Effective tolerance values.
+For physical interpretation, read
+[Interpret Your Result](../../guide/understanding-results.md). For every field,
+read the [BasicResult schema](../result-schemas/basic-result.md).
 
 ## Example
 
 ```python
 from findspingroup import example_path, find_spin_group_basic
 
-summary = find_spin_group_basic(example_path("0.800_MnTe.mcif"))
+result = find_spin_group_basic(example_path("0.800_MnTe.mcif"))
 
-print(summary["index"])
-print(summary["magnetic_phase"])
-print(summary["msg_bns_number"], summary["msg_symbol"])
+print("OSSG:", result["index"])
+print("MSG:", result["msg_bns_number"], result["msg_symbol"])
+print("order:", result["conf"], result["magnetic_phase"])
+print("spin splitting:", result["properties"]["ss_wo_soc"], result["properties"]["ss_w_soc"])
+print("AHC:", result["properties"]["ahc_wo_soc"], result["properties"]["ahc_w_soc"])
 ```
 
-Expected output:
+Expected core output:
 
 ```text
-194.164.1.1.L
-AFM(Altermagnet)
-63.457 Cmcm
+OSSG: 194.164.1.1.L
+MSG: 63.457 Cmcm
+order: Collinear AFM(Altermagnet)
+spin splitting: k-dependent Yes
+AHC: No No
 ```
 
-## Notes
-
-Use `find_spin_group_basic(...)` for compact identification. Use
-`find_spin_group(...)` when you need generated SCIF, POSCAR, KPOINTS, operation
-payloads, quasi-2D diagnostics, tensor outputs, or detailed route audits.
+`Yes` here means symmetry-allowed, not a calculated nonzero magnitude.

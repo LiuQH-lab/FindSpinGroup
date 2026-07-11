@@ -1,75 +1,92 @@
-# FindSpinGroup Documentation
+# FindSpinGroup
 
-`findspingroup` is a Python package, command-line program, and
-[web application](https://app.findspingroup.com) for identifying oriented spin
-space group (OSSG) symmetry in magnetic crystal structures.
+**From a magnetic structure to its spin-space symmetry and symmetry-allowed
+physical responses.**
 
-Given a structure with magnetic moments, FindSpinGroup identifies the OSSG,
-reports the corresponding magnetic space group (MSG), classifies the magnetic
-phase, and can generate symmetry data for downstream first-principles,
-high-throughput, and web-application workflows.
+FindSpinGroup identifies the oriented spin space group (OSSG) of a supplied
+magnetic configuration, its spin-orbit-compatible magnetic space group (MSG),
+and symmetry constraints on spin splitting, anomalous Hall conductivity, spin
+texture, polar axes, magnetic sites, and related quantities.
 
-## Where Things Belong
+> FindSpinGroup analyzes symmetry. It does not calculate energies, transition
+> temperatures, band splittings, conductivity magnitudes, or magnetic ground
+> states.
 
-This documentation is split into three layers.
+## Start In One Minute
 
-**Guide** explains how to complete user tasks. Start here if you are not sure
-which command or Python function to use.
+```bash
+python -m pip install --upgrade findspingroup
+fsg path/to/structure.mcif
+```
 
-**Reference** documents the exact Python functions, return objects, CLI flags,
-and output fields. Use it when you know the entry point and need precise
-parameter or output meaning.
-
-**Advanced Notes** explain internal settings, transform terminology, and
-diagnostic routes that are useful for expert users and maintainers.
-
-The repository `README.md` is intentionally shorter than this site. It is only
-the project entry point: what the package does, how to install it, and where to
-continue.
-
-## Start Here
-
-Use the quick path if you only need the identified group labels and magnetic
-phase:
+Or from Python:
 
 ```python
-from findspingroup import example_path, find_spin_group_basic
+from findspingroup import find_spin_group_basic
 
-summary = find_spin_group_basic(example_path("0.800_MnTe.mcif"))
+result = find_spin_group_basic("path/to/structure.mcif")
 
-print(summary["index"])
-print(summary["magnetic_phase"])
-print(summary["msg_bns_number"], summary["msg_symbol"])
+print(result["index"])
+print(result["magnetic_phase"])
+print(result["msg_bns_number"], result["msg_symbol"])
+print(result["properties"])
 ```
 
-Expected output:
+## Read The Result In This Order
 
-```text
-194.164.1.1.L
-AFM(Altermagnet)
-63.457 Cmcm
-```
+| Read first | Question answered | Scientific meaning |
+| --- | --- | --- |
+| `index`, `ossg_symbol_linear` | What is the nonrelativistic spin-space symmetry? | OSSG symmetry of the supplied ordered magnetic configuration. |
+| `msg_bns_number`, `msg_symbol` | What symmetry is compatible with SOC? | MSG after spin and real-space rotations are locked. |
+| `conf` | How are the moments geometrically arranged? | Collinear, coplanar, or noncoplanar; not an FM/AFM label. |
+| `magnetic_phase` | How is the magnetic configuration classified? | Rule-based, tolerance-dependent phase label. |
+| `properties` | Which responses are symmetry-allowed? | Spin splitting and AHC permission with and without SOC. |
+| `spin_texture_config_*` | What is the leading momentum dependence? | Lowest-order symmetry-allowed spin-texture polynomial in the reported frame. |
 
-## Main Routes
+`allowed` means “not forced to vanish by the analyzed symmetry.” It does not
+mean that a response is necessarily large or experimentally observable.
 
-Use `find_spin_group_basic(...)` or `fsg file.mcif` for compact identification.
+## Choose By Your Goal
 
-Use `find_spin_group(...)` or `fsg --all file.mcif` for the full result object,
-generated SCIF, POSCAR, KPOINTS, tensor outputs, quasi-2D diagnostics, and audit
-information.
+| I want to... | Start here |
+| --- | --- |
+| identify one material and understand the main output | [Quickstart](guide/getting-started.md) |
+| understand the physical meaning and limitations | [Interpret Your Result](guide/understanding-results.md) |
+| choose between quick, full, and input-cell analysis | [Choose a Workflow](guide/choosing-an-api.md) |
+| decide whether to change tolerances | [Parameters and Reliability](guide/reliability-and-tolerances.md) |
+| run commands or export files | [CLI by Task](reference/cli.md) |
+| integrate FindSpinGroup in Python | [Python API](reference/python-api.md) |
+| inspect every field and nested payload | [Result Schemas](reference/result-schemas/index.md) |
 
-Use `find_spin_group_input_ssg(...)` or `fsg -w file.mcif` when you need SSG and
-MSG operations in the input-cell setting and optional helper files written to
-disk.
+## Three Analysis Levels
 
-## Next Steps
+### Quick analysis
 
-- [Getting Started](guide/getting-started.md) - install and run the first case.
-- [Choosing an API](guide/choosing-an-api.md) - choose the right function or CLI
-  route.
-- [Understanding Results](guide/understanding-results.md) - read the OSSG, MSG,
-  magnetic phase, settings, and artifacts.
-- [Python API Reference](reference/python-api.md) - exact function signatures,
-  parameters, returns, and examples.
-- [Result Schemas](reference/result-schemas/index.md) - field-by-field output
-  meaning by returned object.
+Use `fsg FILE` or `find_spin_group_basic(FILE)` for identification, screening,
+and the main physics-facing constraints. This is the right starting point for
+most users.
+
+### Full analysis
+
+Use `fsg --full FILE --show FIELD` or `find_spin_group(FILE)` when you need
+cells, operations, tensor constraints, magnetic-site analysis,
+SCIF/POSCAR/KPOINTS, quasi-2D diagnostics, or route audits. The CLI requires a
+selected field so a huge raw result cannot bury the requested information.
+
+### Input-cell operation export
+
+Use `fsg -w FILE` or `find_spin_group_input_ssg(FILE)` when a downstream code
+needs SSG and MSG operations expressed in the user-supplied cell. Check the
+returned warning before using operations from a non-primitive input cell.
+
+## Before You Publish A Result
+
+1. Record the FindSpinGroup version and all non-default parameters.
+2. Confirm that the input magnetic moments and their coordinate convention are
+   correct.
+3. Check tolerance sensitivity for noisy, nearly symmetric, or very small
+   moments.
+4. Keep every operation, coordinate, spin-texture basis, and generated file
+   attached to its reported cell/spin-frame setting.
+5. Describe symmetry outputs as allowed or forbidden constraints, not computed
+   response magnitudes.

@@ -7,7 +7,17 @@ result = find_spin_group("path/to/structure.mcif")
 structured = result.to_structured_dict()
 ```
 
-Use `StructuredResult` for full programmatic integrations.
+Use `StructuredResult` to navigate a full result by meaning in Python.
+
+!!! warning "Python view, not a JSON schema"
+    This accessor groups the current full result without converting every
+    value. SSG operation lists contain `SpinSpaceGroupOperation` objects, MSG
+    operation lists contain raw `[time_reversal, rotation, translation]`
+    triples, and other layers may contain NumPy arrays or domain objects.
+    Therefore `json.dumps(result.to_structured_dict())` is not supported as a
+    complete serialization route. For JSON, prefer `find_spin_group_basic(...)`,
+    `fsg --json`, `find_spin_group_input_ssg(...)`, or a purpose-built
+    serialized field such as `operation_views`.
 
 ## Shape
 
@@ -23,8 +33,8 @@ Use `StructuredResult` for full programmatic integrations.
 }
 ```
 
-`legacy` is the raw compatibility dictionary. New integrations should prefer the
-structured layers.
+`legacy` is the raw compatibility dictionary. It is included for navigation
+and compatibility, not as a serialized contract.
 
 ## `summary`
 
@@ -119,10 +129,11 @@ Each `SSGPayload` may contain `setting`, `spin_frame_setting`, `ops`, `seitz`,
 `seitz_latex`, `seitz_descriptions`, `international_linear`,
 `international_latex`, `symbol_calibration_tol`, and `type`.
 
-See [SSGPayload](payload-definitions.md#ssgpayload),
-[SSGOperation](payload-definitions.md#ssgoperation), and
+See [SSGPayload](payload-definitions.md#ssgpayload) and
 [SeitzDescription](payload-definitions.md#seitzdescription) for the next layer
-below this field.
+below this field. In this accessor, `ops` contains Python
+`SpinSpaceGroupOperation` objects rather than serialized `SSGOperation`
+dictionaries.
 
 ### `groups.msg_by_cell`
 
@@ -135,8 +146,9 @@ MSG operation payloads grouped by cell setting.
 }
 ```
 
-See [MSGPayload](payload-definitions.md#msgpayload) and
-[MSGOperation](payload-definitions.md#msgoperation) for the operation shape.
+See [MSGPayload](payload-definitions.md#msgpayload). In this accessor, each
+`ops` item is the raw triple `[time_reversal, real_rotation, translation]`, not
+a serialized `MSGOperation` dictionary.
 
 ### `groups.little_groups`
 

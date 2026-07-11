@@ -1,34 +1,35 @@
-# Guide
+# User Guide
 
-The guide is organized around user tasks, not source-code modules. Read these
-pages when you want to know what to run and how to interpret the result.
+The guide follows a researcher's workflow:
 
-## What The Guide Covers
+1. run one magnetic structure;
+2. identify which symmetry description answers the question;
+3. interpret the physics-facing outputs and their limitations;
+4. test numerical reliability;
+5. request operations or files only when needed.
 
-- Install the package and run a first example.
-- Choose between the quick, full, and input-cell routes.
-- Understand the most important outputs before reading the full reference.
-- Use the concept glossary for groups, settings, operations, k-points, spin
-  texture, Wyckoff chains, and vector constraints.
-- Prepare supported input files with magnetic moments.
-- Export generated SCIF, POSCAR, KPOINTS, and input-cell operation files.
-- Diagnose common usage errors.
+## Recommended Path
 
-## What The Guide Does Not Cover
+| Step | Page | Outcome |
+| ---: | --- | --- |
+| 1 | [Quickstart](getting-started.md) | Run the CLI or Python API and understand the first six result lines. |
+| 2 | [Interpret Your Result](understanding-results.md) | Distinguish OSSG, MSG, moment geometry, phase, spin splitting, AHC, and spin texture. |
+| 3 | [Choose A Workflow](choosing-an-api.md) | Select quick analysis, full analysis, or input-cell operation export. |
+| 4 | [Parameters And Reliability](reliability-and-tolerances.md) | Decide whether a tolerance change is justified and test sensitivity. |
+| 5 | [Input Formats](input-formats.md) | Verify magnetic moments, coordinate conventions, and POSCAR/INCAR behavior. |
+| 6 | [Examples](examples.md) | Adapt complete workflows to a research task. |
 
-The guide does not list every attribute on the raw result object. For exact
-function signatures, all documented output fields, CLI flags, and SCIF modes,
-use the [Reference](../reference/index.md).
+Use [Troubleshooting](troubleshooting.md) when a run fails or produces an
+unexpected result.
 
-Internal transform diagnostics and setting contracts are collected under
-[Advanced Notes](../advanced/index.md).
+## Where Detailed Information Lives
 
-## Recommended Reading Order
+- Exact commands and exports: [CLI Reference](../reference/cli.md)
+- Function signatures and returns: [Python API](../reference/python-api.md)
+- Complete dictionary and nested field shapes:
+  [Result Schemas](../reference/result-schemas/index.md)
+- Terminology and settings glossary: [Concepts](concepts.md)
+- SCIF modes and setting contracts: [SCIF Export](../reference/scif.md)
 
-1. [Getting Started](getting-started.md)
-2. [Choosing an API](choosing-an-api.md)
-3. [Understanding Results](understanding-results.md)
-4. [Concepts](concepts.md)
-5. [Input Formats](input-formats.md)
-6. [Examples](examples.md)
-7. [Troubleshooting](troubleshooting.md)
+The complete field inventory is intentionally kept out of the learning path so
+that diagnostic and legacy details do not obscure the main scientific result.

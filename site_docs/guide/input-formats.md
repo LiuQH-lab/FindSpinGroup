@@ -3,6 +3,19 @@
 FindSpinGroup requires a magnetic structure. The input must contain magnetic
 moments in a supported form.
 
+## Pre-Run Checklist
+
+Before interpreting a result, verify:
+
+1. every intended magnetic site has a moment or is represented through the
+   input format's magnetic-site/orbit information;
+2. moment components use the coordinate convention expected by the format;
+3. occupancies and labels distinguish crystallographically distinct sites;
+4. the lattice/coordinates represent the magnetic structure you intend to
+   classify, not only its nonmagnetic parent;
+5. for POSCAR workflows, you know whether moments came from the file or a
+   sibling `INCAR`.
+
 ## Supported Files
 
 `.mcif`
@@ -31,6 +44,21 @@ frame before operation export.
 
 POSCAR moments are treated as Cartesian.
 
+The moment scale is interpreted in μB for tolerance and net-moment reporting.
+Check the source format carefully when moments were originally supplied in a
+crystallographic/lattice basis; a correct numerical triplet in the wrong frame
+can produce a plausible but incorrect symmetry result.
+
+For a first diagnostic, print the parsed classification context rather than
+immediately changing tolerances:
+
+```bash
+fsg structure.mcif \
+  --show conf \
+  --show net_moment \
+  --show magnetic_phase_details
+```
+
 ## POSCAR And INCAR Behavior
 
 For POSCAR-like inputs, the CLI is optimized for VASP working directories. It
@@ -49,6 +77,10 @@ find_spin_group(
 
 This difference keeps scripted Python calls reproducible while preserving the
 convenient CLI behavior for VASP directories.
+
+For reproducible calculations, state the source of the moments explicitly. In
+a Python integration, prefer embedded POSCAR moments unless reading the sibling
+`INCAR` is an intentional part of the input contract.
 
 ## CLI Auto-Selection
 
@@ -71,3 +103,15 @@ fsg magnetic_input
 ```
 
 When multiple candidates are found, the CLI reports which file it selected.
+
+Auto-selection is convenient interactively. Scripts and published workflows
+should pass an explicit path so that a new file in the working directory cannot
+silently change the selected input.
+
+## Input Validity Versus Physical Validity
+
+A successfully parsed file is not automatically a physically reliable model.
+FindSpinGroup analyzes the ordered moments it receives. It cannot decide
+whether the structure is energetically stable, whether domains are populated,
+or whether a refined small moment is significant. Those judgments belong to
+the input provenance and the accompanying tolerance-sensitivity analysis.

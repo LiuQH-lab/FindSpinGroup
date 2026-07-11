@@ -1,7 +1,8 @@
 # Concepts
 
-This page defines the concepts that appear repeatedly in FindSpinGroup output.
-Use it as the companion page for field references such as
+This page is a glossary for concepts that appear repeatedly in FindSpinGroup
+output. New users should read [Interpret Your Result](understanding-results.md)
+first, then return here for terminology. Use it as the companion page for field references such as
 [CLI Show Fields](../reference/cli-show-fields.md) and the result-schema pages.
 
 The field-reference pages should stay short: a field entry should say what the
@@ -32,9 +33,10 @@ specific input cell rather than only the public convention setting.
 The default. The input is treated as a three-dimensional magnetic crystal.
 
 `calculation_mode="quasi2d"`
-Runs the quasi-2D path. The code identifies a vacuum axis, builds a 2D compact
-k-point view, and recomputes 2D spin-texture constraints in the corresponding
-in-plane momentum variables.
+Runs the quasi-2D interpretation path. The code identifies a vacuum axis,
+regularizes insufficient vacuum when necessary, builds a 2D compact k-point
+view, and recomputes 2D spin-texture constraints in the corresponding in-plane
+momentum variables.
 
 ## Group Objects
 
@@ -171,7 +173,8 @@ The user-facing magnetic phase summary. It can include tags such as
 altermagnetism or spin-orbit magnet behavior.
 
 `net_moment`
-The total magnetic moment vector used by the route.
+The magnitude of the vector sum of magnetic moments in the analyzed magnetic
+cell, reported as a scalar in μB.
 
 `zero_net_moment_tol`
 The tolerance used to decide whether the net moment is treated as zero for

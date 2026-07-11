@@ -66,9 +66,12 @@ result.to_structured_dict() -> dict
 
 ### Purpose
 
-Return the full result grouped by semantic layer. This is the recommended full
-output for new integrations because callers do not have to infer meaning from
-flat legacy attribute names.
+Return the full result grouped by semantic layer so Python callers do not have
+to infer meaning from flat legacy attribute names.
+
+This is a navigation view, not a fully serialized contract: operation lists,
+cells, arrays, and the `legacy` layer can contain Python/NumPy domain objects.
+Do not pass the whole result directly to `json.dumps()`.
 
 ### Returns
 
@@ -133,8 +136,8 @@ result.to_dict() -> dict
 
 Return the raw attribute dictionary. This is useful for compatibility and
 debugging, but it is not the recommended starting point for new integrations.
-Use `to_summary_dict()` for compact display and `to_structured_dict()` for the
-complete structured contract.
+Use `to_summary_dict()` for compact display and `to_structured_dict()` for
+semantic navigation of the complete Python result.
 
 ## Common Direct Attributes
 

@@ -1,10 +1,15 @@
 # Reference
 
-The reference documents the exact public surfaces: Python functions, returned
-objects, CLI flags, output fields, and SCIF export modes.
+The reference documents exact public surfaces: Python functions, returned
+objects, CLI flags, output fields, and SCIF export modes. It is deliberately
+separate from the learning path so raw/legacy/diagnostic fields do not obscure
+the main scientific conclusions.
 
 Use the guide first if you are still deciding what to run. Use the reference
 when you know the entry point and need precise parameter or output meaning.
+
+For physical interpretation rather than schema lookup, use
+[Interpret Your Result](../guide/understanding-results.md).
 
 ## Reference Pages
 

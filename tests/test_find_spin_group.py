@@ -509,10 +509,44 @@ def test_cli_without_explicit_file_prefers_mcif_over_poscar_and_runs_basic(monke
     cli_module.main()
     stdout = capsys.readouterr()
 
-    assert "Index: 194.164.1.1.L" in stdout.out
-    assert "Spin arithmetic crystal class: 6/mmmP" in stdout.out
-    assert "Magnetic phase: AFM(Altermagnet)" in stdout.out
+    assert "OSSG: 194.164.1.1.L" in stdout.out
+    assert "MSG with SOC: 63.457 Cmcm" in stdout.out
+    assert "Magnetic order: Collinear; AFM(Altermagnet)" in stdout.out
+    assert "AHC: without SOC forbidden; with SOC forbidden" in stdout.out
     assert "Using other.mcif" in stdout.err or "Auto-selected structure file: other.mcif" in stdout.err
+
+
+def test_cli_help_prioritizes_tasks_and_progressive_disclosure(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    monkeypatch.setattr(sys, "argv", ["fsg", "--help"])
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 0
+    output = capsys.readouterr().out
+    assert "usage: fsg [OPTIONS] [STRUCTURE]" in output
+    assert "analysis level and output:" in output
+    assert "file export:" in output
+    assert "physical interpretation:" in output
+    assert "advanced numerical tolerances:" in output
+    assert "--full, --all" in output
+    assert "--details" in output
+    assert "fsg structure.mcif --show properties" in output
+
+
+def test_cli_version_is_available_without_an_input_file(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+    from findspingroup.version import __version__
+
+    monkeypatch.setattr(sys, "argv", ["fsg", "--version"])
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 0
+    assert capsys.readouterr().out.strip() == f"fsg {__version__}"
 
 
 def test_cli_auto_selects_only_magnetic_structure_candidates(monkeypatch, tmp_path):
@@ -615,17 +649,95 @@ def test_cli_write_outputs_input_ssg_bundle_into_current_directory(monkeypatch, 
     assert (tmp_path / "magnetic_primitive_poscar.vasp").is_file()
 
 
-def test_cli_all_show_filters_full_route_fields(monkeypatch, capsys):
+def test_cli_full_alias_show_filters_full_route_fields(monkeypatch, capsys):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["fsg", "--all", "--show", "msg_symbol", "examples/0.800_MnTe.mcif"],
+        ["fsg", "--full", "--show", "msg_symbol", "examples/0.800_MnTe.mcif"],
     )
 
     import findspingroup.cli as cli_module
 
     cli_module.main()
     assert capsys.readouterr().out.strip() == "Cmcm"
+
+
+def test_cli_full_payload_serializes_spin_space_group_operations(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+    from findspingroup.structure import SpinSpaceGroupOperation
+
+    class _FakeResult:
+        def to_dict(self):
+            return {
+                "raw_ops": [
+                    SpinSpaceGroupOperation(
+                        np.eye(3),
+                        np.eye(3),
+                        np.array([0.0, 0.5, 0.0]),
+                    )
+                ]
+            }
+
+    monkeypatch.setattr(cli_module, "find_spin_group", lambda *_args, **_kwargs: _FakeResult())
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "--full", "--json", "--show", "raw_ops", "dummy.mcif"],
+    )
+
+    cli_module.main()
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload[0] == {
+        "spin_rotation": np.eye(3).tolist(),
+        "real_rotation": np.eye(3).tolist(),
+        "translation": [0.0, 0.5, 0.0],
+    }
+
+
+@pytest.mark.parametrize("json_flag", [[], ["--json"]])
+def test_cli_full_requires_a_selected_field(monkeypatch, capsys, json_flag):
+    import findspingroup.cli as cli_module
+
+    called = False
+
+    def _unexpected_full_route(*_args, **_kwargs):
+        nonlocal called
+        called = True
+        raise AssertionError("full analysis should not run before option validation")
+
+    monkeypatch.setattr(cli_module, "find_spin_group", _unexpected_full_route)
+    monkeypatch.setattr(sys, "argv", ["fsg", "--full", *json_flag, "dummy.mcif"])
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 1
+    assert not called
+    error = capsys.readouterr().err
+    assert "requires at least one `--show FIELD`" in error
+    assert "raw full result is too large" in error
+
+
+def test_cli_unknown_show_field_exits_nonzero(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    monkeypatch.setattr(
+        cli_module,
+        "find_spin_group_basic",
+        lambda *_args, **_kwargs: {"index": "1.1.1.1.P1"},
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "dummy.mcif", "--show", "does_not_exist"],
+    )
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 1
+    assert "Unknown or unavailable --show field" in capsys.readouterr().err
 
 
 def test_cli_show_field_aliases_full_route(monkeypatch, capsys):
@@ -670,6 +782,36 @@ def test_cli_show_formats_dict_fields_readably(monkeypatch, capsys):
     assert "momentum_space_spin_configuration: coplanar" in output
     assert "basis:" in output
     assert "1. C1*kx*sigma_y" in output
+
+
+def test_cli_show_basis_by_order_keeps_nested_basis_content():
+    import findspingroup.cli as cli_module
+
+    output = cli_module._format_show_value(
+        [
+            {
+                "order": 0,
+                "spin_texture_type": "s-wave",
+                "nullity": 1,
+                "basis": ["C1*(sigma_z) + o(1)"],
+                "basis_latex": [r"C_{1}\left(\sigma_{z}\right) + o(1)"],
+            },
+            {
+                "order": 1,
+                "spin_texture_type": "p-wave",
+                "nullity": 0,
+                "basis": [],
+                "basis_latex": [],
+            },
+        ]
+    )
+
+    assert "order 0:" in output
+    assert "spin_texture_type: s-wave" in output
+    assert "C1*(sigma_z) + o(1)" in output
+    assert r"C_{1}\left(\sigma_{z}\right) + o(1)" in output
+    assert "order 1:" in output
+    assert "spin_texture_type: p-wave" in output
 
 
 def test_cli_show_json_keeps_machine_readable_payload(monkeypatch, capsys):
@@ -760,6 +902,22 @@ def test_cli_rejects_show_with_artifact_writer(monkeypatch, capsys, tmp_path):
     assert "Write-artifact flags cannot be combined" in capsys.readouterr().err
 
 
+def test_cli_rejects_show_with_input_cell_writer(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["fsg", "-w", "--show", "index", "dummy.mcif"],
+    )
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 1
+    assert "cannot be combined with `--show`" in capsys.readouterr().err
+
+
 def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatch, capsys):
     import findspingroup.cli as cli_module
 
@@ -781,6 +939,9 @@ def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatc
         [
             "fsg",
             "--all",
+            "--json",
+            "--show",
+            "ok",
             "--space-tol",
             "0.03",
             "--mtol",
@@ -803,7 +964,7 @@ def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatc
 
     cli_module.main()
 
-    assert json.loads(capsys.readouterr().out) == {"ok": True}
+    assert json.loads(capsys.readouterr().out) is True
     assert captured == {
         "path": "dummy.mcif",
         "space_tol": pytest.approx(0.03),
@@ -819,7 +980,68 @@ def test_cli_accepts_hyphen_tolerance_aliases_and_forwards_full_route(monkeypatc
     }
 
 
-def test_cli_default_route_forwards_basic_without_quasi2d_options(monkeypatch, capsys):
+def test_cli_quick_summary_prioritizes_physics_without_basis_noise(capsys):
+    import findspingroup.cli as cli_module
+
+    cli_module._emit_basic_summary(
+        {
+            "index": "194.164.1.1.L",
+            "conf": "Collinear",
+            "magnetic_phase": "AFM(Altermagnet)",
+            "msg_bns_number": "63.457",
+            "msg_symbol": "Cmcm",
+            "msg_type": 1,
+            "net_moment": 0.0,
+            "zero_net_moment_tol": 0.02,
+            "properties": {
+                "ss_wo_soc": "k-dependent",
+                "ss_w_soc": "Yes",
+                "ahc_wo_soc": "No",
+                "ahc_w_soc": "No",
+            },
+            "spin_texture_config_no_soc": {
+                "spin_texture_type": "g-wave",
+                "order": 4,
+                "momentum_space_spin_configuration": "collinear",
+                "basis": ["C1*(very_long_expression)"],
+            },
+            "spin_texture_config_soc": {
+                "spin_texture_type": "d-wave",
+                "order": 2,
+                "momentum_space_spin_configuration": "noncoplanar",
+                "basis": ["C1*(another_long_expression)"],
+            },
+        },
+        source="sample.mcif",
+    )
+
+    output = capsys.readouterr().out
+    assert "OSSG: 194.164.1.1.L" in output
+    assert "MSG with SOC: 63.457 Cmcm (type 1)" in output
+    assert "Magnetic order: Collinear; AFM(Altermagnet)" in output
+    assert "without SOC k-dependent; with SOC allowed" in output
+    assert "AHC: without SOC forbidden; with SOC forbidden" in output
+    assert "without SOC g-wave (order 4, collinear)" in output
+    assert "C1*(" not in output
+    assert "not calculated magnitudes" in output
+
+
+def test_cli_vector_constraint_includes_nonzero_axis_setting():
+    import findspingroup.cli as cli_module
+
+    text = cli_module._format_vector_constraint_entry(
+        "real_space_t_odd_p_even",
+        {
+            "free_dimension": 1,
+            "allowed_axes": [{"label": "a + c"}],
+            "allowed_axes_setting": "acc_primitive",
+        },
+    )
+
+    assert text == "T-odd/P-even real=1D a + c @ acc_primitive"
+
+
+def test_cli_details_route_forwards_basic_without_quasi2d_options(monkeypatch, capsys):
     import findspingroup.cli as cli_module
 
     captured = {}
@@ -863,8 +1085,16 @@ def test_cli_default_route_forwards_basic_without_quasi2d_options(monkeypatch, c
             "msg_is_polar": False,
             "msg_is_chiral": False,
             "spin_texture_config_database": {"spin_texture_type": "forbidden"},
-            "spin_texture_config_no_soc": {"spin_texture_type": "s-wave", "basis": ["C1*sigma_z"]},
-            "spin_texture_config_soc": {"spin_texture_type": "p-wave", "basis": ["C1*kx*sigma_z"]},
+            "spin_texture_config_no_soc": {
+                "spin_texture_type": "s-wave",
+                "basis_setting": "ossg_unit_cartesian",
+                "basis": ["C1*sigma_z"],
+            },
+            "spin_texture_config_soc": {
+                "spin_texture_type": "p-wave",
+                "basis_setting": "msg_unit_cartesian",
+                "basis": ["C1*kx*sigma_z"],
+            },
             "vector_constraints_by_symmetry": {
                 "sg": {
                     "constraints": {
@@ -888,6 +1118,7 @@ def test_cli_default_route_forwards_basic_without_quasi2d_options(monkeypatch, c
         "argv",
         [
             "fsg",
+            "--details",
             "--space-tol",
             "0.03",
             "--mtol",
@@ -915,10 +1146,10 @@ def test_cli_default_route_forwards_basic_without_quasi2d_options(monkeypatch, c
     assert "Magnetic space group: 1.1 P1 (type 1)" in output
     assert "Spin arithmetic crystal class: 1P" in output
     assert "EMPG: 1" in output
-    assert "Net moment: 0.0 (zero tol 0.04)" in output
+    assert "Net moment: 0.0 μB (zero tol 0.04 μB)" in output
     assert "Spin texture database" not in output
-    assert "Spin texture w/o SOC: wave=s-wave; basis=C1*sigma_z" in output
-    assert "Spin texture w/ SOC: wave=p-wave; basis=C1*kx*sigma_z" in output
+    assert "Spin texture w/o SOC: wave=s-wave; setting=ossg_unit_cartesian; basis=C1*sigma_z" in output
+    assert "Spin texture w/ SOC: wave=p-wave; setting=msg_unit_cartesian; basis=C1*kx*sigma_z" in output
     assert "Symmetry flags:" not in output
     assert "SG: polar=No, chiral=No; T-even/P-odd real=0D none" in output
     assert "Polar axes:" not in output
@@ -1016,7 +1247,7 @@ def test_cli_rejects_quasi2d_options_without_full_route(monkeypatch, capsys):
         cli_module.main()
 
     assert excinfo.value.code == 1
-    assert "only supported by the full route" in capsys.readouterr().err
+    assert "requires full analysis; use `--full`" in capsys.readouterr().err
 
 
 def test_cli_rejects_legacy_writer_flags_outside_matching_modes(monkeypatch, capsys):
@@ -1033,6 +1264,31 @@ def test_cli_rejects_legacy_writer_flags_outside_matching_modes(monkeypatch, cap
 
     assert excinfo.value.code == 1
     assert "`--write-symmetry-dat` is only valid" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    ("selector", "value", "required_writer"),
+    [
+        ("--scif-cell-mode", "input_oriented", "--write-scif"),
+        ("--ssg-matrix-setting", "poscar-spin-frame", "--write-ssg-matrices"),
+    ],
+)
+def test_cli_rejects_export_settings_without_their_writer(
+    monkeypatch,
+    capsys,
+    selector,
+    value,
+    required_writer,
+):
+    import findspingroup.cli as cli_module
+
+    monkeypatch.setattr(sys, "argv", ["fsg", selector, value, "dummy.mcif"])
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli_module.main()
+
+    assert excinfo.value.code == 1
+    assert f"`{selector}` requires `{required_writer}`" in capsys.readouterr().err
 
 
 def test_find_spin_group_poscar_ssg_reports_embedded_magnetic_primitive_case(tmp_path):

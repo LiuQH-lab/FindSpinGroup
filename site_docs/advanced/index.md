@@ -1,42 +1,84 @@
-# Advanced Notes
+# Advanced Diagnostics And Validation
 
-Advanced notes collect terminology and diagnostics that are important for
-expert users, maintainers, and validation work, but should not be required for
-the first successful run.
+Use this section after the user-facing OSSG/MSG/physics result is understood.
+Advanced fields explain **how** the route reached that result and how data move
+between settings; they are not additional material properties.
 
-## Topics That Belong Here
+## When Advanced Output Is Appropriate
 
-SSG, OSSG, and MSG concepts
-Conceptual relationship between nonrelativistic spin-space symmetry and
-magnetic-space-group descriptions.
+- an OSSG label changes under small tolerance variations;
+- an input, convention, database-standard, or ACC operation list disagrees;
+- a transformed cell cannot be paired with its SSG operations;
+- an input-cell operation export warns that the cell is not magnetic primitive;
+- SCIF/POSCAR round trips change the identification;
+- a batch regression differs from an accepted baseline.
 
-Cell settings
-The difference between input, input magnetic primitive, database standard,
-convention, ACC primitive, and ACC conventional settings.
+For ordinary interpretation, stay with
+[Interpret Your Result](../guide/understanding-results.md).
 
-Transform diagnostics
-How transforms connect cells and operation payloads, and how route audits should
-be read when a case fails.
+## Settings At A Glance
 
-Tolerance interpretation
-How `space_tol`, `mtol`, `meigtol`, `matrix_tol`, and `parser_atol` affect
-matching and classification.
+| Setting | Main purpose | Typical user product |
+| --- | --- | --- |
+| `input` | Preserve the user-supplied cell | Interoperability with an external code |
+| `input_magnetic_primitive` | Remove magnetic-cell supercell redundancy | Primitive reference for input-cell warnings |
+| `database_standard` | Match identify-index database conventions | Reproduction and route diagnostics |
+| `convention` | Public OSSG/GSPG presentation | Symbols and human-facing operations |
+| `acc_primitive` | ACC-aligned magnetic primitive cell | Matched VASP POSCAR/KPOINTS |
+| `acc_conventional` | Conventional ACC presentation | Comparison/classification workflows |
 
-SCIF generator details
-Repo-local tags, symbolic numeric formatting, roundtrip behavior, and quasi-2D
-metadata.
+A valid transformation chain must keep the cell and SSG paired. If a selected
+setting transform cannot carry both through the required chain, that failure is
+diagnostic evidence; silently substituting an unrelated basis would hide the
+problem.
 
-Batch validation
-Regression suites, export columns, baseline comparison, and high-throughput
-screening workflows.
+## Diagnostic Payloads
 
-## Placement Rule
+**`identify_index_details`.** Exact identification components, selected
+database records, and route evidence.
 
-If a page is needed to run the first example, choose an API, or read the main
-result fields, it belongs in the guide.
+**`acc_primitive_resolution_audit`.** How the ACC primitive transform/setting
+was resolved.
 
-If a page defines exact function signatures, returned fields, CLI flags, or
-SCIF modes, it belongs in the reference.
+**`transforms.audit` in `StructuredResult`.** Audits for standard-to-ACC and
+convention transform chains.
 
-If a page explains route internals, database settings, transform audits, or
-development validation, it belongs here.
+**`operation_views`.** Named complete/generator/nontrivial/MSG operation views.
+Each view carries a real-space and spin-frame setting.
+
+**`tolerances`.** Numerical thresholds that belong to the result provenance.
+
+## Validation Order
+
+When a result is surprising:
+
+1. verify input moments, occupancies, and coordinate conventions;
+2. reproduce quick analysis with defaults;
+3. vary one justified tolerance at a time;
+4. compare `index`, MSG, `conf`, and phase evidence;
+5. only then inspect identify-index, transforms, and operation settings;
+6. validate generated files by parsing/rerunning them through the intended
+   public route;
+7. use the batch workflow for broad regression claims.
+
+See [Parameters And Reliability](../guide/reliability-and-tolerances.md) before
+interpreting a tolerance-dependent change.
+
+## Batch Regression Evidence
+
+The repository batch workflow records baseline, comparison, and error
+artifacts. A clean single example is not evidence that a transform/output change
+is safe across SSG types. Changes to standard-cell selection, operation
+transforms, generated SCIF/POSCAR, or public schemas should use the relevant
+focused tests and the agreed batch suite.
+
+Operational commands are maintained in the repository batch workflow guide.
+Accepted baselines should record code version and tolerance profile; do not
+silently overwrite an accepted successful case with a different result.
+
+## Scientific Boundary
+
+Route diagnostics can establish reproducibility and internal consistency. They
+cannot establish energetic stability, response magnitude, experimental domain
+population, or transition kinetics. Those require the appropriate electronic-
+structure, thermodynamic, or experimental analysis.
