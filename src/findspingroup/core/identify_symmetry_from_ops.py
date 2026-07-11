@@ -573,16 +573,19 @@ def _search_transition_candidate_progressive(
     ):
         basis_matrices = [vector.reshape(3, 3) for vector in vh[-dim:, :]]
         basis_metrics = [_transition_basis_metrics(matrix) for matrix in basis_matrices]
-        for residual_tol in _transition_residual_tolerances(
+        residual_tolerances = _transition_residual_tolerances(
             singular_values,
             dim=dim,
             sv_tol=sv_tol,
-        ):
-            candidate = _search_transition_candidate(
-                basis_matrices,
-                linear_system,
-                residual_tol=residual_tol,
-            )
+        )
+        candidates = _search_transition_candidate(
+            basis_matrices,
+            linear_system,
+            residual_tol=residual_tolerances,
+        )
+        if candidates is None:
+            candidates = [None] * len(residual_tolerances)
+        for residual_tol, candidate in zip(residual_tolerances, candidates):
             attempts.append(
                 {
                     "dim": int(dim),
@@ -658,39 +661,53 @@ def _search_transition_candidate(
     *,
     residual_tol,
 ):
-    best_candidate = None
-    best_key = None
+    scalar_tolerance = np.isscalar(residual_tol)
+    residual_tolerances = (
+        [float(residual_tol)]
+        if scalar_tolerance
+        else [float(value) for value in residual_tol]
+    )
+    best_candidates = [None] * len(residual_tolerances)
+    best_keys = [None] * len(residual_tolerances)
 
-    def consider_candidate(candidate_matrix):
-        nonlocal best_candidate, best_key
+    def consider_candidate(candidate_matrix, tolerance_indices):
         metrics = _score_transition_candidate(candidate_matrix, linear_system)
         if metrics is None:
             return
-        metrics["passes_residual_tol"] = metrics["residual"] <= residual_tol
-        key = (
-            not metrics["passes_residual_tol"],
-            *_candidate_sort_key(metrics),
-        )
-        if best_candidate is None or key < best_key:
-            best_candidate = metrics
-            best_key = key
+        for index in tolerance_indices:
+            passes_residual_tol = metrics["residual"] <= residual_tolerances[index]
+            key = (not passes_residual_tol, *_candidate_sort_key(metrics))
+            if best_candidates[index] is None or key < best_keys[index]:
+                best_candidates[index] = {
+                    **metrics,
+                    "passes_residual_tol": passes_residual_tol,
+                }
+                best_keys[index] = key
 
+    all_tolerance_indices = range(len(residual_tolerances))
     for coeffs in _iter_transition_coefficients(len(basis_matrices)):
         candidate = np.zeros((3, 3), dtype=float)
         for coeff, basis in zip(coeffs, basis_matrices):
             candidate += coeff * basis
-        consider_candidate(candidate)
+        consider_candidate(candidate, all_tolerance_indices)
 
-    if best_candidate is None or not best_candidate["passes_residual_tol"] or best_candidate["sigma_min"] < 1e-8:
+    random_tolerance_indices = [
+        index
+        for index, candidate in enumerate(best_candidates)
+        if candidate is None
+        or not candidate["passes_residual_tol"]
+        or candidate["sigma_min"] < 1e-8
+    ]
+    if random_tolerance_indices:
         rng = np.random.default_rng(0)
         for _ in range(max(64, 16 * len(basis_matrices))):
             coeffs = rng.normal(size=len(basis_matrices))
             candidate = np.zeros((3, 3), dtype=float)
             for coeff, basis in zip(coeffs, basis_matrices):
                 candidate += coeff * basis
-            consider_candidate(candidate)
+            consider_candidate(candidate, random_tolerance_indices)
 
-    return best_candidate
+    return best_candidates[0] if scalar_tolerance else best_candidates
 
 
 def _iter_transition_coefficients(dim):
