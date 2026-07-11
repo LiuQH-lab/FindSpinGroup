@@ -1169,6 +1169,7 @@ def generate_scif(
     real_space_setting: str | None = None,
     spin_frame_setting: str | None = None,
     quasi_2d: dict | None = None,
+    operation_loops=None,
 ):
     """
     input:
@@ -1186,7 +1187,9 @@ def generate_scif(
     cell = cell_G0.to_spglib(mag=True)
     configuration = ssg.conf
     norm_direction = ssg.sog_direction
-    non_centered_nssg_ops, nontrivial_spin_translation_ops = _resolve_scif_operation_loops(ssg)
+    if operation_loops is None:
+        operation_loops = _resolve_scif_operation_loops(ssg)
+    non_centered_nssg_ops, nontrivial_spin_translation_ops = operation_loops
 
 
 
@@ -1209,20 +1212,23 @@ def generate_scif(
         ssg_primitive=ssg_primitive,
         identify_index_details=identify_index_details,
     )
-    chen_symbol_transform_parts = _resolve_transform_chen_parts(
-        cell_G0=cell_G0,
-        ssg=ssg,
-        basis_tag_transforms=basis_tag_transforms,
-        ssg_primitive=ssg_primitive,
-        identify_index_details=identify_index_details,
-        strip_spin_lattice_lengths=False,
-    )
     chen_number = spin_space_group_index
-    chen_name = (
-        spin_space_group_name_chen
-        if spin_space_group_name_chen is not None
-        else _chen_linear_name_from_transform_parts(filename, ssg, chen_symbol_transform_parts)
-    )
+    if spin_space_group_name_chen is not None:
+        chen_name = spin_space_group_name_chen
+    else:
+        chen_symbol_transform_parts = _resolve_transform_chen_parts(
+            cell_G0=cell_G0,
+            ssg=ssg,
+            basis_tag_transforms=basis_tag_transforms,
+            ssg_primitive=ssg_primitive,
+            identify_index_details=identify_index_details,
+            strip_spin_lattice_lengths=False,
+        )
+        chen_name = _chen_linear_name_from_transform_parts(
+            filename,
+            ssg,
+            chen_symbol_transform_parts,
+        )
     latex_name = spin_space_group_name_latex
     oriented_linear_name = spin_space_group_name_linear
     if chen_number is None:
