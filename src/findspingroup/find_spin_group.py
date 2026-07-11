@@ -683,6 +683,33 @@ ACC_PRIMITIVE_POSCAR_SPIN_FRAME_SETTING = "acc_primitive_poscar_spin_frame"
 OSSG_ORIENTED_SPIN_FRAME_SETTING = "ossg_oriented_spin_frame"
 G0_STANDARD_SETTING = "G0std"
 L0_STANDARD_SETTING = "L0std"
+
+FULL_ROUTE_OPTIONAL_COMPONENTS = frozenset(
+    {
+        "operation_views",
+        "scif",
+        "spin_texture",
+        "tensors",
+    }
+)
+
+
+def _resolve_full_route_components(components) -> frozenset[str]:
+    if components is None:
+        return FULL_ROUTE_OPTIONAL_COMPONENTS
+    if isinstance(components, str):
+        requested = {components}
+    else:
+        requested = {str(component) for component in components}
+    unknown = requested - FULL_ROUTE_OPTIONAL_COMPONENTS
+    if unknown:
+        raise ValueError(
+            "Unknown full-route components: "
+            + ", ".join(sorted(unknown))
+            + ". Available components: "
+            + ", ".join(sorted(FULL_ROUTE_OPTIONAL_COMPONENTS))
+        )
+    return frozenset(requested)
 # Temporary production bridge for known redundant pure-translation ACC-P
 # records in the current identify-index database. Remove this fallback and
 # restore strict ACC-P resolution after the refreshed database covers these
@@ -7765,7 +7792,9 @@ def _find_spin_group_from_parsed(
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
     spin_texture_basis_max_order: int | None = None,
+    components=None,
 ) -> MagSymmetryResult:
+    enabled_components = _resolve_full_route_components(components)
     input_lattice_for_cell = lattice_factors
     input_positions_for_cell = positions
     input_lattice_array = np.asarray(lattice_factors, dtype=float)
@@ -8446,10 +8475,14 @@ def _find_spin_group_from_parsed(
                 tol=tol_cfg.m_matrix_tol,
             )
         )
-    tensor_outputs = _compute_tensor_outputs(
-        acc_magnetic_primitive_ssg,
-        acc_magnetic_primitive_cell,
-        tol=tol_cfg.m_matrix_tol,
+    tensor_outputs = (
+        _compute_tensor_outputs(
+            acc_magnetic_primitive_ssg,
+            acc_magnetic_primitive_cell,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        if "tensors" in enabled_components
+        else {}
     )
 
     convention_nssg_ops = public_ossg_ssg.nssg
@@ -8656,7 +8689,12 @@ def _find_spin_group_from_parsed(
             seitz_tol=input_setting_ossg.symbol_calibration_tol,
             spin_transform=input_lattice_col,
         )
-    operation_views = _build_operation_views(
+    operation_views_builder = (
+        _build_operation_views
+        if "operation_views" in enabled_components
+        else lambda _sources: None
+    )
+    operation_views = operation_views_builder(
         {
             "convention_cartesian": {
                 "ssg": public_convention_cartesian_ssg,
@@ -8809,14 +8847,19 @@ def _find_spin_group_from_parsed(
             },
         }
 
+    scif_enabled = "scif" in enabled_components
     canonical_scif_target = scif_export_targets[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]
-    actual_chen_linear_name = _build_chen_linear_name(
-        source_name,
-        canonical_scif_target["export_cell"],
-        canonical_scif_target["export_ssg"],
-        canonical_scif_target["basis_tag_transforms"],
-        ssg_primitive,
-        identify_index_details,
+    actual_chen_linear_name = (
+        _build_chen_linear_name(
+            source_name,
+            canonical_scif_target["export_cell"],
+            canonical_scif_target["export_ssg"],
+            canonical_scif_target["basis_tag_transforms"],
+            ssg_primitive,
+            identify_index_details,
+        )
+        if scif_enabled
+        else None
     )
 
     source_parent_space_group = (
@@ -8824,7 +8867,9 @@ def _find_spin_group_from_parsed(
     )
     scif_real_space_cache = {}
     scif_outputs = {}
-    for cell_mode, export_target in scif_export_targets.items():
+    for cell_mode, export_target in (
+        scif_export_targets.items() if scif_enabled else ()
+    ):
         export_cell = export_target["export_cell"]
         export_ssg = export_target["export_ssg"]
         is_input_like_scif = bool(export_target.get("is_input_setting", False))
@@ -8926,7 +8971,7 @@ def _find_spin_group_from_parsed(
             quasi_2d=quasi_2d_diagnostics,
         )
 
-    scif = scif_outputs[SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED]
+    scif = scif_outputs.get(SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED)
 
     acc_primitive_output_cell_snapshot = _serialize_cell_snapshot(
         acc_primitive_output_cell,
@@ -8942,16 +8987,21 @@ def _find_spin_group_from_parsed(
         site_order=acc_primitive_wp_site_order,
     )
     acc_p_c_poscar = acc_primitive_output_poscar
-    spin_texture_config_database = _spin_texture_config_for_public_output(identify_info)
-    spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
-        public_convention_oriented_ssg,
-        convention_cell,
-        tol=tol_cfg.m_matrix_tol,
-        calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
-        reference=spin_texture_config_database,
-        generator_ops=convention_oriented_generator_ops,
-        spin_texture_basis_max_order=spin_texture_basis_max_order,
-    )
+    if "spin_texture" in enabled_components:
+        spin_texture_config_database = _spin_texture_config_for_public_output(identify_info)
+        spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
+            public_convention_oriented_ssg,
+            convention_cell,
+            tol=tol_cfg.m_matrix_tol,
+            calibration_atol_limit=max(tol_cfg.m_matrix_tol, tol_cfg.moment),
+            reference=spin_texture_config_database,
+            generator_ops=convention_oriented_generator_ops,
+            spin_texture_basis_max_order=spin_texture_basis_max_order,
+        )
+    else:
+        spin_texture_config_database = None
+        spin_texture_config_no_soc = None
+        spin_texture_config_soc = None
 
     result = {
         'index':identify_info,
@@ -8960,7 +9010,7 @@ def _find_spin_group_from_parsed(
         'id_index_info':identify_info,
         'scif':scif,
         'scif_outputs': scif_outputs,
-        'scif_cell_modes': sorted(scif_export_targets.keys()),
+        'scif_cell_modes': sorted(scif_outputs.keys()),
         'poscar_mp':acc_primitive_output_poscar,
         'acc':ssg_primitive.acc,
         'msg_acc': msg_acc,
@@ -8994,7 +9044,7 @@ def _find_spin_group_from_parsed(
         'primitive_magnetic_cell_poscar':acc_p_c_poscar,
         'scif': scif,
         'scif_outputs': scif_outputs,
-        'scif_cell_modes': sorted(scif_export_targets.keys()),
+        'scif_cell_modes': sorted(scif_outputs.keys()),
         'primitive_magnetic_cell_detail': acc_primitive_output_cell_snapshot,
         'acc_primitive_magnetic_cell': acc_primitive_output_cell_tuple,
         'acc_primitive_magnetic_cell_setting': ACC_PRIMITIVE_SETTING,
@@ -10165,6 +10215,7 @@ def find_spin_group_from_data(
     calculation_mode: str | None = "3d",
     vacuum_axis: str | None = "c",
     spin_texture_basis_max_order: int | None = None,
+    components=None,
 ) -> MagSymmetryResult:
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     return _find_spin_group_from_parsed(
@@ -10181,6 +10232,7 @@ def find_spin_group_from_data(
         calculation_mode=calculation_mode,
         vacuum_axis=vacuum_axis,
         spin_texture_basis_max_order=spin_texture_basis_max_order,
+        components=components,
     )
 
 
@@ -10430,6 +10482,7 @@ def find_spin_group(
     poscar_allow_incar_magmom: bool = False,
     poscar_prefer_incar_magmom: bool = False,
     spin_texture_basis_max_order: int | None = None,
+    components=None,
 ) -> MagSymmetryResult:
     """
     Find the spin space group of a crystal structure given in a CIF file.
@@ -10472,6 +10525,7 @@ def find_spin_group(
         calculation_mode=calculation_mode,
         vacuum_axis=vacuum_axis,
         spin_texture_basis_max_order=spin_texture_basis_max_order,
+        components=components,
     )
 
 
