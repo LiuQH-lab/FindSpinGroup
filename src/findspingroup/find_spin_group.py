@@ -3572,6 +3572,7 @@ def _build_operation_view_set(
     setting_label: str,
     spin_frame: str,
     generator_ops: list[SpinSpaceGroupOperation] | None = None,
+    generator_ops_complete: bool = False,
     msg_ops: list[SpinSpaceGroupOperation] | None = None,
     msg_ops_payload: list[dict] | None = None,
     msg_seitz_latex: list[str] | None = None,
@@ -3601,14 +3602,7 @@ def _build_operation_view_set(
         all_ops = [all_ops[index - 1] for index in nssg_indices_in_source]
         ops_payload = _serialize_ssg_operation_matrices(all_ops)
         seitz_latex = [seitz_latex[index - 1] for index in nssg_indices_in_source]
-        if generator_ops is None:
-            view_ssg = SpinSpaceGroup(
-                all_ops,
-                tol=ssg.tol,
-                real_space_metric=ssg.real_space_metric,
-            )
-            generator_ops = _symbol_generator_ops_for_current_basis(view_ssg)
-        else:
+        if generator_ops is not None:
             generator_ops = list(generator_ops)
         collinear_note = _operation_view_collinear_note(ssg, spin_frame=spin_frame)
 
@@ -3624,10 +3618,15 @@ def _build_operation_view_set(
         )
         views["nssg"]["note"] = collinear_note
 
-    if generator_ops is None:
-        generator_ops = _symbol_generator_ops_for_current_basis(ssg)
-    elif not is_collinear:
-        generator_ops = list(generator_ops) + _symbol_generator_ops_for_current_basis(ssg)
+    if generator_ops is not None:
+        generator_ops = list(generator_ops)
+    if generator_ops is None or not generator_ops_complete:
+        view_ssg = SpinSpaceGroup(
+            all_ops,
+            tol=ssg.tol,
+            real_space_metric=ssg.real_space_metric,
+        )
+        generator_ops = _symbol_generator_ops_for_current_basis(view_ssg)
     if generator_ops:
         generator_indices = _deduplicate_operation_view_indices(
             _operation_view_indices_from_ops(
@@ -3762,6 +3761,7 @@ def _build_operation_views(operation_sources: dict[str, dict]) -> dict:
             setting_label=source.get("setting_label", setting_key),
             spin_frame=source.get("spin_frame", "cartesian"),
             generator_ops=source.get("generator_ops"),
+            generator_ops_complete=bool(source.get("generator_ops_complete", False)),
             msg_ops=source.get("msg_ops"),
             msg_ops_payload=source.get("msg_ops_payload"),
             msg_seitz_latex=source.get("msg_seitz_latex"),
@@ -8809,6 +8809,7 @@ def _find_spin_group_from_parsed(
                 "setting_label": convention_setting,
                 "spin_frame": "cartesian",
                 "generator_ops": convention_cartesian_generator_ops,
+                "generator_ops_complete": True,
                 "msg_ops": convention_cartesian_msg_ops,
                 "msg_ops_payload": convention_cartesian_msg_payload,
                 "msg_seitz_latex": convention_cartesian_msg_seitz_latex,
@@ -8821,6 +8822,7 @@ def _find_spin_group_from_parsed(
                 "setting_label": convention_setting,
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": convention_oriented_generator_ops,
+                "generator_ops_complete": True,
                 "msg_ops": convention_oriented_msg_ops,
                 "msg_ops_payload": convention_oriented_msg_payload,
                 "msg_seitz_latex": convention_oriented_msg_seitz_latex,
@@ -8833,6 +8835,7 @@ def _find_spin_group_from_parsed(
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": "cartesian",
                 "generator_ops": acc_primitive_cartesian_generator_ops,
+                "generator_ops_complete": True,
                 "msg_ops": acc_primitive_cartesian_msg_ops,
                 "msg_ops_payload": acc_primitive_cartesian_msg_payload,
                 "msg_seitz_latex": acc_primitive_cartesian_msg_seitz_latex,
@@ -8845,6 +8848,7 @@ def _find_spin_group_from_parsed(
                 "setting_label": ACC_PRIMITIVE_SETTING,
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": acc_primitive_oriented_generator_ops,
+                "generator_ops_complete": True,
                 "msg_ops": acc_primitive_oriented_msg_ops,
                 "msg_ops_payload": acc_primitive_oriented_msg_payload,
                 "msg_seitz_latex": acc_primitive_oriented_msg_seitz_latex,
@@ -8857,6 +8861,7 @@ def _find_spin_group_from_parsed(
                 "setting_label": "input",
                 "spin_frame": "cartesian",
                 "generator_ops": input_cartesian_generator_ops,
+                "generator_ops_complete": input_setting_matches_true_ssg,
                 "msg_ops": input_cartesian_msg_ops,
                 "msg_ops_payload": input_cartesian_msg_payload,
                 "msg_seitz_latex": input_cartesian_msg_seitz_latex,
@@ -8869,6 +8874,7 @@ def _find_spin_group_from_parsed(
                 "setting_label": "input",
                 "spin_frame": OSSG_ORIENTED_SPIN_FRAME_SETTING,
                 "generator_ops": input_oriented_generator_ops,
+                "generator_ops_complete": input_setting_matches_true_ssg,
                 "msg_ops": input_oriented_msg_ops,
                 "msg_ops_payload": input_oriented_msg_payload,
                 "msg_seitz_latex": input_oriented_msg_seitz_latex,
