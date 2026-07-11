@@ -181,6 +181,54 @@ def _select_heuristic_vacuum_axis(
     return "heuristic", viable[0].axis_index, candidates, viable[0].axis
 
 
+def resolve_quasi2d_preprocessing(
+    lattice_matrix,
+    positions,
+    *,
+    calculation_mode: str | None = "3d",
+    vacuum_axis: str | None = "c",
+) -> tuple[str, str | None]:
+    """Resolve the calculation mode and any axis needed before symmetry search.
+
+    Explicit quasi-2D vacuum padding changes the structure presented to the
+    symmetry search, so heuristic axis selection must happen before that search
+    rather than later while building diagnostics. Legacy ``auto`` mode remains
+    diagnostic-only and therefore does not mutate the analyzed structure.
+    """
+    normalized_mode = _normalize_calculation_mode(calculation_mode)
+    if normalized_mode not in {"3d", "quasi2d", "auto"}:
+        raise ValueError(
+            f"Unknown calculation_mode {calculation_mode!r}; expected '3d', "
+            "'quasi2d', or 'auto'."
+        )
+
+    explicit_axis, explicit_axis_index = _normalize_axis(vacuum_axis)
+    if _normalize_scalar(vacuum_axis) is not None and explicit_axis_index is None:
+        raise ValueError(
+            f"Unknown vacuum_axis {vacuum_axis!r}; expected one of a, b, or c."
+        )
+    if normalized_mode == "3d":
+        return normalized_mode, None
+    if normalized_mode == "auto":
+        return normalized_mode, None
+    if normalized_mode == "quasi2d" and explicit_axis_index is not None:
+        return normalized_mode, explicit_axis
+
+    raw_cell_detail = {
+        "lattice": np.asarray(lattice_matrix, dtype=float).reshape(3, 3),
+        "positions": np.asarray(positions, dtype=float).reshape(-1, 3),
+    }
+    heuristic_status, _, _, heuristic_axis = _select_heuristic_vacuum_axis(
+        raw_cell_detail
+    )
+    if heuristic_status == "heuristic" and heuristic_axis is not None:
+        return normalized_mode, heuristic_axis
+    raise ValueError(
+        "calculation_mode='quasi2d' requires an explicit vacuum_axis when "
+        "the input geometry does not determine a unique vacuum direction."
+    )
+
+
 def _occupied_window_fractional(coords: np.ndarray) -> tuple[float, float, float, float, np.ndarray]:
     coords = np.sort(np.mod(np.asarray(coords, dtype=float).reshape(-1), 1.0))
     if coords.size == 0:
