@@ -615,11 +615,22 @@ def _spin_texture_config_from_ossg_convention(
         tol=tol,
         time_reversal_resolver=convention_ossg.classify_magnetic_operation,
     )
+    full_soc_pairs = _msg_operation_pairs_in_ossg_unit_cartesian(msg_ops, convention_cell)
+    soc_generator_pairs = _validated_spin_texture_constraint_generators(
+        full_soc_pairs,
+        tol=tol,
+    )
     soc = _safe_classify_spin_texture_config(
-        _msg_operation_pairs_in_ossg_unit_cartesian(msg_ops, convention_cell),
+        soc_generator_pairs,
         source="ossg_unit_cartesian_msg_ops",
         basis_orders_through=spin_texture_basis_max_order,
     )
+    if soc is None and len(soc_generator_pairs) < len(full_soc_pairs):
+        soc = _safe_classify_spin_texture_config(
+            full_soc_pairs,
+            source="ossg_unit_cartesian_msg_ops",
+            basis_orders_through=spin_texture_basis_max_order,
+        )
     if soc is not None:
         soc["basis_setting"] = "ossg_unit_cartesian"
     return no_soc, soc
@@ -2555,9 +2566,17 @@ def is_ahc(mpg):
     return wSOC
 
 
-def _serialize_tensor_solution(solution, operations_count):
+def _serialize_tensor_solution(solution, operations_count, solver_operations_count=None):
     constraint_matrix, nullspace_basis, relations, components = solution
     free_parameters = int(nullspace_basis.shape[1]) if nullspace_basis.ndim == 2 else 0
+    constraint_shape = list(constraint_matrix.shape)
+    if solver_operations_count is not None and solver_operations_count < operations_count:
+        # Each group operation contributes one square n^r constraint block.
+        # Keep the public shape describing the full-group formulation even
+        # when an equivalent generator subset is used for the numerical solve.
+        constraint_shape[0] += (
+            int(operations_count) - int(solver_operations_count)
+        ) * int(constraint_shape[1])
 
     def _symbolize_display(value):
         if isinstance(value, str):
@@ -2572,7 +2591,7 @@ def _serialize_tensor_solution(solution, operations_count):
 
     return {
         'operations_count': operations_count,
-        'constraint_shape': list(constraint_matrix.shape),
+        'constraint_shape': constraint_shape,
         'nullspace_shape': list(nullspace_basis.shape),
         'free_parameters': free_parameters,
         'is_zero': free_parameters == 0,
@@ -2651,25 +2670,38 @@ def _tensor_ops_w_soc(ssg: SpinSpaceGroup, cell: CrystalCell, tol: float):
 def _compute_tensor_outputs(ssg: SpinSpaceGroup, cell: CrystalCell, tol: float):
     ops_wo_soc = _tensor_ops_wo_soc(ssg, cell)
     ops_w_soc = _tensor_ops_w_soc(ssg, cell, tol=tol)
+    generator_ops_wo_soc = _validated_gspg_constraint_generators(ops_wo_soc, tol=tol)
+    generator_ops_w_soc = _validated_gspg_constraint_generators(ops_w_soc, tol=tol)
     tensor_specs = {
-        'AHE_woSOC': (solve_ahe, ops_wo_soc, {'symbol': r'\sigma', 'use_antisymmetry': True}),
-        'AHE_wSOC': (solve_ahe, ops_w_soc, {'symbol': r'\sigma', 'use_antisymmetry': True}),
-        'BCDTensor': (solve_bcd, ops_wo_soc, {'symbol': 'D'}),
-        'MSGBCDTensor': (solve_bcd, ops_w_soc, {'symbol': 'D'}),
-        'QMDTensor': (solve_qmd, ops_wo_soc, {'symbol': 'Q'}),
-        'MSGQMDTensor': (solve_qmd, ops_w_soc, {'symbol': 'Q'}),
-        'IMDTensor': (solve_imd, ops_wo_soc, {'symbol': 'I'}),
-        'MSGIMDTensor': (solve_imd, ops_w_soc, {'symbol': 'I'}),
+        'AHE_woSOC': (solve_ahe, generator_ops_wo_soc, ops_wo_soc, {'symbol': r'\sigma', 'use_antisymmetry': True}),
+        'AHE_wSOC': (solve_ahe, generator_ops_w_soc, ops_w_soc, {'symbol': r'\sigma', 'use_antisymmetry': True}),
+        'BCDTensor': (solve_bcd, generator_ops_wo_soc, ops_wo_soc, {'symbol': 'D'}),
+        'MSGBCDTensor': (solve_bcd, generator_ops_w_soc, ops_w_soc, {'symbol': 'D'}),
+        'QMDTensor': (solve_qmd, generator_ops_wo_soc, ops_wo_soc, {'symbol': 'Q'}),
+        'MSGQMDTensor': (solve_qmd, generator_ops_w_soc, ops_w_soc, {'symbol': 'Q'}),
+        'IMDTensor': (solve_imd, generator_ops_wo_soc, ops_wo_soc, {'symbol': 'I'}),
+        'MSGIMDTensor': (solve_imd, generator_ops_w_soc, ops_w_soc, {'symbol': 'I'}),
     }
     tensor_outputs = {}
-    for key, (solver, operations, kwargs) in tensor_specs.items():
+    for key, (solver, solver_operations, full_operations, kwargs) in tensor_specs.items():
         try:
             tensor_outputs[key] = _serialize_tensor_solution(
-                solver(operations, **kwargs),
-                operations_count=len(operations),
+                solver(solver_operations, **kwargs),
+                operations_count=len(full_operations),
+                solver_operations_count=len(solver_operations),
             )
         except Exception as error:
-            tensor_outputs[key] = {'error': str(error)}
+            if len(solver_operations) >= len(full_operations):
+                tensor_outputs[key] = {'error': str(error)}
+                continue
+            try:
+                tensor_outputs[key] = _serialize_tensor_solution(
+                    solver(full_operations, **kwargs),
+                    operations_count=len(full_operations),
+                    solver_operations_count=len(full_operations),
+                )
+            except Exception as full_error:
+                tensor_outputs[key] = {'error': str(full_error)}
     return tensor_outputs
 
 
@@ -3126,6 +3158,64 @@ def _select_gspg_generator_ops(ops, *, tol: float) -> list:
         if target_keys.issubset(closure):
             return selected
     return selected if target_keys.issubset(closure) else candidates
+
+
+def _validated_gspg_constraint_generators(
+    full_ops,
+    *,
+    tol: float,
+    preferred_generators=None,
+) -> list:
+    def normalize_pair(op):
+        if isinstance(op, dict):
+            return [
+                np.asarray(op["spin_rotation"], dtype=float),
+                np.asarray(op["real_rotation"], dtype=float),
+            ]
+        return [np.asarray(op[0], dtype=float), np.asarray(op[1], dtype=float)]
+
+    operations = deduplicate_matrix_pairs(
+        [normalize_pair(op) for op in full_ops],
+        tol=tol,
+    )
+    if not operations:
+        return []
+
+    target_keys = {_gspg_pair_key(op) for op in operations}
+    limit = max(4096, len(target_keys) * 8)
+
+    def closes_exactly(candidates) -> bool:
+        if not candidates:
+            return False
+        try:
+            return _gspg_pair_closure(candidates, tol=tol, limit=limit) == target_keys
+        except RuntimeError:
+            return False
+
+    if preferred_generators is not None:
+        preferred = deduplicate_matrix_pairs(
+            [normalize_pair(op) for op in preferred_generators],
+            tol=tol,
+        )
+        if closes_exactly(preferred):
+            return preferred
+
+    selected = _select_gspg_generator_ops(operations, tol=tol)
+    return selected if closes_exactly(selected) else operations
+
+
+def _validated_spin_texture_constraint_generators(full_ops, *, tol: float) -> list[dict]:
+    generators = _validated_gspg_constraint_generators(full_ops, tol=tol)
+    # A positional pair means (Q, S) to the spin-texture solver, whereas the
+    # closure helper works with (S, R). Preserve the explicit keyed contract so
+    # real-space rotations are converted to reciprocal Q by the solver.
+    return [
+        {
+            "spin_rotation": np.asarray(spin_rotation, dtype=float),
+            "real_rotation": np.asarray(real_rotation, dtype=float),
+        }
+        for spin_rotation, real_rotation in generators
+    ]
 
 
 def _gspg_pair_is_spin_only(pair, *, tol: float) -> bool:

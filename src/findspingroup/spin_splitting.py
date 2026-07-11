@@ -889,14 +889,17 @@ def radical_text(
                 error = abs(target - approx)
                 if error > zero_tol:
                     continue
-                if multiplier == 1 and denominator == 1:
+                divisor = math.gcd(multiplier, denominator)
+                reduced_multiplier = multiplier // divisor
+                reduced_denominator = denominator // divisor
+                if reduced_multiplier == 1 and reduced_denominator == 1:
                     body = f"sqrt({radicand})"
-                elif multiplier == 1:
-                    body = f"sqrt({radicand})/{denominator}"
-                elif denominator == 1:
-                    body = f"{multiplier}*sqrt({radicand})"
+                elif reduced_multiplier == 1:
+                    body = f"sqrt({radicand})/{reduced_denominator}"
+                elif reduced_denominator == 1:
+                    body = f"{reduced_multiplier}*sqrt({radicand})"
                 else:
-                    body = f"{multiplier}*sqrt({radicand})/{denominator}"
+                    body = f"{reduced_multiplier}*sqrt({radicand})/{reduced_denominator}"
                 candidate = f"{sign}{body}"
                 if best is None or (error, len(candidate), candidate) < (best[0], len(best[1]), best[1]):
                     best = (error, candidate)
