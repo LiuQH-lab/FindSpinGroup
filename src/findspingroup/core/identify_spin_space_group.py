@@ -1,6 +1,7 @@
 import itertools
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import lru_cache
 
 import numpy as np
 
@@ -1774,7 +1775,58 @@ def _spatial_group_closure_failure(ops, tol: float, label: str) -> str | None:
     return None
 
 
-def _candidate_audit_failure(ssg_ops, group_tol=DEFAULT_TOL) -> str | None:
+def _candidate_audit_tol_key(group_tol) -> tuple:
+    if isinstance(group_tol, Tolerances):
+        return (
+            "tolerances",
+            float(group_tol.space),
+            float(group_tol.moment),
+            float(group_tol.m_eig),
+            float(group_tol.occupancy),
+            float(group_tol.m_matrix_tol),
+        )
+    return ("scalar", float(group_tol))
+
+
+def _candidate_audit_operation_key(op: SpinSpaceGroupOperation) -> tuple[bytes, bytes, bytes]:
+    return (
+        np.asarray(op.spin_rotation, dtype=np.float64).reshape(3, 3).tobytes(),
+        np.asarray(op.rotation, dtype=np.float64).reshape(3, 3).tobytes(),
+        np.asarray(op.translation, dtype=np.float64).reshape(3).tobytes(),
+    )
+
+
+def _candidate_audit_ops_key(ssg_ops) -> tuple[tuple[bytes, bytes, bytes], ...]:
+    # Group audits are independent of operation enumeration order. Exact bytes
+    # avoid merging numerically close candidates that still require separate
+    # tolerance-sensitive validation.
+    return tuple(sorted(_candidate_audit_operation_key(op) for op in ssg_ops))
+
+
+def _restore_candidate_audit_tol(tol_key: tuple):
+    if tol_key[0] == "scalar":
+        return float(tol_key[1])
+    return Tolerances(
+        space=float(tol_key[1]),
+        moment=float(tol_key[2]),
+        m_eig=float(tol_key[3]),
+        occupancy=float(tol_key[4]),
+        m_matrix_tol=float(tol_key[5]),
+    )
+
+
+def _restore_candidate_audit_ops(ops_key):
+    return [
+        SpinSpaceGroupOperation(
+            np.frombuffer(spin_bytes, dtype=np.float64).reshape(3, 3).copy(),
+            np.frombuffer(real_bytes, dtype=np.float64).reshape(3, 3).copy(),
+            np.frombuffer(translation_bytes, dtype=np.float64).reshape(3).copy(),
+        )
+        for spin_bytes, real_bytes, translation_bytes in ops_key
+    ]
+
+
+def _candidate_audit_failure_uncached(ssg_ops, group_tol=DEFAULT_TOL) -> str | None:
     if not ssg_ops:
         return "candidate produced no SSG operations"
     try:
@@ -1804,6 +1856,24 @@ def _candidate_audit_failure(ssg_ops, group_tol=DEFAULT_TOL) -> str | None:
         return None
     except Exception as exc:
         return f"{type(exc).__name__}: {exc}"
+
+
+@lru_cache(maxsize=128)
+def _candidate_audit_failure_cached(ops_key: tuple, tol_key: tuple) -> str | None:
+    return _candidate_audit_failure_uncached(
+        _restore_candidate_audit_ops(ops_key),
+        group_tol=_restore_candidate_audit_tol(tol_key),
+    )
+
+
+def _candidate_audit_failure(ssg_ops, group_tol=DEFAULT_TOL) -> str | None:
+    ssg_ops = list(ssg_ops)
+    if not ssg_ops:
+        return "candidate produced no SSG operations"
+    return _candidate_audit_failure_cached(
+        _candidate_audit_ops_key(ssg_ops),
+        _candidate_audit_tol_key(group_tol),
+    )
 
 
 def _format_candidate_audit_failures(profiles, limit=5):
