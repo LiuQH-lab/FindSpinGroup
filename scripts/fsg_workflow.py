@@ -291,6 +291,53 @@ def _submit_roundtrip_stage(
     _submit_remote_stage(profile, snapshot, command=command, dry_run=dry_run)
 
 
+QUASI2D_EXPORT_FIELDS = (
+    "index,phase,quasi_2d.status,quasi_2d.source,"
+    "quasi_2d.vacuum_axis_input,quasi_2d.magnetic_phase,"
+    "quasi_2d.spin_splitting_2d,quasi_2d.interpretation,"
+    "quasi_2d.generic_point_comparison.summary,"
+    "quasi_2d.generic_point_comparison.spin_splitting_changed,"
+    "quasi_2d.spin_texture_config_no_soc.spin_texture_type,"
+    "quasi_2d.spin_texture_config_no_soc.momentum_space_spin_configuration,"
+    "quasi_2d.spin_texture_config_no_soc.operation_audit.non_plane_preserving_operation_count,"
+    "quasi_2d.spin_texture_config_soc.spin_texture_type,"
+    "quasi_2d.spin_texture_config_soc.momentum_space_spin_configuration,"
+    "quasi_2d.spin_texture_config_soc.operation_audit.non_plane_preserving_operation_count"
+)
+
+
+def _submit_quasi2d_stage(
+    config: dict[str, Any],
+    profile: dict[str, Any],
+    snapshot: Snapshot,
+    *,
+    dataset_name: str,
+    vacuum_axis: str | None,
+    workers: int | None,
+    limit: int | None,
+    baseline_suite_override: str | None,
+    tag: str | None,
+    dry_run: bool,
+) -> None:
+    _submit_mcif_stage(
+        config,
+        profile,
+        snapshot,
+        dataset_name=dataset_name,
+        route="full",
+        calculation_mode="quasi2d",
+        vacuum_axis=vacuum_axis,
+        workers=workers,
+        limit=limit,
+        runtime_export=False,
+        selected_export=True,
+        export_fields_override=QUASI2D_EXPORT_FIELDS,
+        baseline_suite_override=baseline_suite_override,
+        tag=tag,
+        dry_run=dry_run,
+    )
+
+
 def command_batch_test(args: argparse.Namespace) -> None:
     config = _load_config(args.profile_config)
     profile = _profile(config, args.profile)
@@ -322,19 +369,6 @@ def command_quasi2d_test(args: argparse.Namespace) -> None:
         raise SystemExit("--axis-sweep cannot be combined with --vacuum-axis.")
     snapshot = _prepare_remote_snapshot(profile, dry_run=not args.execute)
     axes = ["a", "b", "c"] if args.axis_sweep else [args.vacuum_axis]
-    export_fields = (
-        "index,phase,quasi_2d.status,quasi_2d.source,"
-        "quasi_2d.vacuum_axis_input,quasi_2d.magnetic_phase,"
-        "quasi_2d.spin_splitting_2d,quasi_2d.interpretation,"
-        "quasi_2d.generic_point_comparison.summary,"
-        "quasi_2d.generic_point_comparison.spin_splitting_changed,"
-        "quasi_2d.spin_texture_config_no_soc.spin_texture_type,"
-        "quasi_2d.spin_texture_config_no_soc.momentum_space_spin_configuration,"
-        "quasi_2d.spin_texture_config_no_soc.operation_audit.non_plane_preserving_operation_count,"
-        "quasi_2d.spin_texture_config_soc.spin_texture_type,"
-        "quasi_2d.spin_texture_config_soc.momentum_space_spin_configuration,"
-        "quasi_2d.spin_texture_config_soc.operation_audit.non_plane_preserving_operation_count"
-    )
     dataset = _dataset(config, args.dataset)
     base_baseline_suite = str(dataset.get("baseline_suite") or args.dataset)
     for axis in axes:
@@ -343,19 +377,14 @@ def command_quasi2d_test(args: argparse.Namespace) -> None:
         if args.axis_sweep:
             axis_tag = f"{args.tag}_axis_{axis}" if args.tag else f"axis_{axis}"
             baseline_suite_override = f"{base_baseline_suite}_axis_{axis}"
-        _submit_mcif_stage(
+        _submit_quasi2d_stage(
             config,
             profile,
             snapshot,
             dataset_name=args.dataset,
-            route="full",
-            calculation_mode="quasi2d",
             vacuum_axis=axis,
             workers=args.workers,
             limit=args.limit,
-            runtime_export=False,
-            selected_export=True,
-            export_fields_override=export_fields,
             baseline_suite_override=baseline_suite_override,
             tag=axis_tag,
             dry_run=not args.execute,
@@ -434,6 +463,23 @@ def command_release_test(args: argparse.Namespace) -> None:
         dataset_name="scif_roundtrip_2241",
         kind="scif",
         workers=roundtrip_workers,
+        tag=args.tag,
+        dry_run=not args.execute,
+    )
+    quasi2d_dataset = (
+        args.quasi2d_dataset
+        or profile.get("release_quasi2d_dataset")
+        or "quasi2d_inputversion"
+    )
+    _submit_quasi2d_stage(
+        config,
+        profile,
+        snapshot,
+        dataset_name=str(quasi2d_dataset),
+        vacuum_axis=None,
+        workers=args.quasi2d_workers or args.workers,
+        limit=None,
+        baseline_suite_override=None,
         tag=args.tag,
         dry_run=not args.execute,
     )
@@ -555,6 +601,18 @@ def main() -> int:
         "--roundtrip-workers",
         type=int,
         help="Override roundtrip worker count. Defaults to --workers/profile workers.",
+    )
+    release.add_argument(
+        "--quasi2d-workers",
+        type=int,
+        help="Override quasi-2D worker count. Defaults to --workers/profile workers.",
+    )
+    release.add_argument(
+        "--quasi2d-dataset",
+        help=(
+            "Override the release quasi-2D dataset. Defaults to the profile's "
+            "release_quasi2d_dataset or quasi2d_inputversion."
+        ),
     )
     release.add_argument("--no-local-tests", dest="run_local_tests", action="store_false")
     release.set_defaults(func=command_release_test, run_local_tests=True)

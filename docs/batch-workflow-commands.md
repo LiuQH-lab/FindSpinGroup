@@ -85,8 +85,15 @@ Default intent:
 - submit 2241 full route
 - submit 2241 POSCAR ACC primitive roundtrip
 - submit 2241 SCIF roundtrip
+- submit the quasi-2D inputversion full-route batch with automatic vacuum-axis
+  detection
 - use the same profile worker count for route and roundtrip stages unless
-  `--workers` or `--roundtrip-workers` overrides it
+  `--workers`, `--roundtrip-workers`, or `--quasi2d-workers` overrides it
+
+The quasi-2D release dataset defaults to the profile's
+`release_quasi2d_dataset`, then falls back to `quasi2d_inputversion`. Use
+`--quasi2d-dataset` only when the selected cluster profile needs another
+filesystem-visible copy of the same release dataset.
 
 Keep the 2241 basic and full routes on separate baseline suites.  The compact
 basic payload and full runtime payload are intentionally different comparison
@@ -96,8 +103,8 @@ Do not push, tag, or move a release version until all stages are clean.
 
 Current acceptance notes for the 2241 release suite:
 
-- basic and full route runs are expected to process all 2241 inputs; the current
-  known dataset errors are the two malformed DyGa3 records
+- basic and full route runs are expected to process all 2241 inputs without
+  runtime errors; the former DyGa3 missing-occupancy parser failures are fixed
 - POSCAR roundtrip can still show the known fractional-occupancy POSCAR-loss
   mismatches for Sr2Ir/Sn and YBa/Fe/O mixed-occupancy cases
 - SCIF roundtrip currently has one tracked non-fractional compact-output
@@ -111,6 +118,12 @@ Current acceptance notes for the 2241 release suite:
   the current formatter fix.
 - roundtrip jobs should be submitted with parallel workers for release testing;
   serial roundtrip jobs are no longer the intended pre-push path
+- the quasi-2D release stage must process the configured inputversion dataset
+  with automatic vacuum-axis detection and write the compact quasi-2D selected
+  fields; forced `a/b/c` axis sweeps remain separate diagnostics
+- the current quasi-2D inputversion release dataset contains 4737 rows; compare
+  its identified index, 2D spin splitting, generic-point result, no-SOC/SOC
+  spin texture, and plane-preserving audit against the accepted quasi-2D run
 - local unit/smoke tests are still part of the release gate; clean cluster
   batches alone are not enough to push
 
