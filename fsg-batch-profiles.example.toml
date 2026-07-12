@@ -12,6 +12,9 @@ remote_tmp_dir = "<remote tmp directory for snapshot extraction>"
 python_bin = "<remote Python interpreter>"
 workers = 192
 sbatch_args = ["--partition", "<full-node-partition>", "--qos", "<qos-name>"]
+# Optional release-test dataset override when this profile sees a different
+# filesystem copy of the quasi-2D inputversion dataset.
+release_quasi2d_dataset = "quasi2d_inputversion"
 # Optional: use for POSCAR/SCIF roundtrip stages when they need different
 # Slurm resources than the full MCIF stages, for example extra memory with
 # fewer workers.
@@ -27,6 +30,7 @@ remote_tmp_dir = "<remote tmp directory for snapshot extraction>"
 python_bin = "<remote Python interpreter>"
 workers = 8
 sbatch_args = ["--partition", "<standard-partition>", "--qos", "<qos-name>"]
+release_quasi2d_dataset = "quasi2d_inputversion"
 
 [datasets.mcif_241130_no2186]
 description = "Bundled standard regression set."
