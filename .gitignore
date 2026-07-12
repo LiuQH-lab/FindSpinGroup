@@ -213,6 +213,7 @@ temp_cif_file
 upload_files
 output_files
 output/
+outputs/
 datasets/
 # Local derived artifacts: batch summaries, case-study tables, fetched cluster outputs.
 artifacts/
