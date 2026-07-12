@@ -4085,6 +4085,57 @@ def test_find_spin_group_classifies_single_ssg_magnetic_atom_orbit_as_fm():
     assert result.spinsplitting_wo_soc == "Zeeman"
 
 
+@pytest.mark.parametrize(
+    "source_path",
+    [
+        "tests/testset/mcif_241130_no2186/0.1048_HoGa.mcif",
+        "tests/testset/mcif_241130_no2186/0.403_NdCo2.mcif",
+        "tests/testset/mcif_241130_no2186/0.103_Mn2GeO4.mcif",
+    ],
+)
+def test_phase_orbit_count_matches_complete_ssg_spin_wyckoff_orbits(source_path):
+    result = find_spin_group(source_path)
+
+    assert result.magnetic_site_summary["status"] == "ok"
+    assert result.magnetic_atom_orbit_count_ssg == len(
+        result.magnetic_site_summary["ssg_magnetic_site_dofs"]
+    )
+
+
+def test_spin_wyckoff_analysis_reuses_request_memo(monkeypatch):
+    module = importlib.import_module("findspingroup.find_spin_group")
+    calls = []
+    sentinel = object()
+
+    def fake_get_spin_wyckoff(*args, **kwargs):
+        calls.append((args, kwargs))
+        return sentinel
+
+    monkeypatch.setattr(module, "get_spin_wyckoff", fake_get_spin_wyckoff)
+    cell = object()
+    operations = [[np.eye(3), np.eye(3), np.zeros(3)]]
+    memo = {}
+
+    first = module._get_spin_wyckoff_for_analysis(
+        cell,
+        operations,
+        atol=0.01,
+        magnetic_indices=[2, 1],
+        memo=memo,
+    )
+    second = module._get_spin_wyckoff_for_analysis(
+        cell,
+        operations,
+        atol=0.01,
+        magnetic_indices=[1, 2],
+        memo=memo,
+    )
+
+    assert first is sentinel
+    assert second is sentinel
+    assert len(calls) == 1
+
+
 def test_find_spin_group_basic_reports_classification_tolerances():
     result = find_spin_group_basic(
         "tests/testset/mcif_241130_no2186/0.103_Mn2GeO4.mcif",

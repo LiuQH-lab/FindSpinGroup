@@ -6611,11 +6611,12 @@ def _magnetic_site_dof_maps_for_cell(
         site_count,
     )
     _ssg_magnetic_indices, _ssg_classes, ssg_dof, ssg_spin_classes, ssg_constraints = (
-        get_spin_wyckoff(
+        _get_spin_wyckoff_for_analysis(
             cell,
             ssg.ops,
             atol=tol_cfg.m_matrix_tol,
             magnetic_indices=magnetic_indices,
+            memo=dataset_memo,
         )
     )
     ssg_dof_rows = _site_dof_rows(ssg_spin_classes, ssg_dof, ssg_constraints)
@@ -6628,11 +6629,12 @@ def _magnetic_site_dof_maps_for_cell(
     msg_ops = list(oriented_ssg.msg_ops)
     if msg_ops:
         _msg_magnetic_indices, _msg_classes, msg_dof, msg_spin_classes, msg_constraints = (
-            get_spin_wyckoff(
+            _get_spin_wyckoff_for_analysis(
                 cell,
                 msg_ops,
                 atol=tol_cfg.m_matrix_tol,
                 magnetic_indices=magnetic_indices,
+                memo=dataset_memo,
             )
         )
         msg_dof_rows = _site_dof_rows(msg_spin_classes, msg_dof, msg_constraints)
@@ -7023,6 +7025,50 @@ def get_spin_wyckoff(
     return magnetic_index, equivalence_classes, magnetic_representative_dof,equivalence_classes_spin,constraints
 
 
+def _spin_wyckoff_operation_sequence_key(ssg_ops) -> tuple:
+    return tuple(
+        (
+            _exact_array_key(operation[0]),
+            _exact_array_key(operation[1]),
+            _exact_array_key(operation[2]),
+        )
+        for operation in ssg_ops
+    )
+
+
+def _get_spin_wyckoff_for_analysis(
+    cell: CrystalCell,
+    ssg_ops,
+    *,
+    atol: float,
+    magnetic_indices: list[int] | None,
+    memo=None,
+):
+    operations = tuple(ssg_ops)
+    magnetic_index_key = (
+        None
+        if magnetic_indices is None
+        else tuple(sorted({int(index) for index in magnetic_indices}))
+    )
+    key = (
+        "spin_wyckoff",
+        id(cell),
+        float(atol),
+        magnetic_index_key,
+        _spin_wyckoff_operation_sequence_key(operations),
+    )
+    return _request_memoized(
+        memo,
+        key,
+        lambda: get_spin_wyckoff(
+            cell,
+            operations,
+            atol=atol,
+            magnetic_indices=magnetic_indices,
+        ),
+    )
+
+
 def _parse_parent_child_expansion(child_transform: str | None):
     if child_transform is None:
         return None
@@ -7111,23 +7157,32 @@ def _analyze_ssg_magnetic_atom_orbits(
         nonzero_indices,
         site_count,
     )
-    _indices, _all_orbits, magnetic_orbits = _spin_space_site_orbits(
+    ssg_dataset = _g0_dataset_for_analysis(
+        ssg.G0_ops,
         cell,
-        ssg.ops,
-        atol=tol_cfg.space,
-        magnetic_indices=magnetic_indices,
+        tol_cfg.space,
+        memo=dataset_memo,
     )
+    # Site orbits depend only on the SSG real-space projection G0; spin parts
+    # enter later when site-symmetry constraints and moment DOFs are required.
+    orbit_labels = _dataset_wyckoff_orbits(ssg_dataset)[:site_count]
+    site_indices_by_orbit = {}
+    for site_index, orbit_label in enumerate(orbit_labels):
+        site_indices_by_orbit.setdefault(int(orbit_label), []).append(int(site_index))
 
     magnetic_index_set = set(magnetic_indices)
     nonzero_index_set = set(nonzero_indices)
     moments = np.asarray(cell.moments_cartesian, dtype=float)
     rows = []
-    for orbit_id, orbit in enumerate(magnetic_orbits, start=1):
-        site_indices = sorted(
-            magnetic_index_set.intersection(int(index) for index in orbit["class_indices"])
-        )
-        if not site_indices:
-            continue
+    magnetic_orbits = sorted(
+        (
+            sorted(magnetic_index_set.intersection(site_indices))
+            for site_indices in site_indices_by_orbit.values()
+            if magnetic_index_set.intersection(site_indices)
+        ),
+        key=lambda site_indices: site_indices[0],
+    )
+    for orbit_id, site_indices in enumerate(magnetic_orbits, start=1):
         moment_sum = np.sum(moments[site_indices], axis=0)
         element_symbols = sorted(
             {
@@ -7138,7 +7193,7 @@ def _analyze_ssg_magnetic_atom_orbits(
         rows.append(
             {
                 "orbit_id": int(orbit_id),
-                "representative_index": int(orbit["representative_index"]),
+                "representative_index": int(site_indices[0]),
                 "site_indices": [int(index) for index in site_indices],
                 "site_count": len(site_indices),
                 "elements": element_symbols,
@@ -7357,11 +7412,12 @@ def _build_magnetic_site_summary(
         )
 
     _ssg_magnetic_indices, _ssg_classes, ssg_dof, ssg_spin_classes, ssg_constraints = (
-        get_spin_wyckoff(
+        _get_spin_wyckoff_for_analysis(
             cell,
             ssg.ops,
             atol=tol_cfg.m_matrix_tol,
             magnetic_indices=magnetic_indices,
+            memo=dataset_memo,
         )
     )
     ssg_dof_rows = _site_dof_rows(ssg_spin_classes, ssg_dof, ssg_constraints)
@@ -7377,11 +7433,12 @@ def _build_magnetic_site_summary(
     msg_representative_by_site = {}
     if msg_ops:
         _msg_magnetic_indices, _msg_classes, msg_dof, msg_spin_classes, msg_constraints = (
-            get_spin_wyckoff(
+            _get_spin_wyckoff_for_analysis(
                 cell,
                 msg_ops,
                 atol=tol_cfg.m_matrix_tol,
                 magnetic_indices=magnetic_indices,
+                memo=dataset_memo,
             )
         )
         msg_dof_rows = _site_dof_rows(msg_spin_classes, msg_dof, msg_constraints)
@@ -8136,10 +8193,12 @@ def _find_spin_group_from_parsed(
         ssg_primitive,
         magnetic_primitive_cell,
     )
+    wyckoff_dataset_memo = {}
     magnetic_atom_orbit_analysis = _analyze_ssg_magnetic_atom_orbits(
         magnetic_primitive_cell,
         ssg_primitive,
         tol_cfg,
+        dataset_memo=wyckoff_dataset_memo,
     )
 
     magnetic_phase_payload = classify_magnetic_phase(
@@ -9108,7 +9167,6 @@ def _find_spin_group_from_parsed(
                 "suppress_repo_local_summary": input_setting_index_differs,
             }
         )
-    wyckoff_dataset_memo = {}
     wp_chain, g0std_wp_site_order = _build_wp_chain_payload_and_site_order(
         G0std_cell,
         G0std_ssg,
@@ -9240,11 +9298,12 @@ def _find_spin_group_from_parsed(
                 parent_space_group_comparison,
                 magnetic_indices,
             ) = scif_real_space_cache[real_space_cache_key]
-        export_wyckoff = get_spin_wyckoff(
+        export_wyckoff = _get_spin_wyckoff_for_analysis(
             export_cell,
             export_ssg.ops,
             atol=tol_cfg.m_matrix_tol,
             magnetic_indices=magnetic_indices,
+            memo=wyckoff_dataset_memo,
         )
         source_cell_parameter_strings = (
             None
