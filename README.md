@@ -8,12 +8,9 @@ FindSpinGroup takes a crystal structure with magnetic moments and identifies:
 3. symmetry constraints on spin splitting, anomalous Hall conductivity, spin
    texture, polar axes, magnetic sites, and related observables.
 
-These are symmetry statements about the magnetic configuration supplied by the
-user. FindSpinGroup does **not** calculate an energy scale, transition
-temperature, response magnitude, or whether that configuration is the material's
-thermodynamic ground state.
-
 Web application: [app.findspingroup.com](https://app.findspingroup.com)
+Visualization: [view.findspingroup.com](https://view.findspingroup.com)
+SSG Database: [database.findspingroup.com](https://database.findspingroup.com)
 
 ## What Can It Tell Me?
 
@@ -29,25 +26,16 @@ Web application: [app.findspingroup.com](https://app.findspingroup.com)
 ## Install
 
 ```bash
-python -m pip install --upgrade findspingroup
+pip install --upgrade findspingroup
 fsg --version
 ```
 
-FindSpinGroup requires Python 3.11 or newer. To use the current source tree:
+FindSpinGroup requires Python 3.11 or newer.
 
-```bash
-git clone https://github.com/LiuQH-lab/FindSpinGroup.git
-cd FindSpinGroup
-python -m pip install -e ".[dev]"
-```
 
-If `fsg --version` or the options below are unavailable, the executable on your
-`PATH` predates this interface. Install the current source or use the manual
-version matching the installed package.
+## Quick Start
 
-## Sixty-Second Start
-
-Analyze a magnetic CIF, SCIF, or POSCAR-like input containing magnetic moments:
+Analyze a magnetic CIF, SCIF, or POSCAR input containing magnetic moments (including #MAGMOM= ... in POSCAR):
 
 ```bash
 fsg path/to/structure.mcif
@@ -64,9 +52,6 @@ Spin splitting: without SOC k-dependent; with SOC allowed
 AHC: without SOC forbidden; with SOC forbidden
 Leading spin texture: without SOC g-wave; with SOC d-wave
 ```
-
-Here, `allowed` means that symmetry does not force the response to vanish. It
-does not guarantee a measurable nonzero value.
 
 Ask for only the fields you need:
 
@@ -113,40 +98,7 @@ structured = result.to_structured_dict() # groups, cells, properties, artifacts
 objects; it is not a directly JSON-serializable contract. Use the basic route
 or a purpose-built operation export for machine-readable integration.
 
-## Parameters: Start With The Defaults
 
-Most users should change no numerical tolerances on the first run.
-
-| Parameter | Default | What it controls | Why changing it matters |
-| --- | ---: | --- | --- |
-| `space_tol` | `0.02` | Shared spatial matching and symmetry-detection tolerance | Can change the identified spatial symmetry. |
-| `mtol` | `0.02 μB` | Equivalence of magnetic moments | Can change the SSG and the zero-net-moment phase decision. |
-| `meigtol` | `2e-5` | Spin point-group eigenvalue decisions | Advanced numerical diagnostic. |
-| `matrix_tol` | `0.01` | Standardization and matrix comparisons | Advanced transform/point-group diagnostic. |
-| `parser_atol` | `0.02` | Parser-side moment consistency checks | Tune only for a documented parser-expansion error. |
-
-If a result changes under small, physically reasonable tolerance variations,
-treat the classification as numerically sensitive and inspect the input rather
-than reporting a single label without qualification.
-
-`space_tol` is shared across symmetry detection and internal position
-comparisons; the current route does not expose one uniform unit interpretation
-for every use of that value.
-
-## Important Output Boundaries
-
-- `conf` describes the geometry of the moments. `Collinear` does not by itself
-  mean ferromagnetic or antiferromagnetic.
-- `magnetic_phase` is a symmetry- and tolerance-dependent classification of the
-  supplied configuration, not a phase-diagram calculation.
-- `properties.ss_*` and `properties.ahc_*` report symmetry permission. They do
-  not calculate band splittings or Hall conductivity.
-- Spin-texture bases use the reported `basis_setting`; they are not automatically
-  expressed along the input-file axes.
-- POSCAR and KPOINTS generated together use the same ACC primitive real-space
-  setting and should be kept paired.
-- Quasi-2D analysis is an explicit interpretation workflow; specify the intended
-  vacuum axis and inspect its diagnostic output.
 
 ## Supported Inputs
 
@@ -174,32 +126,33 @@ Start with:
 
 The complete manual is published on
 [Read the Docs](https://findspingroup.readthedocs.io/). Detailed schemas and
-diagnostic fields are kept in Reference so that they do not obscure the main
-scientific workflow.
+diagnostic fields are kept in Reference.
 
 AI agents and tool-using models should start with the dedicated
 [FindSpinGroup AI Agent Guide](https://github.com/LiuQH-lab/FindSpinGroup/blob/main/FSG_AGENT_GUIDE.md),
 which provides a compact route-selection and scientific-interpretation
 protocol rather than another human tutorial.
 
-## Citation And Reproducibility
+## How to cite FindSpinGroup
 
-The repository does not yet provide formal citation metadata. Until a project
-citation is published, report the FindSpinGroup version, repository URL, input
-structure provenance, all non-default parameters, and the setting/frame of any
-exported operations or basis functions.
+If FindSpinGroup contributes to published work, cite:
 
-## Development
+> Y. Yu, X. Chen, Y. Zhu, Y. Li, R. Xiong, J. Li, Y. Liu, and Q. Liu,
+> "Identifying Oriented Spin Space Groups and Related Physical Properties
+> Using an Online Platform FINDSPINGROUP," arXiv:2604.21397 (2026).
+> [https://doi.org/10.48550/arXiv.2604.21397](https://doi.org/10.48550/arXiv.2604.21397)
 
-```bash
-python -m pip install -e ".[dev,docs]"
-PYTHONPATH=src python -m pytest
-mkdocs build --strict
+```bibtex
+@article{Yu2026FindSpinGroup,
+  title   = {Identifying Oriented Spin Space Groups and Related Physical Properties Using an Online Platform FINDSPINGROUP},
+  author  = {Yu, Yutong and Chen, Xiaobing and Zhu, Yanzhou and Li, Yuhui and Xiong, Renzheng and Li, Jiayu and Liu, Yuntian and Liu, Qihang},
+  journal = {arXiv preprint arXiv:2604.21397},
+  year    = {2026},
+  doi     = {10.48550/arXiv.2604.21397},
+  url     = {https://arxiv.org/abs/2604.21397}
+}
 ```
 
-Changes to symmetry identification, public fields, cells, or generated
-artifacts should also be checked with the repository's focused and batch
-regression workflows.
 
 ## License
 
