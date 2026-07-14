@@ -1,12 +1,15 @@
 import ast
 import re
 from copy import deepcopy
+from fractions import Fraction
 from findspingroup.version import __version__
+from itertools import product
+from math import lcm
 import numpy as np
 
 from functools import cached_property, lru_cache
 
-from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
+from findspingroup.core.tolerances import DEFAULT_KPOINT_TOL, DEFAULT_TOL, Tolerances
 from findspingroup.structure.cell import AtomicSite, SpaceToleranceDegeneracyError
 from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs, get_space_group_from_operations, \
     get_arithmetic_crystal_class_from_ops, identify_point_group, get_magnetic_space_group_from_operations
@@ -792,17 +795,18 @@ class BrillouinZoneMatcher:
         self.parsed_rules = []
         for label, pattern, splitting in rules:
             parsed = self._parse_pattern(pattern)
-            score = self._calculate_specificity_score(parsed)
             has_splitting, marker = self._normalize_splitting_marker(splitting)
             self.parsed_rules.append({
                 'label': label,
                 'pattern': parsed,
                 'splitting': has_splitting,
                 'marker': marker,
-                'score': score
+                'dimension': parsed['dimension'],
             })
 
-        self.parsed_rules.sort(key=lambda x: x['score'], reverse=True)
+        # A lower-dimensional affine stratum is more specific. Python's stable
+        # sort preserves the ACC table order for strata of the same dimension.
+        self.parsed_rules.sort(key=lambda rule: rule['dimension'])
 
     @staticmethod
     def _normalize_splitting_marker(splitting):
@@ -815,69 +819,223 @@ class BrillouinZoneMatcher:
         marker = "***" if bool(splitting) else ""
         return bool(splitting), marker
 
-    def _parse_pattern(self, pattern_str):
-        content = pattern_str.strip("()").split(",")
-        parsed = []
-        for item in content:
-            item = item.strip()
+    @staticmethod
+    def _parse_pattern(pattern_str):
+        expressions = tuple(item.strip() for item in pattern_str.strip("()").split(","))
+        if len(expressions) != 3:
+            raise ValueError(f"Invalid k-point pattern: {pattern_str}")
 
-            try:
-                val = float(eval(item, {"__builtins__": None}, {}))
-                parsed.append({'type': 'fixed', 'val': val})
-            except:
-                parsed.append({'type': 'var', 'name': item})
-        return parsed
+        coefficients = np.asarray(
+            [_kpoint_linear_coefficients(expression) for expression in expressions],
+            dtype=float,
+        )
+        offset = coefficients[:, 0]
+        parameter_matrix = coefficients[:, 1:]
+        used_columns = np.flatnonzero(
+            np.any(np.abs(parameter_matrix) > 1e-12, axis=0)
+        )
+        active_matrix = parameter_matrix[:, used_columns]
+        dimension = int(np.linalg.matrix_rank(active_matrix, tol=1e-10))
+        if dimension != len(used_columns):
+            raise ValueError(
+                f"K-point pattern has dependent parameters: {pattern_str}"
+            )
 
-    def _calculate_specificity_score(self, parsed_pattern):
-        score = 0
-        vars_seen = set()
+        periods = []
+        for column in active_matrix.T:
+            denominators = [
+                Fraction(float(value)).limit_denominator(96).denominator
+                for value in column
+                if abs(value) > 1e-12
+            ]
+            periods.append(lcm(*denominators))
+        periods = np.asarray(periods, dtype=float)
 
-        for p in parsed_pattern:
-            if p['type'] == 'fixed':
-                score += 10
-            elif p['type'] == 'var':
-                if p['name'] in vars_seen:
-                    score += 5
-                vars_seen.add(p['name'])
-        return score
+        coordinate_min = offset.copy()
+        coordinate_max = offset.copy()
+        for column, period in zip(active_matrix.T, periods):
+            displacement = column * period
+            coordinate_min += np.minimum(displacement, 0.0)
+            coordinate_max += np.maximum(displacement, 0.0)
 
-    def check(self, u, v, w, tol=1e-5):
-        input_k = np.mod([u, v, w],1)
+        return {
+            'expressions': expressions,
+            'offset': offset,
+            'parameter_matrix': active_matrix,
+            'parameter_pinv': (
+                np.linalg.pinv(active_matrix) if dimension else np.empty((0, 3))
+            ),
+            'parameter_periods': periods,
+            'coordinate_min': coordinate_min,
+            'coordinate_max': coordinate_max,
+            'dimension': dimension,
+        }
 
-        for rule in self.parsed_rules:
-            match = True
-            var_map = {}
+    @staticmethod
+    def _matches_rule(input_k, rule, *, tol):
+        pattern = rule['pattern']
+        input_k = np.asarray(input_k, dtype=float)
+        dimension = pattern['dimension']
+        if dimension == 3:
+            return True
 
-            for i in range(3):
-                rule_comp = rule['pattern'][i]
-                input_val = input_k[i]
+        if dimension == 0:
+            delta = input_k - pattern['offset']
+            return bool(np.max(np.abs(delta - np.rint(delta))) <= tol)
 
-                if rule_comp['type'] == 'fixed':
-                    if abs(input_val - rule_comp['val']) > tol:
-                        match = False
-                        break
+        # Each affine parameter is periodic on the reciprocal torus. If a
+        # column contains rational coefficients with denominator q, shifting
+        # that parameter by q changes k only by a reciprocal lattice vector.
+        # Restricting parameters to these finite periods therefore makes the
+        # reciprocal-vector search finite without losing solutions.
+        shift_ranges = []
+        for lower, upper, value in zip(
+            pattern['coordinate_min'],
+            pattern['coordinate_max'],
+            input_k,
+        ):
+            first = int(np.ceil(lower - value - tol))
+            last = int(np.floor(upper - value + tol))
+            if first > last:
+                return False
+            shift_ranges.append(range(first, last + 1))
 
-                elif rule_comp['type'] == 'var':
-                    var_name = rule_comp['name']
-                    if var_name in var_map:
-                        if abs(input_val - var_map[var_name]) > tol:
-                            match = False
-                            break
-                    else:
-                        var_map[var_name] = input_val
+        matrix = pattern['parameter_matrix']
+        pinv = pattern['parameter_pinv']
+        periods = pattern['parameter_periods']
+        for reciprocal_shift in product(*shift_ranges):
+            target = input_k + np.asarray(reciprocal_shift, dtype=float) - pattern['offset']
+            parameters = pinv @ target
+            if np.max(np.abs(matrix @ parameters - target)) > tol:
+                continue
+            if np.any(parameters < -tol) or np.any(parameters > periods + tol):
+                continue
+            return True
+        return False
 
-            if match:
-                return {
-                    "matched_label": rule['label'],
-                    "has_splitting": rule['splitting'],
-                    "splitting_marker": rule['marker'],
-                    "k_point": (u, v, w)
-                }
+    @staticmethod
+    def _direction_matches_rule(direction, rule, *, tol):
+        pattern = rule['pattern']
+        dimension = pattern['dimension']
+        if dimension == 3:
+            return True
+        direction = np.asarray(direction, dtype=float)
+        if dimension == 0:
+            return bool(np.max(np.abs(direction)) <= tol)
+        projected = (
+            pattern['parameter_matrix']
+            @ pattern['parameter_pinv']
+            @ direction
+        )
+        return bool(np.max(np.abs(projected - direction)) <= tol)
 
+    @staticmethod
+    def _wrap_kpoint(kpoint, *, tol):
+        wrapped = np.mod(np.asarray(kpoint, dtype=float), 1.0)
+        wrapped[np.abs(wrapped - 1.0) <= tol] = 0.0
+        return wrapped
+
+    def _check_candidates(self, original_k, candidates, *, tol):
+        # Dimension is the primary specificity. Within one dimension, prefer
+        # the label matching the displayed coordinates directly; only then
+        # search symmetry-equivalent orbit points. This avoids arbitrary
+        # relabeling between equivalent ACC strata while still allowing an
+        # orbit line to override a more generic direct plane.
+        dimensions = sorted({rule['dimension'] for rule in self.parsed_rules})
+        for dimension in dimensions:
+            rules = [rule for rule in self.parsed_rules if rule['dimension'] == dimension]
+            candidate_groups = (candidates[:1], candidates[1:])
+            for candidate_group in candidate_groups:
+                for rule in rules:
+                    for candidate in candidate_group:
+                        input_k = self._wrap_kpoint(candidate, tol=tol)
+                        if self._matches_rule(input_k, rule, tol=tol):
+                            return {
+                                "matched_label": rule['label'],
+                                "has_splitting": rule['splitting'],
+                                "splitting_marker": rule['marker'],
+                                "k_point": tuple(np.asarray(original_k, dtype=float)),
+                                "matched_k_point": tuple(input_k),
+                            }
+        return None
+
+    def check(self, u, v, w, tol=DEFAULT_KPOINT_TOL):
+        original_k = np.asarray([u, v, w], dtype=float)
+        result = self._check_candidates(original_k, [original_k], tol=tol)
+        if result is not None:
+            return result
         raise ValueError(f"No matching rule found for k-point ({u}, {v}, {w})")
 
+    def check_orbit(self, u, v, w, reciprocal_operations, tol=DEFAULT_KPOINT_TOL):
+        original_k = np.asarray([u, v, w], dtype=float)
+        candidates = [original_k]
+        candidates.extend(
+            np.asarray(operation, dtype=float) @ original_k
+            for operation in reciprocal_operations
+        )
+        result = self._check_candidates(original_k, candidates, tol=tol)
+        if result is not None:
+            return result
+        raise ValueError(
+            f"No matching rule found for reciprocal orbit of k-point ({u}, {v}, {w})"
+        )
 
-def write_kpoints(seekpath_out, matcher: BrillouinZoneMatcher, num_points=40, extra_kpoints=None):
+    def check_path(
+        self,
+        start,
+        end,
+        reciprocal_operations=None,
+        tol=DEFAULT_KPOINT_TOL,
+    ):
+        original_start = np.asarray(start, dtype=float)
+        original_end = np.asarray(end, dtype=float)
+        candidate_paths = [(original_start, original_end)]
+        if reciprocal_operations is not None:
+            candidate_paths.extend(
+                (
+                    np.asarray(operation, dtype=float) @ original_start,
+                    np.asarray(operation, dtype=float) @ original_end,
+                )
+                for operation in reciprocal_operations
+            )
+
+        dimensions = sorted({rule['dimension'] for rule in self.parsed_rules})
+        for dimension in dimensions:
+            rules = [rule for rule in self.parsed_rules if rule['dimension'] == dimension]
+            candidate_groups = (candidate_paths[:1], candidate_paths[1:])
+            for candidate_group in candidate_groups:
+                for rule in rules:
+                    for candidate_start, candidate_end in candidate_group:
+                        wrapped_start = self._wrap_kpoint(candidate_start, tol=tol)
+                        if not self._matches_rule(wrapped_start, rule, tol=tol):
+                            continue
+                        direction = candidate_end - candidate_start
+                        if not self._direction_matches_rule(direction, rule, tol=tol):
+                            continue
+                        return {
+                            "matched_label": rule['label'],
+                            "has_splitting": rule['splitting'],
+                            "splitting_marker": rule['marker'],
+                            "start_k_point": tuple(original_start),
+                            "end_k_point": tuple(original_end),
+                            "matched_start_k_point": tuple(wrapped_start),
+                            "matched_direction": tuple(direction),
+                        }
+        raise ValueError(
+            "No matching rule found for affine k-path "
+            f"from {tuple(original_start)} to {tuple(original_end)}"
+        )
+
+
+def write_kpoints(
+    seekpath_out,
+    matcher: BrillouinZoneMatcher,
+    num_points=40,
+    extra_kpoints=None,
+    reciprocal_orbit_operations=None,
+    exact_splitting_resolver=None,
+    exact_path_splitting_resolver=None,
+):
     """
     Write k-point path string with spin-splitting info for endpoints and paths.
     """
@@ -931,14 +1089,49 @@ def write_kpoints(seekpath_out, matcher: BrillouinZoneMatcher, num_points=40, ex
         # Render a cleaner display label.
         return 'Γ' if label == 'GAMMA' else label.replace('_', '')
 
+    def get_kpoint_match(u, v, w):
+        if reciprocal_orbit_operations is None:
+            return matcher.check(u, v, w)
+        return matcher.check_orbit(
+            u,
+            v,
+            w,
+            reciprocal_orbit_operations,
+        )
+
     # Helper: determine the splitting state for one k-point.
     def get_split_status(u, v, w):
-        """
-        Return `(matched_label, marker)` for a k-point coordinate.
-        """
-        result = matcher.check(u, v, w)
+        """Return `(matched_label, marker)` for a k-point coordinate."""
+        result = get_kpoint_match(u, v, w)
+        if exact_splitting_resolver is not None:
+            exact_splitting = exact_splitting_resolver(np.asarray([u, v, w], dtype=float))
+            _has_splitting, marker = matcher._normalize_splitting_marker(exact_splitting)
+            return result['matched_label'], marker
         fallback_marker = "***" if result['has_splitting'] else ""
         return result['matched_label'], result.get('splitting_marker', fallback_marker)
+
+    def get_path_status(k1, k2):
+        result = matcher.check_path(
+            k1,
+            k2,
+            reciprocal_operations=reciprocal_orbit_operations,
+        )
+        fallback_marker = result.get(
+            'splitting_marker',
+            "***" if result['has_splitting'] else "",
+        )
+        if exact_path_splitting_resolver is None:
+            if exact_splitting_resolver is not None:
+                path_fraction = np.sqrt(5.0) - 2.0
+                generic_k = k1 + path_fraction * (k2 - k1)
+                exact_splitting = exact_splitting_resolver(generic_k)
+                _has_splitting, fallback_marker = matcher._normalize_splitting_marker(
+                    exact_splitting
+                )
+            return result['matched_label'], fallback_marker
+        exact_splitting = exact_path_splitting_resolver(k1, k2)
+        _has_splitting, marker = matcher._normalize_splitting_marker(exact_splitting)
+        return result['matched_label'], marker
 
     # Helper: format the display tag.
     def make_tag(label, marker, is_path=False):
@@ -958,18 +1151,15 @@ def write_kpoints(seekpath_out, matcher: BrillouinZoneMatcher, num_points=40, ex
             k1 = np.array(kpts_list[start_label])
             k2 = np.array(kpts_list[end_label])
 
-            # Use the midpoint to represent the path segment.
-            mid_k = (k1 + k2) / 2.0
-
             lbl_start, split_start = get_split_status(k1[0], k1[1], k1[2])
             lbl_end, split_end = get_split_status(k2[0], k2[1], k2[2])
-            lbl_mid, split_mid = get_split_status(mid_k[0], mid_k[1], mid_k[2])
+            lbl_path, split_path = get_path_status(k1, k2)
 
-            path_label.append(lbl_mid)
+            path_label.append(lbl_path)
 
             tag_start_pt = make_tag(lbl_start, split_start, is_path=False)
             tag_end_pt = make_tag(lbl_end, split_end, is_path=False)
-            tag_path = make_tag(lbl_mid, split_mid, is_path=True)
+            tag_path = make_tag(lbl_path, split_path, is_path=True)
 
             s_head.append(
                 f"{k1[0]:10.6f} {k1[1]:10.6f} {k1[2]:10.6f} ! "
@@ -996,7 +1186,8 @@ def write_kpoints(seekpath_out, matcher: BrillouinZoneMatcher, num_points=40, ex
     if extra_kpoints:
         add_kpoints = []
         for i in extra_kpoints:
-            if matcher.check(*i[0])['matched_label'] in path_label:
+            matched_label = get_kpoint_match(*i[0])['matched_label']
+            if matched_label in path_label:
                 continue
             else:
                 add_kpoints.append(i)
@@ -2156,7 +2347,12 @@ class SpinSpaceGroup:
     def get_international_symbol(self, tol=1e-4, *, basis_mode: str = "standard"):
         return build_international_symbol(self, tol=tol, basis_mode=basis_mode)
 
-    def get_KPOINTS(self, spin_splitting_w_soc=None):
+    def get_KPOINTS(
+        self,
+        spin_splitting_w_soc=None,
+        exact_splitting_resolver=None,
+        exact_path_splitting_resolver=None,
+    ):
         if spin_splitting_w_soc is None:
             spin_splitting_w_soc = [False] * len(self.is_spinsplitting)
         if len(spin_splitting_w_soc) != len(self.is_spinsplitting):
@@ -2177,7 +2373,21 @@ class SpinSpaceGroup:
         matcher = BrillouinZoneMatcher(spin_splitting_info)
         low_symm_indices = find_uvw_whole_string(self.kpoints_symbol_primitive)
         extra_point_info = [(self.kpoints_primitive[ind], self.kpoints_label[ind]) for ind in low_symm_indices]
-        return write_kpoints(self.kpath_info, matcher, extra_kpoints=extra_point_info)
+        reciprocal_orbit_operations = deduplicate_matrix_pairs(
+            [
+                np.linalg.det(op[0]) * np.linalg.inv(np.asarray(op[1], dtype=float)).T
+                for op in self.gspg_ops_raw
+            ],
+            tol=self.tol,
+        )
+        return write_kpoints(
+            self.kpath_info,
+            matcher,
+            extra_kpoints=extra_point_info,
+            reciprocal_orbit_operations=reciprocal_orbit_operations,
+            exact_splitting_resolver=exact_splitting_resolver,
+            exact_path_splitting_resolver=exact_path_splitting_resolver,
+        )
 
     def get_little_groups_symbols(self):
         latex_symbols = []
@@ -2257,6 +2467,7 @@ class SpinSpaceGroup:
 
     def get_little_groups(self):
         k_little_groups = []
+        kpoint_tol = min(float(self.tol), DEFAULT_KPOINT_TOL)
         if self.is_primitive:
             kpoints = self.kpoints_primitive
         else:
@@ -2275,7 +2486,7 @@ class SpinSpaceGroup:
                 for op, eop in zip(self.gspg_ops_raw, effective_ops):
                     target_kpoint = eop @ primitive_kpoint % 1
                     diff = getNormInf(primitive_kpoint % 1, target_kpoint)
-                    if diff < self.tol:
+                    if diff < kpoint_tol:
                         little_group.append(op)
                 k_little_groups.append(little_group)
         else:
@@ -2290,13 +2501,13 @@ class SpinSpaceGroup:
                     if self.is_primitive:
                         target_kpoint = eop @ kpoint_array % 1
                         diff = getNormInf(kpoint_array % 1, target_kpoint)
-                        if diff < self.tol:
+                        if diff < kpoint_tol:
                             little_group.append(op)
                     else:
                         # Check complex lattice condition
                         primitive_kpoint = cptrans.T @ kpoint_array % 1
                         transformed_primitive = conjugated_eop @ primitive_kpoint % 1
-                        if getNormInf(primitive_kpoint, transformed_primitive) < self.tol:
+                        if getNormInf(primitive_kpoint, transformed_primitive) < kpoint_tol:
                             little_group.append(op)
                 k_little_groups.append(little_group)
         return k_little_groups

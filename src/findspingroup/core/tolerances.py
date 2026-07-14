@@ -1,5 +1,9 @@
 from dataclasses import dataclass
 
+
+DEFAULT_KPOINT_TOL = 1e-5
+
+
 @dataclass(frozen=True)
 class Tolerances:
     space: float = 0.02 # Angstrom

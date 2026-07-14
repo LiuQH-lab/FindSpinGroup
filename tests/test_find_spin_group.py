@@ -85,8 +85,11 @@ from findspingroup.ferroelectric import (
     build_vector_constraints_by_symmetry_payload,
 )
 from findspingroup.find_spin_group import (
+    SCIF_CELL_MODE_INPUT_CARTESIAN,
     SCIF_CELL_MODE_INPUT_IDENTIFIED,
+    SCIF_CELL_MODE_INPUT_ORIENTED,
     SCIF_CELL_MODE_MAGNETIC_PRIMITIVE,
+    SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
     SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
     _classify_quasi2d_spin_texture_config,
     _canonicalize_input_to_standard_setting,
@@ -99,6 +102,7 @@ from findspingroup.find_spin_group import (
     _spin_transform_to_in_lattice,
     _spin_transform_to_oriented_abc,
     _build_msg_little_group_payload,
+    _effective_operation_stabilizes_primitive_kpath,
     _get_magnetic_little_group,
     _primitive_msg_ops_from_ssg,
     _tensor_ops_wo_soc,
@@ -3286,6 +3290,22 @@ def test_mn3sn_cartesian_standard_spin_axes_prefer_symbolic_components_over_alph
     assert "sqrt(3)/2" in l0_joined
 
 
+def test_mn3sn_scif_parent_child_transform_snaps_integer_origin_shift_to_zero():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.199_Mn3Sn.mcif")
+
+    for cell_mode in (
+        SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN,
+        SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED,
+        SCIF_CELL_MODE_INPUT_CARTESIAN,
+        SCIF_CELL_MODE_INPUT_ORIENTED,
+    ):
+        scif_text = result.to_scif(cell_mode=cell_mode)
+        assert (
+            '_parent_space_group.child_transform_Pp_abc  "a,b,c;0,0,0"'
+            in scif_text
+        ), cell_mode
+
+
 def test_describe_point_operation_requires_physical_tolerance_for_noisy_improper_fourfold():
     matrix = np.array(
         [
@@ -4999,6 +5019,132 @@ def test_kpoints_mark_spin_splitting_with_and_without_soc():
     assert "Γ ***" in kpoints_text
     assert "X ^^^" in kpoints_text
     assert "| GP ***^^^" in kpoints_text
+
+
+def test_brillouin_zone_matcher_prefers_special_line_across_reciprocal_orbit():
+    matcher = group_module.BrillouinZoneMatcher(
+        [
+            ("Λ", "(u,u,0)", (False, True)),
+            ("B", "(u,v,0)", (True, True)),
+        ]
+    )
+    reciprocal_operation = np.array(
+        [
+            [1.0, 0.0, 0.0],
+            [-1.0, -1.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+
+    special_line = matcher.check_orbit(
+        5.0 / 12.0,
+        1.0 / 6.0,
+        0.0,
+        [reciprocal_operation],
+    )
+    generic_plane = matcher.check_orbit(
+        0.417,
+        0.237,
+        0.0,
+        [reciprocal_operation],
+    )
+
+    assert matcher.check(5.0 / 12.0, 1.0 / 6.0, 0.0)["matched_label"] == "B"
+    assert special_line["matched_label"] == "Λ"
+    assert np.allclose(special_line["matched_k_point"], [5.0 / 12.0] * 2 + [0.0])
+    assert generic_plane["matched_label"] == "B"
+
+
+def test_brillouin_zone_matcher_understands_centered_affine_kpoint_strata():
+    matcher = group_module.BrillouinZoneMatcher(
+        [
+            ("B", "(-u/2+w/2,u/2+w/2,u/2-w/2)", (False, True)),
+            ("C", "(-u/2+v/2,u/2-v/2,u/2+v/2)", (True, False)),
+            (
+                "GP",
+                "(-u/2+v/2+w/2,u/2-v/2+w/2,u/2+v/2-w/2)",
+                (True, True),
+            ),
+        ]
+    )
+
+    b_point = np.array([-0.15, 0.267, 0.15])
+    c_point = np.array([-0.09, 0.09, 0.327])
+    gp_point = np.array([0.0955, 0.2755, 0.1415])
+
+    assert matcher.check(*b_point)["matched_label"] == "B"
+    assert matcher.check(*c_point)["matched_label"] == "C"
+    assert matcher.check(*gp_point)["matched_label"] == "GP"
+
+
+def test_brillouin_zone_matcher_classifies_the_whole_affine_path():
+    matcher = group_module.BrillouinZoneMatcher(
+        [
+            ("X", "(1/2,0,0)", (False, True)),
+            ("Σ", "(u,0,0)", (True, False)),
+            ("GP", "(u,v,w)", (True, True)),
+        ]
+    )
+
+    result = matcher.check_path([0.0, 0.0, 0.0], [1.0, 0.0, 0.0])
+
+    assert result["matched_label"] == "Σ"
+
+
+def test_affine_kpath_stabilizer_excludes_midpoint_only_symmetry():
+    inversion = -np.eye(3)
+    start = np.zeros(3)
+    end = np.array([1.0, 0.0, 0.0])
+    midpoint = (start + end) / 2.0
+
+    assert np.allclose(inversion @ midpoint % 1.0, midpoint % 1.0)
+    assert not _effective_operation_stabilizes_primitive_kpath(
+        inversion,
+        start,
+        end,
+        tol=1e-5,
+    )
+
+
+def test_arbitrary_kpoint_little_group_uses_kpoint_not_matrix_tolerance():
+    swap_xy = np.array(
+        [
+            [0.0, 1.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    operation = [1, swap_xy, np.zeros(3)]
+
+    exact_group = _get_magnetic_little_group(
+        [0.417, 0.417, 0.0],
+        [operation],
+        tol=0.01,
+    )
+    near_but_generic_group = _get_magnetic_little_group(
+        [0.417, 0.4175, 0.0],
+        [operation],
+        tol=0.01,
+    )
+
+    assert exact_group == [operation]
+    assert near_but_generic_group == []
+
+
+def test_vcl2_kpoints_use_exact_path_little_groups_and_acc_orbit_labels():
+    result = find_spin_group("src/findspingroup/examples/1.237_VCl2.mcif")
+    blocks = [block for block in result.KPOINTS.split("\n\n") if block.strip()]
+
+    gamma_m = next(block for block in blocks if "! Γ" in block and "! M" in block)
+    m_k = next(block for block in blocks if "! M" in block and "! K" in block)
+    l_h = next(block for block in blocks if "! L" in block and "! H" in block)
+
+    assert "| Σ ***^^^" in gamma_m
+    assert "| Λ ^^^" in m_k
+    assert "***" not in m_k
+    assert "| Q ^^^" in l_h
+    assert "***" not in l_h
+    assert "! B ***^^^" in result.KPOINTS
 
 
 def test_quasi2d_input_padding_expands_vacuum_axis_without_stretching_slab():
