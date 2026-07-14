@@ -5021,6 +5021,33 @@ def test_kpoints_mark_spin_splitting_with_and_without_soc():
     assert "| GP ***^^^" in kpoints_text
 
 
+def test_kpoints_skip_zero_length_segments_but_keep_reciprocal_shift_paths():
+    matcher = group_module.BrillouinZoneMatcher(
+        [
+            ("Γ", "(0,0,0)", (False, False)),
+            ("GP", "(u,v,w)", (True, True)),
+        ]
+    )
+    kpoints_text = group_module.write_kpoints(
+        {
+            "point_coords": {
+                "GAMMA": [0.0, 0.0, 0.0],
+                "GAMMA_ALIAS": [0.0, 0.0, 0.0],
+                "GAMMA_SHIFT": [1.0, 0.0, 0.0],
+            },
+            "path": [
+                ("GAMMA", "GAMMA_ALIAS"),
+                ("GAMMA", "GAMMA_SHIFT"),
+            ],
+        },
+        matcher,
+    )
+
+    assert "GAMMAALIAS" not in kpoints_text
+    assert "GAMMASHIFT" in kpoints_text
+    assert kpoints_text.count("| GP ***^^^") == 1
+
+
 def test_brillouin_zone_matcher_prefers_special_line_across_reciprocal_orbit():
     matcher = group_module.BrillouinZoneMatcher(
         [

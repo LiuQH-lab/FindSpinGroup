@@ -1151,6 +1151,12 @@ def write_kpoints(
             k1 = np.array(kpts_list[start_label])
             k2 = np.array(kpts_list[end_label])
 
+            # SeekPath may retain distinct labels that collapse to the same
+            # numerical point for a special lattice metric. Such a pair is a
+            # point, not a band-path segment.
+            if np.max(np.abs(k2 - k1)) <= DEFAULT_KPOINT_TOL:
+                continue
+
             lbl_start, split_start = get_split_status(k1[0], k1[1], k1[2])
             lbl_end, split_end = get_split_status(k2[0], k2[1], k2[2])
             lbl_path, split_path = get_path_status(k1, k2)
