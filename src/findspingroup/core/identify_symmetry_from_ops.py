@@ -1767,13 +1767,9 @@ def get_space_group_from_operations(space_group_operations,symprec = 0.02,bz = F
         # corresponding to the same space group setting as in Bilbao Crystallographic Server
         space_group_dataset =get_symmetry_dataset(cell, symprec=symprec, hall_number=SG_HALL_MAPPING[space_group_dataset.number])
 
-    if bz :
-        from seekpath import get_path
-
-        path_info = get_path(cell,with_time_reversal=False,symprec=symprec)
-        return  space_group_dataset, path_info
-    else:
-        return space_group_dataset
+    if bz:
+        return space_group_dataset, None
+    return space_group_dataset
 
 
 def get_magnetic_space_group_from_operations(magnetic_space_group_operations):
@@ -1853,7 +1849,7 @@ def get_magnetic_space_group_from_operations(magnetic_space_group_operations):
             "mpg_symbol":mpg_symbol}
 
 
-def get_arithmetic_crystal_class_from_ops(ops, *, include_kpath: bool = True):
+def get_arithmetic_crystal_class_from_ops(ops, *, include_kpath: bool = False):
     """
     rely on spglib
     :parameter: ops: list of [rotation matrix, translation vector], space group operations
@@ -1862,11 +1858,8 @@ def get_arithmetic_crystal_class_from_ops(ops, *, include_kpath: bool = True):
 
 
     # get point group rotations
-    if include_kpath:
-        acc_dataset, kpath_info = get_space_group_from_operations(ops, bz=True)
-    else:
-        acc_dataset = get_space_group_from_operations(ops, bz=False)
-        kpath_info = None
+    acc_dataset = get_space_group_from_operations(ops, bz=False)
+    kpath_info = None
 
     if acc_dataset is None:
         raise ValueError("Can not find spg dataset in arithmetic crystal class ")

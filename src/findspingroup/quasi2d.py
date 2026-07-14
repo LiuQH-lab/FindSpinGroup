@@ -8,7 +8,7 @@ from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pai
 from findspingroup.core.tolerances import DEFAULT_KPOINT_TOL
 from findspingroup.structure.group import (
     BrillouinZoneMatcher,
-    find_uvw_whole_string,
+    build_acc_stratum_kpath,
     solve_spin_constraint_from_stacked,
     write_kpoints,
 )
@@ -572,17 +572,9 @@ def _kpoint_projection_summary(kpoint_rows: list[dict]) -> dict:
     }
 
 
-def _format_seekpath_label(label: str) -> str:
-    return "Γ" if label == "GAMMA" else str(label).replace("_", "")
-
-
 def _build_in_plane_compact_kpoints(
     acc_primitive_ssg,
     kpoint_rows: list[dict],
-    *,
-    input_to_acc_matrix: np.ndarray,
-    vacuum_axis_index: int,
-    tol: float,
 ) -> str:
     in_plane_labels = {
         row["label"]
@@ -600,45 +592,13 @@ def _build_in_plane_compact_kpoints(
         return ""
 
     matcher = BrillouinZoneMatcher(rules)
-    original_kpath = acc_primitive_ssg.kpath_info
-    original_point_coords = original_kpath["point_coords"]
-    filtered_point_coords = {
-        label: coords
-        for label, coords in original_point_coords.items()
-        if _format_seekpath_label(label) in in_plane_labels
-    }
-    filtered_path = []
-    for start_label, end_label in original_kpath["path"]:
-        if start_label not in filtered_point_coords or end_label not in filtered_point_coords:
-            continue
-        start = np.asarray(original_point_coords[start_label], dtype=float)
-        end = np.asarray(original_point_coords[end_label], dtype=float)
-        midpoint = (start + end) / 2.0
-        midpoint_plane, _, _, _ = _classify_kpoint_plane(
-            midpoint,
-            input_to_acc_matrix,
-            vacuum_axis_index,
-            tol=tol,
-        )
-        if midpoint_plane == "in_plane":
-            filtered_path.append((start_label, end_label))
-
-    low_symm_indices = find_uvw_whole_string(acc_primitive_ssg.kpoints_symbol_primitive)
-    extra_points = [
-        (acc_primitive_ssg.kpoints_primitive[index], acc_primitive_ssg.kpoints_label[index])
-        for index in low_symm_indices
-        if _classify_kpoint_plane(
-            np.asarray(acc_primitive_ssg.kpoints_primitive[index], dtype=float),
-            input_to_acc_matrix,
-            vacuum_axis_index,
-            tol=tol,
-        )[0]
-        == "in_plane"
-    ]
-    kpoints_text = write_kpoints(
-        {"point_coords": filtered_point_coords, "path": filtered_path},
+    kpath_info = build_acc_stratum_kpath(
         matcher,
-        extra_kpoints=extra_points,
+        included_labels=in_plane_labels,
+    )
+    kpoints_text = write_kpoints(
+        kpath_info,
+        matcher,
     )
     return kpoints_text
 
@@ -1046,9 +1006,6 @@ def build_quasi2d_diagnostics(
         compact_kpoints = _build_in_plane_compact_kpoints(
             acc_primitive_ssg,
             rows,
-            input_to_acc_matrix=input_to_acc_matrix,
-            vacuum_axis_index=vacuum_axis_index,
-            tol=tol,
         )
     except ValueError as exc:
         compact_kpoints = ""
