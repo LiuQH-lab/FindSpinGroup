@@ -24,7 +24,7 @@ from findspingroup.core.identify_index.contract_222 import (
     get_coplanar_222_lookup_entry,
     has_coplanar_222_lookup_group,
 )
-from findspingroup.core.tolerances import DEFAULT_TOL, Tolerances
+from findspingroup.core.tolerances import DEFAULT_KPOINT_TOL, DEFAULT_TOL, Tolerances
 from findspingroup.data import MSGMPG_DB
 from findspingroup.data.acc_aligned_p_index_loader import (
     get_acc_aligned_conventional_to_primitive_p,
@@ -5874,10 +5874,14 @@ def _identify_parent_space_group_for_export_cell(
         "IT_number": int(dataset.number),
         "transform_to_parent_space_group_Pp": "",
     }
+    normalized_parent_origin_shift = normalize_vector_to_zero(
+        np.asarray(dataset.origin_shift, dtype=float),
+        atol=1e-5,
+    )
     try:
         generated["transform_to_parent_space_group_Pp"] = affine_matrix_to_xyz_expression(
             np.asarray(dataset.transformation_matrix, dtype=float).T,
-            normalize_vector_to_zero(np.asarray(dataset.origin_shift, dtype=float), atol=1e-9),
+            normalized_parent_origin_shift,
             ('a', 'b', 'c'),
             separate_translation=True,
             coeff_precision=6,
@@ -5891,7 +5895,7 @@ def _identify_parent_space_group_for_export_cell(
     try:
         generated["child_transform_Pp_abc"] = affine_matrix_to_xyz_expression(
             np.asarray(dataset.transformation_matrix, dtype=float).T,
-            normalize_vector_to_zero(np.asarray(dataset.origin_shift, dtype=float), atol=1e-9),
+            normalized_parent_origin_shift,
             ('a', 'b', 'c'),
             separate_translation=True,
             coeff_precision=6,
@@ -5974,16 +5978,18 @@ def _primitive_msg_ops_from_ssg(ssg_ops, tol: float, time_reversal_resolver=None
 
 def _get_magnetic_little_group(kpoint, primitive_msg_operations, tol: float) -> list[list]:
     magnetic_little_group = []
+    kpoint_tol = min(float(tol), DEFAULT_KPOINT_TOL)
     primitive_kpoint = np.asarray(kpoint, dtype=float)
     for time_reversal, rotation, translation in primitive_msg_operations:
         reciprocal_rotation = np.linalg.inv(np.asarray(rotation, dtype=float)).T
         transformed_kpoint = time_reversal * reciprocal_rotation @ primitive_kpoint
-        if getNormInf(transformed_kpoint % 1, primitive_kpoint) < tol:
+        if getNormInf(transformed_kpoint % 1, primitive_kpoint) < kpoint_tol:
             magnetic_little_group.append([time_reversal, rotation, translation])
     return magnetic_little_group
 
 
 def _get_ssg_little_groups(ssg: SpinSpaceGroup, *, tol: float) -> list[list[SpinSpaceGroupOperation]]:
+    kpoint_tol = min(float(tol), DEFAULT_KPOINT_TOL)
     kpoints = ssg.kpoints_primitive if ssg.is_primitive else ssg.kpoints_conventional
     ops = list(ssg.ops)
     effective_ops = [
@@ -5998,7 +6004,7 @@ def _get_ssg_little_groups(ssg: SpinSpaceGroup, *, tol: float) -> list[list[Spin
             little_group = []
             for op, effective_op in zip(ops, effective_ops):
                 target_kpoint = effective_op @ primitive_kpoint % 1
-                if getNormInf(primitive_kpoint % 1, target_kpoint) < tol:
+                if getNormInf(primitive_kpoint % 1, target_kpoint) < kpoint_tol:
                     little_group.append(op)
             little_groups.append(little_group)
         return little_groups
@@ -6016,12 +6022,12 @@ def _get_ssg_little_groups(ssg: SpinSpaceGroup, *, tol: float) -> list[list[Spin
         for op, effective_op, conjugated_effective_op in zip(ops, effective_ops, conjugated_effective_ops):
             if ssg.is_primitive:
                 target_kpoint = effective_op @ kpoint_array % 1
-                if getNormInf(kpoint_array % 1, target_kpoint) < tol:
+                if getNormInf(kpoint_array % 1, target_kpoint) < kpoint_tol:
                     little_group.append(op)
             else:
                 primitive_kpoint = cptrans.T @ kpoint_array % 1
                 transformed_primitive = conjugated_effective_op @ primitive_kpoint % 1
-                if getNormInf(primitive_kpoint, transformed_primitive) < tol:
+                if getNormInf(primitive_kpoint, transformed_primitive) < kpoint_tol:
                     little_group.append(op)
         little_groups.append(little_group)
     return little_groups
@@ -6033,6 +6039,7 @@ def _get_ssg_little_group_for_primitive_kpoint(
     *,
     tol: float,
 ) -> list[SpinSpaceGroupOperation]:
+    kpoint_tol = min(float(tol), DEFAULT_KPOINT_TOL)
     kpoint_array = np.asarray(kpoint, dtype=float)
     ops = list(ssg.ops)
     effective_ops = [
@@ -6043,7 +6050,7 @@ def _get_ssg_little_group_for_primitive_kpoint(
         return [
             op
             for op, effective_op in zip(ops, effective_ops)
-            if getNormInf(kpoint_array % 1, effective_op @ kpoint_array % 1) < tol
+            if getNormInf(kpoint_array % 1, effective_op @ kpoint_array % 1) < kpoint_tol
         ]
 
     cptrans = np.asarray(ssg.cptrans, dtype=float)
@@ -6056,15 +6063,89 @@ def _get_ssg_little_group_for_primitive_kpoint(
         return [
             op
             for op, effective_op in zip(ops, effective_ops)
-            if getNormInf(kpoint_array % 1, effective_op @ kpoint_array % 1) < tol
+            if getNormInf(kpoint_array % 1, effective_op @ kpoint_array % 1) < kpoint_tol
         ]
 
     primitive_kpoint = cptrans.T @ kpoint_array % 1
     return [
         op
         for op, conjugated_effective_op in zip(ops, conjugated_effective_ops)
-        if getNormInf(primitive_kpoint, conjugated_effective_op @ primitive_kpoint % 1) < tol
+        if getNormInf(primitive_kpoint, conjugated_effective_op @ primitive_kpoint % 1) < kpoint_tol
     ]
+
+
+def _effective_operation_stabilizes_primitive_kpath(
+    effective_operation,
+    start_kpoint,
+    end_kpoint,
+    *,
+    tol: float,
+) -> bool:
+    operation = np.asarray(effective_operation, dtype=float)
+    start = np.asarray(start_kpoint, dtype=float)
+    direction = np.asarray(end_kpoint, dtype=float) - start
+    delta_start = operation @ start - start
+    delta_direction = operation @ direction - direction
+    return (
+        getNormInf(delta_start, np.zeros(3)) < tol
+        and getNormInf(delta_direction, np.zeros(3), mode=False) < tol
+    )
+
+
+def _get_ssg_little_group_for_primitive_kpath(
+    ssg: SpinSpaceGroup,
+    start_kpoint,
+    end_kpoint,
+    *,
+    tol: float,
+) -> list[SpinSpaceGroupOperation]:
+    kpoint_tol = min(float(tol), DEFAULT_KPOINT_TOL)
+    ops = list(ssg.ops)
+    effective_ops = [
+        np.linalg.det(op.spin_rotation) * np.linalg.inv(np.asarray(op.rotation, dtype=float)).T
+        for op in ops
+    ]
+    if (
+        not ssg.is_primitive
+        and ssg.cptrans is not None
+        and not np.allclose(ssg.cptrans, np.eye(3), atol=tol)
+    ):
+        cptrans = np.asarray(ssg.cptrans, dtype=float)
+        cptrans_inv = np.linalg.inv(cptrans)
+        effective_ops = [cptrans_inv @ effective_op @ cptrans for effective_op in effective_ops]
+    return [
+        op
+        for op, effective_op in zip(ops, effective_ops)
+        if _effective_operation_stabilizes_primitive_kpath(
+            effective_op,
+            start_kpoint,
+            end_kpoint,
+            tol=kpoint_tol,
+        )
+    ]
+
+
+def _get_magnetic_little_group_for_primitive_kpath(
+    start_kpoint,
+    end_kpoint,
+    primitive_msg_operations,
+    *,
+    tol: float,
+) -> list[list]:
+    kpoint_tol = min(float(tol), DEFAULT_KPOINT_TOL)
+    little_group = []
+    for time_reversal, rotation, translation in primitive_msg_operations:
+        effective_operation = (
+            float(time_reversal) * np.linalg.inv(np.asarray(rotation, dtype=float)).T
+        )
+        if _effective_operation_stabilizes_primitive_kpath(
+            effective_operation,
+            start_kpoint,
+            end_kpoint,
+            tol=kpoint_tol,
+        ):
+            little_group.append([time_reversal, rotation, translation])
+    return little_group
 
 
 def _ssg_little_group_symbol(
@@ -6199,6 +6280,22 @@ def _get_spin_splitting_for_msg_little_groups(
         spin_splitting, _constraint = solve_spin_constraint_from_stacked(spinmatrices)
         spin_splittings.append(spin_splitting)
     return spin_splittings
+
+
+def _get_spin_splitting_for_ssg_little_group(
+    little_group: list[SpinSpaceGroupOperation],
+    *,
+    tol: float,
+) -> str:
+    if not little_group:
+        return "unknown"
+    spin_matrices = deduplicate_matrix_pairs(
+        [np.asarray(op.spin_rotation, dtype=float) - np.eye(3) for op in little_group],
+        tol=tol,
+    )
+    stacked = np.vstack(spin_matrices)
+    spin_splitting, _constraint = solve_spin_constraint_from_stacked(stacked)
+    return spin_splitting
 
 
 def _build_msg_little_group_payload(
@@ -8801,8 +8898,83 @@ def _find_spin_group_from_parsed(
         acc_magnetic_primitive_cell,
         tol=tol_cfg.m_matrix_tol,
     )
+
+    exact_kpoint_splitting_cache = {}
+    exact_kpath_splitting_cache = {}
+
+    def _resolve_exact_kpoint_splitting(kpoint):
+        key = tuple(np.round(np.mod(np.asarray(kpoint, dtype=float), 1.0), 12))
+        cached = exact_kpoint_splitting_cache.get(key)
+        if cached is not None:
+            return cached
+
+        ssg_little_group = _get_ssg_little_group_for_primitive_kpoint(
+            acc_primitive_output_ssg,
+            kpoint,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        without_soc = _get_spin_splitting_for_ssg_little_group(
+            ssg_little_group,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        msg_little_group = _get_magnetic_little_group(
+            kpoint,
+            primitive_msg_ops,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        with_soc = _get_spin_splitting_for_msg_little_groups(
+            [msg_little_group],
+            acc_magnetic_primitive_cell,
+            tol=tol_cfg.m_matrix_tol,
+        )[0]
+        resolved = (
+            without_soc == "spin splitting",
+            with_soc == "spin splitting",
+        )
+        exact_kpoint_splitting_cache[key] = resolved
+        return resolved
+
+    def _resolve_exact_kpath_splitting(start_kpoint, end_kpoint):
+        key = (
+            tuple(np.round(np.asarray(start_kpoint, dtype=float), 12)),
+            tuple(np.round(np.asarray(end_kpoint, dtype=float), 12)),
+        )
+        cached = exact_kpath_splitting_cache.get(key)
+        if cached is not None:
+            return cached
+
+        ssg_little_group = _get_ssg_little_group_for_primitive_kpath(
+            acc_primitive_output_ssg,
+            start_kpoint,
+            end_kpoint,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        without_soc = _get_spin_splitting_for_ssg_little_group(
+            ssg_little_group,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        msg_little_group = _get_magnetic_little_group_for_primitive_kpath(
+            start_kpoint,
+            end_kpoint,
+            primitive_msg_ops,
+            tol=tol_cfg.m_matrix_tol,
+        )
+        with_soc = _get_spin_splitting_for_msg_little_groups(
+            [msg_little_group],
+            acc_magnetic_primitive_cell,
+            tol=tol_cfg.m_matrix_tol,
+        )[0]
+        resolved = (
+            without_soc == "spin splitting",
+            with_soc == "spin splitting",
+        )
+        exact_kpath_splitting_cache[key] = resolved
+        return resolved
+
     KPOINTS = acc_primitive_output_ssg.get_KPOINTS(
-        spin_splitting_w_soc=msg_spin_splittings
+        spin_splitting_w_soc=msg_spin_splittings,
+        exact_splitting_resolver=_resolve_exact_kpoint_splitting,
+        exact_path_splitting_resolver=_resolve_exact_kpath_splitting,
     )
     msg_spin_polarizations_poscar = _get_spin_constraint_for_msg_little_groups(
         msg_little_groups,

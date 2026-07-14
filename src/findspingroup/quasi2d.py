@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs
+from findspingroup.core.tolerances import DEFAULT_KPOINT_TOL
 from findspingroup.structure.group import (
     BrillouinZoneMatcher,
     find_uvw_whole_string,
@@ -394,6 +395,7 @@ def _classify_kpoint_plane(
 
 
 def _little_group_for_primitive_kpoint(ssg, k_point, *, tol: float) -> list:
+    kpoint_tol = min(float(tol), DEFAULT_KPOINT_TOL)
     k_array = np.asarray(k_point, dtype=float).reshape(3)
     effective_ops = [
         np.linalg.det(op[0]) * np.array(np.linalg.inv(op[1]).T)
@@ -403,7 +405,7 @@ def _little_group_for_primitive_kpoint(ssg, k_point, *, tol: float) -> list:
     if ssg.cptrans is None or np.allclose(ssg.cptrans, np.eye(3)):
         for op, effective_op in zip(ssg.gspg_ops_raw, effective_ops):
             target = effective_op @ k_array % 1
-            if getNormInf(k_array % 1, target) < tol:
+            if getNormInf(k_array % 1, target) < kpoint_tol:
                 little_group.append(op)
         return little_group
 
@@ -415,7 +417,7 @@ def _little_group_for_primitive_kpoint(ssg, k_point, *, tol: float) -> list:
     primitive_kpoint = cptrans.T @ k_array % 1
     for op, conjugated_effective_op in zip(ssg.gspg_ops_raw, conjugated_effective_ops):
         transformed = conjugated_effective_op @ primitive_kpoint % 1
-        if getNormInf(primitive_kpoint, transformed) < tol:
+        if getNormInf(primitive_kpoint, transformed) < kpoint_tol:
             little_group.append(op)
     return little_group
 
