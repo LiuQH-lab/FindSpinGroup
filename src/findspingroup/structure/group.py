@@ -503,17 +503,12 @@ def _cached_acc_symbol_info_by_key(ops_key: tuple):
     )
 
 
-@lru_cache(maxsize=256)
-def _cached_acc_kpath_info_by_key(ops_key: tuple):
-    ops = [
-        [_restore_matrix_from_bytes(rotation_bytes), _restore_vector_from_bytes(translation_bytes)]
-        for rotation_bytes, translation_bytes in ops_key
-    ]
-    _, _, _, kpath_info = get_arithmetic_crystal_class_from_ops(
-        ops,
-        include_kpath=True,
+@lru_cache(maxsize=128)
+def _cached_acc_kpath_info_by_rules(rules_key: tuple):
+    matcher = BrillouinZoneMatcher(
+        [(label, pattern, False) for label, pattern in rules_key]
     )
-    return deepcopy(kpath_info)
+    return build_acc_stratum_kpath(matcher)
 
 
 @lru_cache(maxsize=512)
@@ -1027,8 +1022,120 @@ class BrillouinZoneMatcher:
         )
 
 
+_KPOINT_STRATUM_PARAMETER_PAIRS = (
+    ((0.173, 0.319, 0.431), (0.277, 0.557, 0.683)),
+    ((0.211, 0.373, 0.587), (0.347, 0.523, 0.761)),
+    ((0.137, 0.293, 0.619), (0.251, 0.467, 0.829)),
+)
+
+
+def _generic_segment_for_kpoint_rule(
+    matcher: BrillouinZoneMatcher,
+    rule: dict,
+    *,
+    tol: float = DEFAULT_KPOINT_TOL,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return a validated generic segment inside one affine k-vector stratum."""
+    pattern = rule['pattern']
+    dimension = int(rule['dimension'])
+    if dimension <= 0:
+        raise ValueError(f"K-point stratum {rule['label']} is zero-dimensional")
+
+    matrix = pattern['parameter_matrix']
+    periods = pattern['parameter_periods']
+    for start_fractions, end_fractions in _KPOINT_STRATUM_PARAMETER_PAIRS:
+        start_parameters = np.asarray(start_fractions[:dimension], dtype=float) * periods
+        end_parameters = np.asarray(end_fractions[:dimension], dtype=float) * periods
+        start = pattern['offset'] + matrix @ start_parameters
+        end = pattern['offset'] + matrix @ end_parameters
+        try:
+            start_label = matcher.check(*start, tol=tol)['matched_label']
+            end_label = matcher.check(*end, tol=tol)['matched_label']
+            path_label = matcher.check_path(start, end, tol=tol)['matched_label']
+        except ValueError:
+            continue
+        if start_label == end_label == path_label == rule['label']:
+            return start, end
+
+    raise ValueError(
+        "Unable to construct a generic segment for ACC k-vector stratum "
+        f"{rule['label']}:{rule['pattern']['expressions']}"
+    )
+
+
+def build_acc_stratum_kpath(
+    matcher: BrillouinZoneMatcher,
+    *,
+    included_labels=None,
+    tol: float = DEFAULT_KPOINT_TOL,
+) -> dict:
+    """Build a compact path covering every selected ACC k-vector stratum.
+
+    Zero-dimensional strata are covered as endpoints of a point-star path.
+    Every positive-dimensional stratum receives one validated generic segment.
+    A generic segment is sufficient for a plane or volume because embedded
+    special lines and points are emitted as their own lower-dimensional strata.
+    """
+    allowed = None if included_labels is None else set(included_labels)
+    rules = [
+        rule
+        for rule in matcher.parsed_rules
+        if allowed is None or rule['label'] in allowed
+    ]
+    point_rules = [rule for rule in rules if rule['dimension'] == 0]
+    positive_dimensional_rules = [rule for rule in rules if rule['dimension'] > 0]
+
+    point_coords = {
+        rule['label']: np.asarray(rule['pattern']['offset'], dtype=float)
+        for rule in point_rules
+    }
+    display_labels = {rule['label']: rule['label'] for rule in point_rules}
+    path = []
+
+    if len(point_rules) > 1:
+        anchor = next(
+            (rule['label'] for rule in point_rules if rule['label'] in {'Γ', 'GAMMA'}),
+            point_rules[0]['label'],
+        )
+        path.extend(
+            (anchor, rule['label'])
+            for rule in point_rules
+            if rule['label'] != anchor
+        )
+
+    generic_segment_starts = []
+    for index, rule in enumerate(positive_dimensional_rules):
+        start, end = _generic_segment_for_kpoint_rule(matcher, rule, tol=tol)
+        start_key = f"__acc_stratum_{index}_start"
+        end_key = f"__acc_stratum_{index}_end"
+        point_coords[start_key] = start
+        point_coords[end_key] = end
+        display_labels[start_key] = f"{rule['label']}1"
+        display_labels[end_key] = f"{rule['label']}2"
+        path.append((start_key, end_key))
+        generic_segment_starts.append(start_key)
+
+    if len(point_rules) == 1 and generic_segment_starts:
+        path.insert(0, (point_rules[0]['label'], generic_segment_starts[0]))
+
+    for start_label, end_label in path:
+        start = point_coords[start_label]
+        end = point_coords[end_label]
+        if np.max(np.abs(end - start)) <= tol:
+            raise ValueError(
+                f"ACC k-path contains a zero-length segment: {start_label}->{end_label}"
+            )
+        matcher.check_path(start, end, tol=tol)
+
+    return {
+        'point_coords': point_coords,
+        'path': path,
+        'display_labels': display_labels,
+    }
+
+
 def write_kpoints(
-    seekpath_out,
+    kpath_info,
     matcher: BrillouinZoneMatcher,
     num_points=40,
     extra_kpoints=None,
@@ -1039,8 +1146,9 @@ def write_kpoints(
     """
     Write k-point path string with spin-splitting info for endpoints and paths.
     """
-    kpts = seekpath_out['point_coords']
-    path = seekpath_out['path']
+    kpts = kpath_info['point_coords']
+    path = kpath_info['path']
+    display_labels = kpath_info.get('display_labels', {})
 
     def append_low_sym_points_simple_chain(extra_points):
         """
@@ -1049,7 +1157,8 @@ def write_kpoints(
 
         Parameters:
         extra_points: list of tuples, e.g. [([0.1, 0, 0], "MyP1"), ([0.2, 0, 0], "MyP2")]
-        seekpath_output: dict, output from `seekpath.get_path()`
+        The returned mapping follows the internal ``point_coords``/``path``
+        contract used by :func:`write_kpoints`.
         """
 
         # Copy the base data.
@@ -1066,7 +1175,7 @@ def write_kpoints(
             point_coords[label] = np.array(coords)
             new_labels_ordered.append(label)
 
-        # Build the chain path. Seekpath usually labels Gamma as `GAMMA`.
+        # Build the chain path around the conventional `GAMMA` label.
         gamma_label = 'GAMMA'
 
         # A. Start segment: GAMMA -> first extra point.
@@ -1087,6 +1196,7 @@ def write_kpoints(
 
     def fmt(label):
         # Render a cleaner display label.
+        label = display_labels.get(label, label)
         return 'Γ' if label == 'GAMMA' else label.replace('_', '')
 
     def get_kpoint_match(u, v, w):
@@ -1151,9 +1261,8 @@ def write_kpoints(
             k1 = np.array(kpts_list[start_label])
             k2 = np.array(kpts_list[end_label])
 
-            # SeekPath may retain distinct labels that collapse to the same
-            # numerical point for a special lattice metric. Such a pair is a
-            # point, not a band-path segment.
+            # Distinct symbolic labels can collapse to the same numerical
+            # point. Such a pair is a point, not a band-path segment.
             if np.max(np.abs(k2 - k1)) <= DEFAULT_KPOINT_TOL:
                 continue
 
@@ -1183,7 +1292,7 @@ def write_kpoints(
     s = []
     # Write the file header.
     s.append(
-        f"Generated by seekpath and findspingroup v{__version__} "
+        f"Generated from ACC k-vector strata by findspingroup v{__version__} "
         f"(*** for spin splitting w/o SOC; ^^^ for spin splitting w/ SOC)\n "
     )
     s.append(f"{num_points}\nLine-mode\nReciprocal\n")
@@ -1197,8 +1306,8 @@ def write_kpoints(
                 continue
             else:
                 add_kpoints.append(i)
-        extra_seekpath = append_low_sym_points_simple_chain(add_kpoints)
-        s = _write_kpoints(s,extra_seekpath['path'],extra_seekpath['point_coords']|kpts)[1]
+        extra_kpath = append_low_sym_points_simple_chain(add_kpoints)
+        s = _write_kpoints(s,extra_kpath['path'],extra_kpath['point_coords']|kpts)[1]
     return ''.join(s)
 
 def find_uvw_whole_string(data_list):
@@ -2082,8 +2191,10 @@ class SpinSpaceGroup:
 
     @cached_property
     def kpath_info(self):
-        return _cached_acc_kpath_info_by_key(
-            _matrix_vector_ops_cache_key([[i, j[1]] for j in self.pure_t_group for i in self.ekPG])
+        return deepcopy(
+            _cached_acc_kpath_info_by_rules(
+                tuple(zip(self.kpoints_label, self.kpoints_primitive_string))
+            )
         )
 
     @cached_property
@@ -2377,20 +2488,9 @@ class SpinSpaceGroup:
             for i, j in enumerate(self.is_spinsplitting)
         ]
         matcher = BrillouinZoneMatcher(spin_splitting_info)
-        low_symm_indices = find_uvw_whole_string(self.kpoints_symbol_primitive)
-        extra_point_info = [(self.kpoints_primitive[ind], self.kpoints_label[ind]) for ind in low_symm_indices]
-        reciprocal_orbit_operations = deduplicate_matrix_pairs(
-            [
-                np.linalg.det(op[0]) * np.linalg.inv(np.asarray(op[1], dtype=float)).T
-                for op in self.gspg_ops_raw
-            ],
-            tol=self.tol,
-        )
         return write_kpoints(
-            self.kpath_info,
+            build_acc_stratum_kpath(matcher),
             matcher,
-            extra_kpoints=extra_point_info,
-            reciprocal_orbit_operations=reciprocal_orbit_operations,
             exact_splitting_resolver=exact_splitting_resolver,
             exact_path_splitting_resolver=exact_path_splitting_resolver,
         )

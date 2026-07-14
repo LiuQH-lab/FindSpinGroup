@@ -13,6 +13,7 @@ import findspingroup.structure.cell as cell_module
 import findspingroup.structure.group as group_module
 from findspingroup.data.acc_aligned_p_index_loader import (
     _spin_texture_config_record,
+    acc_kpoint_symbols_by_number,
     get_pair_id_for_ssg_label,
     get_ssg_conventional_kpoint_symbols_for_label,
     get_spin_texture_config_for_ssg_label,
@@ -4736,7 +4737,7 @@ def test_v2se2o_quasi2d_case_study_uses_final_acc_primitive_transform_chain():
     assert quasi_2d["KPOINTS"].startswith(result.KPOINTS.splitlines()[0])
     assert "Line-mode\nReciprocal" in quasi_2d["KPOINTS"]
     assert "  0.000000   0.000000   0.500000 ! Z" not in quasi_2d["KPOINTS"]
-    assert "  0.417000   0.237000   0.000000 ! D" in quasi_2d["KPOINTS"]
+    assert " | D ***" in quasi_2d["KPOINTS"]
     kpoints_2d = [
         row
         for row in quasi_2d["kpoints"]
@@ -5158,20 +5159,61 @@ def test_arbitrary_kpoint_little_group_uses_kpoint_not_matrix_tolerance():
     assert near_but_generic_group == []
 
 
-def test_vcl2_kpoints_use_exact_path_little_groups_and_acc_orbit_labels():
+def test_vcl2_kpoints_cover_acc_strata_without_generic_plane_mislabeling():
     result = find_spin_group("src/findspingroup/examples/1.237_VCl2.mcif")
     blocks = [block for block in result.KPOINTS.split("\n\n") if block.strip()]
 
     gamma_m = next(block for block in blocks if "! Γ" in block and "! M" in block)
-    m_k = next(block for block in blocks if "! M" in block and "! K" in block)
-    l_h = next(block for block in blocks if "! L" in block and "! H" in block)
+    lambda_path = next(block for block in blocks if "| Λ" in block)
+    q_path = next(block for block in blocks if "| Q" in block)
+    b_path = next(block for block in blocks if "| B" in block)
 
     assert "| Σ ***^^^" in gamma_m
-    assert "| Λ ^^^" in m_k
-    assert "***" not in m_k
-    assert "| Q ^^^" in l_h
-    assert "***" not in l_h
-    assert "! B ***^^^" in result.KPOINTS
+    assert "| Λ ^^^" in lambda_path
+    assert "***" not in lambda_path
+    assert "| Q ^^^" in q_path
+    assert "***" not in q_path
+    assert "| B ***^^^" in b_path
+
+
+def test_acc_stratum_kpaths_cover_every_runtime_point_line_plane_and_volume():
+    covered_by_dimension = {0: 0, 1: 0, 2: 0, 3: 0}
+
+    for payload in acc_kpoint_symbols_by_number().values():
+        rules = [
+            (*group_module.parse_label_and_value(symbol), False)
+            for symbol in payload["primitive"]
+        ]
+        matcher = group_module.BrillouinZoneMatcher(rules)
+        kpath_info = group_module.build_acc_stratum_kpath(matcher)
+        point_coords = kpath_info["point_coords"]
+        paths = kpath_info["path"]
+
+        endpoint_values = [
+            np.asarray(point_coords[label], dtype=float)
+            for path in paths
+            for label in path
+        ]
+        positive_dimensional_labels = {
+            matcher.check_path(point_coords[start], point_coords[end])["matched_label"]
+            for start, end in paths
+        }
+
+        for start, end in paths:
+            assert not np.allclose(point_coords[start], point_coords[end], atol=1e-8)
+
+        for rule in matcher.parsed_rules:
+            dimension = rule["dimension"]
+            covered_by_dimension[dimension] += 1
+            if dimension == 0:
+                assert any(
+                    np.allclose(value, rule["pattern"]["offset"], atol=1e-8)
+                    for value in endpoint_values
+                )
+            else:
+                assert rule["label"] in positive_dimensional_labels
+
+    assert covered_by_dimension == {0: 418, 1: 452, 2: 229, 3: 73}
 
 
 def test_quasi2d_input_padding_expands_vacuum_axis_without_stretching_slab():

@@ -8899,82 +8899,8 @@ def _find_spin_group_from_parsed(
         tol=tol_cfg.m_matrix_tol,
     )
 
-    exact_kpoint_splitting_cache = {}
-    exact_kpath_splitting_cache = {}
-
-    def _resolve_exact_kpoint_splitting(kpoint):
-        key = tuple(np.round(np.mod(np.asarray(kpoint, dtype=float), 1.0), 12))
-        cached = exact_kpoint_splitting_cache.get(key)
-        if cached is not None:
-            return cached
-
-        ssg_little_group = _get_ssg_little_group_for_primitive_kpoint(
-            acc_primitive_output_ssg,
-            kpoint,
-            tol=tol_cfg.m_matrix_tol,
-        )
-        without_soc = _get_spin_splitting_for_ssg_little_group(
-            ssg_little_group,
-            tol=tol_cfg.m_matrix_tol,
-        )
-        msg_little_group = _get_magnetic_little_group(
-            kpoint,
-            primitive_msg_ops,
-            tol=tol_cfg.m_matrix_tol,
-        )
-        with_soc = _get_spin_splitting_for_msg_little_groups(
-            [msg_little_group],
-            acc_magnetic_primitive_cell,
-            tol=tol_cfg.m_matrix_tol,
-        )[0]
-        resolved = (
-            without_soc == "spin splitting",
-            with_soc == "spin splitting",
-        )
-        exact_kpoint_splitting_cache[key] = resolved
-        return resolved
-
-    def _resolve_exact_kpath_splitting(start_kpoint, end_kpoint):
-        key = (
-            tuple(np.round(np.asarray(start_kpoint, dtype=float), 12)),
-            tuple(np.round(np.asarray(end_kpoint, dtype=float), 12)),
-        )
-        cached = exact_kpath_splitting_cache.get(key)
-        if cached is not None:
-            return cached
-
-        ssg_little_group = _get_ssg_little_group_for_primitive_kpath(
-            acc_primitive_output_ssg,
-            start_kpoint,
-            end_kpoint,
-            tol=tol_cfg.m_matrix_tol,
-        )
-        without_soc = _get_spin_splitting_for_ssg_little_group(
-            ssg_little_group,
-            tol=tol_cfg.m_matrix_tol,
-        )
-        msg_little_group = _get_magnetic_little_group_for_primitive_kpath(
-            start_kpoint,
-            end_kpoint,
-            primitive_msg_ops,
-            tol=tol_cfg.m_matrix_tol,
-        )
-        with_soc = _get_spin_splitting_for_msg_little_groups(
-            [msg_little_group],
-            acc_magnetic_primitive_cell,
-            tol=tol_cfg.m_matrix_tol,
-        )[0]
-        resolved = (
-            without_soc == "spin splitting",
-            with_soc == "spin splitting",
-        )
-        exact_kpath_splitting_cache[key] = resolved
-        return resolved
-
     KPOINTS = acc_primitive_output_ssg.get_KPOINTS(
         spin_splitting_w_soc=msg_spin_splittings,
-        exact_splitting_resolver=_resolve_exact_kpoint_splitting,
-        exact_path_splitting_resolver=_resolve_exact_kpath_splitting,
     )
     msg_spin_polarizations_poscar = _get_spin_constraint_for_msg_little_groups(
         msg_little_groups,
