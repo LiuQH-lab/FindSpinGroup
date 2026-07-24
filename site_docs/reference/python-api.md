@@ -1,7 +1,7 @@
 # Python API: Start With The Scientific Task
 
-FindSpinGroup has three primary file-based functions. Most users need only the
-first one.
+FindSpinGroup has three primary file-based functions and one operation-only
+constructor. Most structure-analysis users need only the first function.
 
 ## Main Functions
 
@@ -10,12 +10,14 @@ first one.
 | Identify and screen a magnetic structure | `find_spin_group_basic(...)` | `BasicResult` dictionary | `index`, `magnetic_phase`, MSG fields, `properties` |
 | Inspect operations, settings, tensors, sites, or generated artifacts | `find_spin_group(...)` | `MagSymmetryResult` | a specific attribute or `to_structured_dict()` Python view |
 | Export operations in the user-supplied cell | `find_spin_group_input_ssg(...)` | `InputSSGResult` dictionary | primitive-cell warning, then `ssg`/`msg` |
+| Identify an SSG from complete operations or generators | `get_spin_space_group_from_operations(...)` | `SpinSpaceGroup` | `index`, `conf`, G0/L0, ACC, point groups |
 
 Detailed pages:
 
 - [`find_spin_group_basic`](api/find-spin-group-basic.md)
 - [`find_spin_group`](api/find-spin-group.md)
 - [`find_spin_group_input_ssg`](api/find-spin-group-input-ssg.md)
+- [`get_spin_space_group_from_operations`](api/get-spin-space-group-from-operations.md)
 
 ## Recommended First Call
 
@@ -111,6 +113,36 @@ Use `find_spin_group_from_data(...)`, `find_spin_group_basic_from_data(...)`, or
 already owns parsed lattice, position, species, occupancy, and moment arrays.
 The file-based functions are safer for ordinary use because they also preserve
 input-format metadata and spin-frame conventions.
+
+## Operation-Only Identification
+
+Use `get_spin_space_group_from_operations(...)` when another program already
+owns SSG operations or generators and no atomic structure is available:
+
+```python
+from findspingroup import get_spin_space_group_from_operations
+
+ssg = get_spin_space_group_from_operations(
+    generators,
+    spin_configuration="collinear",
+    spin_only_direction=[0, 0, 1],
+    spin_frame="oriented",
+)
+
+print(ssg.index, ssg.G0_num, ssg.L0_num)
+print(ssg.acc, ssg.n_spin_part_point_group_symbol_s)
+```
+
+This route performs finite affine closure, completes the finite spin-only
+representative used by the core, and identifies the database/convention index.
+It does not construct a fictitious magnetic crystal. Consequently it cannot
+produce atom-, cell-, Wyckoff-, net-moment-, SCIF-, POSCAR-, or
+material-classification results.
+
+For SOC/MSG analysis, spin and real rotations must be expressed in one common
+physical coordinate representation. See the
+[operation-only API contract](api/get-spin-space-group-from-operations.md)
+before using `ssg.msg_info`.
 
 ## Interpretation Rule
 
