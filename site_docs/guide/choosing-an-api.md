@@ -13,6 +13,7 @@ Choose from the scientific task, not from an internal object name.
 | Export SCIF in a chosen setting | `fsg FILE --write-scif OUT` | `result.to_scif(...)` | Full analysis |
 | Analyze a slab as quasi-2D | `fsg --full --calculation-mode quasi2d --vacuum-axis c FILE --show quasi_2d` | `find_spin_group(..., calculation_mode="quasi2d")` | Full analysis with quasi-2D interpretation payload |
 | Export operations in exactly the input cell | `fsg -w FILE` | `find_spin_group_input_ssg(FILE)` | Specialized operation export |
+| Identify a group from operation matrices or generators | none | `get_spin_space_group_from_operations(...)` | Operation-only `SpinSpaceGroup`; no material artifacts |
 
 ## Quick Analysis: The Default
 
@@ -90,6 +91,26 @@ an incomplete subgroup of the primitive-cell symmetry. Before consuming
 
 Use this route because a downstream program requires the input setting, not as
 a shortcut to the canonical OSSG identification.
+
+## Operations Without A Structure
+
+Use `get_spin_space_group_from_operations(...)` only when operations are the
+primary input. It accepts a complete finite operation set or generators,
+closes them modulo the declared or inferred spin-only subgroup, and returns an
+identified `SpinSpaceGroup`.
+
+This route can derive group-theoretic information such as index,
+configuration, G0/L0, translational indices, spin point groups, ACC, standard
+k-point templates, and operation-based symbols. It cannot infer atoms,
+Wyckoff splitting, net moment, magnetic phase, structure-dependent tensors, or
+files such as SCIF/POSCAR.
+
+MSG interpretation additionally requires spin and real rotations in one common
+physical coordinate representation. Merely labeling two independently
+oriented settings as "oriented" does not establish their relative frame. A
+Cartesian spin matrix paired with a fractional real-space matrix is sufficient
+for OSSG identification but not by itself for a physically meaningful SOC/MSG
+embedding.
 
 ## File Path Or Parsed Arrays?
 
