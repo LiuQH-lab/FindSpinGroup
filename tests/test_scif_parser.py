@@ -29,6 +29,7 @@ from findspingroup.io import (
     parse_scif_text,
 )
 from findspingroup.io.scif_generator import (
+    _format_transform_chen_pp_abcs,
     _parse_solver_component_expression,
     _parse_solver_numeric_token,
     _source_to_target_basis_pp_string,
@@ -116,6 +117,37 @@ def test_scif_basis_relation_pp_string_writes_source_basis_vectors_as_rows():
     )
 
     assert pp_string == "2/3a+1/3b-4/3c,-1/3a-2/3b-4/3c,-1/3a+1/3b-4/3c;0,0,0"
+
+
+def test_scif_chen_spin_transform_writes_target_basis_in_current_spin_basis():
+    current_to_chen_coordinates = np.array(
+        [
+            [0.0, np.sqrt(3.0) / 2.0, 0.0],
+            [0.0, 0.0, 1.0],
+            [1.0, -0.5, 0.0],
+        ]
+    )
+
+    tag = _format_transform_chen_pp_abcs(
+        {
+            "space_matrix": np.eye(3),
+            "space_shift": np.zeros(3),
+            "spin_basis_rows": current_to_chen_coordinates,
+        }
+    )
+
+    assert tag == (
+        "_space_group_spin.transform_Chen_Liu_Pp_abcs  "
+        "'a,b,c;0,0,0;sqrt(3)/3as+cs,2*sqrt(3)/3as,bs'"
+    )
+    assert np.allclose(
+        np.linalg.inv(current_to_chen_coordinates),
+        [
+            [1.0 / np.sqrt(3.0), 0.0, 1.0],
+            [2.0 / np.sqrt(3.0), 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+        ],
+    )
 
 
 def _actual_basis_spin_transform(cell: CrystalCell) -> np.ndarray:
@@ -285,17 +317,29 @@ def test_generated_database_standard_scif_uses_g0std_for_non_type_k_cartesian_mo
     assert roundtrip.index == result.index
 
 
-def test_generated_scif_spin_only_direction_follows_spin_frame():
+def test_generated_scif_collinear_direction_uses_current_lattice_basis():
     mnte = find_spin_group("examples/0.800_MnTe.mcif")
 
     assert _scif_line(
         mnte.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN),
         "_space_group_spin.collinear_direction_xyz",
-    ) == "_space_group_spin.collinear_direction_xyz '1/2,sqrt(3)/2,0'"
+    ) == "_space_group_spin.collinear_direction_xyz '1,1,0'"
     assert _scif_line(
         mnte.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
         "_space_group_spin.collinear_direction_xyz",
     ) == "_space_group_spin.collinear_direction_xyz '1,1,0'"
+
+    ca3lios = find_spin_group(
+        "tests/testset/mcif_241130_no2186/0.3_Ca3LiOsO6.mcif"
+    )
+    assert _scif_line(
+        ca3lios.to_scif(cell_mode=SCIF_CELL_MODE_INPUT_CARTESIAN),
+        "_space_group_spin.collinear_direction_xyz",
+    ) == "_space_group_spin.collinear_direction_xyz '1,0,0'"
+    assert _scif_line(
+        ca3lios.to_scif(cell_mode=SCIF_CELL_MODE_MAGNETIC_PRIMITIVE_CARTESIAN),
+        "_space_group_spin.collinear_direction_xyz",
+    ) == "_space_group_spin.collinear_direction_xyz '1,-1,0'"
     assert _scif_line(
         mnte.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN),
         "_space_group_spin.coplanar_perp_uvw",
@@ -1119,7 +1163,8 @@ def test_generated_scif_uses_cif_legal_fsg_tags_and_full_precision_operations():
     assert "_space_group_spin.fsg_transform_to_parent_space_group_Pp" not in result.scif
     assert (
         "_space_group_spin.transform_Chen_Liu_Pp_abcs  "
-        "'a,b,c;0,0,0;-sqrt(6)/2as+sqrt(6)/2bs-cs,-sqrt(6)/2bs-cs,sqrt(6)/2as-cs'"
+        "'a,b,c;0,0,0;-sqrt(6)/9as-sqrt(6)/9bs+2*sqrt(6)/9cs,"
+        "sqrt(6)/9as-2*sqrt(6)/9bs+sqrt(6)/9cs,-1/3as-1/3bs-1/3cs'"
         in result.scif
     )
     assert "1/3u-1/3w,2/3u-v-1/6w,-8/3u-1/3w" in result.scif
@@ -1153,23 +1198,27 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
             "C m_{001}|2/ m_{001}|m : (1,1,-1;-1)",
             (
                 "a,b,a+c;0,0,0;"
-                "-0.769566as-0.353349cs,1.532627as-1.67819cs,-5*sqrt(2)/4bs"
+                "-0.915527as+0.192768bs,-2*sqrt(2)/5cs,"
+                "-0.836116as-0.419833bs"
             ),
         ),
         (
             "tests/testset/mcif_241130_no2186/1.526_LiCoF4.mcif",
             "P 1|2_{1}/ 1|c : -1|(1/2,0,0) ∞_{001}m|1",
-            "a,b,-a+c;0,0,0;0.991105as+0.024956cs,bs,-0.133079as+0.999689cs",
+            "a,b,-a+c;0,0,0;1.005604as-0.025103cs,bs,"
+            "0.133867as+0.99697cs",
         ),
         (
             "examples/2.116_Na3Co2SbO6.mcif",
             "P 2_{001}|2/ 2_{001}|m : (1,2_{010},2_{010}) m_{010}|1",
-            "a,b,a+c;0,1/4,0;sqrt(3)bs,-1.641911as+1.441404cs,-0.551479as-0.960393cs",
+            "a,b,a+c;0,1/4,0;-0.404924bs-0.60773cs,sqrt(3)/3as,"
+            "0.232517bs-0.692268cs",
         ),
         (
             "tests/testset/mcif_241130_no2186/1.570_La3OsO7.mcif",
             "P 1|2_{1}/ 1|c : -1|(0,0,1/2) ∞_{001}m|1",
-            "a+2c,-b,1/2a;0,1/2,0;-0.827444as-0.203384cs,-bs,-0.561549as+0.979099cs",
+            "a+2c,-b,1/2a;0,1/2,0;-1.059219as-0.220027cs,-bs,"
+            "-0.6075as+0.895154cs",
         ),
     ],
 )
@@ -1197,7 +1246,7 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_mnte():
         "P -1|6_{3}/ -1|m 1|m -1|c ∞_{001}m|1"
     )
     assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == (
-        "a,b,c;0,0,0;sqrt(3)/2as-sqrt(3)/2bs,-cs,1/2as+1/2bs"
+        "a,b,c;0,0,0;sqrt(3)/3as+cs,-sqrt(3)/3as+cs,-bs"
     )
 
 
@@ -1208,7 +1257,9 @@ def test_generated_input_oriented_scif_transform_chen_omits_lattice_lengths_for_
     )
 
     assert metadata["space_group_spin"]["transform_spinframe_P_abc"] == "a,b,c"
-    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == "a,b,c;0,0,0;as,-cs,bs"
+    assert metadata["space_group_spin"]["transform_Chen_Pp_abcs"] == (
+        "a,b,c;0,0,0;as,cs,-bs"
+    )
 
 
 def test_generated_scif_uses_solver_derived_symmform_uvw_for_mn3sn():

@@ -535,7 +535,13 @@ def _format_transform_chen_pp_abcs(transform_parts: dict | None):
         return None
     space_matrix = transform_parts["space_matrix"]
     space_shift = transform_parts["space_shift"]
-    spin_basis_rows = transform_parts["spin_basis_rows"]
+    # ``spin_basis_rows`` is the coordinate transform used internally:
+    #     u_Chen = S u_current.
+    # The SCIF tag instead lists the Chen target basis vectors in the current
+    # spin basis, which is the inverse relation.
+    spin_basis_rows = np.linalg.inv(
+        np.asarray(transform_parts["spin_basis_rows"], dtype=float)
+    )
 
     return (
         f"_space_group_spin.transform_Chen_Liu_Pp_abcs  "
@@ -1187,6 +1193,18 @@ def generate_scif(
     cell = cell_G0.to_spglib(mag=True)
     configuration = ssg.conf
     norm_direction = ssg.sog_direction
+    if configuration == "Collinear" and norm_direction is not None:
+        spin_basis_rows = (
+            np.eye(3)
+            if spinframe_basis_abc_rows is None
+            else np.asarray(spinframe_basis_abc_rows, dtype=float)
+        )
+        # ``collinear_direction_xyz`` is defined in current lattice-unit-cell
+        # coordinates, not in the independently declared spin frame.
+        norm_direction = spin_basis_rows.T @ np.asarray(
+            norm_direction,
+            dtype=float,
+        )
     if operation_loops is None:
         operation_loops = _resolve_scif_operation_loops(ssg)
     non_centered_nssg_ops, nontrivial_spin_translation_ops = operation_loops
