@@ -133,6 +133,14 @@ def _real_generator_tokens(sg_num: int, named_count: int) -> list[str]:
     return tokens + ["?"] * (named_count - len(tokens))
 
 
+def _real_symbol_tokens(sg_num: int, generator_tokens: list[str]) -> list[str]:
+    """Restore HM direction placeholders without treating them as generators."""
+    symbol_tokens = list(SGdisc[sg_num][1:])
+    if [token for token in symbol_tokens if token != "1"] == generator_tokens:
+        return symbol_tokens
+    return list(generator_tokens)
+
+
 def _to_latex_token(token: str) -> str:
     token = re.sub(r"alpha(\d+)", r"\\alpha_{\1}", token)
     token = re.sub(r"beta(\d+)", r"\\beta_{\1}", token)
@@ -968,15 +976,33 @@ def build_international_symbol(
 
     pair_linear_terms: list[str] = []
     pair_latex_terms: list[str] = []
+    symbol_pair_linear_terms: list[str] = []
+    symbol_pair_latex_terms: list[str] = []
     point_pair_linear_terms: list[str] = []
     point_pair_latex_terms: list[str] = []
 
     if named_pair_data:
-        for spin_info, real_tok, _matched in named_pair_data:
+        named_pair_iter = iter(named_pair_data)
+        for real_tok in _real_symbol_tokens(sg_num, real_tokens):
+            if real_tok == "1":
+                symbol_pair_linear_terms.append("1|1")
+                symbol_pair_latex_terms.append(r"^{1}1")
+                point_pair_linear_terms.append("1|1")
+                point_pair_latex_terms.append(r"^{1}1")
+                continue
+
+            spin_info, generator_real_tok, _matched = next(named_pair_iter)
+            if generator_real_tok != real_tok:
+                raise ValueError(
+                    "Real-space generator token order does not match the HM symbol slots: "
+                    f"SG {sg_num}, expected {real_tok!r}, got {generator_real_tok!r}."
+                )
             spin_tok = _point_token_from_info(spin_info, parameter_namer=parameter_namer)
             spin_tok_latex = _point_token_from_info(spin_info, latex=True, parameter_namer=parameter_namer)
             pair_linear_terms.append(f"{spin_tok}|{real_tok}")
             pair_latex_terms.append(rf"^{{{spin_tok_latex}}}{_to_latex_token(real_tok)}")
+            symbol_pair_linear_terms.append(pair_linear_terms[-1])
+            symbol_pair_latex_terms.append(pair_latex_terms[-1])
 
             point_real_tok = _point_group_token_from_real_token(real_tok)
             point_pair_linear_terms.append(f"{spin_tok}|{point_real_tok}")
@@ -984,14 +1010,16 @@ def build_international_symbol(
     elif sg1_token is not None:
         pair_linear_terms.append(sg1_token)
         pair_latex_terms.append(_to_latex_token(sg1_token))
+        symbol_pair_linear_terms.append(pair_linear_terms[-1])
+        symbol_pair_latex_terms.append(pair_latex_terms[-1])
         point_pair_linear_terms.append(sg1_token)
         point_pair_latex_terms.append(_to_latex_token(sg1_token))
 
     point_part_linear = " ".join(point_pair_linear_terms).strip()
     point_part_latex = " ".join(point_pair_latex_terms).strip()
 
-    base_linear = " ".join([bravais] + pair_linear_terms).strip()
-    base_latex = " ".join([_to_latex_token(bravais)] + pair_latex_terms).strip()
+    base_linear = " ".join([bravais] + symbol_pair_linear_terms).strip()
+    base_latex = " ".join([_to_latex_token(bravais)] + symbol_pair_latex_terms).strip()
 
     translation_linear_terms: list[str] = []
     translation_latex_terms: list[str] = []
