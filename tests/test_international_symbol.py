@@ -5,10 +5,13 @@ import pytest
 
 from findspingroup import find_spin_group
 from findspingroup.data.POINT_GROUP_MATRIX import operations_hex
+from findspingroup.data.SG_SYMBOL import SGdisc
 from findspingroup.structure.group import SpinSpaceGroup, SpinSpaceGroupOperation
 from findspingroup.utils.international_symbol import (
     _minimal_k_translation_generators,
     _point_group_token_from_real_token,
+    _real_generator_tokens,
+    _real_symbol_tokens,
 )
 from findspingroup.utils.seitz_symbol import (
     calibrated_symbol_tol,
@@ -49,6 +52,84 @@ def test_point_group_token_drops_braced_screw_subscripts():
     assert _point_group_token_from_real_token("6_{3}/") == "6/"
     assert _point_group_token_from_real_token("4_1") == "4"
     assert _point_group_token_from_real_token("c") == "m"
+
+
+@pytest.mark.parametrize(
+    ("sg_num", "expected_tokens"),
+    [
+        (149, ["3", "1", "2"]),
+        (150, ["3", "2", "1"]),
+        (151, ["3_{1}", "1", "2"]),
+        (152, ["3_{1}", "2", "1"]),
+        (153, ["3_{2}", "1", "2"]),
+        (154, ["3_{2}", "2", "1"]),
+        (156, ["3", "m", "1"]),
+        (157, ["3", "1", "m"]),
+        (158, ["3", "c", "1"]),
+        (159, ["3", "1", "c"]),
+        (162, ["-3", "1", "m"]),
+        (163, ["-3", "1", "c"]),
+        (164, ["-3", "m", "1"]),
+        (165, ["-3", "c", "1"]),
+    ],
+)
+def test_trigonal_hm_symbol_restores_identity_direction_slots(
+    sg_num,
+    expected_tokens,
+):
+    generator_tokens = _real_generator_tokens(sg_num, named_count=2)
+
+    assert len(generator_tokens) == 2
+    assert _real_symbol_tokens(sg_num, generator_tokens) == expected_tokens
+
+
+def test_only_trigonal_directional_hm_symbols_need_identity_slots():
+    identity_slot_sg_numbers = {
+        sg_num
+        for sg_num, tokens in SGdisc.items()
+        if sg_num != 1 and "1" in tokens[1:]
+    }
+
+    assert identity_slot_sg_numbers == {
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        156,
+        157,
+        158,
+        159,
+        162,
+        163,
+        164,
+        165,
+    }
+
+
+def test_type_g_symbol_distinguishes_p_minus3_m1_setting():
+    result = find_spin_group("tests/testset/mcif_241130_no2186/1.237_VCl2.mcif")
+    ssg = SpinSpaceGroup(result.convention_ssg_ops)
+    symbol = ssg.international_symbol_current_frame
+
+    assert result.G0_num == 164
+    assert result.G0_symbol == "P-3m1"
+    assert result.primitive_magnetic_cell_ssg_type == "g"
+    assert result.convention_ssg_international_linear.startswith(
+        "P 2_{120}|-3 2_{120}|m 1|1 :"
+    )
+    assert r"^{2_{120}}\bar{3} ^{2_{120}}m ^{1}1" in (
+        result.convention_ssg_international_latex
+    )
+    assert result.gspg_point_part_linear.endswith("1|1")
+    assert symbol["real_generator_pairs_linear"] == [
+        "2_{120}|-3",
+        "2_{120}|m",
+    ]
+    assert "1" not in {
+        operation["label"] for operation in symbol["generator_operations"]
+    }
 
 
 def test_mag_symmetry_result_repr_uses_linear_symbol_by_default():
