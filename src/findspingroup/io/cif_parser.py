@@ -9,6 +9,66 @@ from ..structure import AtomicSite,CrystalCell
 from ..structure.cell import are_positions_equivalent
 from ..utils import general_positions_to_matrix
 from ..utils.matrix_utils import evaluate_numeric_expression
+
+
+def _tokenize_cif_line(line):
+    """Tokenize one CIF data line while preserving quoted and bracketed values."""
+    tokens = []
+    current = []
+    quote = None
+    brackets = []
+    closing_bracket = {"[": "]", "{": "}"}
+
+    def flush():
+        if current:
+            tokens.append("".join(current))
+            current.clear()
+
+    for char in line:
+        if quote is not None:
+            if char == quote:
+                quote = None
+            else:
+                current.append(char)
+            continue
+
+        if char in {"'", '"'} and not current:
+            quote = char
+            continue
+
+        if char in closing_bracket:
+            brackets.append(char)
+            current.append(char)
+            continue
+
+        if char in {"]", "}"}:
+            # Keep extra closing brackets inside malformed legacy values.
+            if brackets and closing_bracket[brackets[-1]] == char:
+                brackets.pop()
+            current.append(char)
+            continue
+
+        if char == "#" and not brackets and not current:
+            break
+
+        if char.isspace() and not brackets:
+            flush()
+            continue
+
+        current.append(char)
+
+    if quote is not None:
+        # Preserve compatibility with malformed legacy citation rows.
+        try:
+            return shlex.split(line, comments=False, posix=True)
+        except ValueError:
+            return re.split(r'\s+', line.strip())
+    if brackets:
+        return re.split(r'\s+', line.strip())
+    flush()
+    return tokens
+
+
 class CifParser:
 
 
@@ -73,7 +133,7 @@ class CifParser:
 
     def _parse_loop(self, lines, start_idx):
         keys = []
-        values = []
+        token_rows = []
         i = start_idx
 
         # get all keys
@@ -87,23 +147,64 @@ class CifParser:
 
         while i < len(lines):
             line = lines[i].strip()
-            if not line or line.startswith('_') or line.startswith('#')or line.lower() == 'loop_':
+            lower_line = line.lower()
+            if (
+                not line
+                or line.startswith('_')
+                or lower_line == 'loop_'
+                or lower_line == 'stop_'
+                or lower_line.startswith('data_')
+                or lower_line.startswith('save_')
+            ):
                 break
+            if line.startswith('#'):
+                i += 1
+                continue
 
-            try:
-                parts = shlex.split(line, comments=False, posix=True)
-            except ValueError:
-                parts = re.split(r'\s+', line)
-
-            parts = self._repair_loop_row_missing_default_values(keys, parts)
-            values.append(parts)
+            token_rows.append(_tokenize_cif_line(line))
             i += 1
 
-
+        values = self._pack_loop_rows(keys, token_rows)
         for idx, key in enumerate(keys):
             self.data[key] = [row[idx] for row in values]
 
         return i
+
+    @classmethod
+    def _pack_loop_rows(cls, keys, token_rows):
+        if not keys:
+            raise ValueError("CIF loop does not define any data names.")
+
+        width = len(keys)
+        if cls._can_repair_missing_atom_site_occupancy(keys, token_rows):
+            return [
+                cls._repair_loop_row_missing_default_values(keys, row)
+                for row in token_rows
+            ]
+
+        if all(len(row) == width for row in token_rows):
+            return token_rows
+
+        tokens = [token for row in token_rows for token in row]
+        if len(tokens) % width != 0:
+            raise ValueError(
+                f"CIF loop has {len(tokens)} values for {width} data names."
+            )
+        return [
+            tokens[start : start + width]
+            for start in range(0, len(tokens), width)
+        ]
+
+    @staticmethod
+    def _can_repair_missing_atom_site_occupancy(keys, token_rows):
+        width = len(keys)
+        return (
+            width > 2
+            and keys[-1] == '_atom_site_occupancy'
+            and all(key.startswith('_atom_site_') for key in keys)
+            and any(len(row) == width - 1 for row in token_rows)
+            and all(len(row) in {width, width - 1} for row in token_rows)
+        )
 
     @staticmethod
     def _repair_loop_row_missing_default_values(keys, parts):
@@ -132,14 +233,51 @@ class ScifParser(CifParser):
     pass
 
 
-def convert_string_to_float(s):
-    match = re.search(r"(-?\d+(\.\d+)?)", s)
-    if match:
-        num = float(match.group(1))
-        return num
+_CIF_NUMBER_RE = re.compile(
+    r"""
+    (?P<number>[+-]?(?:\d+(?:\.\d*)?|\.\d+))
+    (?:\(\d+\))?
+    (?P<exponent>[eE][+-]?\d+)?
+    """,
+    re.VERBOSE,
+)
+# Historical MAGNDATA records contain whitespace-free OCR suffixes, incomplete
+# uncertainty parentheses, and trailing punctuation after otherwise valid numbers.
+_CIF_LEGACY_NUMBER_WITH_SUFFIX_RE = re.compile(
+    r"""
+    (?P<number>[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)
+    (?P<suffix>(?:(?:[A-Za-z]+)|(?:\([^\s]*\)?)|[).,])+)
+    """,
+    re.VERBOSE,
+)
+_CIF_MINUS_TRANSLATION = str.maketrans(
+    {
+        "\N{MINUS SIGN}": "-",
+        "\N{EN DASH}": "-",
+        "\N{EM DASH}": "-",
+    }
+)
 
-    else:
-        return ValueError('Error,check abc')
+
+def convert_string_to_float(value):
+    if isinstance(value, (int, float, np.integer, np.floating)):
+        return float(value)
+
+    text = str(value).strip().translate(_CIF_MINUS_TRANSLATION)
+    if len(text) >= 2 and text[0] == text[-1] and text[0] in {"'", '"'}:
+        text = text[1:-1].strip()
+    text = re.sub(r"(?<=\d)\.\.(?=\d)", ".", text)
+
+    match = _CIF_NUMBER_RE.fullmatch(text)
+    if match is not None:
+        exponent = match.group("exponent") or ""
+        return float(match.group("number") + exponent)
+
+    legacy_match = _CIF_LEGACY_NUMBER_WITH_SUFFIX_RE.fullmatch(text)
+    if legacy_match is not None:
+        return float(legacy_match.group("number"))
+
+    raise ValueError(f"Invalid CIF numeric value: {value!r}")
 
 
 def _get_first_existing(data: dict, keys: list[str]):
