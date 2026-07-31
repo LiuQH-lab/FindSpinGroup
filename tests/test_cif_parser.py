@@ -1,14 +1,68 @@
 import numpy as np
+import pytest
 from pathlib import Path
 
 from findspingroup.io import parse_cif_file, parse_cif_metadata, parse_structure_file
-from findspingroup.io.cif_parser import CifParser
+from findspingroup.io.cif_parser import CifParser, convert_string_to_float
 
 
 def test_cif_parser_preserves_quoted_symmetry_operation_tokens():
     data = CifParser("tests/testset/errorset/yzplane.mcif").parse()
 
     assert data["_space_group_symop_operation_xyz"] == ["x, y, z"]
+
+
+def test_cif_parser_packs_loop_values_across_physical_lines():
+    data = CifParser(
+        source_text="""data_test
+loop_
+_test.id
+_test.value
+row1
+1
+row2 2 row3 3
+"""
+    ).parse()
+
+    assert data["_test.id"] == ["row1", "row2", "row3"]
+    assert data["_test.value"] == ["1", "2", "3"]
+
+
+def test_cif_parser_preserves_bracketed_loop_values():
+    data = CifParser(
+        source_text="""data_test
+loop_
+_parent_propagation_vector.id
+_parent_propagation_vector.kxkykz
+k1 [0 1/2 -1/2]
+"""
+    ).parse()
+
+    assert data["_parent_propagation_vector.id"] == ["k1"]
+    assert data["_parent_propagation_vector.kxkykz"] == ["[0 1/2 -1/2]"]
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1e-3", 1e-3),
+        ("-2.5E+2", -250.0),
+        ("3.14159(12)", 3.14159),
+        ("1.25(3)e-2", 0.0125),
+        ("'4.5e1'", 45.0),
+        ("−0.0318(7)", -0.0318),
+        ("5..88848(6)", 5.88848),
+        ("-3.11.", -3.11),
+    ],
+)
+def test_convert_string_to_float_supports_cif_number_syntax(value, expected):
+    assert convert_string_to_float(value) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("value", ["?", ".", "1/2", "1.0 trailing"])
+def test_convert_string_to_float_rejects_invalid_numeric_values(value):
+    with pytest.raises(ValueError, match="Invalid CIF numeric value"):
+        convert_string_to_float(value)
 
 
 def test_parse_cif_file_accepts_single_quoted_symmetry_loop_rows():

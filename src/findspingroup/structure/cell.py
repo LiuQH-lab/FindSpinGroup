@@ -712,23 +712,42 @@ class CrystalCell:
 
         self.positions = np.asarray(self.positions, dtype=float).reshape(-1, 3) % 1.0
         self.occupancies = np.asarray(self.occupancies, dtype=float).reshape(-1)
-
-
+        self.elements = list(self.elements)
+        site_count = len(self.positions)
+        if site_count == 0:
+            raise ValueError("CrystalCell requires at least one atomic site.")
+        site_lengths = {
+            "positions": site_count,
+            "occupancies": len(self.occupancies),
+            "elements": len(self.elements),
+        }
 
         if self.moments is None:
             pass
         else:
             self.moments = np.asarray(self.moments, dtype=float).reshape(-1, 3)
+            site_lengths["moments"] = len(self.moments)
+
+        mismatched = {
+            name: length
+            for name, length in site_lengths.items()
+            if length != site_count
+        }
+        if mismatched:
+            lengths = ", ".join(
+                f"{name}={length}" for name, length in site_lengths.items()
+            )
+            raise ValueError(
+                "CrystalCell per-site arrays must have identical lengths "
+                f"({lengths})."
+            )
+
+        if self.moments is not None:
             self.net_moment= np.linalg.norm([sum(_) for _ in zip(*self.moments_cartesian)])
             if any([np.linalg.norm(i) > MAGNETIC_PRESENCE_TOL for i in self.moments]) :
                 pass
             else:
                 self.moments = None
-
-
-
-
-        self.elements = list(self.elements)
 
         if self.moments is None:
             spins = [[0.0, 0.0, 0.0]] * len(self.positions)
