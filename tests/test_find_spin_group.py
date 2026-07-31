@@ -4316,7 +4316,9 @@ def test_get_magnetic_space_group_from_operations_handles_noisy_fractional_trans
     msg_info = get_magnetic_space_group_from_operations(little_group)
 
     assert msg_info is not None
-    assert msg_info["mpg_symbol"] == "1"
+    assert msg_info["msg_bns_symbol"] == "P-1"
+    assert msg_info["mpg_num"] == "2.1.3"
+    assert msg_info["mpg_symbol"] == "-1"
 
 
 @pytest.mark.parametrize(
