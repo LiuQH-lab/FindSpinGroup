@@ -9536,7 +9536,6 @@ def _find_spin_group_from_parsed(
         'wp_chain': wp_chain,
         'acc_primitive_wp_chain': acc_primitive_wp_chain,
         'input_wp_chain': input_wp_chain,
-        'scif':scif,
     }
     symmetry = {'index':identify_info,
                 'configuration':ssg_primitive.conf,
