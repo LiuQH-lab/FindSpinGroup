@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from pathlib import Path
 
 from findspingroup.core.identify_index.contract_222 import (
     COPLANAR_222_MAP_NUMBER_CONTRACT,
@@ -7,6 +8,42 @@ from findspingroup.core.identify_index.contract_222 import (
 )
 import findspingroup.core.identify_index.databases.query_ssg_map as ssg_map_query
 import findspingroup.core.identify_index.databases.query_ssg_reduce as ssg_reduce_query
+
+
+def test_coplanar_222_json_source_matches_runtime_map_database():
+    db_path = Path(ssg_map_query.db_path_222).resolve()
+    json_path = db_path.parents[1] / "data" / "spin_space_groups" / "222_map.json"
+    columns = (
+        "L0_id",
+        "G0_id",
+        "it",
+        "ik",
+        "num",
+        "isonum",
+        "transformation_matrix",
+        "all_maps",
+        "transformation_maps",
+        "old_num",
+        "old_trans_1",
+        "old_trans_2",
+    )
+    serialized_fields = set(columns[6:])
+
+    with json_path.open("r", encoding="utf-8") as handle:
+        source_rows = json.load(handle)
+    with sqlite3.connect(db_path) as conn:
+        raw_rows = conn.execute(
+            f"SELECT {', '.join(columns)} FROM ssg_map ORDER BY id"
+        ).fetchall()
+
+    database_rows = []
+    for raw_row in raw_rows:
+        row = dict(zip(columns, raw_row))
+        for field in serialized_fields:
+            row[field] = json.loads(row[field])
+        database_rows.append(row)
+
+    assert source_rows == database_rows
 
 
 def test_coplanar_222_lookup_uses_fixed_map_number_contract():
