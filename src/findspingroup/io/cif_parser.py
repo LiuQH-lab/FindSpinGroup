@@ -923,7 +923,6 @@ def _extract_scif_metadata(data: dict):
             "L0_number": repo_local_extensions["L0_number"],
             "it": repo_local_extensions["it"],
             "ik": repo_local_extensions["ik"],
-            "spin_space_point_group_name": repo_local_extensions["spin_space_point_group_name"],
             "spin_part_point_group": repo_local_extensions["spin_part_point_group"],
             "transform_to_input_Pp": repo_local_extensions["transform_to_input_Pp"],
             "transform_to_magnetic_primitive_Pp": repo_local_extensions["transform_to_magnetic_primitive_Pp"],
