@@ -11,6 +11,7 @@ constructor. Most structure-analysis users need only the first function.
 | Inspect operations, settings, tensors, sites, or generated artifacts | `find_spin_group(...)` | `MagSymmetryResult` | a specific attribute or `to_structured_dict()` Python view |
 | Export operations in the user-supplied cell | `find_spin_group_input_ssg(...)` | `InputSSGResult` dictionary | primitive-cell warning, then `ssg`/`msg` |
 | Identify an SSG from complete operations or generators | `get_spin_space_group_from_operations(...)` | `SpinSpaceGroup` | `index`, `conf`, G0/L0, ACC, point groups |
+| Constrain the spin polarization at an exact numerical k point | `analyze_kpoint_spin_polarization(...)` | `KPointSpinPolarizationResult` mapping | `without_soc`, `with_soc`, k-point settings |
 
 Detailed pages:
 
@@ -18,6 +19,7 @@ Detailed pages:
 - [`find_spin_group`](api/find-spin-group.md)
 - [`find_spin_group_input_ssg`](api/find-spin-group-input-ssg.md)
 - [`get_spin_space_group_from_operations`](api/get-spin-space-group-from-operations.md)
+- [`analyze_kpoint_spin_polarization`](api/analyze-kpoint-spin-polarization.md)
 
 ## Recommended First Call
 

@@ -2520,6 +2520,43 @@ class MagSymmetryResult:
                 f"Available: {available}"
             ) from exc
 
+    def prepare_kpoint_spin_polarization_analyzer(self):
+        """Build a reusable analyzer for symmetry-allowed spin vectors at arbitrary k."""
+
+        from findspingroup.kpoint_spin_polarization import KPointSpinPolarizationAnalyzer
+
+        return KPointSpinPolarizationAnalyzer.from_result(self)
+
+    def analyze_kpoint_spin_polarization(
+        self,
+        kpoint,
+        *,
+        kpoint_setting: str = "acc_primitive",
+        kpoint_tol: float = DEFAULT_KPOINT_TOL,
+    ) -> dict:
+        """Analyze no-SOC and SOC spin-polarization constraints at one exact k point."""
+
+        return self.prepare_kpoint_spin_polarization_analyzer().query(
+            kpoint,
+            kpoint_setting=kpoint_setting,
+            kpoint_tol=kpoint_tol,
+        )
+
+    def analyze_kpoint_spin_polarizations(
+        self,
+        kpoints,
+        *,
+        kpoint_setting: str = "acc_primitive",
+        kpoint_tol: float = DEFAULT_KPOINT_TOL,
+    ) -> list[dict]:
+        """Analyze several exact k points while reusing one symmetry context."""
+
+        return self.prepare_kpoint_spin_polarization_analyzer().query_many(
+            kpoints,
+            kpoint_setting=kpoint_setting,
+            kpoint_tol=kpoint_tol,
+        )
+
 
 
 
