@@ -20,6 +20,7 @@ nav:
       - find_spin_group: reference/api/find-spin-group.md
       - find_spin_group_input_ssg: reference/api/find-spin-group-input-ssg.md
       - get_spin_space_group_from_operations: reference/api/get-spin-space-group-from-operations.md
+      - Arbitrary-k Spin Polarization: reference/api/analyze-kpoint-spin-polarization.md
   - Examples: guide/examples.md
   - Troubleshooting: guide/troubleshooting.md
   - Concepts And Settings: guide/concepts.md
