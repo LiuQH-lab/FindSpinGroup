@@ -89,6 +89,7 @@ from findspingroup.utils.seitz_symbol import (
     canonicalize_group_seitz_descriptions,
     describe_spin_space_operation,
 )
+from findspingroup.tensor_constraints import solve_wpd_qmd
 from findspingroup.version import __version__
 
 
@@ -2111,8 +2112,12 @@ class MagSymmetryResult:
         self.AHE_wSOC = self.tensor_outputs.get('AHE_wSOC')
         self.BCDTensor = self.tensor_outputs.get('BCDTensor')
         self.MSGBCDTensor = self.tensor_outputs.get('MSGBCDTensor')
+        # Legacy Zhu/Das-QK QMD: T-odd, j<->k symmetric, longitudinal sector retained.
         self.QMDTensor = self.tensor_outputs.get('QMDTensor')
         self.MSGQMDTensor = self.tensor_outputs.get('MSGQMDTensor')
+        # Gao/Qiang WPD interQMD: same group character plus the cyclic identity.
+        self.WPDQMDTensor = self.tensor_outputs.get('WPDQMDTensor')
+        self.MSGWPDQMDTensor = self.tensor_outputs.get('MSGWPDQMDTensor')
         self.IMDTensor = self.tensor_outputs.get('IMDTensor')
         self.MSGIMDTensor = self.tensor_outputs.get('MSGIMDTensor')
 
@@ -2768,6 +2773,9 @@ def _compute_tensor_outputs(ssg: SpinSpaceGroup, cell: CrystalCell, tol: float):
     ops_w_soc = _tensor_ops_w_soc(ssg, cell, tol=tol)
     generator_ops_wo_soc = _validated_gspg_constraint_generators(ops_wo_soc, tol=tol)
     generator_ops_w_soc = _validated_gspg_constraint_generators(ops_w_soc, tol=tol)
+    # Keep both QMD conventions explicit.  They use the same OSSG/MSG operation
+    # sets and T-odd character; WPD-QMD differs only by its intrinsic cyclic
+    # mixed-symmetry constraint.  See solve_wpd_qmd for equations and citations.
     tensor_specs = {
         'AHE_woSOC': (solve_ahe, generator_ops_wo_soc, ops_wo_soc, {'symbol': r'\sigma', 'use_antisymmetry': True}),
         'AHE_wSOC': (solve_ahe, generator_ops_w_soc, ops_w_soc, {'symbol': r'\sigma', 'use_antisymmetry': True}),
@@ -2775,6 +2783,8 @@ def _compute_tensor_outputs(ssg: SpinSpaceGroup, cell: CrystalCell, tol: float):
         'MSGBCDTensor': (solve_bcd, generator_ops_w_soc, ops_w_soc, {'symbol': 'D'}),
         'QMDTensor': (solve_qmd, generator_ops_wo_soc, ops_wo_soc, {'symbol': 'Q'}),
         'MSGQMDTensor': (solve_qmd, generator_ops_w_soc, ops_w_soc, {'symbol': 'Q'}),
+        'WPDQMDTensor': (solve_wpd_qmd, generator_ops_wo_soc, ops_wo_soc, {'symbol': r'Q^{WPD}'}),
+        'MSGWPDQMDTensor': (solve_wpd_qmd, generator_ops_w_soc, ops_w_soc, {'symbol': r'Q^{WPD}'}),
         'IMDTensor': (solve_imd, generator_ops_wo_soc, ops_wo_soc, {'symbol': 'I'}),
         'MSGIMDTensor': (solve_imd, generator_ops_w_soc, ops_w_soc, {'symbol': 'I'}),
     }

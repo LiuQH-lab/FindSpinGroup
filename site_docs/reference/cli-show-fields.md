@@ -159,6 +159,21 @@ magnetic_site_summary
 operation_views
 ```
 
+Tensor constraints are full-analysis fields. These aliases print the number of
+free parameters and readable component relations; add `--json` to obtain the
+complete constraint matrices and nullspace basis.
+
+| Alias | Direct result field | Response model |
+| --- | --- | --- |
+| `qmd-no-soc` | `QMDTensor` | Legacy Zhu/Das-QK QMD under OSSG |
+| `qmd-soc` | `MSGQMDTensor` | Legacy Zhu/Das-QK QMD under MSG |
+| `wpd-qmd-no-soc` | `WPDQMDTensor` | WPD/Qiang interQMD under OSSG |
+| `wpd-qmd-soc` | `MSGWPDQMDTensor` | WPD/Qiang interQMD under MSG |
+
+```bash
+fsg --full structure.mcif --show qmd-soc --show wpd-qmd-soc
+```
+
 `quasi_2d` is populated only when quasi-2D analysis is explicitly requested:
 
 ```bash

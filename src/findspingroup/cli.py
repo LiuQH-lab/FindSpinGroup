@@ -60,6 +60,12 @@ _SHOW_FIELD_ALIASES = {
     "wyckoff-chain": "wp_chain",
     "spin-texture-no-soc": "spin_texture_config_no_soc",
     "spin-texture-soc": "spin_texture_config_soc",
+    "qmd-no-soc": "QMDTensor",
+    "qmd-soc": "MSGQMDTensor",
+    "wpd-qmd-no-soc": "WPDQMDTensor",
+    "wpd-qmd-soc": "MSGWPDQMDTensor",
+    "wpd_qmd_no_soc": "WPDQMDTensor",
+    "wpd_qmd_soc": "MSGWPDQMDTensor",
 }
 _POSCAR_MAGMOM_PATTERN = re.compile(r"^\s*#*\s*magmom\s*=", re.IGNORECASE | re.MULTILINE)
 _INCAR_MAGMOM_PATTERN = re.compile(r"^\s*MAGMOM\s*=", re.IGNORECASE | re.MULTILINE)
@@ -369,6 +375,33 @@ def _format_spin_texture_config(value: dict) -> str:
     return "\n".join(lines) if lines else "(empty)"
 
 
+def _looks_like_tensor_solution(value: dict) -> bool:
+    return {
+        "operations_count",
+        "free_parameters",
+        "is_zero",
+        "relations",
+        "nullspace_basis",
+    }.issubset(value)
+
+
+def _format_tensor_solution(value: dict) -> str:
+    if "error" in value:
+        return f"error: {value['error']}"
+    lines = [
+        f"operations_count: {_format_show_scalar(value.get('operations_count'))}",
+        f"free_parameters: {_format_show_scalar(value.get('free_parameters'))}",
+        f"is_zero: {_format_show_scalar(value.get('is_zero'))}",
+        "relations:",
+    ]
+    relations = value.get("relations") or []
+    if relations:
+        lines.extend(f"  {index}. {relation}" for index, relation in enumerate(relations, start=1))
+    else:
+        lines.append("  (empty)")
+    return "\n".join(lines)
+
+
 def _format_text_mapping_summary(value: dict) -> str:
     rows = []
     for key, text in value.items():
@@ -439,6 +472,9 @@ def _format_show_value(value, *, indent: int = 0) -> str:
     if isinstance(value, (int, float, bool)) or value is None:
         return prefix + _format_show_scalar(value)
     if isinstance(value, dict):
+        if _looks_like_tensor_solution(value):
+            rendered = _format_tensor_solution(value)
+            return "\n".join(prefix + line if line else line for line in rendered.splitlines())
         if all(isinstance(item, str) and "\n" in item for item in value.values()):
             return _format_text_mapping_summary(value)
         if _looks_like_operation_view(value):

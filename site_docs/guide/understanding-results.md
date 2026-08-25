@@ -226,6 +226,37 @@ Full analysis adds deeper constraints:
 **Tensor outputs.** Symmetry-allowed component relations and free parameters.
 They do not provide numerical material coefficients.
 
+For quantum-metric dipole conductivity, `QMDTensor` is the legacy Zhu/Das-QK
+response. It decomposes into a fully symmetric sector and the cyclic
+mixed-symmetry `WPDQMDTensor` sector. The fully symmetric sector obeys the same
+symmetry constraints as `IMDTensor`, but physically it is the QK BCPD sector,
+not an inverse-mass-dipole contribution. `MSGQMDTensor`, `MSGIMDTensor`, and
+`MSGWPDQMDTensor` are the corresponding with-SOC constraints.
+
+The two QMD outputs share the same time-reversal-odd group transformation and
+the same symmetry between the two electric-field indices. They differ in their
+intrinsic permutation contract:
+
+| Output | Microscopic convention represented | Additional identity | Pure longitudinal sector |
+| --- | --- | --- | --- |
+| `QMDTensor` | Zhu/Das-QK legacy QMD | None beyond `j <-> k` | May be allowed |
+| `WPDQMDTensor` | Gao/Qiang WPD interband QMD | `Q[i,j,k] + Q[j,k,i] + Q[k,i,j] = 0` | Forbidden |
+
+The implementation reports symmetry-allowed component spaces; it does not
+perform the microscopic Brillouin-zone integral or assert that WPD exhausts all
+possible intrinsic quantum-metric contributions.
+
+References:
+
+- Gao, Yang, and Niu, *Phys. Rev. Lett.* **112**, 166601 (2014),
+  [doi:10.1103/PhysRevLett.112.166601](https://doi.org/10.1103/PhysRevLett.112.166601).
+- Das et al., *Phys. Rev. B* **108**, L201405 (2023),
+  [doi:10.1103/PhysRevB.108.L201405](https://doi.org/10.1103/PhysRevB.108.L201405).
+- Zhu et al., *Nature Communications* **16**, 4882 (2025),
+  [doi:10.1038/s41467-025-60128-2](https://doi.org/10.1038/s41467-025-60128-2).
+- Qiang et al., *Advanced Science* **13**, e14818 (2026),
+  [doi:10.1002/advs.202514818](https://doi.org/10.1002/advs.202514818).
+
 **`magnetic_site_summary`.** Magnetic orbits and site-symmetry degrees of
 freedom. A zero reported moment can still belong to a magnetic
 parent-space-group orbit.

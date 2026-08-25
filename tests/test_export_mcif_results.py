@@ -63,6 +63,14 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
                             [["0", "0", "0"], ["0", "0", "0"], ["0", "0", "0"]],
                         ],
                     },
+                    "WPDQMDTensor": {"is_zero": True},
+                    "MSGWPDQMDTensor": {
+                        "is_zero": False,
+                        "relations": [
+                            r"Q^{WPD}_{xyz} = Q^{WPD}_{xzy} = -Q^{WPD}_{yxz} = -Q^{WPD}_{yzx}"
+                        ],
+                        "components": [],
+                    },
                     "IMDTensor": {"is_zero": True},
                     "MSGIMDTensor": {"is_zero": True},
                     "BCDTensor": {"is_zero": True},
@@ -276,6 +284,8 @@ def test_runtime_excel_export_rows_include_quasi2d_fields():
     assert r"\sigma_{xy} = C1" in row["ahe_tensor_equations_soc"]
     assert row["ahe_tensor_equations_no_soc"] == r"\sigma=0"
     assert "Q_{xxx} = C1" in row["qmd_tensor_equations_soc"]
+    assert row["wpd_qmd_tensor_equations_no_soc"] == r"Q^{WPD}=0"
+    assert r"Q^{WPD}_{xyz} = Q^{WPD}_{xzy}" in row["wpd_qmd_tensor_equations_soc"]
     assert row["sg_polar_axes"] == "z"
     assert row["sg_polar_axes_setting"] == "G0std"
     assert row["ossg_polar_axes"] == "x"

@@ -133,6 +133,12 @@ def _tensor_equation_export_values(tensor_outputs: Any) -> dict[str, Any]:
         "ahe_tensor_equations_no_soc": _tensor_equations(payload.get("AHE_woSOC"), symbol=r"\sigma"),
         "qmd_tensor_equations_soc": _tensor_equations(payload.get("MSGQMDTensor"), symbol="Q"),
         "qmd_tensor_equations_no_soc": _tensor_equations(payload.get("QMDTensor"), symbol="Q"),
+        "wpd_qmd_tensor_equations_soc": _tensor_equations(
+            payload.get("MSGWPDQMDTensor"), symbol=r"Q^{WPD}"
+        ),
+        "wpd_qmd_tensor_equations_no_soc": _tensor_equations(
+            payload.get("WPDQMDTensor"), symbol=r"Q^{WPD}"
+        ),
         "imd_tensor_equations_soc": _tensor_equations(payload.get("MSGIMDTensor"), symbol="I"),
         "imd_tensor_equations_no_soc": _tensor_equations(payload.get("IMDTensor"), symbol="I"),
         "bcd_tensor_equations_soc": _tensor_equations(payload.get("MSGBCDTensor"), symbol="D"),

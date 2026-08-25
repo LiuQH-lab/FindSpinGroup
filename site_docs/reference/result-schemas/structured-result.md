@@ -225,7 +225,13 @@ Anomalous Hall conductivity constraints: `with_soc`, `without_soc`.
 
 `properties.tensors`
 Symmetry-constrained tensor outputs: `AHE_wSOC`, `AHE_woSOC`, `BCDTensor`,
-`IMDTensor`, `QMDTensor`, `MSGBCDTensor`, `MSGIMDTensor`, and `MSGQMDTensor`.
+`IMDTensor`, `QMDTensor`, `WPDQMDTensor`, `MSGBCDTensor`, `MSGIMDTensor`,
+`MSGQMDTensor`, and `MSGWPDQMDTensor`. `QMDTensor` retains the legacy
+Zhu/Das-QK tensor with symmetry only in the final two indices. `WPDQMDTensor`
+is its WPD/Qiang interQMD mixed-symmetry sector and additionally satisfies the
+cyclic identity. The remaining fully symmetric QK sector has the same symmetry
+constraints as `IMDTensor`, although it is physically BCPD rather than IMD.
+The `MSG` prefix denotes the corresponding with-SOC result.
 
 `properties.magnetic_site`
 Magnetic-site and Wyckoff degree-of-freedom summary. Important fields include

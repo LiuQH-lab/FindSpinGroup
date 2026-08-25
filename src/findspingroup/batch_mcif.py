@@ -195,6 +195,8 @@ def _build_tensor_summary(result) -> dict:
         "MSGBCDTensor",
         "QMDTensor",
         "MSGQMDTensor",
+        "WPDQMDTensor",
+        "MSGWPDQMDTensor",
         "IMDTensor",
         "MSGIMDTensor",
     ]
