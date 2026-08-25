@@ -789,6 +789,49 @@ def test_cli_show_formats_dict_fields_readably(monkeypatch, capsys):
     assert "1. C1*kx*sigma_y" in output
 
 
+def test_cli_show_qmd_aliases_use_compact_tensor_relations(monkeypatch, capsys):
+    import findspingroup.cli as cli_module
+
+    tensor_payload = {
+        "operations_count": 6,
+        "free_parameters": 1,
+        "is_zero": False,
+        "relations": [r"Q^{WPD}_{xyz} = Q^{WPD}_{xzy}"],
+        "nullspace_basis": [[1.0]],
+    }
+
+    class _FakeResult:
+        def to_dict(self):
+            return {
+                "QMDTensor": dict(tensor_payload),
+                "WPDQMDTensor": dict(tensor_payload),
+            }
+
+    monkeypatch.setattr(cli_module, "find_spin_group", lambda *_args, **_kwargs: _FakeResult())
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "fsg",
+            "--all",
+            "--show",
+            "qmd-no-soc",
+            "--show",
+            "wpd-qmd-no-soc",
+            "dummy.mcif",
+        ],
+    )
+
+    cli_module.main()
+
+    output = capsys.readouterr().out
+    assert "## qmd-no-soc" in output
+    assert "## wpd-qmd-no-soc" in output
+    assert "free_parameters: 1" in output
+    assert r"Q^{WPD}_{xyz} = Q^{WPD}_{xzy}" in output
+    assert "nullspace_basis" not in output
+
+
 def test_cli_show_basis_by_order_keeps_nested_basis_content():
     import findspingroup.cli as cli_module
 
@@ -4372,6 +4415,8 @@ def test_find_spin_group_exposes_tensor_outputs():
     assert result.MSGBCDTensor is not None
     assert result.QMDTensor is not None
     assert result.MSGQMDTensor is not None
+    assert result.WPDQMDTensor is not None
+    assert result.MSGWPDQMDTensor is not None
     assert result.IMDTensor is not None
     assert result.MSGIMDTensor is not None
     assert result.AHE_woSOC is not None
@@ -4386,6 +4431,13 @@ def test_find_spin_group_exposes_tensor_outputs():
     assert result.AHE_wSOC["is_zero"] is False
     assert result.MSGQMDTensor["free_parameters"] == 3
     assert result.MSGIMDTensor["free_parameters"] == 1
+    assert result.QMDTensor["free_parameters"] == (
+        result.WPDQMDTensor["free_parameters"] + result.IMDTensor["free_parameters"]
+    )
+    assert result.MSGQMDTensor["free_parameters"] == (
+        result.MSGWPDQMDTensor["free_parameters"]
+        + result.MSGIMDTensor["free_parameters"]
+    )
 
 
 def test_crse_w_soc_tensor_inputs_match_legacy_magnetic_point_group_behavior():
@@ -6226,6 +6278,11 @@ def test_mag_symmetry_result_exposes_structured_output_contract():
     assert structured["properties"]["magnetic_phase"]["details"] == result.magnetic_phase_details
     assert structured["properties"]["quasi_2d"] == result.quasi_2d
     assert structured["properties"]["magnetic_site"] == result.magnetic_site_summary
+    assert structured["properties"]["tensors"]["WPDQMDTensor"] == result.WPDQMDTensor
+    assert (
+        structured["properties"]["tensors"]["MSGWPDQMDTensor"]
+        == result.MSGWPDQMDTensor
+    )
 
     assert structured["artifacts"]["scif"]["default"] == result.scif
     assert structured["artifacts"]["kpoints"]["acc_primitive"]["text"] == result.KPOINTS

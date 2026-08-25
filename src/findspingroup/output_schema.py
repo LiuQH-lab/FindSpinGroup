@@ -136,6 +136,8 @@ EXPORT_PROPERTY_COLUMNS: Final = (
     "ahe_tensor_equations_no_soc",
     "qmd_tensor_equations_soc",
     "qmd_tensor_equations_no_soc",
+    "wpd_qmd_tensor_equations_soc",
+    "wpd_qmd_tensor_equations_no_soc",
     "imd_tensor_equations_soc",
     "imd_tensor_equations_no_soc",
     "bcd_tensor_equations_soc",

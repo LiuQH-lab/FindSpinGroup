@@ -42,8 +42,14 @@ DEFAULT_COLUMNS = [
     ("tensor_summary.MSGBCDTensor.is_zero", "MSG_BCD_zero"),
     ("tensor_summary.MSGIMDTensor.free_parameters", "MSG_IMD_free"),
     ("tensor_summary.MSGIMDTensor.is_zero", "MSG_IMD_zero"),
+    ("tensor_summary.QMDTensor.free_parameters", "QMD_free"),
+    ("tensor_summary.QMDTensor.is_zero", "QMD_zero"),
     ("tensor_summary.MSGQMDTensor.free_parameters", "MSG_QMD_free"),
     ("tensor_summary.MSGQMDTensor.is_zero", "MSG_QMD_zero"),
+    ("tensor_summary.WPDQMDTensor.free_parameters", "WPD_QMD_free"),
+    ("tensor_summary.WPDQMDTensor.is_zero", "WPD_QMD_zero"),
+    ("tensor_summary.MSGWPDQMDTensor.free_parameters", "MSG_WPD_QMD_free"),
+    ("tensor_summary.MSGWPDQMDTensor.is_zero", "MSG_WPD_QMD_zero"),
 ]
 
 
