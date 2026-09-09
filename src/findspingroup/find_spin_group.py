@@ -2660,11 +2660,14 @@ def spin_splitting_w_soc(ssg:SpinSpaceGroup):
 def is_ahc(mpg):
     if mpg == None:
         return 'Error, cannot determine MSG.'
-    if mpg in MSGMPG_DB.FMMPG_INTlist:
-        wSOC = 'Yes'
-    else:
-        wSOC = 'No'
-    return wSOC
+    mpg_identifier = str(mpg).strip()
+    mpg_number = MSGMPG_DB.MPG_SYMBOL_TO_NUM.get(mpg_identifier, mpg_identifier)
+    if (
+        mpg_identifier in MSGMPG_DB.FMMPG_HMlist
+        or mpg_number in MSGMPG_DB.FMMPG_INTlist
+    ):
+        return 'Yes'
+    return 'No'
 
 
 def _serialize_tensor_solution(solution, operations_count, solver_operations_count=None):

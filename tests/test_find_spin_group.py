@@ -6102,6 +6102,37 @@ def test_find_spin_group_exposes_msg_acc_for_conb3s6_tripleq():
 
     assert result.acc == "6mmP"
     assert result.msg_acc == "3m1P"
+    assert result.gspg_effective_mpg_symbol == "62'2'"
+    assert result.ahc_wo_soc == "Yes"
+    assert result.AHE_woSOC["is_zero"] is False
+    assert result.vector_constraints_by_symmetry["ossg"]["constraints"][
+        "real_space_t_odd_p_even"
+    ]["free_dimension"] == 1
+
+
+@pytest.mark.parametrize(
+    ("mpg_identifier", "expected"),
+    [
+        ("24.4.90", "Yes"),
+        ("62'2'", "Yes"),
+        ("-3m'1", "Yes"),
+        ("8.2.25", "No"),
+        ("mmm1'", "No"),
+        (None, "Error, cannot determine MSG."),
+    ],
+)
+def test_is_ahc_accepts_mpg_numbers_and_hm_symbols(mpg_identifier, expected):
+    assert find_spin_group_module.is_ahc(mpg_identifier) == expected
+
+
+def test_find_spin_group_basic_reports_no_soc_ahc_from_effective_mpg_symbol():
+    result = find_spin_group_basic("examples/CoNb3S6_tripleQ.mcif")
+
+    assert result["empg"] == "62'2'"
+    assert result["properties"]["ahc_wo_soc"] == "Yes"
+    assert result["vector_constraints_by_symmetry"]["ossg"]["constraints"][
+        "real_space_t_odd_p_even"
+    ]["free_dimension"] == 1
 
 
 def test_mag_symmetry_result_exposes_core_group_identifiers():
