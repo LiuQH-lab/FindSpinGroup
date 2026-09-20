@@ -1892,10 +1892,14 @@ def get_arithmetic_crystal_class_from_ops(ops, *, include_kpath: bool = False):
         else:
             pointgroup = '-31m'
 
-    if pointgroup == '-62m':
-        if international[-1] == '2':
+    # spglib reports the D3h point group as ``-6m2`` for all four
+    # hexagonal settings 187--190.  The arithmetic crystal class must retain
+    # the orientation encoded by the identified space group: 187/188 use
+    # -6m2, whereas 189/190 use -62m.
+    if pointgroup in {'-6m2', '-62m'} and bravais_lattice_letter == 'P':
+        if acc_dataset.number in (187, 188):
             pointgroup = '-6m2'
-        else:
+        elif acc_dataset.number in (189, 190):
             pointgroup = '-62m'
 
     acc_symbol = pointgroup + bravais_lattice_letter
