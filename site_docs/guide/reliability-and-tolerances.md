@@ -155,6 +155,16 @@ scale either error budget. Pure expansions retain source atom identities and
 identify periodic copies by lattice cosets, even when distinct input sites are
 closer than the physical matching tolerance.
 
+`CrystalCell` moments in `in_lattice` are absolute components along the three
+normalized lattice directions. Their Cartesian conversion uses the actual
+lattice orientation and handedness, not just the cell angles. A cell change
+keeps the physical Cartesian vector fixed and re-expresses its components in
+the target frame. Magnetic presence and contraction residuals use the physical
+vector norm. Identification without primitive-cell reduction also converts
+these components to Cartesian before fitting spin rotations. These normalized
+moment components are distinct from the relative spin coordinates used in
+oriented SCIF operation matrices.
+
 Several separate operations should not be confused with crystal idealization:
 
 - Magnetic primitive reduction groups moment vectors within `mtol` and can

@@ -2187,6 +2187,13 @@ def identify_spin_space_group_result(
         cell :CrystalCell = default_cell.get_primitive_structure(magnetic=True)[0]
     else:
         cell: CrystalCell = default_cell
+    if cell.moments is not None and cell.spin_setting != "cartesian":
+        # Point-group fitting and AtomicSite operation actions use world
+        # Cartesian spin vectors, including the no-primitive direct route.
+        cell = CrystalCell(
+            cell.lattice_matrix, cell.positions, cell.occupancies, cell.elements,
+            cell.moments_cartesian, spin_setting="cartesian", tol=cell.tol,
+        )
     if cell.moments is None or not cell.magnetic_atom_indices:
         raise MagneticToleranceDegeneracyError(NONMAGNETIC_MTOL_ERROR)
     # get space operations
