@@ -6897,6 +6897,7 @@ def classify_magnetic_phase(
     is_ss_gp,
     net_moment_tol=None,
     magnetic_atom_orbit_analysis=None,
+    accepted_group_audit=None,
 ):
     net_moment_value = float(net_moment)
     zero_net_moment_tol = float(
@@ -6971,6 +6972,17 @@ def classify_magnetic_phase(
             'net_moment': net_moment_value,
             'zero_net_moment_tol': zero_net_moment_tol,
             'zero_net_moment': zero_net_moment,
+            'net_moment_decision': {
+                'comparison': 'abs(net_moment) < zero_net_moment_tol',
+                'units': 'mu_B_per_magnetic_primitive_cell',
+                'absolute_net_moment': abs(net_moment_value),
+                'threshold': zero_net_moment_tol,
+                'margin': zero_net_moment_tol - abs(net_moment_value),
+                'ratio': (abs(net_moment_value) / zero_net_moment_tol
+                          if zero_net_moment_tol > 0 else None),
+                'at_threshold': abs(net_moment_value) == zero_net_moment_tol,
+            },
+            'accepted_group_audit': accepted_group_audit,
             'fm_like_by_spin_point_group': fm_like_by_spin_point_group,
             'symmetry_family': symmetry_family,
             'order_type': base_phase,
@@ -8449,6 +8461,7 @@ def _find_spin_group_from_parsed(
         mpg_identifier=primitive_ossg_for_phase.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
         magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
+        accepted_group_audit=getattr(identify_result, 'numerical_audit', None),
     )
     magnetic_phase = magnetic_phase_payload['phase']
     magnetic_phase_base = magnetic_phase_payload['base_phase']
@@ -10138,6 +10151,7 @@ def _find_spin_group_basic_from_parsed(
         mpg_identifier=primitive_ossg_for_phase.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
         magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
+        accepted_group_audit=getattr(identify_result, 'numerical_audit', None),
     )
     ss_w_soc = spin_splitting_w_soc(ssg_primitive)
     ahc_w_soc = is_ahc(primitive_ossg_for_phase.mpg_num)
@@ -10783,6 +10797,7 @@ def _find_spin_group_acc_primitive_from_parsed(
         mpg_identifier=selected_standard_ossg.mpg_num,
         is_ss_gp=ssg_primitive.is_spinsplitting[-1],
         magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
+        accepted_group_audit=getattr(identify_result, 'numerical_audit', None),
     )
     spin_texture_config_database = _spin_texture_config_for_public_output(identify_info)
     spin_texture_config_no_soc, spin_texture_config_soc = _spin_texture_config_from_ossg_convention(
@@ -11080,6 +11095,7 @@ def _find_spin_group_input_ssg_from_parsed(
         mpg_identifier=primitive_ossg.mpg_num,
         is_ss_gp=primitive_ssg.is_spinsplitting[-1],
         magnetic_atom_orbit_analysis=magnetic_atom_orbit_analysis,
+        accepted_group_audit=getattr(primitive_identify_result, 'numerical_audit', None),
     )
     warning = None
     if not is_input_magnetic_primitive:
