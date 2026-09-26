@@ -165,6 +165,16 @@ these components to Cartesian before fitting spin rotations. These normalized
 moment components are distinct from the relative spin coordinates used in
 oriented SCIF operation matrices.
 
+SCIF reconstruction uses the declared spin frame. If its basis rows in lattice
+coordinates are `A`, the spin basis in the file's canonical Cartesian frame is
+`B = L.T @ A.T`. Atom moments are absolute unit-direction components, while
+`uvw` operations act on relative coordinates: the absolute-component action is
+`D U D^-1`, with `D` containing the lengths of the columns of `B`.
+`parse_scif_file(..., return_metadata=True)` reports `spin_setting`: the default
+`a,b,c` frame returns `in_lattice` components; other declared frames are converted
+to Cartesian. A nonidentity legacy matrix-only frame without an explicit `abc`
+declaration is rejected rather than guessing its row/column convention.
+
 Several separate operations should not be confused with crystal idealization:
 
 - Magnetic primitive reduction groups moment vectors within `mtol` and can
