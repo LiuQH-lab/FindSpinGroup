@@ -367,7 +367,7 @@ def _format_spinframe_transform_abc(
     )
     return (
         "_space_group_spin.transform_spinframe_P_abc  "
-        f"'{_format_basis_transform_rows(rows, ('a', 'b', 'c'), tol=max(1e-10, 10 ** (-coeff_precision)))}'"
+        f"'{affine_matrix_to_xyz_expression(rows, np.zeros(3), ('a', 'b', 'c'), coeff_precision=coeff_precision)}'"
     )
 
 
@@ -771,7 +771,7 @@ def _parse_solver_component_expression(
     expr: str,
     *,
     parameter_symbols: tuple[str, ...] = ("Sx", "Sy", "Sz"),
-    zero_tol: float = 1e-10,
+    zero_tol: float = 1e-12,
 ) -> dict[str, float]:
     coefficients = {symbol: 0.0 for symbol in parameter_symbols}
     normalized = expr.replace(" ", "")
@@ -797,24 +797,17 @@ def _render_relative_solver_row(
     coeffs: np.ndarray,
     parameter_names: list[str],
     *,
-    zero_tol: float = 1e-10,
+    zero_tol: float = 1e-12,
 ) -> str:
-    def _snap_solver_coeff(value: float) -> float:
-        numeric = float(value)
-        if abs(numeric) <= max(zero_tol, 1e-10):
-            return 0.0
-        if abs(numeric - 1.0) <= 1e-4:
-            return 1.0
-        if abs(numeric + 1.0) <= 1e-4:
-            return -1.0
-        return numeric
-
     tokens = []
     for coeff, parameter in zip(coeffs, parameter_names):
-        coeff = _snap_solver_coeff(coeff)
+        coeff = float(coeff)
         if abs(coeff) <= zero_tol:
             continue
-        coeff_str = _format_scif_symbolic_scalar(coeff, decimal_precision=6, zero_tol=zero_tol)
+        budget = max(zero_tol, 16*np.finfo(float).eps*max(1.,abs(coeff)))
+        coeff_str = _format_scif_symbolic_scalar(
+            coeff, decimal_precision=SCIF_OPERATION_FULL_PRECISION,
+            zero_tol=zero_tol, rational_tol=budget, sqrt_tol=budget)
         if coeff_str == "1":
             tokens.append(parameter)
         elif coeff_str == "-1":
@@ -834,7 +827,7 @@ def _render_relative_solver_row(
 def _solver_constraints_to_matrix(
     constraints: list[str],
     *,
-    zero_tol: float = 1e-10,
+    zero_tol: float = 1e-12,
 ) -> np.ndarray:
     parameter_symbols = ("Sx", "Sy", "Sz")
     return np.array(
@@ -850,7 +843,7 @@ def _solver_constraints_to_matrix(
 def _solver_matrix_to_symmform(
     coefficient_matrix: np.ndarray,
     *,
-    zero_tol: float = 1e-10,
+    zero_tol: float = 1e-12,
 ) -> str:
     used_columns = [
         index for index in range(coefficient_matrix.shape[1])
@@ -863,7 +856,11 @@ def _solver_matrix_to_symmform(
     pivot_rows = []
     for column_index in used_columns:
         column = coefficient_matrix[:, column_index].copy()
-        pivot_row = next(i for i, value in enumerate(column) if abs(value) > zero_tol)
+        # A tiny leading component is not a usable parameter normalization.
+        # Keep the first well-scaled component (within a factor two of the
+        # largest), so reparameterization cannot amplify noise into huge terms.
+        pivot_floor = .5 * np.max(np.abs(column))
+        pivot_row = next(i for i, value in enumerate(column) if abs(value) >= pivot_floor)
         pivot_value = column[pivot_row]
         if pivot_value < 0:
             column *= -1
@@ -893,7 +890,7 @@ def _solver_matrix_to_symmform(
 def _solver_constraints_to_relative_symmform(
     constraints: list[str],
     *,
-    zero_tol: float = 1e-10,
+    zero_tol: float = 1e-12,
 ) -> str:
     """
     Convert solver-derived site-symmetry constraints into the raw lattice-basis
@@ -909,7 +906,8 @@ def _solver_constraints_to_absolute_symmform(
     constraints: list[str],
     lattice_rows,
     *,
-    zero_tol: float = 1e-10,
+    zero_tol: float = 1e-12,
+    spin_basis_lengths=None,
 ) -> str:
     """
     Convert solver-derived site-symmetry constraints into the normalized-basis
@@ -917,7 +915,8 @@ def _solver_constraints_to_absolute_symmform(
     `a/|a|, b/|b|, c/|c|` component frame.
     """
     coefficient_matrix = _solver_constraints_to_matrix(constraints, zero_tol=zero_tol)
-    basis_lengths = np.linalg.norm(np.asarray(lattice_rows, dtype=float), axis=1)
+    basis_lengths = (np.linalg.norm(np.asarray(lattice_rows, dtype=float), axis=1)
+                     if spin_basis_lengths is None else np.asarray(spin_basis_lengths, float))
     return _solver_matrix_to_symmform(
         np.diag(basis_lengths) @ coefficient_matrix,
         zero_tol=zero_tol,
@@ -984,6 +983,7 @@ def write_scif_atoms(
     moment_precision: int = SCIF_OPERATION_FULL_PRECISION,
     magnitude_precision: int = 3,
     moment_basis_cartesian=None,
+    spin_basis_lengths=None,
 ):
     def _absolute_symmform_from_moment(moment_components, *, zero_tol: float = 1e-10) -> str:
         """
@@ -1064,7 +1064,13 @@ def write_scif_atoms(
         if moment_basis_cartesian is None
         else np.asarray(moment_basis_cartesian, dtype=float)
     )
-    moment_basis_lengths = np.linalg.norm(moment_basis_cartesian, axis=0)
+    # Absolute components use unit directions; relative uvw uses the actual
+    # declared spin-basis lengths, which need not be the real lattice lengths.
+    moment_basis_lengths = (np.linalg.norm(np.asarray(ssg_cell[0]), axis=1)
+                            if spin_basis_lengths is None else np.asarray(spin_basis_lengths, float))
+    if (moment_basis_lengths.shape != (3,) or not np.all(np.isfinite(moment_basis_lengths))
+            or np.any(moment_basis_lengths <= 0)):
+        raise ValueError("SCIF spin-basis lengths must be three finite positive numbers.")
     element_symbols = [atom_dict[i] for i in ssg_cell[2]]
     element_occupancies = [occup_dict[i] for i in ssg_cell[2]]
     all_site_symbols = []
@@ -1133,7 +1139,8 @@ def write_scif_atoms(
         label = site_label_by_representative[rep_idx]
         x, y, z = spins[rep_idx]
         symmform_uvw = (
-            _solver_constraints_to_absolute_symmform(constraint_map[rep_idx], ssg_cell[0])
+            _solver_constraints_to_absolute_symmform(
+                constraint_map[rep_idx], ssg_cell[0], spin_basis_lengths=moment_basis_lengths)
             if rep_idx in constraint_map
             else _absolute_symmform_from_moment(spins[rep_idx])
         )
@@ -1204,12 +1211,10 @@ def generate_scif(
     cell = cell_G0.to_spglib(mag=True)
     configuration = ssg.conf
     norm_direction = ssg.sog_direction
+    spin_basis_rows = (np.eye(3) if spinframe_basis_abc_rows is None
+                       else np.asarray(spinframe_basis_abc_rows, dtype=float))
+    spin_basis_lengths = np.linalg.norm(np.asarray(cell[0]).T @ spin_basis_rows.T, axis=0)
     if configuration == "Collinear" and norm_direction is not None:
-        spin_basis_rows = (
-            np.eye(3)
-            if spinframe_basis_abc_rows is None
-            else np.asarray(spinframe_basis_abc_rows, dtype=float)
-        )
         # ``collinear_direction_xyz`` is defined in current lattice-unit-cell
         # coordinates, not in the independently declared spin frame.
         norm_direction = spin_basis_rows.T @ np.asarray(
@@ -1449,6 +1454,7 @@ def generate_scif(
         moment_precision=moment_precision,
         magnitude_precision=magnitude_precision,
         moment_basis_cartesian=moment_basis_cartesian,
+        spin_basis_lengths=spin_basis_lengths,
     )
 
     sections = [

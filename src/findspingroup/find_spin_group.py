@@ -57,6 +57,7 @@ from findspingroup.structure.group import (
     integer_points_in_new_cell,
     op_key,
     solve_spin_constraint_from_stacked,
+    _format_spin_constraint_space,
     _resolve_point_group_info,
 )
 from findspingroup.structure.cell import (
@@ -75,6 +76,7 @@ from findspingroup.utils.symbolic_format import (
     symbolize_numeric_tokens_in_string,
 )
 from findspingroup.utils.periodic import fractional_search_radius, periodic_cartesian_distance
+from findspingroup.utils.vector_constraints import solve_vector_constraints
 from findspingroup.utils.space_group_flags import (
     format_polar_axis_vector,
     msg_parent_space_group_info,
@@ -5840,7 +5842,10 @@ def _build_scif_export_targets(
             ),
             "setting_name": setting_name,
             "spin_frame": spin_frame,
-            "spinframe_basis_abc_rows": _scif_spinframe_basis_abc_rows(base_cell, spin_transform),
+            "spinframe_basis_abc_rows": (
+                np.eye(3) if spin_frame == SCIF_SPIN_FRAME_ORIENTED
+                else _scif_spinframe_basis_abc_rows(base_cell, spin_transform)
+            ),
             "moment_basis_cartesian": _scif_moment_basis_cartesian(base_cell, spin_frame),
             "is_input_setting": is_input_setting,
         }
@@ -6817,6 +6822,7 @@ def _magnetic_site_dof_maps_for_cell(
                 msg_ops,
                 atol=tol_cfg.m_matrix_tol,
                 magnetic_indices=magnetic_indices,
+                spin_basis=_lattice_column_matrix(cell),
                 memo=dataset_memo,
             )
         )
@@ -7068,16 +7074,14 @@ def combine_parametric_solutions(rref_matrix, tol=1e-3):
 
     return vector_expr
 
-def calculate_freedom_degree(matrices : list[np.ndarray],tol=0.01):
-    """
-        calculate freedom degree from matrices
-    """
-    stack_matrices = np.vstack(matrices-np.eye(3)).astype(np.float64)
-
-    # rref(stack_matrices, tol=0.01)
-    # pending for (mx,my,mz) representation
-    constraints = combine_parametric_solutions(rref_with_tolerance(stack_matrices))
-    return 3 - np.linalg.matrix_rank(stack_matrices,tol=tol), constraints
+def calculate_freedom_degree(matrices: list[np.ndarray], tol=0.01, *, spin_basis=None,
+                             return_audit=False):
+    """Site DOF and equations from one kernel in the declared physical frame."""
+    stack = (np.asarray(matrices, float).reshape(-1,3,3)-np.eye(3)).reshape(-1,3)
+    space = solve_vector_constraints(stack, tol=tol, frame=spin_basis)
+    _status, constraints = _format_spin_constraint_space(space)
+    result = (space.dimension, constraints)
+    return (*result, space.diagnostics()) if return_audit else result
 
 def _spin_space_site_orbits(
     ssg_cell: CrystalCell,
@@ -7192,6 +7196,8 @@ def get_spin_wyckoff(
     ssg_ops,
     atol=0.001,
     magnetic_indices: list[int] | None = None,
+    *,
+    spin_basis=None,
 ) -> tuple[list, list, dict, list, list]:
     """Calculate spin Wyckoff orbits and magnetic-site constraints."""
     magnetic_index, equivalence_classes, equivalence_classes_spin = (
@@ -7209,7 +7215,9 @@ def get_spin_wyckoff(
     magnetic_representative_dof = {}
     constraints = []
     for info in equivalence_classes_spin:
-        dof, constraint = calculate_freedom_degree(info['site_symmetry_ops'], tol=atol)
+        dof, constraint, audit = calculate_freedom_degree(
+            info['site_symmetry_ops'], tol=atol, spin_basis=spin_basis, return_audit=True)
+        info['constraint_audit'] = audit
         magnetic_representative_dof[info['representative_index']] = int(dof)
         constraints.append(constraint)
 
@@ -7233,6 +7241,7 @@ def _get_spin_wyckoff_for_analysis(
     *,
     atol: float,
     magnetic_indices: list[int] | None,
+    spin_basis=None,
     memo=None,
 ):
     operations = tuple(ssg_ops)
@@ -7245,6 +7254,7 @@ def _get_spin_wyckoff_for_analysis(
         "spin_wyckoff",
         id(cell),
         float(atol),
+        _exact_array_key(np.eye(3) if spin_basis is None else spin_basis),
         magnetic_index_key,
         _spin_wyckoff_operation_sequence_key(operations),
     )
@@ -7256,6 +7266,7 @@ def _get_spin_wyckoff_for_analysis(
             operations,
             atol=atol,
             magnetic_indices=magnetic_indices,
+            spin_basis=spin_basis,
         ),
     )
 
@@ -7629,6 +7640,7 @@ def _build_magnetic_site_summary(
                 msg_ops,
                 atol=tol_cfg.m_matrix_tol,
                 magnetic_indices=magnetic_indices,
+                spin_basis=_lattice_column_matrix(cell),
                 memo=dataset_memo,
             )
         )
@@ -9496,6 +9508,10 @@ def _find_spin_group_from_parsed(
             export_ssg.ops,
             atol=tol_cfg.m_matrix_tol,
             magnetic_indices=magnetic_indices,
+            spin_basis=(
+                _lattice_column_matrix(export_cell)
+                @ np.asarray(export_target["spinframe_basis_abc_rows"], float).T
+            ),
             memo=wyckoff_dataset_memo,
         )
         source_cell_parameter_strings = (

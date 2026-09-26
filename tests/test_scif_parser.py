@@ -46,7 +46,8 @@ from findspingroup.utils.matrix_utils import normalize_vector_to_zero
 
 
 def _roundtrip_index_from_scif_data(scif_path: Path):
-    lattice_factors, positions, elements, occupancies, labels, moments = parse_scif_file(scif_path)
+    parsed, metadata = parse_scif_file(scif_path, return_metadata=True)
+    lattice_factors, positions, elements, occupancies, labels, moments = parsed
     return find_spin_group_from_data(
         str(scif_path),
         lattice_factors,
@@ -54,6 +55,7 @@ def _roundtrip_index_from_scif_data(scif_path: Path):
         elements,
         occupancies,
         moments,
+        input_spin_setting=metadata["spin_setting"],
     )
 
 
@@ -1188,11 +1190,11 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_324():
 
     assert (
         "Fe1\t-1.781909088590099\t1.781909088590101\t-2.182384017536785\t"
-        "u,-u,sqrt(6)/2u\tu,-u,4u\t3.780"
+        "u,-u,sqrt(6)/2u\t1/4w,-1/4w,w\t3.780"
     ) in result.scif
     assert "Sx,Sy,Sz" not in result.scif
     assert metadata["atom_site_spin_moment"]["symmform_uvw"] == ["u,-u,sqrt(6)/2u"]
-    assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,4u"]
+    assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["1/4w,-1/4w,w"]
 
 
 @pytest.mark.parametrize(
@@ -1279,8 +1281,19 @@ def test_generated_scif_uses_solver_derived_symmform_uvw_for_conbs_tripleq_defau
     result = find_spin_group("examples/CoNb3S6_tripleQ.mcif")
     metadata = parse_scif_metadata(source_text=result.scif)
 
-    assert metadata["atom_site_spin_moment"]["symmform_uvw"] == ["u,-u,0.612407u"]
-    assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,0.592416u"]
+    absolute = general_positions_to_matrix(
+        metadata["atom_site_spin_moment"]["symmform_uvw"], variables=("u", "v", "w"))[0][0][0]
+    relative = general_positions_to_matrix(
+        metadata["atom_site_spin_moment"]["symmform_rel_uvw"], variables=("u", "v", "w"))[0][0][0]
+    lengths = np.linalg.norm(np.asarray(result.g0_standard_cell["lattice"]), axis=1)
+    transformed = np.diag(lengths) @ relative
+    np.testing.assert_allclose(absolute @ np.linalg.pinv(absolute),
+                               transformed @ np.linalg.pinv(transformed), atol=1e-12, rtol=0)
+    # The retained lattice has unequal a/b lengths; the absolute coefficient
+    # must not independently snap to -1 while the relative constraint stays -1.
+    assert not np.isclose(absolute[1, 0], -1., atol=1e-8, rtol=0)
+    assert np.isclose(absolute[2, 0], .612407, atol=5e-7, rtol=0)
+    assert np.isclose(relative[2, 0], .592416, atol=5e-7, rtol=0)
 
 
 def test_generated_scif_transform_to_g0std_maps_current_setting_to_g0std_equivalent_ops():
@@ -1343,15 +1356,23 @@ def test_generated_scif_preserves_resolved_boundary_coordinates_for_1669():
         assert np.min(np.max(np.abs(delta), axis=1)) <= 5.1e-9
 
 
-def test_generated_scif_prefers_symbolic_sqrt_coefficients_for_1669():
+def test_generated_scif_preserves_constraint_frame_relation_for_1669():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
         result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
     metadata = parse_scif_metadata(source_text=result.scif)
 
     assert metadata["space_group_spin"]["spin_space_group_name_chen"] is None
-    assert metadata["atom_site_spin_moment"]["symmform_uvw"] == ["u,-u,0"]
-    assert metadata["atom_site_spin_moment"]["symmform_rel_uvw"] == ["u,-u,0"]
+    absolute = general_positions_to_matrix(
+        metadata["atom_site_spin_moment"]["symmform_uvw"], variables=("u", "v", "w"))[0][0][0]
+    relative = general_positions_to_matrix(
+        metadata["atom_site_spin_moment"]["symmform_rel_uvw"], variables=("u", "v", "w"))[0][0][0]
+    lengths = np.linalg.norm(np.asarray(result.g0_standard_cell["lattice"]), axis=1)
+    transformed = np.diag(lengths) @ relative
+    np.testing.assert_allclose(absolute @ np.linalg.pinv(absolute),
+                               transformed @ np.linalg.pinv(transformed), atol=1e-12, rtol=0)
+    assert np.linalg.matrix_rank(absolute) == 1
+    assert not np.isclose(absolute[1, 0], -1., atol=1e-8, rtol=0)
 
 
 def test_generated_scif_roundtrip_resolves_msg_view_seitz_symbols():
