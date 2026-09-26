@@ -6342,7 +6342,7 @@ def _get_spin_constraint_for_msg_little_groups(
             if target_rotation is not None:
                 rotation_cartesian = target_rotation @ rotation_cartesian @ target_rotation_inv
             spin_matrices.append(time_reversal * np.linalg.det(rotation_cartesian) * rotation_cartesian - np.eye(3))
-        spinmatrices = np.vstack(deduplicate_matrix_pairs(spin_matrices, tol=tol))
+        spinmatrices = np.vstack(spin_matrices)
         _spin_splitting, constraint = solve_spin_constraint_from_stacked(spinmatrices)
         constraints.append(constraint)
     return constraints
@@ -6365,7 +6365,7 @@ def _get_spin_splitting_for_msg_little_groups(
             spin_matrices.append(
                 time_reversal * np.linalg.det(rotation_cartesian) * rotation_cartesian - np.eye(3)
             )
-        spinmatrices = np.vstack(deduplicate_matrix_pairs(spin_matrices, tol=tol))
+        spinmatrices = np.vstack(spin_matrices)
         spin_splitting, _constraint = solve_spin_constraint_from_stacked(spinmatrices)
         spin_splittings.append(spin_splitting)
     return spin_splittings
@@ -6378,10 +6378,7 @@ def _get_spin_splitting_for_ssg_little_group(
 ) -> str:
     if not little_group:
         return "unknown"
-    spin_matrices = deduplicate_matrix_pairs(
-        [np.asarray(op.spin_rotation, dtype=float) - np.eye(3) for op in little_group],
-        tol=tol,
-    )
+    spin_matrices = [np.asarray(op.spin_rotation, dtype=float) - np.eye(3) for op in little_group]
     stacked = np.vstack(spin_matrices)
     spin_splitting, _constraint = solve_spin_constraint_from_stacked(stacked)
     return spin_splitting

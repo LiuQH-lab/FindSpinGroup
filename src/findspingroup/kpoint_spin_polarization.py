@@ -17,9 +17,9 @@ from typing import Iterable, Sequence
 
 import numpy as np
 
-from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs
 from findspingroup.core.tolerances import DEFAULT_KPOINT_TOL
-from findspingroup.structure.group import solve_spin_constraint_from_stacked
+from findspingroup.structure.group import _format_spin_constraint_space
+from findspingroup.utils.vector_constraints import solve_vector_constraints
 
 
 _SPIN_CONSTRAINT_TOL = 1e-3
@@ -103,14 +103,12 @@ def _structured_spin_constraint(stacked: np.ndarray, *, tol: float) -> dict:
     if matrix.size == 0:
         raise ValueError("A spin constraint requires at least one little-group operation.")
 
-    _u, singular_values, vh = np.linalg.svd(matrix, full_matrices=True)
-    rank = min(int(np.count_nonzero(singular_values > tol)), 3)
-    dimension = 3 - rank
-    nullspace = vh[rank:, :]
-    projector = nullspace.T @ nullspace if dimension else np.zeros((3, 3), dtype=float)
+    space = solve_vector_constraints(matrix, tol=tol)
+    dimension = space.dimension
+    projector = space.basis @ space.basis.T if dimension else np.zeros((3, 3), dtype=float)
     projector[np.abs(projector) < max(tol * 1e-6, 1e-12)] = 0.0
     basis = _deterministic_basis(projector, dimension, tol=max(tol * 1e-3, 1e-12))
-    spin_splitting, readable_constraint = solve_spin_constraint_from_stacked(matrix, tol=tol)
+    spin_splitting, readable_constraint = _format_spin_constraint_space(space)
 
     if dimension == 0:
         status = "forbidden"
@@ -132,8 +130,9 @@ def _structured_spin_constraint(stacked: np.ndarray, *, tol: float) -> dict:
         "direction_sign_is_ambiguous": bool(dimension == 1),
         "magnitude_is_determined": False,
         "zero_vector_forced": bool(dimension == 0),
-        "singular_values": np.asarray(singular_values, dtype=float).tolist(),
+        "singular_values": space.singular_values.tolist(),
         "constraint_tol": float(tol),
+        "numerical_audit": space.diagnostics(),
     }
 
 
@@ -536,8 +535,7 @@ class KPointSpinPolarizationAnalyzer:
         if signature in cache:
             return deepcopy(cache[signature])
         selected = constraint_matrices[np.asarray(signature, dtype=int)]
-        deduplicated = deduplicate_matrix_pairs(list(selected), tol=self._matrix_tol)
-        stacked = np.vstack(deduplicated)
+        stacked = np.vstack(selected)
         analysis = _structured_spin_constraint(stacked, tol=self.constraint_tol)
         precomputed_entry = precomputed.get(signature)
         if precomputed_entry is None:

@@ -58,3 +58,18 @@ def test_full_rank_constraint_forbids_spin_polarization():
 
     assert spin_splitting == "no spin splitting"
     assert constraint == ["0", "0", "0"]
+
+
+def test_near_collinear_fim_path_and_exact_query_share_the_operation_budget():
+    from findspingroup import find_spin_group
+
+    result = find_spin_group("tests/testset/mcif_241130_no2186/0.270_Tb2MnNiO6.mcif")
+    assert result.conf == "Collinear"
+    assert result.magnetic_phase == "FiM"
+    for kpoint in ([0.,0.,0.], [.173,.319,.431]):
+        query = result.analyze_kpoint_spin_polarization(kpoint)
+        assert query["without_soc"]["dimension"] == 1
+        audit = query.audit["without_soc"]["numerical_audit"]
+        assert audit["max_operation_residual"] <= audit["threshold"]
+    assert "\u0393 ***^^^" in result.KPOINTS
+    assert "| GP ***^^^" in result.KPOINTS

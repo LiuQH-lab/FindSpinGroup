@@ -25,6 +25,7 @@ from findspingroup.utils.seitz_symbol import (
 )
 from findspingroup.utils.international_symbol import build_international_symbol
 from findspingroup.utils.symbolic_format import format_symbolic_scalar
+from findspingroup.utils.vector_constraints import solve_vector_constraints
 
 
 def parse_label_and_value(text):
@@ -222,7 +223,12 @@ def _format_spin_constraint_term(coeff, variable, tol=1e-3):
         return variable
     if abs(coeff + 1.0) < tol:
         return f"-{variable}"
-    return f"{format_symbolic_scalar(coeff)}*{variable}"
+    return f"{_spin_constraint_scalar(coeff, tol)}*{variable}"
+
+
+def _spin_constraint_scalar(value, tol):
+    return format_symbolic_scalar(value, decimal_precision=15, zero_tol=tol,
+                                  rational_tol=tol, sqrt_tol=tol)
 
 
 def _format_spin_constraint_expression(terms, tol=1e-3):
@@ -235,7 +241,7 @@ def _format_spin_constraint_expression(terms, tol=1e-3):
         if abs(magnitude - 1.0) < tol:
             term = variable
         else:
-            term = f"{format_symbolic_scalar(magnitude)}*{variable}"
+            term = f"{_spin_constraint_scalar(magnitude, tol)}*{variable}"
         if not parts:
             parts.append(term if coeff > 0 else f"-{term}")
         else:
@@ -286,29 +292,30 @@ def _format_two_dimensional_spin_constraint(normal, tol=1e-3):
     return result
 
 
-def solve_spin_constraint_from_stacked(stacked, tol=1e-3):
-    """Return spin-splitting status and readable spin-polarization constraints.
+def _format_spin_constraint_space(space, *, display_tol=1e-12):
+    """Format the already accepted kernel; do not make another rank decision."""
+    if space.dimension == 0:
+        return "no spin splitting", ["0", "0", "0"]
+    if space.dimension == 3:
+        return "spin splitting", list(_SPIN_CONSTRAINT_SYMBOLS)
+    if space.dimension == 2:
+        normal = np.cross(space.basis[:,0], space.basis[:,1])
+        normal /= np.max(np.abs(normal))
+        return "spin splitting", _format_two_dimensional_spin_constraint(normal, tol=display_tol)
+    return "spin splitting", _format_one_dimensional_spin_constraint(space.basis[:,0], tol=display_tol)
 
-    The same SVD rank criterion is used for both outputs.  This avoids cases
-    where a nearly collinear C2v presentation is classified as spin splitting
-    by the singular values but formatted as a zero spin direction by RREF.
+
+def solve_spin_constraint_from_stacked(stacked, tol=1e-3):
+    """Return permission and text from one duplication-invariant physical kernel.
+
+    Rows are complete 3x3 operation-minus-identity blocks in an orthonormal spin
+    frame. Short unframed scalar equations are supported for legacy callers.
+    The budget is per operation, independent of the number of repeated blocks.
     """
     matrix = np.asarray(stacked, dtype=float).reshape(-1, 3)
     if matrix.size == 0:
         return "unknown", []
-
-    _, singular_values, vh = np.linalg.svd(matrix, full_matrices=True)
-    rank = int(np.count_nonzero(singular_values > tol))
-    rank = min(rank, 3)
-    nullity = 3 - rank
-
-    if nullity <= 0:
-        return "no spin splitting", ["0", "0", "0"]
-    if nullity == 3:
-        return "spin splitting", list(_SPIN_CONSTRAINT_SYMBOLS)
-    if nullity == 2:
-        return "spin splitting", _format_two_dimensional_spin_constraint(vh[0], tol=tol)
-    return "spin splitting", _format_one_dimensional_spin_constraint(vh[-1], tol=tol)
+    return _format_spin_constraint_space(solve_vector_constraints(matrix, tol=tol))
 
 
 def _to_latex_point_token(token: str) -> str:
@@ -2381,10 +2388,7 @@ class SpinSpaceGroup:
     def _little_group_spin_analysis(self):
         analysis = []
         for little_group in self.little_groups:
-            spin_matrices = deduplicate_matrix_pairs(
-                [op[0] - np.eye(3) for op in little_group],
-                tol=self.tol,
-            )
+            spin_matrices = [op[0] - np.eye(3) for op in little_group]
             stacked = np.vstack(spin_matrices)
             spin_splitting, polarizations = solve_spin_constraint_from_stacked(stacked)
             analysis.append(
