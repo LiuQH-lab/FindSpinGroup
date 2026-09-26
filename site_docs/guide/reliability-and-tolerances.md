@@ -111,6 +111,16 @@ their revision requires their own group-representation validation.
 The legacy symbol closure's `1e-4` translation cleanup remains local
 to generator selection and does not overwrite the supplied numerical operations.
 
+Collinear `operation_views` use a finite `+/-I` nSSG presentation, with the
+continuous spin-only group described separately. Presentation generators are
+the images of full generators under `U*n = chi(U)*n`, `U_display = chi(U)*I`;
+`chi(U)` is not generally `det(U)`. Filtering out spin-only surrogate matrices
+instead of taking this image can lose required generators. These presentation
+generators must not replace the full spin-only constraints in physical texture
+or tensor calculations. When transporting a finite mod-1 generator list to a
+different cell, the source cell's implicit unit translations must also be
+transported: their images can be nontrivial translations of the target cell.
+
 An arbitrary-k query similarly preserves its supplied k point modulo reciprocal
 lattice integers before applying `kpoint_tol`. The k-point tolerance is expressed
 in ACC-primitive reciprocal fractional coordinates; it is not a direct-space

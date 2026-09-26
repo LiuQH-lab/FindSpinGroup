@@ -3544,15 +3544,22 @@ def _transform_operation_generators(
     tol: float,
     real_space_metric=None,
 ) -> list[SpinSpaceGroupOperation]:
-    if not generator_ops:
-        return []
-    return list(
+    # A mod-1 generating list omits the source cell's unit translations. Their
+    # images need not be identity in the target cell (especially for two
+    # non-nested supercells), so transport the infinite lattice generators too.
+    lattice_generators = [SpinSpaceGroupOperation(np.eye(3), np.eye(3), vector) for vector in np.eye(3)]
+    transported = list(
         SpinSpaceGroup(
-            generator_ops,
+            list(generator_ops) + lattice_generators,
             tol=tol,
             real_space_metric=real_space_metric,
         ).transform(transform, shift, frac=True).ops
     )
+    return [op for op in transported if not (
+        np.allclose(op.spin_rotation, np.eye(3), atol=1e-10, rtol=0)
+        and np.allclose(op.rotation, np.eye(3), atol=1e-10, rtol=0)
+        and np.max(np.abs(op.translation - np.rint(op.translation))) < 1e-10
+    )]
 
 
 def _transform_spin_generators(
@@ -3647,6 +3654,32 @@ def _operation_view_collinear_note(ssg: SpinSpaceGroup, *, spin_frame: str) -> d
     }
 
 
+def _collinear_presentation_generators(generator_ops, axis, *, tol):
+    """Project to the displayed +/-I nSSG, not the physical constraint group.
+
+    U n = chi(U) n defines a multiplicative sign character. Its image maps a
+    generating set to a generating set; merely filtering out spin-only proxies
+    does not. In particular det(U) is NOT this character. Keep the original
+    full operators, including spin-only constraints, for texture/tensor solves.
+    """
+    direction = np.asarray(axis, dtype=float).reshape(-1)
+    norm = float(np.linalg.norm(direction))
+    if direction.shape != (3,) or not np.isfinite(norm) or norm == 0:
+        raise ValueError("Collinear generator presentation requires a finite nonzero spin axis.")
+    direction = direction / norm
+    projected = []
+    for op in generator_ops:
+        moved = np.asarray(op.spin_rotation, dtype=float) @ direction
+        sign = 1 if float(np.dot(moved, direction)) >= 0 else -1
+        if not np.allclose(moved, sign * direction, atol=tol, rtol=0):
+            raise ValueError("A displayed collinear generator does not preserve the collinear spin line.")
+        if (sign == 1 and np.allclose(op.rotation, np.eye(3), atol=1e-10, rtol=0)
+                and np.max(np.abs(op.translation - np.rint(op.translation))) < 1e-10):
+            continue
+        projected.append(SpinSpaceGroupOperation(sign * np.eye(3), op.rotation, op.translation))
+    return projected
+
+
 def _build_operation_view_set(
     ssg: SpinSpaceGroup,
     *,
@@ -3712,6 +3745,8 @@ def _build_operation_view_set(
         )
         generator_ops = _symbol_generator_ops_for_current_basis(view_ssg)
     if generator_ops:
+        if is_collinear:
+            generator_ops = _collinear_presentation_generators(generator_ops, ssg.sog_direction, tol=ssg.tol)
         generator_indices = _deduplicate_operation_view_indices(
             _operation_view_indices_from_ops(
                 all_ops,
