@@ -6,7 +6,7 @@ import shlex
 import ast
 from fractions import Fraction
 from ..structure import AtomicSite,CrystalCell
-from ..structure.cell import are_positions_equivalent
+from ..structure.cell import are_positions_equivalent, calculate_vector_coordinates_from_latticefactors
 from ..utils import general_positions_to_matrix
 from ..utils.matrix_utils import evaluate_numeric_expression
 
@@ -1171,7 +1171,53 @@ def parse_cif_file(filename, atol = 0.01, return_metadata=False):
     return parsed
 
 
+def _scif_spin_frame_matrices(data, lattice):
+    """Resolve absolute moment components separately from relative uvw axes.
+
+    Basis rows A express each spin basis vector in the file's lattice basis.
+    B=L.T@A.T contains those vectors in the canonical Cartesian frame of the
+    cell parameters. With D=diag(lengths(B)), uvw acts on relative coordinates,
+    whereas atom moments are components along B@D^-1.
+    """
+    abc = _normalize_scif_scalar(data.get('_space_group_spin.transform_spinframe_P_abc'))
+    numeric = _parse_scif_matrix_list(_get_first_existing(data, [
+        '_space_group_spin.transform_spinframe_P_matrix',
+        '_space_group_spin.tansform_spinframe_P_matrix',
+    ]))
+    if abc is not None:
+        transforms, _ = general_positions_to_matrix([f"{abc},+1"], variables=('a', 'b', 'c'))
+        rows, shift = transforms[0]
+        if np.any(np.asarray(shift) != 0):
+            raise ValueError("SCIF spin-frame basis vectors cannot contain an affine shift.")
+    elif numeric is not None:
+        rows = numeric.get("numeric_components")
+        if rows is None or not np.allclose(rows, np.eye(3), atol=1e-12, rtol=0):
+            raise ValueError(
+                "A non-default legacy spinframe_P_matrix requires an explicit "
+                "transform_spinframe_P_abc declaration; its row/column convention is not defined."
+            )
+    else:
+        rows = np.eye(3)
+    rows = np.asarray(rows, dtype=float)
+    spin_basis = np.asarray(lattice, dtype=float).T @ rows.T
+    lengths = np.linalg.norm(spin_basis, axis=0)
+    if (not np.all(np.isfinite(spin_basis)) or np.any(lengths <= 0)
+            or np.linalg.cond(spin_basis) * np.finfo(float).eps >= 1):
+        raise ValueError("SCIF spin frame must be finite and numerically nonsingular.")
+    lattice_frame = np.array_equal(rows, np.eye(3))
+    return np.diag(lengths), spin_basis / lengths, lattice_frame
+
+
 def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_text=None):
+    """Expand SCIF operations with their declared spin-frame convention.
+
+    Atom axis_u/v/w values are absolute components along unit spin-basis
+    directions; operation uvw expressions act on relative spin coordinates.
+    The default a,b,c basis returns in_lattice moments. Other declared bases
+    return Cartesian moments in the canonical frame of the file's cell
+    parameters. Use return_metadata=True and its spin_setting when passing
+    parsed data to a structure-analysis API.
+    """
     data = ScifParser(filename, source_text=source_text).parse()
     metadata = _extract_scif_metadata(data)
 
@@ -1259,35 +1305,12 @@ def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_t
 
     initial_moments = [moments_by_label.get(lbl, np.array([0.0, 0.0, 0.0])) for lbl in initial_labels]
 
-    transform_spinframe_abc = _normalize_scif_scalar(
-        _get_first_existing(data, ['_space_group_spin.transform_spinframe_P_abc'])
+    lattice = calculate_vector_coordinates_from_latticefactors(*latticefactors)
+    spinframe_lengths_scale, moment_to_cartesian, lattice_frame = _scif_spin_frame_matrices(
+        data, lattice,
     )
-    transform_spinframe_matrix = _parse_scif_matrix_list(
-        _get_first_existing(
-            data,
-            [
-                '_space_group_spin.transform_spinframe_P_matrix',
-                '_space_group_spin.tansform_spinframe_P_matrix',
-            ],
-        )
-    )
-    spinframe_lengths_scale = None
-    normalized_spinframe = None if transform_spinframe_abc is None else re.sub(r"\s+", "", transform_spinframe_abc)
-    transform_spinframe_numeric = (
-        None
-        if transform_spinframe_matrix is None
-        else transform_spinframe_matrix.get("numeric_components")
-    )
-    if normalized_spinframe == "a,b,c":
-        spinframe_lengths_scale = np.diag(np.asarray(latticefactors[:3], dtype=float))
-    elif (
-        transform_spinframe_numeric is not None
-        and np.allclose(np.asarray(transform_spinframe_numeric, dtype=float), np.eye(3), atol=1e-9)
-    ):
-        spinframe_lengths_scale = np.diag(np.asarray(latticefactors[:3], dtype=float))
-    spinframe_lengths_scale_inv = (
-        None if spinframe_lengths_scale is None else np.linalg.inv(spinframe_lengths_scale)
-    )
+    spinframe_lengths_scale_inv = np.linalg.inv(spinframe_lengths_scale)
+    metadata["spin_setting"] = "in_lattice" if lattice_frame else "cartesian"
 
     symop_xyzt = _get_first_existing(
         data,
@@ -1354,20 +1377,12 @@ def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_t
                 # The lattice translation must therefore be acted on by the real-space rotation.
                 new_pos = real_op @ (lat_real_op @ pos + lat_real_shift) + real_shift
                 new_pos = new_pos % 1.0
-                if spinframe_lengths_scale is None:
-                    new_moment = spin_op @ lat_spin_op @ np.asarray(moment, dtype=float)
-                else:
-                    # For the current oriented 'a,b,c' contract, uvw acts on
-                    # relative components in the spin basis while atom moments
-                    # are stored as absolute components along the corresponding
-                    # basis directions.
-                    new_moment = (
-                        spinframe_lengths_scale
-                        @ spin_op
-                        @ lat_spin_op
-                        @ spinframe_lengths_scale_inv
-                        @ np.asarray(moment, dtype=float)
-                    )
+                new_moment = (
+                    spinframe_lengths_scale @ spin_op @ lat_spin_op
+                    @ spinframe_lengths_scale_inv @ np.asarray(moment, dtype=float)
+                )
+                if not lattice_frame:
+                    new_moment = moment_to_cartesian @ new_moment
 
                 same = False
                 for old_index, old_pos in enumerate(all_positions):
