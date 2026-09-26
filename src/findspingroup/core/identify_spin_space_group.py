@@ -383,14 +383,14 @@ def _ssg_operation_preserves_magnetic_atoms(
     return operation_preserves(op.spin_rotation, op.rotation, op.translation)
 
 
-def _normalize_fractional_translation(translation, *, boundary_tol=1e-8):
+def _normalize_fractional_translation(translation, *, boundary_tol=0.0):
     normalized = np.mod(np.asarray(translation, dtype=float), 1.0)
     normalized[np.abs(normalized - 1.0) <= boundary_tol] = 0.0
     normalized[np.abs(normalized) <= boundary_tol] = 0.0
     return normalized
 
 
-def _matrix_close(left, right, tol: float, *, rtol: float = 1e-05) -> bool:
+def _matrix_close(left, right, tol: float, *, rtol: float = 0.0) -> bool:
     left_array = np.asarray(left, dtype=float)
     right_array = np.asarray(right, dtype=float)
     return bool(np.max(np.abs(left_array - right_array) - rtol * np.abs(right_array)) <= tol)
@@ -401,7 +401,7 @@ def _translation_close_mod_lattice(left, right, tol: float) -> bool:
     right_array = _normalize_fractional_translation(right)
     diff = np.abs(left_array - right_array)
     wrapped = np.minimum(diff, 1.0 - diff)
-    return bool(np.max(wrapped) < tol)
+    return bool(np.max(wrapped) <= tol)
 
 
 def _spin_space_operation_same(left: SpinSpaceGroupOperation, right: SpinSpaceGroupOperation, tol: float) -> bool:
@@ -466,12 +466,11 @@ class _SpinSpaceOperationLookup:
         self._arrays_dirty = False
 
     def contains(self, op: SpinSpaceGroupOperation) -> bool:
-        # The bucket grid is much finer than the audit tolerance. If an
-        # operation lands in an existing bucket, every encoded matrix/translation
-        # component differs from the bucket representative by at most key_tol,
-        # hence it is already a valid positive membership match under self.tol.
-        if self._buckets.get(self._key(op)):
-            return True
+        # Hashes locate candidates only: their minimum grid width and periodic
+        # boundary normalization must not override a tighter acceptance budget.
+        for index in self._buckets.get(self._key(op), ()):
+            if _spin_space_operation_same(op, self.ops[index], self.tol):
+                return True
 
         # Rare tolerance-boundary slow path: keep correctness without letting the
         # normal group-audit path pay Python-loop cost for every product.
@@ -481,19 +480,18 @@ class _SpinSpaceOperationLookup:
         spin = np.asarray(op.spin_rotation, dtype=float)
         rotation = np.asarray(op.rotation, dtype=float)
         translation = _normalize_fractional_translation(op.translation)
-        rtol = 1e-05
         spin_close = np.all(
-            np.abs(spin - self._spin_arrays) <= self.tol + rtol * np.abs(self._spin_arrays),
+            np.abs(spin - self._spin_arrays) <= self.tol,
             axis=(1, 2),
         )
         rotation_close = np.all(
             np.abs(rotation - self._rotation_arrays)
-            <= self.tol + rtol * np.abs(self._rotation_arrays),
+            <= self.tol,
             axis=(1, 2),
         )
         diff = np.abs(translation - self._translation_arrays)
         wrapped = np.minimum(diff, 1.0 - diff)
-        translation_close = np.max(wrapped, axis=1) < self.tol
+        translation_close = np.max(wrapped, axis=1) <= self.tol
         return bool(np.any(spin_close & rotation_close & translation_close))
 
 
@@ -537,8 +535,9 @@ class _SpatialOperationLookup:
         self._arrays_dirty = False
 
     def contains(self, op) -> bool:
-        if self._buckets.get(self._key(op)):
-            return True
+        for index in self._buckets.get(self._key(op), ()):
+            if _spatial_operation_same(op, self.ops[index], self.tol):
+                return True
 
         self._ensure_arrays()
         if len(self.ops) == 0:
@@ -548,16 +547,8 @@ class _SpatialOperationLookup:
         rotation_close = np.all(np.abs(rotation - self._rotation_arrays) <= self.tol, axis=(1, 2))
         diff = np.abs(translation - self._translation_arrays)
         wrapped = np.minimum(diff, 1.0 - diff)
-        translation_close = np.max(wrapped, axis=1) < self.tol
+        translation_close = np.max(wrapped, axis=1) <= self.tol
         return bool(np.any(rotation_close & translation_close))
-
-
-def _spin_space_operation_signature(op: SpinSpaceGroupOperation, *, key_tol: float) -> tuple[int, ...]:
-    return (
-        *_matrix_signature(op.spin_rotation, key_tol=key_tol),
-        *_matrix_signature(op.rotation, key_tol=key_tol),
-        *_translation_signature(op.translation, key_tol=key_tol),
-    )
 
 
 def _complete_ssg_ops_by_closure(
@@ -566,7 +557,7 @@ def _complete_ssg_ops_by_closure(
     group_tol=DEFAULT_TOL,
     *,
     label="matched SSG",
-    preserve_cache: dict[tuple[int, ...], bool] | None = None,
+    preserve_cache: dict[tuple[bytes, bytes, bytes], bool] | None = None,
 ):
     tol = _normalize_candidate_tol(group_tol)
     audit_tol = _candidate_audit_tol(tol)
@@ -591,7 +582,9 @@ def _complete_ssg_ops_by_closure(
                 product = left @ right
                 if lookup.contains(product):
                     continue
-                cache_key = _spin_space_operation_signature(product, key_tol=lookup.key_tol)
+                # This cache is scoped to one physical cell/tolerance context.
+                # Near operations can lie on opposite sides of the mtol budget.
+                cache_key = _candidate_audit_operation_key(product)
                 preserves = None if preserve_cache is None else preserve_cache.get(cache_key)
                 if preserves is None:
                     preserves = operation_preserves(
@@ -1463,7 +1456,7 @@ def _maximal_audited_ssg_subgroups_from_generators(
     group_tol=DEFAULT_TOL,
     *,
     label="matched SSG",
-    preserve_cache: dict[tuple[int, ...], bool] | None = None,
+    preserve_cache: dict[tuple[bytes, bytes, bytes], bool] | None = None,
 ):
     if not raw_ssg_ops:
         return []
@@ -1601,8 +1594,13 @@ def _nsspg_invariant_failure(ssg: SpinSpaceGroup) -> str | None:
 
 
 def _candidate_audit_tol(group_tol) -> float:
+    """Dimensionless accepted-operation budget in the magnetic-cell basis.
+
+    Matrix entries and mod-1 fractional translations are algebraic coordinates;
+    the length-valued space tolerance belongs only to physical site matching.
+    """
     if isinstance(group_tol, Tolerances):
-        return max(float(group_tol.space), float(group_tol.m_matrix_tol))
+        return float(group_tol.m_matrix_tol)
     return float(group_tol)
 
 
@@ -1815,7 +1813,6 @@ def _compose_spatial_operation(left, right):
         + np.asarray(left_translation, dtype=float)
     )
     translation = np.mod(translation, 1.0)
-    translation[np.isclose(translation, 1.0, atol=1e-8)] = 0.0
     return [rotation, translation]
 
 
@@ -1823,7 +1820,6 @@ def _invert_spatial_operation(op):
     rotation, translation = op
     inverse_rotation = np.linalg.inv(np.asarray(rotation, dtype=float))
     inverse_translation = np.mod(-inverse_rotation @ np.asarray(translation, dtype=float), 1.0)
-    inverse_translation[np.isclose(inverse_translation, 1.0, atol=1e-8)] = 0.0
     return [inverse_rotation, inverse_translation]
 
 
@@ -1989,7 +1985,7 @@ def _build_candidate_profile(
     group_tol,
     tol,
     configuration_details,
-    preserve_cache: dict[tuple[int, ...], bool] | None = None,
+    preserve_cache: dict[tuple[bytes, bytes, bytes], bool] | None = None,
 ):
     configuration = configuration_details["configuration"]
     raw_ssg_ops = get_ssg_ops(space_operations_list, pg_ops, mag_atoms, tol=tol)
@@ -2083,7 +2079,7 @@ def _select_identify_pg_candidate(bundle, space_operations_list, mag_atoms, meig
     pg_subgroup_tol = _candidate_audit_tol(tol)
 
     profiles = []
-    preserve_cache: dict[tuple[int, ...], bool] = {}
+    preserve_cache: dict[tuple[bytes, bytes, bytes], bool] = {}
     for candidate in bundle["candidates"]:
         full_profile = _build_candidate_profile(
             candidate,
