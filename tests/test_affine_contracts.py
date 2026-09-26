@@ -33,6 +33,21 @@ def test_nofrac_transport_and_spin_only_preserve_integer_lifts():
     assert len(lifted.transform_spin(np.eye(3)).sog) == 1
 
 
+@pytest.mark.parametrize("shift", [5e-5, -5e-5, 5e-10, -5e-10])
+def test_mod1_setting_transport_preserves_common_origin_and_is_reversible(shift):
+    group = SpinSpaceGroup([
+        SpinSpaceGroupOperation.identity(),
+        SpinSpaceGroupOperation(np.eye(3), -np.eye(3), [0.5, 0, 0]),
+    ])
+    p = np.array([shift, -shift / 3, 0])
+    moved = group.transform(np.eye(3), p)
+    restored = moved.transform(np.eye(3), -p)
+    for original, transformed, back in zip(group.ops, moved.ops, restored.ops):
+        expected = original.translation + (np.eye(3) - original.rotation) @ p
+        assert getNormInf(transformed.translation, expected) < 1e-15
+        assert getNormInf(back.translation, original.translation) < 1e-15
+
+
 def test_representative_dedup_checks_boundaries_without_collapsing_lifts():
     ops = [SpinSpaceGroupOperation(np.eye(3), np.eye(3), t)
            for t in ([0.499e-5, 0, 0], [0.501e-5, 0, 0], [1.00000499, 0, 0])]
@@ -151,3 +166,105 @@ def test_g_type_symbol_retains_nontrivial_axis_translation_after_setting_transpo
     # lift: it would hide the twofold spin translation from the g-type symbol.
     assert ": (1,1,2_{010})" in result.convention_ssg_international_linear
     assert ": (2_{001},1,1)" in result.magnetic_primitive_ssg_international_linear
+
+
+def test_ba5co5clo13_named_glide_keeps_its_actual_spin_partner(monkeypatch):
+    module = importlib.import_module("findspingroup.find_spin_group")
+    symbols = importlib.import_module("findspingroup.utils.international_symbol")
+    original_find = symbols._find_real_operation
+    glide_rotation = np.array([[-1, 0, 0], [-1, 1, 0], [0, 0, 1]])
+    checked = []
+
+    def verify(ops, rotation, translation, tol=1e-4, **kwargs):
+        matched = original_find(ops, rotation, translation, tol=tol, **kwargs)
+        if np.allclose(rotation, glide_rotation, atol=1e-10, rtol=0):
+            assert matched is not None
+            assert getNormInf(matched.translation, translation) < 1e-10
+            np.testing.assert_allclose(matched.spin_rotation, -np.eye(3), atol=1e-10, rtol=0)
+            checked.append(matched)
+        return matched
+
+    monkeypatch.setattr(symbols, "_find_real_operation", verify)
+    result = module.find_spin_group("tests/testset/mcif_241130_no2186/0.118_Ba5Co5ClO13.mcif")
+    assert result.index == "194.164.1.1.L"
+    assert "-1|c" in result.convention_ssg_international_linear
+    assert checked
+
+
+@pytest.mark.parametrize("ik, expected", [(1, "?|-1"), (2, "1|-1")])
+def test_missing_named_generator_is_not_reported_as_identity_spin(monkeypatch, ik, expected):
+    symbols = importlib.import_module("findspingroup.utils.international_symbol")
+    # A minimal presentation fixture isolates t-type unknown spin from the
+    # identity-spin definition of L0 generators in a k-type presentation.
+    group = SimpleNamespace(
+        it=1, ik=ik,
+        G0_num=2, G0_symbol="P-1", L0_num=2, L0_symbol="P-1",
+        transformation_to_G0std=np.eye(3), origin_shift_to_G0std=np.zeros(3),
+        transformation_to_G0std_id=np.eye(3), origin_shift_to_G0std_id=np.zeros(3),
+        transformation_to_L0std=np.eye(3), origin_shift_to_L0std=np.zeros(3),
+        nssg=[], identity_real_nssg_ops=[], spin_translation_group=[],
+        n_spin_translation_group=[], conf="Noncoplanar",
+        _translation_period_basis=np.eye(3),
+    )
+    monkeypatch.setattr(symbols, "_canonical_spin_info_map", lambda ssg: {})
+    result = symbols.build_international_symbol(group, basis_mode="current")
+    assert result["real_generator_pairs_linear"] == [expected]
+    assert result["generator_operations"] == []
+
+
+def test_named_generators_use_the_full_current_to_standard_affine_map(monkeypatch):
+    symbols = importlib.import_module("findspingroup.utils.international_symbol")
+    p = np.array([[1, 1, 0], [0, 1, 0], [0, 0, 1]], dtype=float)
+    origin = np.array([0.17, 0.08, 0.03])
+    inversion = SpinSpaceGroupOperation(-np.eye(3), -np.eye(3), np.linalg.solve(p, -2 * origin) % 1)
+    group = SimpleNamespace(
+        it=2, ik=1, G0_num=2, G0_symbol="P-1",
+        transformation_to_G0std=np.diag([2, 1, 1]), origin_shift_to_G0std=np.array([0.05, 0, 0]),
+        transformation_to_G0std_id=p, origin_shift_to_G0std_id=origin,
+        nssg=[inversion], identity_real_nssg_ops=[], spin_translation_group=[], conf="Noncoplanar",
+        _translation_period_basis=np.eye(3),
+    )
+    monkeypatch.setattr(symbols, "_canonical_spin_info_map", lambda ssg: {id(inversion): {"hm_symbol": "-1"}})
+    result = symbols.build_international_symbol(group, basis_mode="current")
+    assert result["real_generator_pairs_linear"] == ["-1|-1"]
+    assert len(result["generator_operations"]) == 1
+
+
+def test_standard_symbol_transport_keeps_the_second_origin_shift():
+    symbols = importlib.import_module("findspingroup.utils.international_symbol")
+    group = SpinSpaceGroup([SpinSpaceGroupOperation.identity(),
+                           SpinSpaceGroupOperation(-np.eye(3), -np.eye(3), [0.3, 0.4, 0.2])])
+    group.__dict__["_G0_info_data"] = {
+        "trans_to_std": np.eye(3), "origin_shift_to_std": np.zeros(3),
+        "trans_to_std_id": np.eye(3), "origin_shift_to_std_id": np.array([0.85, 0.8, 0.9]),
+    }
+    group.__dict__["n_spin_part_std_transformation"] = np.eye(3)
+    transported = symbols._transform_to_g0_basis(group)
+    for original, moved in zip(group.ops, transported.ops):
+        expected = original.translation + (np.eye(3) - original.rotation) @ group.origin_shift_to_G0std_id
+        np.testing.assert_allclose(moved.translation, expected, atol=1e-15, rtol=0)
+        assert getNormInf(moved.translation, np.zeros(3)) < 1e-15
+
+
+def test_tmptin_chen_named_twofold_is_the_product_of_its_mirrors(monkeypatch):
+    module = importlib.import_module("findspingroup.find_spin_group")
+    groups = importlib.import_module("findspingroup.structure.group")
+    build = groups.build_international_symbol
+    checked = []
+
+    def verify(ssg, *args, **kwargs):
+        payload = build(ssg, *args, **kwargs)
+        if kwargs.get("basis_mode") == "current" and payload["linear"].startswith("P 1|m 2_{100}|m"):
+            ops = [op for op in payload["generator_operations"] if op["source"] == "real_generator"]
+            assert len(ops) == 3
+            first, second, product = ops
+            for field in ("spin_rotation", "real_rotation"):
+                np.testing.assert_allclose(np.asarray(first[field]) @ second[field], product[field], atol=1e-10, rtol=0)
+            expected = np.asarray(first["real_rotation"]) @ second["translation"] + first["translation"]
+            np.testing.assert_allclose(expected, product["translation"], atol=1e-10, rtol=0)
+            checked.append(payload["linear"])
+        return payload
+
+    monkeypatch.setattr(groups, "build_international_symbol", verify)
+    module.find_spin_group("tests/testset/mcif_241130_no2186/1.67_TmPtIn.mcif")
+    assert checked

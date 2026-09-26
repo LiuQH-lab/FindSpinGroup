@@ -10,8 +10,10 @@ from findspingroup.structure import CrystalCell
 from findspingroup.io.scif_generator import _transform_ssg_ops_to_chen_frame
 from findspingroup.utils.international_symbol import (
     _axis_period,
+    _find_real_operation,
     _integer_bezout_coefficients,
     _select_preferred_primitive_translation_match,
+    _translation_in_period,
 )
 
 
@@ -71,6 +73,35 @@ def test_axis_selector_does_not_confuse_g0_integer_lifts_with_spin_only():
     np.testing.assert_array_equal(flip.translation, [1, 0, 1 - 8e-14])
     group = SpinSpaceGroup([identity, flip], _translation_period_basis=basis)
     assert len(group.sog) == 1
+
+
+def test_named_generator_matching_preserves_distinct_integer_spin_cosets():
+    target = np.array([0, 0.5, 0])
+    real = np.diag([-1, 1, -1])
+    wanted = SpinSpaceGroupOperation(np.diag([-1, 1, -1]), real, [2, 0.5, 1])
+    other = SpinSpaceGroupOperation(np.diag([-1, -1, 1]), real, [1, 0.5, 0])
+    for ops in ([other, wanted], [wanted, other]):
+        assert _find_real_operation(ops, real, target, period_basis=np.diag([2, 1, 1])) is wanted
+
+
+def test_named_generator_period_matching_does_not_pre_snap_boundary_values():
+    op = SpinSpaceGroupOperation(np.eye(3), -np.eye(3), [1 - 5e-6, 0, 0])
+    assert _find_real_operation([op], -np.eye(3), np.zeros(3), tol=1e-6) is None
+    assert _find_real_operation([op], -np.eye(3), np.zeros(3), tol=6e-6) is op
+
+
+@pytest.mark.parametrize("basis", [np.diag([2, 1, 3]),
+                                  np.array([[1, 70, 0], [0, 1, 0], [0, 0, 1]]),
+                                  np.array([[1, 0.5, 0], [0, 1, 0], [0, 0, 1]])])
+def test_period_membership_matches_exhaustive_lattice_images(basis):
+    inverse = np.linalg.inv(basis)
+    images = np.asarray(list(itertools.product(range(-4, 5), repeat=3))) @ basis.T
+    rng = np.random.default_rng(208)
+    for _ in range(40):
+        tol = 0.02
+        delta = basis @ rng.integers(-2, 3, 3) + rng.uniform(-2 * tol, 2 * tol, size=3)
+        expected = bool(np.any(np.max(np.abs(images - delta), axis=1) < tol))
+        assert _translation_in_period(delta, basis, inverse, tol) == expected
 
 
 def test_threefold_axis_action_is_independent_of_positive_or_negative_lifts():
