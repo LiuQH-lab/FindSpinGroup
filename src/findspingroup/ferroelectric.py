@@ -6,6 +6,9 @@ from typing import Any
 import numpy as np
 import spglib
 from findspingroup.utils.vector_constraints import solve_vector_constraints
+from findspingroup.utils.periodic import fractional_search_radius, periodic_cartesian_distance
+from findspingroup.core.tolerances import DEFAULT_TOL
+from findspingroup.structure.cell import MAGNETIC_PRESENCE_TOL
 
 from findspingroup.io.scif_generator import affine_matrix_to_xyz_expression
 from findspingroup.utils.matrix_utils import (
@@ -740,8 +743,8 @@ def _position_bucket_key(position: np.ndarray, bins: int) -> tuple[int, int, int
 
 
 def _position_neighbor_keys(key: tuple[int, int, int], bins: int):
-    for offset in product((-1, 0, 1), repeat=3):
-        yield tuple((key[index] + offset[index]) % bins for index in range(3))
+    yield from product(*[sorted({(component+offset) % bins for offset in (-1,0,1)})
+                         for component in key])
 
 
 def _site_lookup(
@@ -750,7 +753,9 @@ def _site_lookup(
     *,
     tol: float,
 ) -> tuple[dict[tuple[int, tuple[int, int, int]], list[int]], int]:
-    bins = max(8, int(np.ceil(1.0 / max(float(tol), 1e-5))))
+    # Bucket width is at least the fractional search radius, so one neighbor
+    # on either side covers the physical ball, also in a skew lattice.
+    bins = max(1, int(np.floor(1.0 / max(float(tol), 1e-12))))
     lookup: dict[tuple[int, tuple[int, int, int]], list[int]] = {}
     for index, (position, atom_type) in enumerate(zip(positions, atom_types)):
         key = (int(atom_type), _position_bucket_key(position, bins))
@@ -765,31 +770,34 @@ def _match_transformed_sites(
     translation: np.ndarray,
     *,
     tol: float,
+    lattice=None,
     site_lookup: dict[tuple[int, tuple[int, int, int]], list[int]] | None = None,
     site_lookup_bins: int | None = None,
 ) -> list[int] | None:
     if site_lookup is None or site_lookup_bins is None:
-        site_lookup, site_lookup_bins = _site_lookup(positions, atom_types, tol=tol)
+        radius = tol if lattice is None else fractional_search_radius(lattice, tol)
+        site_lookup, site_lookup_bins = _site_lookup(positions, atom_types, tol=radius)
     mapping = [-1] * len(positions)
     used: set[int] = set()
     for source_index, (position, atom_type) in enumerate(zip(positions, atom_types)):
-        target_position = normalize_vector_to_zero(
+        target_position = np.mod(
             np.asarray(rotation, dtype=float) @ np.asarray(position, dtype=float)
-            + np.asarray(translation, dtype=float),
-            atol=tol,
-        ) % 1.0
+            + np.asarray(translation, dtype=float), 1.0)
         bucket_key = _position_bucket_key(target_position, site_lookup_bins)
-        matched_index = None
+        candidates = []
         for neighbor_key in _position_neighbor_keys(bucket_key, site_lookup_bins):
             for candidate_index in site_lookup.get((int(atom_type), neighbor_key), ()):
-                if candidate_index in used:
-                    continue
-                if _periodic_norm_inf(target_position - positions[candidate_index]) < tol:
-                    matched_index = candidate_index
-                    break
-            if matched_index is not None:
-                break
-        if matched_index is None:
+                distance = (_periodic_norm_inf(target_position-positions[candidate_index])
+                            if lattice is None else periodic_cartesian_distance(
+                                target_position, positions[candidate_index], lattice))
+                candidates.append((distance, candidate_index))
+        if not candidates:
+            return None
+        candidates.sort()
+        distance, matched_index = candidates[0]
+        roundoff = 64*np.finfo(float).eps*(1. if lattice is None else np.linalg.norm(lattice, ord=2))
+        if (distance > tol+roundoff or matched_index in used
+                or (len(candidates)>1 and candidates[1][0]-distance <= roundoff)):
             return None
         mapping[source_index] = matched_index
         used.add(matched_index)
@@ -810,18 +818,25 @@ def _collinear_pattern_context(
     positions = np.asarray(getattr(ordered_cell, "positions"), dtype=float)
     atom_types = [int(item) for item in getattr(ordered_cell, "atom_types")]
     axis = np.asarray(collinear_axis, dtype=float).reshape(3)
-    axis_norm = float(np.linalg.norm(axis))
-    if axis_norm < tol:
+    axis_scale = float(np.max(np.abs(axis)))
+    if not np.isfinite(axis_scale) or axis_scale == 0:
         return None
-    axis = axis / axis_norm
+    axis = axis / axis_scale
+    axis = axis / np.linalg.norm(axis)
     scalars = np.asarray(moments, dtype=float) @ axis
     signed_pattern = np.zeros(len(scalars), dtype=int)
-    signed_pattern[scalars > tol] = 1
-    signed_pattern[scalars < -tol] = -1
-    if not np.any(signed_pattern):
+    # These labels describe the supplied signed order, not whether a finite
+    # spin operation is numerically close to identity. Explicit zero stays zero.
+    present = np.linalg.norm(moments, axis=1) > MAGNETIC_PRESENCE_TOL
+    signed_pattern[present & (scalars > MAGNETIC_PRESENCE_TOL)] = 1
+    signed_pattern[present & (scalars < -MAGNETIC_PRESENCE_TOL)] = -1
+    unresolved = bool(np.any(present & (signed_pattern == 0)))
+    if not np.any(signed_pattern) and not unresolved:
         return None
     lattice = np.asarray(getattr(ordered_cell, "lattice_matrix"), dtype=float)
-    site_lookup, site_lookup_bins = _site_lookup(positions, atom_types, tol=tol)
+    position_tol = getattr(ordered_cell, "tol", DEFAULT_TOL).space
+    site_lookup, site_lookup_bins = _site_lookup(
+        positions, atom_types, tol=fractional_search_radius(lattice, position_tol))
     return {
         "positions": positions,
         "atom_types": atom_types,
@@ -830,6 +845,9 @@ def _collinear_pattern_context(
         "axis": axis,
         "signed_pattern": signed_pattern,
         "lattice": lattice,
+        "position_tol": position_tol,
+        "unresolved_projection": unresolved,
+        "mapping_cache": {},
     }
 
 
@@ -843,15 +861,16 @@ def _transformed_collinear_pattern(
 ) -> tuple[np.ndarray | None, str]:
     if context is None:
         return None, "not_evaluated_missing_collinear_pattern"
-    mapping = _match_transformed_sites(
-        context["positions"],
-        context["atom_types"],
-        rotation,
-        translation,
-        tol=tol,
-        site_lookup=context.get("site_lookup"),
-        site_lookup_bins=context.get("site_lookup_bins"),
-    )
+    if context.get("unresolved_projection"):
+        return None, "not_evaluated_unresolved_collinear_projection"
+    key = (np.asarray(rotation, dtype=float).tobytes(), np.asarray(translation, dtype=float).tobytes())
+    cache = context.setdefault("mapping_cache", {})
+    if key not in cache:
+        cache[key] = _match_transformed_sites(
+            context["positions"], context["atom_types"], rotation, translation,
+            tol=context.get("position_tol", tol), lattice=context.get("lattice"),
+            site_lookup=context.get("site_lookup"), site_lookup_bins=context.get("site_lookup_bins"))
+    mapping = cache[key]
     if mapping is None:
         return None, "not_evaluated_site_mapping_failed"
 
@@ -937,12 +956,10 @@ def _msg_compatible_collinear_branch(
     det_sign = 1 if np.linalg.det(rotation_cart) >= 0 else -1
     locked_spin = int(time_reversal) * det_sign * rotation_cart
     locked_axis = locked_spin @ axis
-    norm = float(np.linalg.norm(locked_axis))
-    if norm < tol:
-        return None
-    locked_axis = locked_axis / norm
     target_axis = int(spin_branch) * axis
-    return bool(np.allclose(locked_axis, target_axis, atol=tol, rtol=0.0))
+    residual = float(np.linalg.norm(locked_axis-target_axis))
+    roundoff = 64*np.finfo(float).eps*max(1., np.linalg.norm(locked_axis))
+    return bool(residual <= tol+roundoff)
 
 
 def _collinear_branch_relation_payloads(
@@ -1190,8 +1207,15 @@ def build_parent_standard_supercell_domain_coset_analysis(
     if parent_space_group_number is None or parent_hall_number is None:
         return None
 
+    if relation_layer == "soc_magnetic" and subgroup_time_branch_scope != "full":
+        return {
+            "status": "not_evaluated_incomplete_soc_axis_constraints",
+            "basis_setting": basis_setting,
+            "candidate_reversal_domains": [],
+        }
+
     axes = None
-    if relation_layer != "soc_magnetic":
+    if relation_layer != "soc_magnetic" or subgroup_time_branch_scope == "full":
         ordered_real_ops_for_axes = [
             (np.asarray(op[0], dtype=float), np.asarray(op[1], dtype=float))
             for op in ordered_magnetic_ops
@@ -1200,12 +1224,8 @@ def build_parent_standard_supercell_domain_coset_analysis(
             ordered_real_ops_for_axes, tol=tol,
             frame=None if ordered_cell is None else np.asarray(ordered_cell.lattice_matrix).T)
     if axes is None:
-        # The SOC branch can be time-branch scoped, so its operation list is not
-        # always a complete polar-axis constraint set.
-        axes = space_group_polar_axis_basis(ordered_space_group_number)
-    if axes is None:
         return {
-            "status": "not_evaluated_missing_ordered_space_group",
+            "status": "not_evaluated_missing_ordered_operation_constraints",
             "basis_setting": basis_setting,
             "candidate_reversal_domains": [],
         }

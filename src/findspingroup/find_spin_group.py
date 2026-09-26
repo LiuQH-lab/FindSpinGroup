@@ -3102,8 +3102,12 @@ def _build_g0std_soc_domain_reversal_coset_analysis(
     tol_cfg: Tolerances,
 ) -> dict:
     ordered_magnetic_ops = []
-    for op in g0std_ssg.msg_ops:
-        time_reversal = g0std_ssg.classify_magnetic_operation(op)
+    # G0std_ssg still carries Cartesian spin components. MSG coupling needs
+    # the oriented lattice frame; retain the original Cartesian axis below
+    # for comparison with ordered_cell.moments_cartesian.
+    oriented_ssg = _ossg_oriented_spin_frame_ssg(g0std_ssg, g0std_cell)
+    for op in oriented_ssg.msg_ops:
+        time_reversal = oriented_ssg.classify_magnetic_operation(op)
         if time_reversal is None:
             continue
         ordered_magnetic_ops.append(
