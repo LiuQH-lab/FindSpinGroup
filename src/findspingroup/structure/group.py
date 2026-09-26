@@ -739,9 +739,24 @@ def _normalize_metric(metric) -> np.ndarray | None:
     if metric is None:
         return None
     metric = np.asarray(metric, dtype=float)
-    if metric.shape != (3, 3):
-        raise ValueError("Real-space metric must be a 3x3 matrix.")
+    if metric.shape != (3, 3) or not np.all(np.isfinite(metric)):
+        raise ValueError("Real-space metric must be a finite 3x3 matrix.")
+    scale = float(np.max(np.abs(metric)))
+    if np.max(np.abs(metric - metric.T)) > 64*np.finfo(float).eps*scale:
+        raise ValueError("Real-space metric must be symmetric.")
+    metric = (metric + metric.T) / 2
+    eigenvalues = np.linalg.eigvalsh(metric)
+    if eigenvalues[0] <= np.finfo(float).eps*eigenvalues[-1]:
+        raise ValueError("Real-space metric must be positive definite and numerically nonsingular.")
     return metric
+
+
+@lru_cache(maxsize=256)
+def _metric_operator_frame(metric_key):
+    """B.T B = G; orthogonal choices of B give the same operator residual."""
+    metric = _normalize_metric(np.asarray(metric_key).reshape(3, 3))
+    basis = np.linalg.cholesky(metric).T
+    return basis, np.linalg.inv(basis)
 
 
 def _metric_cosine(left, right, *, metric=None, tol: float) -> float | None:
@@ -1592,25 +1607,44 @@ class SpinSpaceGroupOperation:
         else:
             return False
 
-    def magnetic_time_reversal(self, atol=1e-3):
+    def magnetic_time_reversal(self, atol=1e-3, *, metric=None):
+        """Test S = theta det(R) R in a shared oriented spin/real basis.
+
+        With a metric, ``atol`` bounds the largest physical unit-vector action
+        error. Without geometry it retains the dimensionless component budget;
+        that legacy algebraic mode does not claim frame-invariant accuracy.
+        No relative tolerance is added in either mode.
+        """
+        atol = float(atol)
+        if not np.isfinite(atol) or atol < 0:
+            raise ValueError("Magnetic-operation tolerance must be finite and nonnegative.")
         det_rotation = float(np.linalg.det(self.rotation))
-        if abs(det_rotation - 1.0) < atol:
+        if abs(det_rotation - 1.0) <= atol:
             effective_rotation = self.rotation
-        elif abs(det_rotation + 1.0) < atol:
+        elif abs(det_rotation + 1.0) <= atol:
             # Magnetic moments are axial vectors, so improper real-space
             # operations contribute an extra det(Rr) factor in the spin action.
             effective_rotation = -self.rotation
         else:
             return None
 
-        if np.allclose(self.spin_rotation, effective_rotation, atol=atol):
+        if metric is None:
+            def residual(target):
+                return float(np.max(np.abs(self.spin_rotation - target)))
+        else:
+            basis, inverse = _metric_operator_frame(tuple(np.asarray(metric, float).ravel()))
+
+            def residual(target):
+                return float(np.linalg.norm(basis @ (self.spin_rotation - target) @ inverse, ord=2))
+
+        if residual(effective_rotation) <= atol:
             return 1
-        if np.allclose(self.spin_rotation, -effective_rotation, atol=atol):
+        if residual(-effective_rotation) <= atol:
             return -1
         return None
 
-    def is_magnetic_space_group_operation(self, atol=1e-3):
-        return self.magnetic_time_reversal(atol=atol) is not None
+    def is_magnetic_space_group_operation(self, atol=1e-3, *, metric=None):
+        return self.magnetic_time_reversal(atol=atol, metric=metric) is not None
 
 class SpinPointGroupOperation:
     """
@@ -2808,7 +2842,7 @@ class SpinSpaceGroup:
         )
 
     def classify_magnetic_operation(self, op):
-        return op.magnetic_time_reversal(atol=self.tol)
+        return op.magnetic_time_reversal(atol=self.tol, metric=self.real_space_metric)
 
     def _collinear_spin_only_promotion_rotations(self):
         axis = self.collinear_axis
