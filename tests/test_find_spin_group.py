@@ -1603,11 +1603,22 @@ def test_tensor_output_display_snaps_common_sqrt_coefficients():
     assert relations == [
         r"\sigma_{xz} = -sqrt(3)/3\sigma_{yz} = -\sigma_{zx} = sqrt(3)/3\sigma_{zy}"
     ]
-    assert components == [
+    expected_yz = [
         ["0", "0", r"-sqrt(3)/3\sigma_{yz}"],
         ["0", "0", r"\sigma_{yz}"],
         [r"sqrt(3)/3\sigma_{yz}", r"-\sigma_{yz}", "0"],
     ]
+    expected_zy = [
+        ["0", "0", r"sqrt(3)/3\sigma_{zy}"],
+        ["0", "0", r"-\sigma_{zy}"],
+        [r"-sqrt(3)/3\sigma_{zy}", r"\sigma_{zy}", "0"],
+    ]
+    # Antisymmetry gives sigma_zy=-sigma_yz. Either free-parameter choice
+    # describes the same tensor; both must retain the exact radical display.
+    assert components in (expected_yz, expected_zy)
+    analytic = np.array([0, 0, -np.sqrt(3)/3, 0, 0, 1, np.sqrt(3)/3, -1, 0])[:, None]
+    basis = np.asarray(result.tensor_outputs["AHE_wSOC"]["nullspace_basis"])
+    np.testing.assert_allclose(basis @ np.linalg.pinv(basis), analytic @ np.linalg.pinv(analytic), atol=1e-10, rtol=0)
 
 
 def test_combine_parametric_solutions_keeps_multi_free_variable_ordering():
@@ -7609,7 +7620,7 @@ def test_msg_spin_polarizations_poscar_projection_behaves_consistently_across_re
 def test_space_tolerance_site_collapse_reports_semantic_error():
     magnetic_cell = (
         np.eye(3),
-        [np.array([0.0, 0.0, 0.0]), np.array([0.05, 0.0, 0.0])],
+        [np.array([0.0, 0.0, 0.0]), np.array([0.5, 0.0, 0.0])],
         [1, 1],
         [np.array([0.0, 0.0, 1.0]), np.array([0.0, 0.0, -1.0])],
     )
@@ -7617,7 +7628,7 @@ def test_space_tolerance_site_collapse_reports_semantic_error():
     with pytest.raises(SpaceToleranceDegeneracyError, match="space_tol"):
         change_cell_settings(
             magnetic_cell,
-            np.eye(3),
+            np.diag([2.0, 1.0, 1.0]),
             np.zeros(3),
             eps=0.1,
             moment_eps=0.02,

@@ -11,7 +11,7 @@ from spglib import standardize_cell as sc
 from findspingroup.core.tolerances import Tolerances, DEFAULT_TOL
 from findspingroup.utils.periodic import positions_within_cartesian_tolerance
 from findspingroup.version import __version__
-from findspingroup.utils.matrix_utils import normalize_vector_to_zero
+from findspingroup.utils.matrix_utils import normalize_vector_to_zero, reduce_computed_mod1
 
 MAGNETIC_PRESENCE_TOL = 1e-5
 
@@ -320,16 +320,15 @@ def _change_cell_settings_unimodular_fast_path(
     eps: float,
     moment_eps: float,
 ):
-    integer_transformation = _as_integer_unimodular_matrix(transformation_matrix, tol=max(eps, 1e-10))
+    integer_transformation = _as_integer_unimodular_matrix(transformation_matrix, tol=1e-10)
     if integer_transformation is None:
         return None
 
     old_positions = np.asarray(old_cell[1], dtype=float)
     old_types = list(old_cell[2])
-    if not _fractional_positions_unique_by_type(old_positions, old_types, eps=eps):
-        return None
-
-    transformation = integer_transformation.astype(float)
+    # The integer matrix certifies topology only; never replace the supplied
+    # affine map used by the paired SSG transformation.
+    transformation = np.asarray(transformation_matrix, dtype=float)
     origin_shift = np.asarray(origin_shift, dtype=float)
     inverse_transformation = np.linalg.inv(transformation)
     new_cell_lattice = np.linalg.inv(transformation).T @ np.asarray(old_cell[0], dtype=float)
@@ -351,7 +350,7 @@ def _change_cell_settings_unimodular_fast_path(
 
         for offset in itertools.product(*offset_options):
             offset = np.asarray(offset, dtype=float)
-            shift = offset @ inverse_transformation
+            shift = inverse_transformation @ offset
             rounded_shift = np.rint(shift).astype(int)
             if not np.allclose(shift, rounded_shift, atol=max(eps, 1e-10), rtol=0.0):
                 continue
@@ -369,27 +368,16 @@ def _change_cell_settings_unimodular_fast_path(
     new_cell_positions = []
     new_cell_types = []
     new_cell_moments = []
-    bins, neighbor_radius = _fractional_bucket_params(eps)
-    position_buckets: dict[tuple, list[int]] = {}
+    seen_source_atoms = set()
     for _shift, atom_index, position in candidate_entries:
-        atom_type = old_types[atom_index]
-        bucket_key = _fractional_bucket_key(position, bins)
-        duplicate_index = None
-        for neighbor_key in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius):
-            for candidate_index in position_buckets.get((atom_type, neighbor_key), ()):
-                if getNormInf(position, new_cell_positions[candidate_index]) < eps:
-                    duplicate_index = candidate_index
-                    break
-            if duplicate_index is not None:
-                break
-        if duplicate_index is not None:
-            if _moment_distance(old_moments[atom_index], new_cell_moments[duplicate_index]) > moment_eps:
-                return None
+        if atom_index in seen_source_atoms:
             continue
-        new_cell_positions.append(normalize_vector_to_zero(position, atol=1e-8))
-        new_cell_types.append(atom_type)
+        # A unimodular map is a known bijection: only different periodic
+        # images of this SAME input atom may be deduplicated here.
+        seen_source_atoms.add(atom_index)
+        new_cell_positions.append(reduce_computed_mod1(position))
+        new_cell_types.append(old_types[atom_index])
         new_cell_moments.append(old_moments[atom_index])
-        position_buckets.setdefault((atom_type, bucket_key), []).append(len(new_cell_positions) - 1)
 
     if len(new_cell_positions) != len(old_positions):
         return None
@@ -447,18 +435,38 @@ def find_cell_border(a, b, c):
     }
 
 def change_cell_settings(old_cell, transformation_matrix, origin_shift, eps=0.0001, moment_eps=None):
+    """Change fractional coordinates by x_new=P*x_old+p, without idealization.
+
+    Lattices contain row vectors, so L_new=P^-T*L_old. Cartesian moments are
+    unchanged. A unimodular reindexing preserves each input site's identity;
+    proximity of two distinct sites is not permission to merge them.
+
+    ``eps`` currently controls legacy general-path boundary/copy comparisons,
+    not eligibility for an integer matrix fast path. ``moment_eps`` controls
+    consistency when a contraction identifies different source sites.
+    """
+    eps = float(eps)
     moment_eps = eps if moment_eps is None else float(moment_eps)
-    """
-    given the old cell and the transformation matrix and origin shift
-    return the transformed cell
-
-
-    old_cell =: [lattice,positions,types,moments_in_lattice] or [lattice,positions,types]
-    transformation_matrix: 3x3 matrix old_cell @ transformation_matrix = new_cell
-    origin_shift: 3x1 vector
-    eps: tolerance for position comparison
-    return new_cell -> [lattice,positions,types,moments]
-    """
+    if not math.isfinite(eps) or eps <= 0 or not math.isfinite(moment_eps) or moment_eps < 0:
+        raise ValueError("Cell comparison tolerances must be finite; eps positive and moment_eps nonnegative.")
+    transformation_matrix = np.asarray(transformation_matrix, dtype=float)
+    origin_shift = np.asarray(origin_shift, dtype=float).reshape(-1)
+    if (transformation_matrix.shape != (3, 3) or origin_shift.shape != (3,)
+            or not np.all(np.isfinite(transformation_matrix)) or not np.all(np.isfinite(origin_shift))):
+        raise ValueError("Cell transformations require a finite 3x3 matrix and three-vector origin.")
+    condition = float(np.linalg.cond(transformation_matrix))
+    if not math.isfinite(condition) or condition * np.finfo(float).eps >= 1:
+        raise ValueError("Cell transformation is singular or numerically unresolved.")
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        expected_count_float = len(old_cell[1]) * abs(np.linalg.det(np.linalg.inv(transformation_matrix)))
+    if not math.isfinite(expected_count_float):
+        raise ValueError("Cell transformation does not have a finite resolved volume ratio.")
+    count_slack = max(1e-8, 64 * np.finfo(float).eps * condition * max(1., expected_count_float))
+    expected_count = round(expected_count_float)
+    if count_slack >= 0.1 or expected_count < 1 or abs(expected_count_float - expected_count) > count_slack:
+        raise SpaceToleranceDegeneracyError(
+            f"Cell transformation has non-integral or unresolved atom multiplicity: {expected_count_float:.12g}."
+        )
 
     if len(old_cell) == 3:
         mag = np.array([[0,0,0]]*len(old_cell[1]))
@@ -534,12 +542,12 @@ def change_cell_settings(old_cell, transformation_matrix, origin_shift, eps=0.00
         if duplicate:
             continue
         # if in (-eps,1+eps) range and not similar to existing positions
-        new_cell_positions.append(normalize_vector_to_zero(j,atol=1e-8))
+        new_cell_positions.append(reduce_computed_mod1(j))
         new_cell_types.append(atom_type)
         new_cell_moments.append(temp_cell_moments[i])
         position_buckets.setdefault((atom_type, bucket_key), []).append(len(new_cell_positions) - 1)
     # print(len(new_cell_positions),len(old_cell[1]),abs(np.linalg.det(transformation_matrix)))
-    if len(new_cell_positions) != round(len(old_cell[1])*abs(np.linalg.det(transformation_matrix))):
+    if len(new_cell_positions) != expected_count:
         raise SpaceToleranceDegeneracyError(
             "space_tol makes transformed atomic positions non-bijective for the "
             "current cell transformation; distinct sites collapse or the "

@@ -133,6 +133,16 @@ ideal symmetric structure. Both magnetic and nonmagnetic primitive-cell
 extraction request `no_idealize=True` from spglib. Subsequent cell-setting
 changes transform the cell and its operations together.
 
+For `x_new = P x_old + p`, the row-vector lattice is
+`L_new = P^-T L_old`. The integer-matrix fast path only certifies that the
+map is a unimodular reindexing; it does not replace the supplied `P` by its
+rounded matrix. It preserves each source atom's identity and removes only
+periodic copies of that same atom. Two distinct nearby sites must not be
+merged by a change of coordinates. Resolved small origin shifts are retained;
+the final modulo-one coordinate cleanup is limited to machine roundoff.
+The requested volume ratio must yield a numerically resolved integral atom
+count, otherwise the transform is rejected.
+
 Several separate operations should not be confused with crystal idealization:
 
 - Magnetic primitive reduction groups moment vectors within `mtol` and can
