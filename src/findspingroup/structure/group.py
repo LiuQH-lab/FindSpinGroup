@@ -766,47 +766,30 @@ def _metric_operator_frame(metric_key):
     return basis, np.linalg.inv(basis)
 
 
-def _metric_cosine(left, right, *, metric=None, tol: float) -> float | None:
-    left_axis = _canonicalize_axis_direction(left, tol=tol)
-    right_axis = _canonicalize_axis_direction(right, tol=tol)
-    if left_axis is None or right_axis is None:
-        return None
+def _collinear_axis_action_matches(rotation, axis, *, sign=1, metric=None, tol: float) -> bool:
+    """Test R*n=sign*n with a dimensionless physical unit-vector budget.
 
+    Promoting a real rotation into the continuous spin-only factor requires
+    that it actually fix the magnetic axis; closeness of two rotation axes is
+    not the same error norm. With no geometry, components are Euclidean.
+    Uniform lattice-unit or direction rescaling must not change this test.
+    """
+    if axis is None:
+        return False
+    direction = np.asarray(axis, dtype=float).reshape(3)
+    maximum = float(np.max(np.abs(direction)))
+    if not np.isfinite(maximum) or maximum == 0:
+        return False
+    direction = direction / maximum
     metric = _normalize_metric(metric)
-    if metric is None:
-        return float(np.dot(left_axis, right_axis))
-
-    left_norm_sq = float(left_axis @ metric @ left_axis)
-    right_norm_sq = float(right_axis @ metric @ right_axis)
-    if left_norm_sq < tol or right_norm_sq < tol:
-        return None
-    return float((left_axis @ metric @ right_axis) / np.sqrt(left_norm_sq * right_norm_sq))
-
-
-def _effective_rotation_axis(rotation, *, tol: float) -> np.ndarray | None:
-    effective_rotation = _effective_proper_rotation(rotation, tol=tol)
-    if effective_rotation is None:
-        return None
-    eigenvalues, eigenvectors = np.linalg.eig(effective_rotation)
-    matches = np.isclose(eigenvalues, 1.0, atol=tol)
-    if not np.any(matches):
-        return None
-    axis = eigenvectors[:, matches][:, 0].real
-    return _canonicalize_axis_direction(axis, tol=tol)
-
-
-def _axes_parallel(left, right, *, metric=None, tol: float) -> bool:
-    cosine = _metric_cosine(left, right, metric=metric, tol=tol)
-    if cosine is None:
-        return False
-    return abs(abs(cosine) - 1.0) < tol
-
-
-def _axes_perpendicular(left, right, *, metric=None, tol: float) -> bool:
-    cosine = _metric_cosine(left, right, metric=metric, tol=tol)
-    if cosine is None:
-        return False
-    return abs(cosine) < tol
+    frame = (np.eye(3) if metric is None
+             else np.linalg.cholesky(metric / np.max(np.abs(metric))).T)
+    physical = frame @ direction
+    action = frame @ (np.asarray(rotation, dtype=float) @ direction)
+    norm = np.linalg.norm(physical)
+    residual = np.linalg.norm(action - sign*physical) / norm
+    roundoff = 64*np.finfo(float).eps*max(1., np.linalg.norm(action)/norm)
+    return bool(residual <= tol + roundoff)
 
 class BrillouinZoneMatcher:
     def __init__(self, rules):
@@ -1871,9 +1854,10 @@ class SpinSpaceGroup:
             effective_rotation = _effective_proper_rotation(rotation, tol=self.tol)
             if effective_rotation is None:
                 continue
-            if not _axes_parallel(
-                _effective_rotation_axis(rotation, tol=self.tol),
+            if not _collinear_axis_action_matches(
+                effective_rotation,
                 axis,
+                metric=self.real_space_metric,
                 tol=self.tol,
             ):
                 continue
@@ -2863,9 +2847,10 @@ class SpinSpaceGroup:
             effective_rotation = _effective_proper_rotation(rotation, tol=self.tol)
             if effective_rotation is None:
                 continue
-            if not _axes_parallel(
-                _effective_rotation_axis(rotation, tol=self.tol),
+            if not _collinear_axis_action_matches(
+                effective_rotation,
                 axis,
+                metric=self.real_space_metric,
                 tol=self.tol,
             ):
                 continue
@@ -2920,10 +2905,10 @@ class SpinSpaceGroup:
             if info.get("hm_symbol", "").lstrip("-") != "2":
                 continue
 
-            effective_axis = _effective_rotation_axis(rotation, tol=self.tol)
-            if not _axes_perpendicular(
-                effective_axis,
+            if not _collinear_axis_action_matches(
+                effective_rotation,
                 axis,
+                sign=-1,
                 metric=self.real_space_metric,
                 tol=self.tol,
             ):
