@@ -9,7 +9,7 @@ from spglib import standardize_cell as sc
 
 
 from findspingroup.core.tolerances import Tolerances, DEFAULT_TOL
-from findspingroup.utils.periodic import positions_within_cartesian_tolerance
+from findspingroup.utils.periodic import positions_within_cartesian_tolerance, fractional_search_radius
 from findspingroup.version import __version__
 from findspingroup.utils.matrix_utils import normalize_vector_to_zero, reduce_computed_mod1
 
@@ -434,6 +434,48 @@ def find_cell_border(a, b, c):
         'z': (min(vz_values), max(vz_values))
     }
 
+
+def _validate_cell_translation_periods(positions, types, moments, lattice, periods, eps, moment_eps):
+    """Validate new unit translations against the original physical cell."""
+    bins, radius = _fractional_bucket_params(fractional_search_radius(lattice, eps))
+    buckets = {}
+    for i, (position, atom_type) in enumerate(zip(positions, types)):
+        buckets.setdefault((atom_type, _fractional_bucket_key(position, bins)), []).append(i)
+    permutations = []
+    for period in periods.T:
+        if np.allclose(period, np.rint(period), atol=1e-10, rtol=0):
+            permutations.append(np.arange(len(positions)))
+            continue
+        permutation = []
+        for i, position in enumerate(positions):
+            target = position + period
+            key = _fractional_bucket_key(target, bins)
+            candidates = {j for neighbor in _fractional_neighbor_keys(key, bins, radius)
+                          for j in buckets.get((types[i], neighbor), ())}
+            matches = [j for j in candidates if positions_within_cartesian_tolerance(
+                target, positions[j], lattice, eps)]
+            if len(matches) != 1:
+                reason = "ambiguous" if matches else "unmatched"
+                raise SpaceToleranceDegeneracyError(
+                    f"Target cell translation {period.tolist()} has {reason} site identity "
+                    f"for source atom {i} under space_tol={eps} (length units)."
+                )
+            j = matches[0]
+            distance = _moment_distance(moments[i], moments[j])
+            if not _within_closed_tolerance(distance, moment_eps):
+                raise SpaceToleranceDegeneracyError(
+                    "space_tol identifies a target-cell translation whose moments differ "
+                    f"beyond mtol: atoms {i},{j}, moment residual={distance}, mtol={moment_eps}."
+                )
+            permutation.append(j)
+        if len(set(permutation)) != len(positions):
+            raise SpaceToleranceDegeneracyError("Target cell translation is not a site bijection.")
+        permutations.append(np.asarray(permutation))
+    for left, right in itertools.combinations(permutations, 2):
+        if not np.array_equal(left[right], right[left]):
+            raise SpaceToleranceDegeneracyError("Target cell translations have noncommuting site permutations.")
+
+
 def change_cell_settings(old_cell, transformation_matrix, origin_shift, eps=0.0001, moment_eps=None):
     """Change fractional coordinates by x_new=P*x_old+p, without idealization.
 
@@ -441,9 +483,10 @@ def change_cell_settings(old_cell, transformation_matrix, origin_shift, eps=0.00
     unchanged. A unimodular reindexing preserves each input site's identity;
     proximity of two distinct sites is not permission to merge them.
 
-    ``eps`` currently controls legacy general-path boundary/copy comparisons,
-    not eligibility for an integer matrix fast path. ``moment_eps`` controls
-    consistency when a contraction identifies different source sites.
+    ``eps`` is a physical position tolerance in the lattice's length unit.
+    ``moment_eps`` is a Cartesian moment tolerance. These do not control matrix
+    integrality or allow merging distinct source atoms in a pure expansion.
+    A contraction must introduce valid, unambiguous source-cell translations.
     """
     eps = float(eps)
     moment_eps = eps if moment_eps is None else float(moment_eps)
@@ -486,95 +529,68 @@ def change_cell_settings(old_cell, transformation_matrix, origin_shift, eps=0.00
     if fast_result is not None:
         return fast_result
 
-    # temporary fix
-    transformation_matrix = np.linalg.inv(transformation_matrix)
-    origin_shift = - transformation_matrix @ origin_shift
-
-    #1.generate the temp cell that includes the new cell
-    if abs(np.linalg.det(transformation_matrix)) < 0.001:
-        raise ValueError("transformation matrix is not valid")
-    eps = eps / abs(np.linalg.det(transformation_matrix)) # adjust eps according to the volume change
-
-    border = find_cell_border(transformation_matrix.T[0], transformation_matrix.T[1],transformation_matrix.T[2])
-    x_range = (math.floor(border['x'][0]+origin_shift[0]),math.ceil(border['x'][1]+origin_shift[0]))
-    y_range = (math.floor(border['y'][0]+origin_shift[1]),math.ceil(border['y'][1]+origin_shift[1]))
-    z_range = (math.floor(border['z'][0]+origin_shift[2]),math.ceil(border['z'][1]+origin_shift[2]))
-
     inverse_transformation = np.linalg.inv(transformation_matrix)
-    transformed_origin_shift = inverse_transformation @ origin_shift
-    old_positions = np.asarray(old_cell[1], dtype=float)
+    old_lattice = np.asarray(old_cell[0], dtype=float)
+    old_positions = np.asarray(old_cell[1], dtype=float) % 1.0
     old_types = list(old_cell[2])
     old_moments = [np.asarray(item, dtype=float) for item in mag]
-    temp_new_cell_positions = []
-    temp_cell_types = []
-    temp_cell_moments = []
-    for x in range(x_range[0], x_range[1]+1):
-        for y in range(y_range[0], y_range[1]+1):
-            for z in range(z_range[0], z_range[1]+1):
-                shift = np.array([x, y, z], dtype=float)
-                translated_positions = old_positions + shift
-                transformed_positions = translated_positions @ inverse_transformation.T - transformed_origin_shift
-                temp_new_cell_positions.extend(np.asarray(item, dtype=float) for item in transformed_positions)
-                temp_cell_types.extend(old_types)
-                temp_cell_moments.extend(old_moments)
-    # print(x_range, y_range, z_range,origin_shift)
-    #2. collect the positions in the new cell
-    new_cell_lattice =  transformation_matrix.T @ old_cell[0] # row vector
+    pure_expansion = np.allclose(inverse_transformation, np.rint(inverse_transformation), atol=1e-10, rtol=0)
+    if not pure_expansion:
+        _validate_cell_translation_periods(old_positions, old_types, old_moments, old_lattice,
+                                           inverse_transformation, eps, moment_eps)
+
+    new_cell_lattice = inverse_transformation.T @ old_lattice
+    # These are conservative enumeration bounds, not coordinate snapping or
+    # duplicate-site acceptance. A length error projects differently on each axis.
+    boundary = np.maximum(eps * np.linalg.norm(np.linalg.inv(new_cell_lattice), axis=0), 1e-12)
+    old_origin = -inverse_transformation @ origin_shift
+    border = find_cell_border(*inverse_transformation.T)
+    ranges = [range(math.floor(border[axis][0] + old_origin[i]) - 1,
+                    math.ceil(border[axis][1] + old_origin[i]) + 1)
+              for i, axis in enumerate(("x", "y", "z"))]
     new_cell_positions = []
     new_cell_types = []
     new_cell_moments = []
-    bins, neighbor_radius = _fractional_bucket_params(eps)
+    radius = 1e-10 if pure_expansion else fractional_search_radius(new_cell_lattice, eps)
+    bins, neighbor_radius = _fractional_bucket_params(radius)
     position_buckets: dict[tuple, list[int]] = {}
-    # print(len(temp_new_cell_positions))
-    for i,j in enumerate(temp_new_cell_positions):
-        if not (-eps < j[0] < 1+eps and -eps < j[1] < 1+eps and -eps <= j[2] < 1+eps):
-            continue
-        bucket_key = _fractional_bucket_key(j, bins)
-        atom_type = temp_cell_types[i]
-        duplicate = False
-        for neighbor_key in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius):
-            for candidate_index in position_buckets.get((atom_type, neighbor_key), ()):
-                if getNormInf(j, new_cell_positions[candidate_index]) < eps:
-                    duplicate = True
-                    break
-            if duplicate:
-                break
-        if duplicate:
-            continue
-        # if in (-eps,1+eps) range and not similar to existing positions
-        new_cell_positions.append(reduce_computed_mod1(j))
-        new_cell_types.append(atom_type)
-        new_cell_moments.append(temp_cell_moments[i])
-        position_buckets.setdefault((atom_type, bucket_key), []).append(len(new_cell_positions) - 1)
-    # print(len(new_cell_positions),len(old_cell[1]),abs(np.linalg.det(transformation_matrix)))
+    source_images = []
+    for shift_tuple in itertools.product(*ranges):
+        shift = np.asarray(shift_tuple, dtype=float)
+        transformed = (old_positions + shift) @ transformation_matrix.T + origin_shift
+        for i, position in enumerate(transformed):
+            if not (np.all(position >= -boundary) and np.all(position < 1 + boundary)):
+                continue
+            group_key = i if pure_expansion else old_types[i]
+            bucket_key = _fractional_bucket_key(position, bins)
+            candidates = {j for neighbor in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius)
+                          for j in position_buckets.get((group_key, neighbor), ())}
+            if pure_expansion:
+                # Same source atom and same lattice coset, independent of eps.
+                matches = [j for j in candidates if np.allclose(
+                    transformation_matrix @ (shift - source_images[j]),
+                    np.rint(transformation_matrix @ (shift - source_images[j])), atol=1e-10, rtol=0)]
+            else:
+                matches = [j for j in candidates if positions_within_cartesian_tolerance(
+                    position, new_cell_positions[j], new_cell_lattice, eps)]
+            if len(matches) > 1:
+                raise SpaceToleranceDegeneracyError("Cell contraction has ambiguous output-site identity under space_tol.")
+            if matches:
+                j = matches[0]
+                if not _within_closed_tolerance(_moment_distance(old_moments[i], new_cell_moments[j]), moment_eps):
+                    raise SpaceToleranceDegeneracyError("space_tol identifies contracted sites whose moments differ beyond mtol.")
+                continue
+            new_cell_positions.append(reduce_computed_mod1(position))
+            new_cell_types.append(old_types[i])
+            new_cell_moments.append(old_moments[i])
+            source_images.append(shift)
+            position_buckets.setdefault((group_key, bucket_key), []).append(len(new_cell_positions) - 1)
     if len(new_cell_positions) != expected_count:
         raise SpaceToleranceDegeneracyError(
             "space_tol makes transformed atomic positions non-bijective for the "
             "current cell transformation; distinct sites collapse or the "
             "transformation is not valid under this tolerance."
         )
-
-    mul_num_list = [0]*len(new_cell_positions)
-    for i,p1 in enumerate(temp_new_cell_positions):
-        atom_type = temp_cell_types[i]
-        bucket_key = _fractional_bucket_key(p1, bins)
-        for neighbor_key in _fractional_neighbor_keys(bucket_key, bins, neighbor_radius):
-            for j in position_buckets.get((atom_type, neighbor_key), ()):
-                p2 = new_cell_positions[j]
-                if getNormInf(p1 % 1, p2) < eps:
-                    # print(p1,p2)
-                    if _moment_distance(temp_cell_moments[i], new_cell_moments[j]) > moment_eps:
-                        raise SpaceToleranceDegeneracyError(
-                            "space_tol makes two transformed atomic sites position-equivalent "
-                            "while their magnetic moments differ beyond mtol; "
-                            f"p:{temp_new_cell_positions[i]} moments:{temp_cell_moments[i]} "
-                            f"and p:{new_cell_positions[j]} moments:{new_cell_moments[j]}."
-                        )
-                    mul_num_list[j] +=1
-                    break
-            else:
-                continue
-            break
 
     return new_cell_lattice, new_cell_positions, new_cell_types, new_cell_moments
 
@@ -973,12 +989,13 @@ class CrystalCell:
             CrystalCell: A new CrystalCell instance with the transformed cell.
         """
         if self.moments is None:
-            new_cell = change_cell_settings(self.to_spglib(mag=False), matrix, shift)
+            new_cell = change_cell_settings(self.to_spglib(mag=False), matrix, shift, eps=self.tol.space)
         else:
             new_cell = change_cell_settings(
                 self.to_spglib(mag=True),
                 matrix,
                 shift,
+                eps=self.tol.space,
                 moment_eps=self.tol.moment,
             )
 

@@ -141,7 +141,19 @@ periodic copies of that same atom. Two distinct nearby sites must not be
 merged by a change of coordinates. Resolved small origin shifts are retained;
 the final modulo-one coordinate cleanup is limited to machine roundoff.
 The requested volume ratio must yield a numerically resolved integral atom
-count, otherwise the transform is rejected.
+count, otherwise the transform is rejected. That count is necessary, not
+sufficient: for contractions or mixed cells, the new unit translations must
+induce compatible, unambiguous site permutations of the original structure.
+The permutations must be bijective and commute. Inconsistent moments or an
+ambiguous site identity produce diagnostics, not a substitute cell basis.
+
+General cell-transform position comparisons use periodic Cartesian distances
+in the lattice's length unit (`eps` in `change_cell_settings`), with a separate
+Cartesian moment-vector budget (`moment_eps`). `CrystalCell.transform` supplies
+its `Tolerances.space` and `Tolerances.moment`. A volume determinant does not
+scale either error budget. Pure expansions retain source atom identities and
+identify periodic copies by lattice cosets, even when distinct input sites are
+closer than the physical matching tolerance.
 
 Several separate operations should not be confused with crystal idealization:
 
