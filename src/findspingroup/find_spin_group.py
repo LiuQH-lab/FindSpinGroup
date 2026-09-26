@@ -146,6 +146,7 @@ def _safe_classify_spin_texture_config(
     atol: float = 1e-10,
     rtol: float = 1e-8,
     zero_tol: float = 1e-8,
+    validation_operations=None,
 ) -> dict | None:
     try:
         return classify_public_spin_texture_config(
@@ -159,6 +160,7 @@ def _safe_classify_spin_texture_config(
             atol=atol,
             rtol=rtol,
             zero_tol=zero_tol,
+            validation_operations=validation_operations,
         )
     except Exception as exc:
         warnings.warn(
@@ -379,11 +381,18 @@ def _classify_quasi2d_spin_texture_config(
             zero_tol=max(1e-8, min(float(calibration_atol_limit), 1e-4)),
         )
         if relaxed is not None and relaxed.get("spin_texture_type") != "forbidden":
+            strict_result = deepcopy(payload)
+            selected_result = deepcopy(relaxed)
             relaxed["calibration"] = {
                 "status": "tolerance_relaxed_without_reference",
                 "strict_key": list(_spin_texture_config_classification_key(payload) or []),
                 "atol": float(calibration_atol_limit),
                 "boundary_atol": float(calibration_atol_limit),
+                "strict_primary": strict_result,
+                "strict_full": deepcopy(strict_result),
+                "reference": None,
+                "selected": selected_result,
+                "reason": "explicit bounded quasi-2D recovery, verified against the complete in-plane operation set",
             }
             payload = relaxed
     payload["basis_setting"] = "quasi2d_ossg_unit_cartesian_in_plane"
@@ -501,47 +510,67 @@ def _classify_spin_texture_config_with_reference(
     fallback_operations=None,
     fallback_source: str | None = None,
 ) -> dict | None:
+    def valid(payload):
+        return isinstance(payload, dict) and (payload.get("constraint_validation") or {}).get("passed", True)
+
+    def finish(payload, calibration=None):
+        if not valid(payload):
+            return None
+        output = deepcopy(payload)
+        for key in ("allowed_orders", "engine", "convention"):
+            output.pop(key, None)
+        output["basis_setting"] = "ossg_unit_cartesian"
+        if calibration is not None:
+            calibration = deepcopy(calibration)
+            calibration["strict_primary"] = deepcopy(primary)
+            calibration["strict_full"] = deepcopy(fallback)
+            calibration["reference"] = (None if reference is None else
+                                          {k: deepcopy(v) for k, v in reference.items() if k != "id"})
+            calibration["selected"] = deepcopy(output)
+            output["calibration"] = calibration
+        return output
+
     reference_key = _spin_texture_config_classification_key(reference)
+    fallback = None
     primary = _safe_classify_spin_texture_config(
         primary_operations,
         source=primary_source,
+        include_diagnostics=True,
+        validation_operations=fallback_operations,
         basis_orders_through=spin_texture_basis_max_order,
     )
-    if reference_key is None:
-        if primary is not None:
-            primary["basis_setting"] = "ossg_unit_cartesian"
-        return primary
-    if _spin_texture_config_classification_key(primary) == reference_key:
-        primary["basis_setting"] = "ossg_unit_cartesian"
-        return primary
+    if valid(primary) and (reference_key is None or _spin_texture_config_classification_key(primary) == reference_key):
+        return finish(primary)
 
-    strict = primary
+    strict = primary if valid(primary) else None
     strict_source = primary_source
     calibration_operations = primary_operations
     if fallback_operations is not None and fallback_source is not None:
         fallback = _safe_classify_spin_texture_config(
             fallback_operations,
             source=fallback_source,
+            include_diagnostics=True,
             basis_orders_through=spin_texture_basis_max_order,
         )
-        if _spin_texture_config_classification_key(fallback) == reference_key:
-            fallback["basis_setting"] = "ossg_unit_cartesian"
-            fallback["calibration"] = {
-                "status": "matched_reference_with_full_operations",
-                "reference_key": list(reference_key),
+        if valid(fallback) and (reference_key is None or _spin_texture_config_classification_key(fallback) == reference_key):
+            return finish(fallback, {
+                "status": ("validated_with_full_operations" if reference_key is None
+                           else "matched_reference_with_full_operations"),
+                "reference_key": list(reference_key or []),
                 "strict_key": list(_spin_texture_config_classification_key(primary) or []),
-            }
-            return fallback
-        strict = fallback if fallback is not None else strict
+                "reason": "primary classification or full-constraint validation did not satisfy the contract",
+            })
+        strict = fallback if valid(fallback) else strict
         strict_source = fallback_source
         calibration_operations = fallback_operations
 
-    diagnostics = _safe_classify_spin_texture_config(
-        calibration_operations,
-        source=strict_source,
-        include_diagnostics=True,
-        basis_orders_through=spin_texture_basis_max_order,
-    )
+    if reference_key is None:
+        warnings.warn("Unable to validate a spin-texture basis against the full operation set.", RuntimeWarning)
+        return None
+
+    # The strict result already contains its singular diagnostics; do not run
+    # the same full-order search again just to choose a bounded recovery budget.
+    diagnostics = fallback if fallback is not None else primary
     candidate_atols = []
     candidate = _reference_calibration_atol(
         reference,
@@ -562,34 +591,36 @@ def _classify_spin_texture_config_with_reference(
         calibrated = _safe_classify_spin_texture_config(
             calibration_operations,
             source=strict_source,
+            include_diagnostics=True,
             basis_orders_through=spin_texture_basis_max_order,
             atol=float(atol),
             zero_tol=max(1e-8, min(float(atol), 1e-4)),
         )
         calibrated_key = _spin_texture_config_classification_key(calibrated)
-        attempts.append({"atol": float(atol), "key": list(calibrated_key or [])})
-        if calibrated_key == reference_key:
-            calibrated["basis_setting"] = "ossg_unit_cartesian"
-            calibrated["calibration"] = {
+        attempts.append({"atol": float(atol), "key": list(calibrated_key or []),
+                         "result": deepcopy(calibrated)})
+        if valid(calibrated) and calibrated_key == reference_key:
+            return finish(calibrated, {
                 "status": "calibrated_to_reference",
                 "reference_key": list(reference_key),
                 "strict_key": list(_spin_texture_config_classification_key(strict) or []),
                 "atol": float(atol),
                 "boundary_atol": float(calibration_atol_limit),
                 "attempts": attempts,
-            }
-            return calibrated
+                "reason": "bounded numerical coefficient recovery, verified against all operations",
+            })
 
     if strict is not None:
-        strict["basis_setting"] = "ossg_unit_cartesian"
-        strict["calibration"] = {
+        return finish(strict, {
             "status": "reference_mismatch",
             "reference_key": list(reference_key),
             "strict_key": list(_spin_texture_config_classification_key(strict) or []),
             "boundary_atol": float(calibration_atol_limit),
             "attempts": attempts,
-        }
-    return strict
+            "reason": "no validated reference match within the explicit recovery bound",
+        })
+    warnings.warn("No valid strict or bounded spin-texture result satisfies the full constraints.", RuntimeWarning)
+    return None
 
 
 def _spin_texture_config_from_ossg_convention(
@@ -639,6 +670,7 @@ def _spin_texture_config_from_ossg_convention(
         soc_generator_pairs,
         source="ossg_unit_cartesian_msg_ops",
         basis_orders_through=spin_texture_basis_max_order,
+        validation_operations=full_soc_pairs,
     )
     if soc is None and len(soc_generator_pairs) < len(full_soc_pairs):
         soc = _safe_classify_spin_texture_config(

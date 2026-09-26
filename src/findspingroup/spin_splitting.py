@@ -6,6 +6,7 @@ from fractions import Fraction
 from typing import Any, Iterable, Sequence
 
 import numpy as np
+from findspingroup.utils.matrix_utils import evaluate_numeric_expression
 
 
 SIGMA_NAMES = ("sigma_x", "sigma_y", "sigma_z")
@@ -88,23 +89,26 @@ def _latex_radical_token(token: str) -> str:
     return token
 
 
-def _latex_numeric_value(value: float, *, zero_tol: float = 1e-8) -> str | None:
-    if abs(value) < zero_tol:
+def _latex_numeric_value(value: float, *, zero_tol: float = 0.) -> str | None:
+    # The ASCII coefficient has already been accepted/formatted. LaTeX is a
+    # representation change, not another independent numerical simplification.
+    budget = max(zero_tol, 16*np.finfo(float).eps*max(1., abs(value)))
+    if value == 0 or abs(value) < zero_tol:
         return "0"
     rounded = round(value)
-    if abs(value - rounded) < zero_tol:
+    if rounded != 0 and abs(value - rounded) <= budget:
         return str(int(rounded))
 
     rational = Fraction(float(value)).limit_denominator(24)
     rational_value = rational.numerator / rational.denominator
-    if abs(value - rational_value) < max(zero_tol, 1e-9):
+    if rational.numerator != 0 and abs(value - rational_value) <= budget:
         if rational.denominator == 1:
             return str(rational.numerator)
         return rf"\frac{{{rational.numerator}}}{{{rational.denominator}}}"
 
     radical = radical_text(
         value,
-        zero_tol=max(zero_tol, 1e-8),
+        zero_tol=budget,
         max_radicand=12,
         max_denominator=24,
         max_multiplier=12,
@@ -138,7 +142,13 @@ def _latex_coefficient_token(token: str) -> str:
         pass
     else:
         numeric_latex = _latex_numeric_value(numeric)
-        return numeric_latex if numeric_latex is not None else token
+        if numeric_latex is not None:
+            return numeric_latex
+        if "e" in token.lower():
+            mantissa, exponent = token.lower().split("e")
+            factor = "" if float(mantissa) == 1 else rf"{mantissa}\times "
+            return rf"{factor}10^{{{int(exponent)}}}"
+        return token
 
     if "/" in token:
         numerator, denominator = token.split("/", 1)
@@ -571,6 +581,7 @@ class SpinSplittingResult:
     allowed_orders: list[OrderDiagnostics]
     engine: str = "numeric-coefficient-svd"
     convention: str = "d(Q k) = S d(k)"
+    constraint_validation: dict[str, Any] | None = None
 
 
 def as_float_3x3(value: Any, *, name: str) -> np.ndarray:
@@ -727,13 +738,14 @@ def unique_operation_pairs(
     *,
     decimals: int,
 ) -> list[OperationPair]:
-    seen: set[tuple[tuple[float, ...], tuple[float, ...]]] = set()
+    buckets: dict[tuple, list[OperationPair]] = {}
     out: list[OperationPair] = []
     for pair in pairs:
         key = (matrix_key(pair.Q, decimals=decimals), matrix_key(pair.S, decimals=decimals))
-        if key in seen:
+        candidates = buckets.setdefault(key, [])
+        if any(np.array_equal(pair.Q, old.Q) and np.array_equal(pair.S, old.S) for old in candidates):
             continue
-        seen.add(key)
+        candidates.append(pair)
         out.append(pair)
     return out
 
@@ -811,7 +823,8 @@ def svd_nullspace(
     return rank, [float(value) for value in singular_values], threshold, min_nonzero, max_zero, confidence, basis
 
 
-def _canonical_basis_vector(vector: np.ndarray, *, zero_tol: float) -> np.ndarray:
+def _canonical_basis_vector(vector: np.ndarray, *, zero_tol: float,
+                            relative_zero_tol: float = CANONICAL_BASIS_RELATIVE_ZERO_TOL) -> np.ndarray:
     vector = np.asarray(vector, dtype=np.float64).copy()
     if vector.size == 0:
         return vector
@@ -820,7 +833,7 @@ def _canonical_basis_vector(vector: np.ndarray, *, zero_tol: float) -> np.ndarra
         return np.zeros_like(vector)
 
     vector = vector / max_abs
-    vector[np.abs(vector) < max(zero_tol, CANONICAL_BASIS_RELATIVE_ZERO_TOL)] = 0.0
+    vector[np.abs(vector) < max(zero_tol, relative_zero_tol)] = 0.0
     first_index = next(
         (index for index, value in enumerate(vector) if abs(value) > zero_tol),
         None,
@@ -830,11 +843,12 @@ def _canonical_basis_vector(vector: np.ndarray, *, zero_tol: float) -> np.ndarra
     return vector
 
 
-def canonicalize_nullspace(basis: np.ndarray, *, zero_tol: float) -> list[np.ndarray]:
+def canonicalize_nullspace(basis: np.ndarray, *, zero_tol: float,
+                          relative_zero_tol: float = CANONICAL_BASIS_RELATIVE_ZERO_TOL) -> list[np.ndarray]:
     if basis.shape[1] == 0:
         return []
     if basis.shape[1] == 1:
-        return [_canonical_basis_vector(basis[:, 0], zero_tol=zero_tol)]
+        return [_canonical_basis_vector(basis[:, 0], zero_tol=zero_tol, relative_zero_tol=relative_zero_tol)]
 
     selected: list[int] = []
     current = np.zeros((0, basis.shape[1]), dtype=np.float64)
@@ -847,7 +861,7 @@ def canonicalize_nullspace(basis: np.ndarray, *, zero_tol: float) -> list[np.nda
                 break
     if len(selected) != basis.shape[1]:
         return [
-            _canonical_basis_vector(basis[:, index], zero_tol=zero_tol)
+            _canonical_basis_vector(basis[:, index], zero_tol=zero_tol, relative_zero_tol=relative_zero_tol)
             for index in range(basis.shape[1])
         ]
 
@@ -855,7 +869,7 @@ def canonicalize_nullspace(basis: np.ndarray, *, zero_tol: float) -> list[np.nda
     canonical = basis @ np.linalg.inv(pivot_block)
     out: list[np.ndarray] = []
     for index in range(canonical.shape[1]):
-        out.append(_canonical_basis_vector(canonical[:, index], zero_tol=zero_tol))
+        out.append(_canonical_basis_vector(canonical[:, index], zero_tol=zero_tol, relative_zero_tol=relative_zero_tol))
     return out
 
 
@@ -916,6 +930,7 @@ def format_float(
     rational_max_denominator: int = 24,
     radical_max_radicand: int = 12,
     radical_max_multiplier: int = 12,
+    decimal_precision: int = 10,
 ) -> str:
     if abs(value) < zero_tol:
         return "0"
@@ -934,7 +949,7 @@ def format_float(
     )
     if radical is not None:
         return radical
-    return f"{value:.10g}"
+    return f"{value:.{decimal_precision}g}"
 
 
 def basis_vector_expression_numeric(
@@ -946,6 +961,8 @@ def basis_vector_expression_numeric(
     rational_max_denominator: int = 24,
     radical_max_radicand: int = 12,
     radical_max_multiplier: int = 12,
+    decimal_precision: int = 10,
+    coefficient_sink: np.ndarray | None = None,
 ) -> str:
     nm = len(monomials)
     pieces: list[str] = []
@@ -961,7 +978,10 @@ def basis_vector_expression_numeric(
                 rational_max_denominator=rational_max_denominator,
                 radical_max_radicand=radical_max_radicand,
                 radical_max_multiplier=radical_max_multiplier,
+                decimal_precision=decimal_precision,
             )
+            if coefficient_sink is not None:
+                coefficient_sink[component * nm + mono_index] = evaluate_numeric_expression(coeff_text)
             if mono == "1":
                 scalar = coeff_text
             elif coeff_text == "1":
@@ -1012,10 +1032,15 @@ def _basis_payload_for_order(
     radical_max_radicand: int,
     radical_max_multiplier: int,
     basis_remainder_order: int | str | None,
+    coefficient_sink: dict | None = None,
+    relative_zero_tol: float = CANONICAL_BASIS_RELATIVE_ZERO_TOL,
+    decimal_precision: int = 10,
 ) -> dict[str, Any]:
-    canonical = canonicalize_nullspace(basis, zero_tol=zero_tol)
+    canonical = canonicalize_nullspace(basis, zero_tol=zero_tol, relative_zero_tol=relative_zero_tol)
     expressions: list[str] = []
+    rendered_vectors = []
     for index, vector in enumerate(canonical):
+        rendered = np.zeros_like(vector) if coefficient_sink is not None else None
         expression = basis_vector_expression_numeric(
             vector,
             monomials,
@@ -1024,7 +1049,11 @@ def _basis_payload_for_order(
             rational_max_denominator=rational_max_denominator,
             radical_max_radicand=radical_max_radicand,
             radical_max_multiplier=radical_max_multiplier,
+            decimal_precision=decimal_precision,
+            coefficient_sink=rendered,
         )
+        if rendered is not None:
+            rendered_vectors.append(rendered)
         expressions.append(f"C{index + 1}*({expression})")
     basis_vectors = combine_spin_texture_basis(expressions)
     expressions = combine_spin_texture_basis_span(basis_vectors)
@@ -1032,6 +1061,8 @@ def _basis_payload_for_order(
     remainder_order = _resolve_basis_remainder_order(order, basis_remainder_order)
     basis_vectors_latex = spin_texture_basis_latex(basis_vectors)
     expressions_latex = spin_texture_basis_latex(expressions)
+    if coefficient_sink is not None:
+        coefficient_sink["basis"] = np.column_stack(rendered_vectors)
     return {
         "order": int(order),
         "spin_texture_type": spin_texture_type_for_order(order),
@@ -1059,6 +1090,47 @@ def _empty_basis_payload_for_order(order: int) -> dict[str, Any]:
     }
 
 
+def _coefficient_span(matrix):
+    if not matrix.size:
+        return np.zeros((matrix.shape[0], 0))
+    u, singular, _ = np.linalg.svd(matrix, full_matrices=False)
+    threshold = 64*np.finfo(float).eps*max(matrix.shape)*singular[0]
+    return u[:, singular > threshold]
+
+
+def _validate_coefficient_bases(matrix, raw, rendered, *, threshold, order):
+    """Check coefficient-space kernels, not physical magnetic moments.
+
+    Rows are complete operation constraint blocks in the declared monomial
+    basis. Reparameterizing free coefficients cannot change the tested span.
+    """
+    raw_q, rendered_q = _coefficient_span(raw), _coefficient_span(rendered)
+    size = matrix.shape[1]
+    blocks = matrix.reshape(-1, size, size)
+    def residual(q):
+        if not q.shape[1]:
+            return 0.
+        return max((float(np.linalg.norm(block@q, ord=2)) for block in blocks), default=0.)
+    raw_error, rendered_error = residual(raw_q), residual(rendered_q)
+    roundoff = 64*np.finfo(float).eps*max(1., max((float(np.linalg.norm(b)) for b in blocks), default=0.))
+    raw_passed = raw_error <= threshold+roundoff
+    return {
+        "passed": bool(raw_passed and rendered_q.shape[1] == raw_q.shape[1]
+                       and rendered_error <= threshold+roundoff),
+        "raw_passed": bool(raw_passed),
+        "norm": "maximum_coefficient_unit_vector_action_error_per_operation",
+        "order": int(order),
+        "raw_dimension": raw_q.shape[1],
+        "rendered_dimension": rendered_q.shape[1],
+        "raw_max_operation_residual": raw_error,
+        "rendered_max_operation_residual": rendered_error,
+        "threshold": float(threshold),
+        "roundoff_allowance": float(roundoff),
+        "operation_constraint_blocks": len(blocks),
+        "presentation_refined": False,
+    }
+
+
 def classify_spin_splitting_numeric(
     operations: Iterable[OperationPair | tuple[Any, Any] | dict[str, Any]],
     *,
@@ -1075,8 +1147,17 @@ def classify_spin_splitting_numeric(
     rational_max_denominator: int = 24,
     radical_max_radicand: int = 12,
     radical_max_multiplier: int = 12,
+    validation_operations=None,
 ) -> SpinSplittingResult:
+    for name, value in (("atol", atol), ("rtol", rtol), ("zero_tol", zero_tol)):
+        if not math.isfinite(float(value)) or value < 0:
+            raise ValueError(f"{name} must be finite and nonnegative")
+    # Keep supplied constraint coefficients; only the SVD decides numerical
+    # rank. Display cleanup is separate and must pass full-operation validation.
+    computational_zero_tol = 0.
     pairs = normalize_operations(operations, key_decimals=key_decimals)
+    validation_pairs = (None if validation_operations is None
+                        else normalize_operations(validation_operations, key_decimals=key_decimals))
     if k_dimension is None:
         k_dimension = int(pairs[0].Q.shape[0]) if pairs else 3
     if k_dimension <= 0:
@@ -1095,12 +1176,21 @@ def classify_spin_splitting_numeric(
     allowed_orders: list[OrderDiagnostics] = []
     basis_by_order: list[dict[str, Any]] = []
     leading_payload: dict[str, Any] | None = None
+    leading_validation = None
+    validation_history = []
+
+    def combined_validation():
+        validation = dict(leading_validation)
+        validation["passed"] = all(item["passed"] for item in validation_history)
+        if basis_orders_through is not None:
+            validation["orders"] = list(validation_history)
+        return validation
     for order in range(max_order + 1):
         matrix, monomials = constraint_matrix_for_order_numeric(
             pairs,
             order,
             k_dimension=k_dimension,
-            zero_tol=zero_tol,
+            zero_tol=computational_zero_tol,
             key_decimals=key_decimals,
         )
         rank, singular_values, threshold, min_nonzero, max_zero, confidence, basis = svd_nullspace(
@@ -1131,6 +1221,7 @@ def classify_spin_splitting_numeric(
             )
         )
         if nullity:
+            rendered = {}
             order_payload = _basis_payload_for_order(
                 order=order,
                 basis=basis,
@@ -1141,11 +1232,34 @@ def classify_spin_splitting_numeric(
                 radical_max_radicand=radical_max_radicand,
                 radical_max_multiplier=radical_max_multiplier,
                 basis_remainder_order=basis_remainder_order,
+                coefficient_sink=rendered,
             )
+            validation_matrix = matrix if validation_pairs is None else constraint_matrix_for_order_numeric(
+                validation_pairs, order, k_dimension=k_dimension, zero_tol=computational_zero_tol,
+                key_decimals=key_decimals)[0]
+            validation = _validate_coefficient_bases(
+                validation_matrix, basis, rendered["basis"], threshold=threshold, order=order)
+            if validation["raw_passed"] and not validation["passed"]:
+                # Refine presentation once, never the accepted rank or operation
+                # set. The original display cutoff is not an error budget.
+                precise_zero = min(zero_tol, max(np.finfo(float).eps, threshold*1e-3))
+                order_payload = _basis_payload_for_order(
+                    order=order, basis=basis, monomials=monomials, k_names=k_names,
+                    zero_tol=precise_zero, relative_zero_tol=precise_zero, decimal_precision=15,
+                    rational_max_denominator=rational_max_denominator,
+                    radical_max_radicand=radical_max_radicand,
+                    radical_max_multiplier=radical_max_multiplier,
+                    basis_remainder_order=basis_remainder_order, coefficient_sink=rendered)
+                validation = _validate_coefficient_bases(
+                    validation_matrix, basis, rendered["basis"], threshold=threshold, order=order)
+                validation["presentation_refined"] = True
+            validation_history.append(validation)
             if basis_orders_through is not None and order <= int(basis_orders_through):
+                order_payload["constraint_validation"] = validation
                 basis_by_order.append(order_payload)
             if leading_payload is None:
                 leading_payload = order_payload
+                leading_validation = validation
             if basis_orders_through is None or order >= int(basis_orders_through):
                 return SpinSplittingResult(
                     order=leading_payload["order"],
@@ -1161,6 +1275,7 @@ def classify_spin_splitting_numeric(
                         "momentum_space_spin_configuration"
                     ],
                     allowed_orders=allowed_orders,
+                    constraint_validation=combined_validation(),
                 )
         elif basis_orders_through is not None and order <= int(basis_orders_through):
             basis_by_order.append(_empty_basis_payload_for_order(order))
@@ -1179,6 +1294,7 @@ def classify_spin_splitting_numeric(
                 "momentum_space_spin_configuration"
             ],
             allowed_orders=allowed_orders,
+            constraint_validation=combined_validation(),
         )
 
     return SpinSplittingResult(
@@ -1193,6 +1309,11 @@ def classify_spin_splitting_numeric(
         spin_rank=0,
         momentum_space_spin_configuration="zero",
         allowed_orders=allowed_orders,
+        constraint_validation={
+            "passed": True,
+            "status": "no_allowed_basis_through_search_order",
+            "max_order": int(max_order),
+        },
     )
 
 
@@ -1234,6 +1355,8 @@ def result_to_jsonable(result: SpinSplittingResult, *, include_diagnostics: bool
         payload.pop("convention", None)
     if payload.get("basis_by_order") is None:
         payload.pop("basis_by_order", None)
+    if payload.get("constraint_validation") is None:
+        payload.pop("constraint_validation", None)
     if "basis_latex" not in payload:
         payload["basis_latex"] = spin_texture_basis_latex(payload.get("basis"))
     return payload
@@ -1305,6 +1428,7 @@ def classify_public_spin_texture_config(
     rtol: float = 1e-8,
     atol: float = 1e-10,
     zero_tol: float = 1e-8,
+    validation_operations=None,
 ) -> dict[str, Any]:
     effective_max_order = int(basis_orders_through) if basis_orders_through is not None else max_order
     result = classify_spin_splitting_numeric(
@@ -1317,8 +1441,11 @@ def classify_public_spin_texture_config(
         rtol=rtol,
         atol=atol,
         zero_tol=zero_tol,
+        validation_operations=validation_operations,
     )
     payload = result_to_jsonable(result, include_diagnostics=include_diagnostics)
+    if not include_diagnostics and not (payload.get("constraint_validation") or {}).get("passed", True):
+        raise ValueError(f"Spin-texture basis failed full-operation validation: {payload['constraint_validation']}")
     payload["source"] = source
     payload["classifier_tolerances"] = {
         "rtol": float(rtol),
