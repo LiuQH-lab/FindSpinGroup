@@ -714,7 +714,12 @@ def test_pure_actual_basis_scif_write_and_read_split_is_explicit_for_0427():
     coeff = np.asarray(moments[idx], dtype=float)
     actual_cart = actual_basis @ coeff
     canonical_cart = canonical_basis @ coeff
-    internal_cart = np.asarray(parsed_cell.moments_cartesian[idx], dtype=float)
+    # CrystalCell sorts its sites, including by moment magnitude. Match the
+    # physical site instead of assuming the parser's row index survives.
+    parsed_cell_idx = next(i for i, position in enumerate(parsed_cell.positions)
+                           if np.allclose(position, positions[idx], atol=1e-12, rtol=0)
+                           and parsed_cell.elements[i] == elements[idx])
+    internal_cart = np.asarray(parsed_cell.moments_cartesian[parsed_cell_idx], dtype=float)
 
     source_matches = [
         source_index
@@ -1320,12 +1325,22 @@ def test_generated_scif_transform_to_input_recovers_1669_source_magnetic_fe_sema
     )
 
 
-def test_generated_scif_stabilizes_boundary_fractional_coordinates_for_1669():
+def test_generated_scif_preserves_resolved_boundary_coordinates_for_1669():
     with pytest.warns(RuntimeWarning, match="Identify-index database entry unavailable"):
         result = find_spin_group("tests/testset/mcif_241130_no2186/1.669_KFe(PO3F)2.mcif")
 
-    assert "Fe1\tFe\t0\t0.33333222\t0.375\t1.0\t36" in result.scif
-    assert "K1\tK\t0\t0\t0\t1.0\t36" in result.scif
+    assert "Fe1\tFe\t0.00000111\t0.33333222\t0.375\t1.0\t36" in result.scif
+    tags = parse_scif_metadata(source_text=result.scif)["raw_scif_tags"]
+    for label, element in [("Fe1", "Fe"), ("K1", "K")]:
+        index = tags["_atom_site_label"].index(label)
+        emitted = np.array([float(tags[f"_atom_site_fract_{axis}"][index]) for axis in "xyz"])
+        candidates = np.array([position for position, species in
+                               zip(result.g0_standard_cell["positions"], result.g0_standard_cell["elements"])
+                               if species == element])
+        delta = emitted - candidates
+        delta -= np.rint(delta)
+        # Eight decimal places, not an additional 1e-5 geometry snap.
+        assert np.min(np.max(np.abs(delta), axis=1)) <= 5.1e-9
 
 
 def test_generated_scif_prefers_symbolic_sqrt_coefficients_for_1669():
