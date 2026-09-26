@@ -6,7 +6,7 @@ import warnings
 import numpy as np
 from findspingroup.version import __version__
 from findspingroup.structure import CrystalCell, SpinSpaceGroup, SpinSpaceGroupOperation
-from findspingroup.utils.matrix_utils import normalize_vector_to_zero
+from findspingroup.utils.matrix_utils import normalize_vector_to_zero, reduce_computed_mod1
 from findspingroup.utils.symbolic_format import format_symbolic_scalar
 
 
@@ -92,12 +92,9 @@ def _format_scif_float(value: float, precision: int = 6, zero_tol: float = 1e-12
     return f"{numeric:.{precision}f}".rstrip("0").rstrip(".")
 
 
-def _stabilize_fractional_boundary_value(value: float, *, boundary_tol: float = 1e-5) -> float:
-    numeric = float(value)
-    wrapped = numeric % 1.0
-    if abs(wrapped) < boundary_tol or abs(wrapped - 1.0) < boundary_tol:
-        return 0.0
-    return numeric
+def _stabilize_fractional_boundary_value(value: float) -> float:
+    """Atomic coordinates are mod-1; clean only floating-point roundoff."""
+    return float(reduce_computed_mod1(value))
 
 
 def _format_scif_symbolic_scalar(
@@ -251,13 +248,17 @@ def affine_matrix_to_xyz_expression(
     variables=('x', 'y', 'z'),
     *,
     separate_translation=False,
-    coeff_precision: int = 6,
+    coeff_precision: int = SCIF_OPERATION_FULL_PRECISION,
 ) -> str:
     """
     Convert affine matrix (3x3 + translation) to string like:
       - "x,y,z"                            (no translation)
       - "x+1/2,y+1/2,z"                    (embedded translation)
       - "x,y,z;1/2,1/2,0"                  (separate_translation=True)
+
+    Coefficients and translations share the requested decimal precision.
+    Compact fractions/radicals are allowed only within that error budget;
+    small resolved translations and rotation components are not discarded.
     """
 
     # If no translation is given, use (u,v,w) and zero translation (your original logic)
@@ -265,28 +266,39 @@ def affine_matrix_to_xyz_expression(
         variables = ('u', 'v', 'w')
         translation3x1 = [0, 0, 0]
 
+    def number(value):
+        numeric = float(value)
+        if not math.isfinite(numeric):
+            raise ValueError("Affine expressions require finite coefficients and translations.")
+        tolerance = max(0.5 * 10.0 ** (-coeff_precision),
+                        16 * np.finfo(float).eps * max(1.0, abs(numeric)))
+        return _format_scif_symbolic_scalar(
+            numeric, decimal_precision=coeff_precision, zero_tol=tolerance,
+            rational_tol=tolerance, sqrt_tol=tolerance, max_denominator=100,
+        )
+
     result = []
 
     for row, t in zip(matrix3x3, translation3x1):
         terms = []
         for coeff, var in zip(row, variables):
-            if abs(coeff) < 0.001:
+            coeff_str = number(coeff)
+            if coeff_str == "0":
                 continue
-            elif abs(coeff - 1) < 0.001:
+            elif coeff_str == "1":
                 terms.append(f"{var}")
-            elif abs(coeff + 1) < 0.001:
+            elif coeff_str == "-1":
                 terms.append(f"-{var}")
             else:
-                coeff_str = _format_scif_symbolic_scalar(
-                    coeff, decimal_precision=coeff_precision
-                )
                 terms.append(f"{coeff_str}{var}")
 
         # Only add translation into the expression if we are NOT separating it
-        if (not separate_translation) and abs(t) > 1e-3:
-            terms.append(str(Fraction(t).limit_denominator(100)))
+        if not separate_translation:
+            translation_str = number(t)
+            if translation_str != "0":
+                terms.append(translation_str)
 
-        result.append('+'.join(terms).replace('+-', '-'))
+        result.append('+'.join(terms).replace('+-', '-') or "0")
 
     expr_part = ",".join(result)
 
@@ -295,12 +307,7 @@ def affine_matrix_to_xyz_expression(
         return expr_part
 
     # Build the ";a,b,c" translation part
-    trans_terms = []
-    for t in translation3x1:
-        if abs(t) < 1e-3:
-            trans_terms.append("0")
-        else:
-            trans_terms.append(str(Fraction(t).limit_denominator(100)))
+    trans_terms = [number(t) for t in translation3x1]
 
     trans_part = ",".join(trans_terms)
     return f"{expr_part};{trans_part}"

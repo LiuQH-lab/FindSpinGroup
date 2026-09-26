@@ -175,6 +175,16 @@ coordinates are `A`, the spin basis in the file's canonical Cartesian frame is
 to Cartesian. A nonidentity legacy matrix-only frame without an explicit `abc`
 declaration is rejected rather than guessing its row/column convention.
 
+Machine-readable affine expressions retain resolved small coefficients and
+translations. The default precision is 15 decimal places; a fraction or radical
+is substituted only if its residual fits that precision or machine roundoff.
+The writer does not independently approximate every translation with a bounded
+denominator or discard terms below `1e-3`. Atomic boundary cleanup is likewise
+machine-scale, followed by the configured coordinate serialization precision.
+Readable GSPG affine rows use the same precise default because they may be
+reused as tensor-analysis input. These rules do not change separate Seitz-label
+display tolerances or globally idealize asymmetric representatives.
+
 Several separate operations should not be confused with crystal idealization:
 
 - Magnetic primitive reduction groups moment vectors within `mtol` and can
