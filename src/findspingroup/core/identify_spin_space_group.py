@@ -38,6 +38,7 @@ class IdentifySpinSpaceGroupResult:
     primitive_cell: CrystalCell
     ssg: SpinSpaceGroup
     input_space_group: InputSpaceGroupInfo | None = None
+    numerical_audit: dict | None = None
 
 
 class MagneticToleranceDegeneracyError(ValueError):
@@ -364,13 +365,12 @@ def _ssg_group_residual_details(ssg_ops, mag_atoms, tol: Tolerances) -> dict:
     }
     for op_index, op in enumerate(ssg_ops):
         details = _magnetic_action_residual_details(op, mag_atoms, tol, _targets=targets)
+        maxima = {key: max(max_details[key], details[key])
+                  for key in ("max_position", "max_moment", "max_occupancy")}
         if details["normalized"] >= max_details["normalized"]:
             max_details.update(details)
             max_details["worst_op"] = op_index
-        else:
-            max_details["max_position"] = max(max_details["max_position"], details["max_position"])
-            max_details["max_moment"] = max(max_details["max_moment"], details["max_moment"])
-            max_details["max_occupancy"] = max(max_details["max_occupancy"], details["max_occupancy"])
+        max_details.update(maxima)
     return max_details
 
 
@@ -1712,12 +1712,19 @@ def _project_ssg_spin_rotations_to_exact_point_group(
     group_tol=DEFAULT_TOL,
     *,
     label="matched SSG",
+    audit: dict | None = None,
 ):
     tol = _normalize_candidate_tol(group_tol)
     spin_tol = _spin_matrix_projection_tol(mag_atoms, tol)
     raw_spin_rotations = [np.asarray(op[0], dtype=float) for op in ssg_ops]
     unique_spin_rotations = deduplicate_matrix_pairs(raw_spin_rotations, tol=spin_tol)
+    if audit is not None:
+        audit.update(status="checking", spin_matrix_projection_limit=spin_tol,
+                     matrix_change_norm="maximum_absolute_Cartesian_matrix_component",
+                     cleanliness_frobenius_tol=1e-6)
     if _spin_rotations_are_clean_finite_group(unique_spin_rotations):
+        if audit is not None:
+            audit.update(status="unchanged_clean_finite_group", max_spin_matrix_change=0.)
         return list(ssg_ops)
 
     try:
@@ -1760,6 +1767,9 @@ def _project_ssg_spin_rotations_to_exact_point_group(
             spin_tol,
         )
         max_projection_residual = max(max_projection_residual, projection_residual)
+        if audit is not None:
+            audit.update(status="projecting", point_group=str(pg_symbol),
+                         max_spin_matrix_change=max_projection_residual)
         projected_op = SpinSpaceGroupOperation(projected_spin, raw_op[1], raw_op[2])
         if not operation_preserves(projected_op.spin_rotation, projected_op.rotation, projected_op.translation):
             position_residual, moment_residual = _magnetic_action_residual(projected_op, mag_atoms, tol)
@@ -1772,6 +1782,8 @@ def _project_ssg_spin_rotations_to_exact_point_group(
             )
         projected_ops.append(projected_op)
 
+    if audit is not None:
+        audit.update(status="projected_and_physically_validated", operation_count=len(projected_ops))
     return projected_ops
 
 
@@ -1989,6 +2001,7 @@ def _build_candidate_profile(
 ):
     configuration = configuration_details["configuration"]
     raw_ssg_ops = get_ssg_ops(space_operations_list, pg_ops, mag_atoms, tol=tol)
+    projection_audit = {"status": "not_started"}
     try:
         ssg_ops = _complete_ssg_ops_by_closure(
             raw_ssg_ops,
@@ -2002,6 +2015,7 @@ def _build_candidate_profile(
             mag_atoms,
             group_tol=group_tol,
             label=f"{candidate['symbol']} order-{len(pg_ops)} matched SSG",
+            audit=projection_audit,
         )
         ssg_ops = _complete_ssg_ops_by_closure(
             ssg_ops,
@@ -2041,9 +2055,16 @@ def _build_candidate_profile(
 
             ssg_ops = sorted(subgroup_options, key=subgroup_sort_key)[0]
             audit_failure = None
+            projection_audit = {
+                "status": "accepted_audited_subgroup",
+                "rejected_full_candidate": projection_audit,
+                "full_candidate_failure": str(exc),
+            }
         else:
             ssg_ops = raw_ssg_ops
             audit_failure = str(exc)
+            projection_audit["status"] = "rejected"
+            projection_audit["failure"] = str(exc)
     residual = (
         _ssg_group_residual_details(ssg_ops, mag_atoms, tol)
         if ssg_ops
@@ -2070,10 +2091,12 @@ def _build_candidate_profile(
         "signature": _ssg_signature(ssg_ops),
         "audit_failure": audit_failure,
         "residual": residual,
+        "projection_audit": projection_audit,
     }
 
 
-def _select_identify_pg_candidate(bundle, space_operations_list, mag_atoms, meigtol, group_tol=DEFAULT_TOL):
+def _select_identify_pg_candidate(bundle, space_operations_list, mag_atoms, meigtol, group_tol=DEFAULT_TOL,
+                                 *, return_audit=False):
     group_tol = DEFAULT_TOL if group_tol is None else group_tol
     tol = _normalize_candidate_tol(group_tol)
     pg_subgroup_tol = _candidate_audit_tol(tol)
@@ -2152,6 +2175,28 @@ def _select_identify_pg_candidate(bundle, space_operations_list, mag_atoms, meig
     distinct_profiles = maximal_profiles
 
     selected = sorted(distinct_profiles, key=lambda profile: _candidate_profile_sort_key(profile, meigtol))[0]
+    if return_audit:
+        audit = {
+            "setting": "identifier_cell",
+            "spin_frame": "Cartesian",
+            "selected_spin_point_group": selected["candidate"]["symbol"],
+            "selected_operation_count": selected["ssg_op_count"],
+            "spin_representation": selected["projection_audit"],
+            "physical_action_residual": dict(selected["residual"]),
+            "physical_budgets": {"position": float(tol.space), "moment": float(tol.moment),
+                                 "occupancy": float(tol.occupancy)},
+            "units": {"position": "angstrom", "moment": "mu_B", "occupancy": "dimensionless"},
+            "index_scope": "candidate operation list and identifier magnetic-site list",
+        }
+        source_index = selected["residual"].get("worst_atom")
+        if source_index is not None:
+            site = mag_atoms[int(source_index)]
+            audit["worst_source_site"] = {
+                "element": site.element_symbol,
+                "fractional_position": np.asarray(site.position).tolist(),
+                "moment_cartesian": np.asarray(site.magnetic_moment).tolist(),
+            }
+        return selected["candidate"], selected["ssg_ops"], audit
     return selected["candidate"], selected["ssg_ops"]
 
 def get_pg(moments,atom_types,mtol,meigtol,matrix_tol=0.01):
@@ -2221,12 +2266,13 @@ def identify_spin_space_group_result(
             tol.m_eig,
             tol.m_matrix_tol,
         )
-        _selected_pg, ssg_ops = _select_identify_pg_candidate(
+        _selected_pg, ssg_ops, numerical_audit = _select_identify_pg_candidate(
             pg_bundle,
             space_operations_list,
             [cell.atoms[i] for i in cell.magnetic_atom_indices],
             tol.m_eig,
             tol,
+            return_audit=True,
         )
     except ValueError as exc:
         if str(exc) in {
@@ -2254,10 +2300,12 @@ def identify_spin_space_group_result(
         symbol=str(p_dataset.international),
         basis_or_setting=getattr(p_dataset, "choice", None) or None,
     )
+    numerical_audit["lattice_rows"] = np.asarray(cell.lattice_matrix).tolist()
     return IdentifySpinSpaceGroupResult(
         primitive_cell=cell,
         ssg=ssg,
         input_space_group=input_space_group,
+        numerical_audit=numerical_audit,
     )
 
 
