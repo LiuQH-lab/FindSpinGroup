@@ -195,6 +195,13 @@ checked like any other observation. Inconsistent specified images of one site
 raise a diagnostic rather than silently keeping whichever image appeared first.
 The parser does not average positions/moments or project them onto symmetry.
 
+Site-orbit and site-stabilizer construction also uses `cell.tol.space` in
+physical length units. Nearby same-element sites remain distinct: each image
+uses its nearest compatible site, and the resulting action must be bijective.
+Missing images, ambiguous nearest ties and overlapping orbits are errors,
+not reasons to silently omit constraints. Spin-rank tolerance is independent
+of this geometric matching budget.
+
 Several separate operations should not be confused with crystal idealization:
 
 - Magnetic primitive reduction groups moment vectors within `mtol` and can

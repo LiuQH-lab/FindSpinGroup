@@ -74,6 +74,7 @@ from findspingroup.utils.symbolic_format import (
     format_symbolic_scalar,
     symbolize_numeric_tokens_in_string,
 )
+from findspingroup.utils.periodic import fractional_search_radius, periodic_cartesian_distance
 from findspingroup.utils.space_group_flags import (
     format_polar_axis_vector,
     msg_parent_space_group_info,
@@ -7087,6 +7088,12 @@ def _spin_space_site_orbits(
     atol=0.001,
     magnetic_indices: list[int] | None = None,
 ) -> tuple[list[int], list[dict], list[dict]]:
+    """Collect site stabilizers using the paired cell's physical position budget.
+
+    ``atol`` is retained for callers' spin-constraint budget; it does not set a
+    fractional distance. Spatial actions are cached independently of spin and
+    must give bijective nearest-site permutations within ``cell.tol.space``.
+    """
     if not ssg_cell or not ssg_ops:
         raise ValueError("Input ssg_cell and ssg_ops cannot be empty.")
     ssg_cell_spglib = ssg_cell.to_spglib(mag=True)
@@ -7094,9 +7101,9 @@ def _spin_space_site_orbits(
     coords = np.array(ssg_cell_spglib[1])
     atom_types = list(ssg_cell.atom_types)
 
-    bins = max(1, int(np.ceil(1.0 / max(atol, 1e-12))))
-    bucket_width = 1.0 / bins
-    neighbor_radius = max(1, int(np.ceil(atol / bucket_width)))
+    position_tol = ssg_cell.tol.space
+    radius = fractional_search_radius(ssg_cell.lattice_matrix, position_tol + 64*np.finfo(float).eps)
+    bins = max(1, min(10**9, int(np.floor(1.0 / radius))))
 
     def _bucket_key(position):
         wrapped = np.mod(np.asarray(position, dtype=float), 1.0)
@@ -7104,18 +7111,42 @@ def _spin_space_site_orbits(
         return tuple(int(value) for value in indices)
 
     def _neighbor_keys(bucket_key):
-        for dx in range(-neighbor_radius, neighbor_radius + 1):
-            for dy in range(-neighbor_radius, neighbor_radius + 1):
-                for dz in range(-neighbor_radius, neighbor_radius + 1):
-                    yield (
-                        (bucket_key[0] + dx) % bins,
-                        (bucket_key[1] + dy) % bins,
-                        (bucket_key[2] + dz) % bins,
-                    )
+        yield from product(*[sorted({(value + shift) % bins for shift in (-1, 0, 1)})
+                             for value in bucket_key])
 
     typed_position_buckets: dict[tuple, list[int]] = {}
     for index, coord in enumerate(coords):
         typed_position_buckets.setdefault((atom_types[index], _bucket_key(coord)), []).append(index)
+
+    spatial_actions = {}
+    operation_actions = []
+    for op_index, op in enumerate(ssg_ops):
+        rotation, translation = np.asarray(op[1], float), np.asarray(op[2], float)
+        key = (rotation.tobytes(), translation.tobytes())
+        if key not in spatial_actions:
+            permutation = []
+            for i, coord in enumerate(coords):
+                transformed = rotation @ coord + translation
+                matches = []
+                for neighbor_key in _neighbor_keys(_bucket_key(transformed)):
+                    for j in typed_position_buckets.get((atom_types[i], neighbor_key), ()):
+                        distance = periodic_cartesian_distance(transformed, coords[j], ssg_cell.lattice_matrix)
+                        slack = 64*np.finfo(float).eps*max(1., distance, position_tol)
+                        if distance <= position_tol + slack:
+                            matches.append((distance, j))
+                matches.sort()
+                if not matches:
+                    raise ValueError(
+                        f"SSG site action {op_index} has no image for site {i} "
+                        f"within space={position_tol:g} lattice length units."
+                    )
+                if len(matches) > 1 and abs(matches[0][0]-matches[1][0]) <= 64*np.finfo(float).eps:
+                    raise ValueError(f"SSG site action {op_index} has an ambiguous nearest image for site {i}.")
+                permutation.append(matches[0][1])
+            if len(set(permutation)) != len(coords):
+                raise ValueError(f"SSG site action {op_index} is not a bijective nearest-site mapping.")
+            spatial_actions[key] = permutation
+        operation_actions.append(spatial_actions[key])
 
     # Get indices of magnetic atoms and initialization
 
@@ -7136,37 +7167,15 @@ def _spin_space_site_orbits(
             continue
         class_i = []
         site_symmetry_ops = []
-        for op in ssg_ops:
-            Rr = np.array(op[1])
-            t = np.array(op[2])
-            trans = normalize_vector_to_zero(Rr @ coords[i] + t)
-            candidate_indices = []
-            seen_candidates = set()
-            for neighbor_key in _neighbor_keys(_bucket_key(trans)):
-                for candidate in typed_position_buckets.get((atom_types[i], neighbor_key), ()):
-                    if candidate in seen_candidates:
-                        continue
-                    seen_candidates.add(candidate)
-                    candidate_indices.append(candidate)
-            best_match = None
-            best_score = None
-            for j in candidate_indices:
-                dist = getNormInf(trans, coords[j])
-                if dist < atol:
-                    score = (dist, 0 if i == j else 1, j)
-                    if best_score is None or score < best_score:
-                        best_score = score
-                        best_match = j
-            if best_match is not None:
-                j = best_match
-                if j not in class_i:
-                    class_i.append(j)
-                    assigned[j] = True
-                # Collect every operation that stabilizes the representative
-                # site.  Near-coincident sites can share a tolerance bucket, so
-                # this must use the nearest site rather than the lowest index.
-                if i == j:
-                    site_symmetry_ops.append(np.array(op[0]))
+        for op, permutation in zip(ssg_ops, operation_actions):
+            j = permutation[i]
+            if j not in class_i:
+                if assigned[j]:
+                    raise ValueError("SSG site actions produce overlapping orbits; inspect the accepted operation set.")
+                class_i.append(j)
+                assigned[j] = True
+            if i == j:
+                site_symmetry_ops.append(np.array(op[0]))
         equivalence_classes.append({
             "representative_index": i,
             "class_indices": class_i,
