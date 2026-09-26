@@ -791,7 +791,9 @@ def svd_nullspace(
     if matrix.size == 0:
         return 0, [], atol, None, 0.0, "high", np.eye(unknown_count, dtype=np.float64)
 
-    _, singular_values, vh = np.linalg.svd(matrix, full_matrices=True)
+    # Tall systems need every right singular vector, not a square matrix of
+    # left vectors. Wide systems still require the complete right nullspace.
+    _, singular_values, vh = np.linalg.svd(matrix, full_matrices=matrix.shape[0] < unknown_count)
     smax = float(singular_values[0]) if singular_values.size else 0.0
     threshold = max(atol, rtol * smax)
     rank = int(np.sum(singular_values > threshold))
