@@ -3774,7 +3774,7 @@ def test_find_spin_group_extreme_mtol_rejects_real_case_as_semantically_degenera
     [
         ("tests/testset/mcif_241130_no2186/1.138_MgV2O4.mcif", "22.1.2.7", 135, 4),
         ("tests/testset/mcif_241130_no2186/1.207_U2Rh2Sn.mcif", "127.2.2.8", 1152, 4),
-        ("tests/testset/mcif_241130_no2186/1.501_Ba2CoO2Cu2S2.mcif", "69.65.2.1.L", 97, 4),
+        ("tests/testset/mcif_241130_no2186/1.501_Ba2CoO2Cu2S2.mcif", "69.65.2.1.L", 7, 4),
     ],
 )
 def test_find_spin_group_recovers_post_batch_three_residual_regressions(

@@ -1314,7 +1314,20 @@ def generate_scif(
     )
     magnetic_acc_value = None
     try:
-        magnetic_acc_value = SpinSpaceGroup(ssg.msg_ops).acc if ssg.msg_ops else None
+        # MSG coupling compares spin and real actions in the SAME oriented
+        # lattice basis. SCIF uvw may instead use an independent Cartesian frame.
+        spin_to_lattice = spin_basis_rows.T
+        lattice_to_spin = np.linalg.inv(spin_to_lattice)
+        oriented_ssg = SpinSpaceGroup(
+            [SpinSpaceGroupOperation(
+                spin_to_lattice @ op.spin_rotation @ lattice_to_spin,
+                op.rotation, op.translation,
+            ) for op in ssg.ops],
+            tol=ssg.tol,
+            real_space_metric=np.asarray(cell[0]) @ np.asarray(cell[0]).T,
+            _translation_period_basis=ssg._translation_period_basis,
+        )
+        magnetic_acc_value = SpinSpaceGroup(oriented_ssg.msg_ops).acc if oriented_ssg.msg_ops else None
     except Exception:
         magnetic_acc_value = None
     magnetic_acc_line = (
