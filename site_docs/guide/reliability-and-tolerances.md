@@ -202,6 +202,15 @@ Missing images, ambiguous nearest ties and overlapping orbits are errors,
 not reasons to silently omit constraints. Spin-rank tolerance is independent
 of this geometric matching budget.
 
+MSG membership compares `S` with `theta * det(R) * R` in the same oriented
+spin/real basis. When its metric `G` is known, the residual is the spectral norm
+of `B * (S - theta * det(R) * R) * B^-1`, with `B.T * B = G`: the largest error
+on a physical unit vector. This criterion is invariant under a change of basis.
+The metric must be finite, symmetric and positive definite. Without geometry,
+the operation-level helper retains an explicit dimensionless component budget;
+it does not claim physical frame invariance. Neither mode adds an implicit
+relative tolerance.
+
 Several separate operations should not be confused with crystal idealization:
 
 - Magnetic primitive reduction groups moment vectors within `mtol` and can
