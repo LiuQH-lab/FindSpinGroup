@@ -6,7 +6,7 @@ from fractions import Fraction
 
 import numpy as np
 
-from spglib import SpglibDataset, get_symmetry_dataset, SpglibMagneticDataset, get_magnetic_symmetry_dataset
+from spglib import SpglibDataset, get_symmetry_dataset, get_magnetic_spacegroup_type_from_symmetry
 from findspingroup.data.MSGMPG_DB import MSG_INT_TO_BNS, BNS_TO_OG_NUM, OG_NUM_TO_MPG
 from findspingroup.utils import SG_HALL_MAPPING
 from findspingroup.utils.matrix_utils import normalize_vector_to_zero
@@ -1610,7 +1610,7 @@ def is_close_matrix_pair(pair1, pair2, tol=1e-5):
     if len(pair1) != len(pair2):
         raise ValueError("Compare two vectors of different lengths.")
     for i, j in enumerate(pair1):
-        if not np.allclose(np.array(pair1[i]), np.array(pair2[i]), atol=tol):
+        if not np.allclose(np.array(pair1[i]), np.array(pair2[i]), atol=tol, rtol=0):
             return False
     return True
 
@@ -1629,6 +1629,17 @@ def _matrix_pair_bucket_key(item, tol=1e-5):
     return tuple(key_parts)
 
 
+def _matrix_pair_near_bucket_boundary(item, tol):
+    scale = 10.0 ** _dedup_bucket_decimals(tol)
+    margin = float(tol) * scale
+    for value in item:
+        scaled = np.asarray(value, dtype=float).ravel() * scale
+        roundoff = 16 * np.finfo(float).eps * np.maximum(1.0, np.abs(scaled))
+        if np.any(np.abs(scaled - np.rint(scaled)) >= 0.5 - margin - roundoff):
+            return True
+    return False
+
+
 def deduplicate_matrix_pairs(matrix_list, tol=1e-5):
     unique = []
     buckets = {}
@@ -1637,22 +1648,15 @@ def deduplicate_matrix_pairs(matrix_list, tol=1e-5):
         candidates = buckets.get(bucket_key, [])
         if any(is_close_matrix_pair(item, u, tol) for u in candidates):
             continue
+        # An equivalent value can round into another bucket only when this
+        # value is within tol of a rounding boundary. Check that rare case.
+        if _matrix_pair_near_bucket_boundary(item, tol) and any(
+            is_close_matrix_pair(item, u, tol) for u in unique
+        ):
+            continue
         unique.append(item)
         buckets.setdefault(bucket_key, []).append(item)
     return unique
-
-
-def _canonicalize_fractional_translation(translation, tol=3e-3, max_den=12):
-    translation = np.mod(np.asarray(translation, dtype=float), 1.0)
-    snapped = []
-    for value in translation:
-        approx = float(Fraction(float(value)).limit_denominator(max_den))
-        if abs(value - approx) < tol:
-            value = approx
-        if abs(value) < tol or abs(value - 1.0) < tol:
-            value = 0.0
-        snapped.append(value)
-    return np.mod(np.asarray(snapped, dtype=float), 1.0)
 
 
 def _fractional_bucket_params(tol: float):
@@ -1774,6 +1778,12 @@ def get_space_group_from_operations(space_group_operations,symprec = 0.02,bz = F
 
 def get_magnetic_space_group_from_operations(magnetic_space_group_operations):
     """
+    Identify a complete MSG operation set in a mod-1 lattice basis.
+
+    Real rotations must preserve that lattice (integer matrices up to numerical
+    roundoff). Translations retain their arbitrary-origin fractional values.
+    Identification uses spglib's operation API, not a synthetic magnetic cell.
+
     :param magnetic_space_group_operations: [[ time_reversal{1,-1},rotation, translation)],...]
     :return : dict with keys:
         msg_int_num: int, magnetic space group international number
@@ -1787,53 +1797,41 @@ def get_magnetic_space_group_from_operations(magnetic_space_group_operations):
     """
     symprec = 0.02
 
-    weird_sites = [np.array([0.1715870, 0.27754210, 0.737388700]),np.array([0,0,0])]
-    weird_moments = [np.array([1.234,0.789,0.345]),np.array([0,0,0])]
-
-    canonical_operations = [
-        [int(op[0]), np.asarray(op[1], dtype=float), _canonicalize_fractional_translation(op[2])]
-        for op in magnetic_space_group_operations
-    ]
-
-    # get point group rotations
-    point_group_rotations = deduplicate_matrix_pairs([i[1] for i in canonical_operations])
-    g = compute_invariant_metric(point_group_rotations)
-    lattice = np.linalg.cholesky(g)  # L @ L.T = g , rows as basis vectors
-
-    positions = []
-    types = []
-    moments = []
-    bins, neighbor_radius = _fractional_bucket_params(1e-4)
-    position_buckets = {}
-    rotations = np.asarray([op[1] for op in canonical_operations], dtype=float)
-    translations = np.mod(np.asarray([op[2] for op in canonical_operations], dtype=float), 1.0)
-    time_reversals = np.asarray([int(op[0]) for op in canonical_operations], dtype=float)
-    det_signs = np.asarray([round(np.linalg.det(op[1])) for op in canonical_operations], dtype=float)
-    for index,site in enumerate(weird_sites):
-        transformed_positions = np.mod(rotations @ site + translations, 1.0)
-        transformed_moments = (det_signs * time_reversals)[:, None] * (rotations @ weird_moments[index])
-        for new_pos, new_mom in zip(transformed_positions, transformed_moments):
-            if _append_unique_fractional_position(
-                new_pos,
-                positions,
-                position_buckets,
-                tol=1e-4,
-                bins=bins,
-                neighbor_radius=neighbor_radius,
-            ):
-                types.append(index+1)
-                moments.append(new_mom)
-
-    cell = (lattice * 5, positions, types, moments@lattice)
-    magnetic_space_group_dataset :SpglibMagneticDataset=get_magnetic_symmetry_dataset(cell, symprec=symprec,mag_symprec=0.02)
-    if magnetic_space_group_dataset is None:
+    if len(magnetic_space_group_operations) == 0:
         return None
 
-    msg_int_num = magnetic_space_group_dataset.uni_number
+    rotations = np.asarray([op[1] for op in magnetic_space_group_operations], dtype=float)
+    integer_rotations = np.rint(rotations)
+    if not np.allclose(rotations, integer_rotations, atol=1e-6, rtol=0):
+        raise ValueError("MSG rotations must preserve the fractional unit-cell lattice.")
+    time_signs = np.asarray([op[0] for op in magnetic_space_group_operations])
+    if not np.all(np.isin(time_signs, [-1, 1])):
+        raise ValueError("MSG time-reversal signs must be +1 or -1.")
+
+    # The operation API avoids synthetic-site collisions at arbitrary origins.
+    # Only integer-lattice equivalence is applied to translations: independent
+    # fraction snapping would break t_ab = R_a t_b + t_a.
+    translations = np.mod(np.asarray([op[2] for op in magnetic_space_group_operations], dtype=float), 1.0)
+    if translations.shape != (len(rotations), 3) or not np.all(np.isfinite(translations)):
+        raise ValueError("MSG translations must be finite fractional three-vectors.")
+    point_group_rotations = deduplicate_matrix_pairs(list(integer_rotations))
+    g = compute_invariant_metric(point_group_rotations)
+    lattice = np.linalg.cholesky(g)
+    msg_type_info = get_magnetic_spacegroup_type_from_symmetry(
+        integer_rotations.astype(int),
+        translations,
+        time_signs == -1,
+        lattice=lattice * 5,
+        symprec=symprec,
+    )
+    if msg_type_info is None:
+        return None
+
+    msg_int_num = msg_type_info.uni_number
     msg_bns_num,msg_bns_symbol = MSG_INT_TO_BNS[msg_int_num]
     msg_og_num = BNS_TO_OG_NUM[msg_bns_num]
     msg_og_symbol = OG_NUM_TO_MPG[msg_og_num]["og_label"]
-    msg_type = magnetic_space_group_dataset.msg_type
+    msg_type = msg_type_info.type
     mpg_num = OG_NUM_TO_MPG[msg_og_num]["pointgroup_no"]
     mpg_symbol = OG_NUM_TO_MPG[msg_og_num]["pointgroup_label"]
 

@@ -21,6 +21,22 @@ for code changes.
 - Missing identify-index database records should remain visible errors unless
   the user explicitly asks for a temporary diagnostic shim.
 
+## Semantic And Mathematical Review
+
+- Before changing an algorithm or shared numerical helper, identify each affected
+  caller's purpose, mathematical object, coordinate/spin frame, translation
+  equivalence, tolerance units, and downstream consumers. Similar code or names
+  do not establish identical semantics.
+- Derive the invariants and examine counterexamples before implementation. Tests
+  are necessary evidence, not a substitute for this review: existing coverage
+  may not protect symbols, generator selection, frame transport, or exports.
+- Keep physical input equivalence, accepted-group representation, and display
+  simplification separate. Never apply modulo-one reduction to lifted G0
+  translations without the correct spin-identity translation lattice.
+- Validate changes one semantic layer at a time. Explain every observed drift
+  with concrete before/after evidence; do not accept a baseline just because
+  calculation succeeded or the group index stayed unchanged.
+
 ## Collaboration and GitHub Workflow
 
 - Do not merge pull requests automatically unless the user explicitly authorizes

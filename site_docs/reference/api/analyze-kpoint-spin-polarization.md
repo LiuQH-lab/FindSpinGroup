@@ -97,6 +97,11 @@ translations. `kpoint_tol` controls
 only little-group membership; it does not replace the spin-constraint rank
 tolerance or any structure-identification tolerance.
 
+Coordinates close to an integer are not snapped onto that integer before
+membership is tested. For example, `kpoint_tol=1e-8` distinguishes a point
+`5e-6` away from Gamma from Gamma itself, on either side of a reciprocal-cell
+boundary. Integer reciprocal translations of the same point remain equivalent.
+
 For `calculation_mode="quasi2d"`, the selected input-cell vacuum component must
 be zero modulo an integer within `kpoint_tol`. An out-of-plane point raises an
 error rather than being silently projected into the plane.

@@ -9,6 +9,7 @@ from spglib import standardize_cell as sc
 
 
 from findspingroup.core.tolerances import Tolerances, DEFAULT_TOL
+from findspingroup.utils.periodic import positions_within_cartesian_tolerance
 from findspingroup.version import __version__
 from findspingroup.utils.matrix_utils import normalize_vector_to_zero
 
@@ -592,12 +593,16 @@ class AtomicSite:
         Occupancy of the atomic site.
     element_symbol (str | int):
         Element symbol or atomic number of the atom.
+    lattice_matrix (np.ndarray | None):
+        Row-vector lattice for physical periodic distances. CrystalCell supplies
+        it automatically; standalone sites without it retain fractional matching.
 
     """
     position: np.ndarray | list[float]
     magnetic_moment: np.ndarray | list[float]
     occupancy: float
     element_symbol: str | int
+    lattice_matrix: np.ndarray | None = field(default=None, repr=False, compare=False)
 
     def __repr__(self):
         return f'AtomicSite(position={self.position}, magnetic_moment={self.magnetic_moment}, occupancy={self.occupancy}, element_symbol="{self.element_symbol}")'
@@ -626,10 +631,15 @@ class AtomicSite:
         self.magnetic_moment = np.array(self.magnetic_moment, dtype=np.float64).reshape(3,)
 
     def is_equivalent(self, other, tol:Tolerances=DEFAULT_TOL):
-        """Check if two AtomicSite instances are equivalent within a tolerance."""
+        """Compare sites in this site's basis; space tolerance is a length if known."""
         if not isinstance(other, AtomicSite):
             return False
-        pos_equal = _within_closed_tolerance(getNormInf(self.position, other.position), tol.space)
+        if self.lattice_matrix is None:
+            pos_equal = _within_closed_tolerance(getNormInf(self.position, other.position), tol.space)
+        else:
+            pos_equal = positions_within_cartesian_tolerance(
+                self.position, other.position, self.lattice_matrix, tol.space
+            )
         mom_equal = _within_closed_tolerance(
             _moment_distance(self.magnetic_moment, other.magnetic_moment),
             tol.moment,
@@ -779,7 +789,7 @@ class CrystalCell:
 
 
         self.atoms = [
-            AtomicSite(pos, spin, occ, elem)
+            AtomicSite(pos, spin, occ, elem, lattice_matrix=self.lattice_matrix)
             for pos, spin, occ, elem in zip(
                 self.positions, spins, self.occupancies, self.elements
             )

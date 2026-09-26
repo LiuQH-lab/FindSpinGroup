@@ -25,7 +25,7 @@ reproducible.
 
 | Parameter | Default | Compares or controls | Increasing it may... | Decreasing it may... |
 | --- | ---: | --- | --- | --- |
-| `space_tol` | `0.02` | Shared atomic-site matching and spatial symmetry detection | Merge slightly displaced sites/operations and produce a higher apparent spatial symmetry | Split approximately equivalent sites and reduce the identified symmetry |
+| `space_tol` | `0.02 Å` | Spatial symmetry detection and lattice-aware magnetic-site matching | Accept larger positional residuals | Reject smaller deviations from an operation's site permutation |
 | `mtol` | `0.02 μB` | Magnetic-moment equivalence, magnetic-site splitting, and zero-net-moment decisions | Treat distinct/small moments as equivalent or zero | Split noisy moments and lower magnetic symmetry |
 | `meigtol` | `0.00002` | Numerical eigenvalue decisions in spin point-group classification | Accept less exact eigenvalue relations | Reject relations affected by floating-point/input noise |
 | `matrix_tol` | `0.01` | Point-group matrices, standardization, and transform consistency | Accept less exact matrices/transforms | Reject numerically noisy but physically intended operations |
@@ -35,10 +35,99 @@ reproducible.
 threshold used to classify the net moment as zero. A change in `mtol` can
 therefore change both the OSSG and `magnetic_phase`.
 
-`space_tol` is passed through both Å-scale symmetry detection and internal
-position-equivalence logic. Because those internal comparisons do not yet form
-one uniform public unit contract, report the numerical value and describe it as
-the shared spatial tolerance rather than attaching one unit to every use.
+Lattice-aware magnetic-site matching uses the shortest periodic Cartesian
+distance, not the largest fractional-coordinate difference. For a row-vector
+lattice `L`, the distance between fractional positions `x` and `y` is
+`min_n ||(x-y-n) L||`, where `n` is an integer lattice vector. Componentwise
+wrapping alone need not find this distance in a skew cell. An accepted operation
+must admit a one-to-one match of the sites with compatible elements, occupancies
+and moments.
+
+This does not turn every internal threshold into an Å tolerance. The legacy
+standalone `AtomicSite` comparison without a lattice is fractional; operation-only
+input cannot infer a physical length scale. Cell-transform deduplication,
+parser expansion, matrix fitting and downstream numerical rank decisions still
+have separate contracts. In particular, `parser_atol` is not a replacement for
+`space_tol`.
+
+Core tolerance values must be finite. `space`, `m_eig` and `m_matrix_tol` in
+`Tolerances` must be positive; `moment` and `occupancy` may be zero. A closed
+comparison allows floating-point roundoff at the boundary, not an additional
+relative physical tolerance. A fixed candidate's acceptance is monotone in its
+tolerance, but the final identified group need not be: primitive-cell reduction,
+moment clustering and candidate selection can also change.
+
+## Keep Three Error Budgets Separate
+
+1. **Input equivalence:** positional lengths, moment differences and occupancies
+   decide which approximate input sites can be related by a symmetry operation.
+2. **Numerical representation:** matrix fitting, affine transformations and
+   nullspace rank deal with the accepted group representation. Their thresholds
+   are not magnetic-moment errors and should not be enlarged to obtain a target
+   label.
+3. **Presentation:** fractional snapping and compact symbolic expressions make
+   output readable. They must not be fed back as silently altered operations.
+
+MSG identification uses the supplied operations directly. Its translations are
+reduced modulo lattice integers, not rounded to nearby small-denominator
+fractions. Computational mod-1 operation multiplication and inversion
+preserve resolved small translations; cleanup there
+is limited to machine roundoff, not a physical equivalence tolerance.
+
+`transform(..., frac=False)` has a different purpose: internal G0/nofrac
+representations retain explicit integer translation lifts. The displayed G0
+cell need not be a magnetic translation cell. Reducing those lifts modulo its
+integer axes can destroy spin-translation information. Representative-list
+deduplication and spin-only selection therefore retain literal translations.
+A genuine L0 cell, in contrast, has spin-identity lattice translations.
+
+For g-type symbol translation factors, a stored representative need not lie
+exactly on the displayed axis: it can differ from an axial translation by a
+known spin-identity lattice period. Symbol selection carries that period through
+setting changes and solves for the shortest positive axial representative.
+It keeps the original operation for generator reuse. The tracked period may
+be a sublattice of the full primitive translation lattice; explicit centering
+operations are not discarded. This bookkeeping does not change the public
+operation tables or redefine spin-only membership.
+
+This is not a blanket removal of all legacy numerical policies. Setting transport
+(`transform(..., frac=True)`), symbol-generator selection and identify-index
+preprocessing retain separate canonicalization
+budgets; their revision requires their own group-representation validation.
+Setting transport still uses its historical `1e-4` cleanup before a possible
+G0/nofrac lift; removing that step alone can turn near-boundary roundoff into
+a different explicit integer lift and corrupt symbol-generator selection.
+In particular, the legacy symbol closure's `1e-4` translation cleanup is local
+to generator selection and does not overwrite the supplied numerical operations.
+
+An arbitrary-k query similarly preserves its supplied k point modulo reciprocal
+lattice integers before applying `kpoint_tol`. The k-point tolerance is expressed
+in ACC-primitive reciprocal fractional coordinates; it is not a direct-space
+distance or a moment tolerance.
+
+## Does Identification Symmetrize The Crystal?
+
+FindSpinGroup does not globally idealize the lattice or move all atoms onto an
+ideal symmetric structure. Both magnetic and nonmagnetic primitive-cell
+extraction request `no_idealize=True` from spglib. Subsequent cell-setting
+changes transform the cell and its operations together.
+
+Several separate operations should not be confused with crystal idealization:
+
+- Magnetic primitive reduction groups moment vectors within `mtol` and can
+  reuse a representative vector for an equivalent site type.
+- Numerical spin-group projection adjusts an operation representation and
+  verifies its action on the magnetic sites; it is not a lattice refinement.
+- SCIF stores asymmetric representatives and operations. Expanding them on
+  readback reconstructs symmetry-related sites, so small deviations in a noisy
+  input need not be preserved atom by atom.
+- Quasi-2D preprocessing may extend the selected vacuum direction, as described
+  below. This is an explicit geometry preprocessing step.
+
+A change of origin or a valid change of basis must preserve the physical
+symmetry conclusions. Affine translations at an arbitrary origin need not be
+simple rational fractions; they must not be rounded merely to obtain a more
+familiar-looking group operation.
 
 ## When Should I Change A Tolerance?
 

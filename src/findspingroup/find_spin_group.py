@@ -1044,6 +1044,7 @@ def _input_compatible_ssg_from_transformed_primitive(
         real_space_metric=transformed_ssg.real_space_metric,
         identify_source_name=transformed_ssg.identify_source_name,
         identify_tol=transformed_ssg.identify_tol,
+        _translation_period_basis=transformed_ssg._translation_period_basis,
     )
 
 
@@ -2743,6 +2744,7 @@ def _ossg_oriented_spin_frame_ssg(ssg: SpinSpaceGroup, cell: CrystalCell) -> Spi
         oriented_ssg.ops,
         tol=ssg.tol,
         real_space_metric=np.asarray(cell.lattice_matrix, dtype=float) @ np.asarray(cell.lattice_matrix, dtype=float).T,
+        _translation_period_basis=oriented_ssg._translation_period_basis,
     )
 
 
@@ -3706,6 +3708,7 @@ def _build_operation_view_set(
             all_ops,
             tol=ssg.tol,
             real_space_metric=ssg.real_space_metric,
+            _translation_period_basis=ssg._translation_period_basis,
         )
         generator_ops = _symbol_generator_ops_for_current_basis(view_ssg)
     if generator_ops:
@@ -9018,6 +9021,7 @@ def _find_spin_group_from_parsed(
             list(public_convention_ssg_ops),
             tol=public_ossg_ssg.tol,
             real_space_metric=public_ossg_ssg.real_space_metric,
+            _translation_period_basis=public_ossg_ssg._translation_period_basis,
         )
     if quasi_2d_diagnostics is not None:
         if "spin_texture" in enabled_components:

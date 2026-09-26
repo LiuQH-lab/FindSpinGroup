@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import re
 from fractions import Fraction
+from math import gcd, lcm
 from typing import TYPE_CHECKING
 
 import numpy as np
 
 from findspingroup.data.SG_SYMBOL import SGdisc, SGgeneratorDict
+from findspingroup.utils.matrix_utils import normalize_vector_to_zero
 from findspingroup.utils.seitz_symbol import (
     _axis_parameter_subscript,
     calibrated_symbol_tol,
@@ -368,56 +370,99 @@ def _select_preferred_translation_match(
     return None
 
 
+def _integer_bezout_coefficients(values: list[int]) -> list[int]:
+    """Return h with h.values = gcd(values), including signed entries."""
+    divisor, coefficients = 0, [0] * len(values)
+    for index, value in enumerate(values):
+        a, b = divisor, abs(value)
+        x0, x1, y0, y1 = 1, 0, 0, 1
+        while b:
+            quotient = a // b
+            a, b = b, a - quotient * b
+            x0, x1 = x1, x0 - quotient * x1
+            y0, y1 = y1, y0 - quotient * y1
+        coefficients = [x0 * item for item in coefficients]
+        coefficients[index] = y0 if value >= 0 else -y0
+        divisor = a
+    return coefficients
+
+
+def _axis_period(period_basis: np.ndarray, axis_index: int, *, tol: float):
+    """Find the primitive integer direction of B^-1 e_i, not of an operation.
+
+    B is a known crystallographic period carried through setting transforms.
+    Rational reconstruction here only removes floating roundoff in that lattice
+    embedding; raw affine translations and origin shifts are never rationalized.
+    """
+    inverse = np.linalg.inv(period_basis)
+    direction = inverse[:, axis_index]
+    error_bound = (64 * np.finfo(float).eps * max(1.0, np.linalg.cond(period_basis))
+                   * max(1.0, float(np.max(np.abs(direction)))))
+    if error_bound >= tol:
+        raise ValueError("Translation period is too ill-conditioned for the symbol tolerance.")
+    rational = [Fraction(float(value)).limit_denominator(1_000_000) for value in direction]
+    if any(abs(float(value) - raw) > error_bound for value, raw in zip(rational, direction)):
+        raise ValueError("Cannot resolve a rational translation period within floating-point error.")
+    denominator = lcm(*(value.denominator for value in rational))
+    integers = [value.numerator * (denominator // value.denominator) for value in rational]
+    divisor = gcd(*integers)
+    if divisor == 0:
+        raise ValueError("Translation period has a zero inverse-basis direction.")
+    primitive = [value // divisor for value in integers]
+    return inverse, float(Fraction(denominator, divisor)), _integer_bezout_coefficients(primitive)
+
+
 def _select_preferred_primitive_translation_match(
     ops: list["SpinSpaceGroupOperation"],
     axis_index: int,
     tol: float = 1e-4,
     *,
     identity_real_ops: list["SpinSpaceGroupOperation"] | None = None,
-) -> "SpinSpaceGroupOperation | None":
+    period_basis: np.ndarray | None = None,
+) -> "tuple[SpinSpaceGroupOperation, np.ndarray] | None":
     """
-    Select the shortest nonzero identity-rotation translation that lies purely
-    along one crystallographic axis. If no such translation exists, fall back
-    to the identity translation.
+    Select the shortest positive axial translation modulo the known period.
+
+    Return the source operation and an axial display representative separately:
+    the source must remain available for generator reuse. For B=I this is a
+    mod-1 list; a lifted G0 list must pass its transported B explicitly.
     """
     identity_rot = np.eye(3)
-    axis_candidates: list["SpinSpaceGroupOperation"] = []
-    zero_candidates: list["SpinSpaceGroupOperation"] = []
+    basis = np.eye(3) if period_basis is None else np.asarray(period_basis, dtype=float)
+    inverse, repeat, coefficients = _axis_period(basis, axis_index, tol=tol)
+    direction = identity_rot[:, axis_index]
+    candidates = []
     search_ops = identity_real_ops if identity_real_ops is not None else ops
 
     for op in search_ops:
         if not np.allclose(op.rotation, identity_rot, atol=tol, rtol=0):
             continue
         raw = np.asarray(op.translation, dtype=float)
-        norm = float(np.linalg.norm(raw))
-        if norm < tol:
-            zero_candidates.append(op)
-            continue
+        coordinates = inverse @ raw
+        zero_residual = raw - basis @ np.rint(coordinates)
+        if np.max(np.abs(zero_residual)) < tol:
+            length = repeat
+            representative = np.zeros(3) if np.linalg.norm(raw) < tol else repeat * direction
+        else:
+            fraction = float(np.dot(np.asarray(coefficients, dtype=np.longdouble),
+                                    coordinates.astype(np.longdouble)) % 1)
+            length = repeat * fraction
+            representative = length * direction
+            residual = raw - representative
+            residual -= basis @ np.rint(inverse @ residual)
+            if length <= 0 or np.max(np.abs(residual)) >= tol:
+                continue
+        candidates.append((length, float(np.linalg.norm(raw)), op, representative))
 
-        abs_raw = np.abs(raw)
-        axis_component = abs_raw[axis_index]
-        off_axis = float(np.sum(abs_raw) - axis_component)
-        if axis_component < tol or off_axis >= tol:
-            continue
-        axis_candidates.append(op)
-
-    if axis_candidates:
-        return min(
-            axis_candidates,
-            key=lambda op: (
-                abs(float(np.asarray(op.translation, dtype=float)[axis_index])),
-                float(np.linalg.norm(np.asarray(op.translation, dtype=float))),
-                tuple(np.round(np.abs(np.asarray(op.translation, dtype=float)), 6)),
-            ),
-        )
-
-    if zero_candidates:
-        return min(
-            zero_candidates,
-            key=lambda op: tuple(np.round(np.abs(np.asarray(op.translation, dtype=float)), 6)),
-        )
-
-    return None
+    if not candidates:
+        return None
+    shortest = min(item[0] for item in candidates)
+    matches = [item for item in candidates if abs(item[0] - shortest) < tol]
+    chosen = min(matches, key=lambda item: item[1])
+    if any(not np.allclose(item[2].spin_rotation, chosen[2].spin_rotation, atol=tol, rtol=0)
+           for item in matches):
+        raise ValueError(f"Conflicting spin actions for axial translation {axis_index} modulo its period.")
+    return chosen[2], chosen[3]
 
 
 def _symbol_type(it: int, ik: int) -> str:
@@ -523,21 +568,33 @@ def _append_generator_operation(
 def _closure_from_generators(
     generators: list["SpinSpaceGroupOperation"], max_size: int = 4096
 ) -> set[tuple]:
+    """Legacy symbol-generator closure, not a general symmetry acceptance test.
+
+    Keep its existing 1e-4 presentation budget local: changing mod-1 operation
+    algebra must not implicitly tighten this separate symbol-selection route.
+    Inputs can be partial Chen/database representatives. No input operation or
+    lifted G0 translation is changed by this bookkeeping calculation.
+    """
     if not generators:
         return set()
+
+    def presentation_representative(op):
+        return type(op)(op.spin_rotation, op.rotation,
+                        normalize_vector_to_zero(op.translation, atol=1e-4))
 
     identity = generators[0].identity()
     seen = {_op_key(identity)}
     queue = [identity]
-
+    words = [word for generator in generators
+             for word in (generator, presentation_representative(generator.inv()))]
     while queue and len(seen) < max_size:
-        cur = queue.pop(0)
-        for gen in generators:
-            for nxt in (cur @ gen, cur @ gen.inv()):
-                key = _op_key(nxt)
-                if key not in seen:
-                    seen.add(key)
-                    queue.append(nxt)
+        current = queue.pop(0)
+        for word in words:
+            candidate = presentation_representative(current @ word)
+            key = _op_key(candidate)
+            if key not in seen:
+                seen.add(key)
+                queue.append(candidate)
     return seen
 
 
@@ -939,13 +996,16 @@ def build_international_symbol(
             centering_targets = _default_centering_vectors(bravais)
 
         for axis_index, (label, target) in enumerate(primitive_targets):
-            matched = _select_preferred_primitive_translation_match(
+            match = _select_preferred_primitive_translation_match(
                 ssg_basis.nssg,
                 axis_index,
                 tol=tol,
                 identity_real_ops=identity_real_ops,
+                period_basis=ssg_basis._translation_period_basis,
             )
-            vector = np.asarray(matched.translation if matched is not None else target, dtype=float)
+            if match is None:
+                raise ValueError(f"Missing axial spin translation {label} in the {basis_name} symbol setting.")
+            matched, vector = match
             spin_info = spin_info_map.get(id(matched)) if matched is not None else None
             primitive_translation_data.append((label, vector, spin_info, matched))
 

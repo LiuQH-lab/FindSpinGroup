@@ -689,7 +689,11 @@ def _transform_ssg_ops_to_chen_frame(
                 new_translation,
             )
         )
-    return SpinSpaceGroup(transformed_ops, tol=ssg.tol)
+    return SpinSpaceGroup(
+        transformed_ops,
+        tol=ssg.tol,
+        _translation_period_basis=space_matrix @ ssg._translation_period_basis,
+    )
 
 
 def _build_chen_linear_name(

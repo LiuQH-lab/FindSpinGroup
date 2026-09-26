@@ -13,8 +13,9 @@ from findspingroup.core.tolerances import DEFAULT_KPOINT_TOL, DEFAULT_TOL, Toler
 from findspingroup.structure.cell import AtomicSite, SpaceToleranceDegeneracyError
 from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs, get_space_group_from_operations, \
     get_arithmetic_crystal_class_from_ops, identify_point_group, get_magnetic_space_group_from_operations
+from findspingroup.core.identify_symmetry_from_ops import _matrix_pair_near_bucket_boundary
 from findspingroup.utils.matrix_utils import getNormInf, integerize_matrix, rref_with_tolerance, in_space_group, \
-    normalize_vector_to_zero
+    normalize_vector_to_zero, reduce_computed_mod1
 from findspingroup.utils.seitz_symbol import (
     _axis_parameter_subscript,
     calibrated_symbol_tol,
@@ -1343,11 +1344,8 @@ def _dedup_bucket_decimals(atol: float) -> int:
     """
     Return a coarse rounding precision for dedup bucketing.
 
-    The bucket key is intentionally coarser than the final equality tolerance so
-    that operations equal within ``atol`` always fall into the same bucket, while
-    still separating obviously different operations. Bucket membership never
-    decides equality on its own; it only reduces the candidate set for the exact
-    tolerant comparison.
+    Coarse buckets accelerate comparison but do not define equivalence.
+    Values close to a rounding boundary require a cross-bucket check.
     """
     atol = float(max(atol, 1e-12))
     return max(0, int(np.ceil(-np.log10(atol))) - 1)
@@ -1362,16 +1360,34 @@ def _op_bucket_key(op, atol: float):
 
 
 def _deduplicate_spin_space_ops(ops, *, tol: float, sort: bool = False):
+    """Deduplicate stored representatives, preserving explicit integer lifts.
+
+    These lists also serve the non-mod-1 G0 symbol route. Unlike the public
+    mod-1 operation comparison, t and t + n are not interchangeable here.
+    """
     ordered_ops = sorted(ops, key=op_key) if sort else list(ops)
     unique_ops = []
-    bucketed_ops: dict[tuple, list] = {}
+    records = np.empty((len(ordered_ops), 21), dtype=float)
+    real_buckets: dict[tuple, list[int]] = {}
+    decimals = _dedup_bucket_decimals(tol)
     for op in ordered_ops:
-        bucket_key = _op_bucket_key(op, tol)
-        candidates = bucketed_ops.get(bucket_key, [])
-        if any(op.is_same_with(existing, atol=tol) for existing in candidates):
-            continue
+        record = np.concatenate([np.asarray(part, dtype=float).ravel() for part in op])
+        real_key = tuple(np.round(record[9:18], decimals))
+        # Spin-only promotion can create thousands of candidates but very few
+        # real rotations. Filter by that part before the exact absolute check.
+        if _matrix_pair_near_bucket_boundary([op[1]], tol):
+            candidates = records[:len(unique_ops)]
+        else:
+            indices = real_buckets.get(real_key, [])
+            candidates = records[indices] if indices else records[:0]
+        if len(candidates):
+            residuals = np.abs(candidates - record)
+            if np.any((np.max(residuals[:, :18], axis=1) <= tol)
+                      & (np.max(residuals[:, 18:], axis=1) < tol)):
+                continue
+        records[len(unique_ops)] = record
+        real_buckets.setdefault(real_key, []).append(len(unique_ops))
         unique_ops.append(op)
-        bucketed_ops.setdefault(bucket_key, []).append(op)
     return unique_ops
 
 
@@ -1486,18 +1502,19 @@ class SpinSpaceGroupOperation:
 
     def __matmul__(self, other):
         if isinstance(other, SpinSpaceGroupOperation):
-            # compose two symmetry operations
+            # This operator composes mod-1 representatives, not nofrac lifts.
             new_rotation = self.rotation @ other.rotation
-            new_translation = normalize_vector_to_zero( self.rotation @ other.translation + self.translation,atol=1e-4)
+            new_translation = reduce_computed_mod1(self.rotation @ other.translation + self.translation)
             new_spin_rotation = self.spin_rotation @ other.spin_rotation
             # constructor expects (spin_rotation, rotation, translation)
             return SpinSpaceGroupOperation(new_spin_rotation, new_rotation, new_translation)
 
         elif isinstance(other, AtomicSite):
             # act on an atomic site
-            new_position = normalize_vector_to_zero(self.rotation @ other.position + self.translation,atol=1e-9)
+            new_position = reduce_computed_mod1(self.rotation @ other.position + self.translation)
             new_magnetic_moment = self.spin_rotation @ other.magnetic_moment
-            return AtomicSite(new_position, new_magnetic_moment,other.occupancy, other.element_symbol)
+            return AtomicSite(new_position, new_magnetic_moment,other.occupancy, other.element_symbol,
+                              lattice_matrix=other.lattice_matrix)
 
         elif isinstance(other, np.ndarray):
             # act on normal vector or [spin, position] vector
@@ -1517,7 +1534,7 @@ class SpinSpaceGroupOperation:
     def inv(self) -> 'SpinSpaceGroupOperation':
         """Inverse of the spin space group operation. {Rs||R|t} -> {Rs^{-1}||R^{-1}|-R{-1}*t}"""
         inv_rotation = np.linalg.inv(self.rotation)
-        inv_translation = normalize_vector_to_zero(-inv_rotation @ self.translation ,atol=1e-4)
+        inv_translation = reduce_computed_mod1(-inv_rotation @ self.translation)
         inv_spin_rotation = np.linalg.inv(self.spin_rotation)
         return SpinSpaceGroupOperation(inv_spin_rotation, inv_rotation, inv_translation)
 
@@ -1639,9 +1656,10 @@ class SpinPointGroupOperation:
 
         elif isinstance(other, AtomicSite):
             # act on an atomic site
-            new_position = normalize_vector_to_zero(self.rotation @ other.position )
+            new_position = reduce_computed_mod1(self.rotation @ other.position)
             new_magnetic_moment = self.spin_rotation @ other.magnetic_moment
-            return AtomicSite(new_position, new_magnetic_moment,other.occupancy, other.element_symbol)
+            return AtomicSite(new_position, new_magnetic_moment,other.occupancy, other.element_symbol,
+                              lattice_matrix=other.lattice_matrix)
 
         elif isinstance(other, np.ndarray):
             # act on normal vector or [spin, position] vector
@@ -1712,6 +1730,7 @@ class SpinSpaceGroup:
         real_space_metric=None,
         identify_source_name: str | None = None,
         identify_tol: float | None = None,
+        _translation_period_basis=None,
     ):
         """
         Initializes a SpinSpaceGroup instance.
@@ -1723,6 +1742,12 @@ class SpinSpaceGroup:
         self.identify_source_name = identify_source_name
         self.identify_tol = identify_tol
         self._identify_index_details_cache = {}
+        # Column basis of the known spin-identity period used by this operation
+        # list. A nofrac G0 list is not generally periodic modulo Z^3.
+        period = np.eye(3) if _translation_period_basis is None else np.asarray(_translation_period_basis, dtype=float)
+        if period.shape != (3, 3) or not np.all(np.isfinite(period)) or np.linalg.det(period) == 0:
+            raise ValueError("Operation translation period must be a finite nonsingular 3x3 basis.")
+        self._translation_period_basis = period.copy()
 
         if isinstance(input_data, str):
             try:
@@ -2513,7 +2538,7 @@ class SpinSpaceGroup:
             if self.conf == 'Collinear':
                 t_count = 0
                 for op in little_group:
-                    if np.allclose(np.array(op[1]), np.eye(3), self.tol):
+                    if np.allclose(np.array(op[1]), np.eye(3), atol=self.tol, rtol=0):
                         t_count += 1
                 if t_count == 2:
                     spin_only_symbol = '^{\\infty }1'
@@ -2527,7 +2552,7 @@ class SpinSpaceGroup:
             else:
                 general_spin_only = []
                 for op in little_group:
-                    if np.allclose(np.array(op[1]), np.eye(3), self.tol):
+                    if np.allclose(np.array(op[1]), np.eye(3), atol=self.tol, rtol=0):
                         general_spin_only.append(np.array(op[0]))
                 pg_info = _resolve_point_group_info(
                     general_spin_only,
@@ -2544,14 +2569,14 @@ class SpinSpaceGroup:
             spin_generators = []
             for index_g in real_info[3]:  # fixed loop variable name clash
                 for op in little_group:
-                    if np.allclose(np.array(op[1]), real_info[1][index_g][0], self.tol):
+                    if np.allclose(np.array(op[1]), real_info[1][index_g][0], atol=self.tol, rtol=0):
                         spin_generators.append(op[0])
                         break
 
             spin_generators_symbols = []
             for spin_op in spin_generators:
                 for op in spin_info[1]:
-                    if np.allclose(np.array(op[0]), spin_op, self.tol):
+                    if np.allclose(np.array(op[0]), spin_op, atol=self.tol, rtol=0):
                         spin_generators_symbols.append(op[2])
 
             latex = ''
@@ -2699,7 +2724,7 @@ class SpinSpaceGroup:
     def get_nontrivial_spin_translation_group(self):
         nontrivial_spin_translation_group = []
         for i in self.nssg:
-            if np.allclose(i[1], np.eye(3), self.tol):
+            if np.allclose(i[1], np.eye(3), atol=self.tol, rtol=0):
                 nontrivial_spin_translation_group.append(i)
         return nontrivial_spin_translation_group
 
@@ -2707,7 +2732,7 @@ class SpinSpaceGroup:
         nssg = []
         if self.conf == 'Collinear':
             for i in self.ops:
-                if np.allclose(i[0], -np.eye(3), self.tol) or np.allclose(i[0], np.eye(3), self.tol):
+                if np.allclose(i[0], -np.eye(3), atol=self.tol, rtol=0) or np.allclose(i[0], np.eye(3), atol=self.tol, rtol=0):
                     nssg.append(i)
         elif self.conf == 'Coplanar':
             for i in self.ops:
@@ -2749,7 +2774,7 @@ class SpinSpaceGroup:
     def get_spin_translation_group(self):
         spin_translation_group = []
         for op in self.ops:
-            if np.allclose(op[1], np.eye(3), self.tol):
+            if np.allclose(op[1], np.eye(3), atol=self.tol, rtol=0):
                 spin_translation_group.append(op)
         return deduplicate_matrix_pairs(spin_translation_group)
 
@@ -2898,13 +2923,15 @@ class SpinSpaceGroup:
     def get_pure_translations(self):
         pure_translations = []
         for op in self.spin_translation_group:
-            if np.allclose(op[0], np.eye(3), self.tol):
+            if np.allclose(op[0], np.eye(3), atol=self.tol, rtol=0):
                 pure_translations.append([op[1], op[2]])
         return pure_translations
 
     def get_spin_only(self):
         spin_only_group = []
         for i in self.spin_translation_group:
+            # Literal zero is intentional: G0 nofrac lists can contain integer
+            # spin translations that must not become spin-only operations.
             if np.allclose(i[2], np.zeros(3), atol=1e-5):
                 spin_only_group.append(i)
         return spin_only_group
@@ -2983,6 +3010,7 @@ class SpinSpaceGroup:
         return GeneralizedSpinPointGroup(spg_ops)
 
     def transform(self, transformation_matrix, origin_shift, frac=True, all_trans=True):
+        """Transport operations; frac=False preserves explicit translation lifts."""
         transformation_matrix_inv = np.linalg.inv(transformation_matrix)
         if frac:
             translations = integer_points_in_new_cell(transformation_matrix_inv.T)
@@ -2995,8 +3023,11 @@ class SpinSpaceGroup:
         for op in [[i[0], i[1], i[2] + np.array(j)] for i in self.ops for j in translations]:
             new_rotation = transformation_matrix @ op[1] @ transformation_matrix_inv
             if frac:
+                # This representative can subsequently be lifted into G0 by a
+                # nofrac transform. Preserve the existing canonicalization until
+                # that route explicitly tracks the integer translation lattice.
                 new_translation = normalize_vector_to_zero(
-                    ((np.eye(3) - new_rotation) @ origin_shift + transformation_matrix @ op[2]), atol=1e-4)
+                    (np.eye(3) - new_rotation) @ origin_shift + transformation_matrix @ op[2], atol=1e-4)
             else:
                 new_translation = ((np.eye(3) - new_rotation) @ origin_shift + transformation_matrix @ op[2])
             new_op = SpinSpaceGroupOperation(op[0], new_rotation, new_translation)
@@ -3014,6 +3045,7 @@ class SpinSpaceGroup:
             real_space_metric=new_metric,
             identify_source_name=self.identify_source_name,
             identify_tol=self.identify_tol,
+            _translation_period_basis=(np.eye(3) if frac else transformation_matrix @ self._translation_period_basis),
         )
 
     def transform_spin(self, spin_transformation_matrix):
@@ -3029,6 +3061,7 @@ class SpinSpaceGroup:
             real_space_metric=self.real_space_metric,
             identify_source_name=self.identify_source_name,
             identify_tol=self.identify_tol,
+            _translation_period_basis=self._translation_period_basis,
         )
 
     def get_attributes_from_database(self):
