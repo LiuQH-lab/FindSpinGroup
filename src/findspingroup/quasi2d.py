@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from findspingroup.core.identify_symmetry_from_ops import deduplicate_matrix_pairs
 from findspingroup.core.tolerances import DEFAULT_KPOINT_TOL
 from findspingroup.structure.group import (
     BrillouinZoneMatcher,
@@ -425,10 +424,7 @@ def _little_group_for_primitive_kpoint(ssg, k_point, *, tol: float) -> list:
 def _spin_splitting_for_little_group(little_group: list, *, tol: float) -> tuple[str, list[str]]:
     if not little_group:
         return "unknown", []
-    spin_matrices = deduplicate_matrix_pairs(
-        [np.asarray(op[0], dtype=float) - np.eye(3) for op in little_group],
-        tol=tol,
-    )
+    spin_matrices = [np.asarray(op[0], dtype=float) - np.eye(3) for op in little_group]
     stacked = np.vstack(spin_matrices)
     return solve_spin_constraint_from_stacked(stacked)
 

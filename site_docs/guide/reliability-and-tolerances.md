@@ -211,6 +211,19 @@ the operation-level helper retains an explicit dimensionless component budget;
 it does not claim physical frame invariance. Neither mode adds an implicit
 relative tolerance.
 
+Spin-polarization permission, subspace dimension and readable equations come
+from one numerical kernel. Exact duplicate operation blocks and machine-zero
+blocks do not change its weighting. The SVD uses the RMS of distinct nonzero
+blocks; the proposed basis is then checked against **every** original operation
+with a maximum unit-vector action residual. If that per-operation budget fails,
+the result is diagnosed as unresolved instead of increasing the tolerance or
+dropping a constraint. This also avoids an unnecessarily large square SVD array.
+Readable coefficients retain small resolved components instead of using the
+rank threshold as a formatting cutoff. Arbitrary-k query audits include the
+threshold, singular values, separation status, frame conditioning, roundoff
+allowance and maximum full-operation residual. These are numerical stability
+diagnostics, not statistical confidence or experimental uncertainty estimates.
+
 Several separate operations should not be confused with crystal idealization:
 
 - Magnetic primitive reduction groups moment vectors within `mtol` and can
