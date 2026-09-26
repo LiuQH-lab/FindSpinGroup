@@ -11116,6 +11116,7 @@ def find_spin_group(
     parsed, source_metadata = parse_structure_file(
         cif,
         atol=parser_atol,
+        position_atol=tol_cfg.space,
         return_metadata=True,
         poscar_allow_incar_magmom=poscar_allow_incar_magmom,
         poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,
@@ -11175,6 +11176,7 @@ def find_spin_group_basic(
     parsed, _source_metadata = parse_structure_file(
         cif,
         atol=parser_atol,
+        position_atol=tol_cfg.space,
         return_metadata=True,
         poscar_allow_incar_magmom=poscar_allow_incar_magmom,
         poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,
@@ -11211,6 +11213,7 @@ def find_spin_group_acc_primitive(
     parsed, _source_metadata = parse_structure_file(
         cif,
         atol=parser_atol,
+        position_atol=tol_cfg.space,
         return_metadata=True,
         poscar_allow_incar_magmom=poscar_allow_incar_magmom,
         poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,
@@ -11267,6 +11270,7 @@ def find_spin_group_input_ssg(
     tol_cfg = Tolerances(space_tol, mtol, meigtol, m_matrix_tol=matrix_tol)
     parsed, source_metadata = parse_structure_file(
         structure_file,
+        position_atol=tol_cfg.space,
         return_metadata=True,
         poscar_allow_incar_magmom=poscar_allow_incar_magmom,
         poscar_prefer_incar_magmom=poscar_prefer_incar_magmom,

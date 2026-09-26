@@ -185,6 +185,16 @@ Readable GSPG affine rows use the same precise default because they may be
 reused as tensor-analysis input. These rules do not change separate Seitz-label
 display tolerances or globally idealize asymmetric representatives.
 
+CIF/SCIF expansion compares periodic positions in the physical cell metric,
+using `position_atol` in cell length units (the file-facing analysis routes pass
+`space_tol`). `parser_atol` bounds the norm of a physical moment-vector
+difference, not each coordinate separately. Direct parsers expose it as `atol`.
+Occupancy matching uses a separate absolute, dimensionless `occupancy_atol`.
+An absent moment record is unspecified; an explicitly supplied zero moment is
+checked like any other observation. Inconsistent specified images of one site
+raise a diagnostic rather than silently keeping whichever image appeared first.
+The parser does not average positions/moments or project them onto symmetry.
+
 Several separate operations should not be confused with crystal idealization:
 
 - Magnetic primitive reduction groups moment vectors within `mtol` and can

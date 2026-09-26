@@ -6,9 +6,10 @@ import shlex
 import ast
 from fractions import Fraction
 from ..structure import AtomicSite,CrystalCell
-from ..structure.cell import are_positions_equivalent, calculate_vector_coordinates_from_latticefactors
+from ..structure.cell import calculate_vector_coordinates_from_latticefactors
 from ..utils import general_positions_to_matrix
 from ..utils.matrix_utils import evaluate_numeric_expression
+from ._expansion import ExpansionSites
 
 
 def _tokenize_cif_line(line):
@@ -1005,8 +1006,15 @@ def parse_cif_metadata(filename=None, *, source_text=None):
     return _extract_cif_metadata(CifParser(filename, source_text=source_text).parse())
 
 
-def parse_cif_file(filename, atol = 0.01, return_metadata=False):
+def parse_cif_file(filename, atol=0.01, return_metadata=False, *,
+                   position_atol=0.02, occupancy_atol=1e-6):
     """
+    Expand CIF/mCIF symmetry without idealizing the asymmetric representatives.
+
+    ``position_atol`` is in cell length units. ``atol`` bounds the physical
+    moment-vector difference at a reconstructed site; ``occupancy_atol`` is
+    an absolute dimensionless difference. Missing moment rows are unspecified,
+    while explicit zero moments participate in consistency checks.
 
     Parameters:
         filename : byte
@@ -1093,7 +1101,12 @@ def parse_cif_file(filename, atol = 0.01, return_metadata=False):
     my_list = _get_first_existing(data, my_keys)
     mz_list = _get_first_existing(data, mz_keys)
 
-    # see if all data are available
+    if any(v is not None for v in [moment_labels, mx_list, my_list, mz_list]) and not all(
+            v is not None for v in [moment_labels, mx_list, my_list, mz_list]):
+        raise ValueError("Incomplete CIF magnetic-moment loop.")
+    if moment_labels is not None and not (len(moment_labels) == len(mx_list) == len(my_list) == len(mz_list)):
+        raise ValueError("Inconsistent CIF magnetic-moment loop lengths.")
+    known_labels = set(moment_labels or [])
     if all(v is not None for v in [moment_labels, mx_list, my_list, mz_list]):
         initial_moments = []
 
@@ -1134,38 +1147,24 @@ def parse_cif_file(filename, atol = 0.01, return_metadata=False):
 
 
     symops_matrices, time_reversal = general_positions_to_matrix(symops)
-    certering_ops_matrices, centering_time_reversal = general_positions_to_matrix(centering_ops)
+    centering_ops_matrices, centering_time_reversal = general_positions_to_matrix(centering_ops)
 
-    # generate all atoms
-    all_positions = []
-    all_elements = []
-    all_occupancies = []
-    all_labels = []
-    all_moments = []
+    lattice = calculate_vector_coordinates_from_latticefactors(*latticefactors)
+    sites = ExpansionSites(
+        lattice, lattice.T / np.array([a, b, c]), position_atol=position_atol,
+        moment_atol=atol, occupancy_atol=occupancy_atol, format_name="CIF",
+    )
     for pos, elem, occ, label, moment in sorted(zip(initial_positions, initial_elements, initial_occupancy, initial_labels,initial_moments),key=lambda x: [abs(i) for i in x[-1]],reverse=True):
         moment_inlattice = np.array([moment[0]/a, moment[1]/b, moment[2]/c])
         for op_index,op in enumerate(symops_matrices):
-            for op_c_index,op_c in enumerate(certering_ops_matrices):
-                new_pos = op[0] @ op_c[0]@ pos + op[1] + op_c[1]
-                new_pos = new_pos % 1.0  # Ensure within [0,1)
+            for op_c_index,op_c in enumerate(centering_ops_matrices):
+                rotation = op[0] @ op_c[0]
+                new_pos = op[0] @ (op_c[0] @ pos + op_c[1]) + op[1]
                 tr = time_reversal[op_index] * centering_time_reversal[op_c_index]
-
-                same = False
-                for old_index,old_pos in enumerate(all_positions):
-                    if are_positions_equivalent(new_pos, old_pos) and all_elements[old_index] == elem and np.allclose(occ,all_occupancies[old_index],atol=0.000001): # deduplicate, same position & same element & same occupancy
-                        same = True
-                        break
-                if same :
-                    continue
-                else:
-                    all_positions.append(new_pos)
-                    all_elements.append(elem)
-                    all_occupancies.append(occ)
-                    all_labels.append(label)
-                    after_moment = round(np.linalg.det(op[0]))*op[0]*tr @ moment_inlattice
-                    final_moment = np.array([after_moment[0]*a,after_moment[1]*b,after_moment[2]*c])
-                    all_moments.append(final_moment)
-    parsed = (latticefactors,all_positions, all_elements, all_occupancies, all_labels, all_moments)
+                after_moment = round(np.linalg.det(rotation)) * tr * (rotation @ moment_inlattice)
+                final_moment = after_moment * np.array([a, b, c])
+                sites.add(new_pos, elem, occ, label, final_moment, moment_known=label in known_labels)
+    parsed = sites.parsed(latticefactors)
     if return_metadata:
         return parsed, metadata
     return parsed
@@ -1208,7 +1207,8 @@ def _scif_spin_frame_matrices(data, lattice):
     return np.diag(lengths), spin_basis / lengths, lattice_frame
 
 
-def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_text=None):
+def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_text=None,
+                    position_atol=0.02, occupancy_atol=1e-6):
     """Expand SCIF operations with their declared spin-frame convention.
 
     Atom axis_u/v/w values are absolute components along unit spin-basis
@@ -1217,6 +1217,10 @@ def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_t
     return Cartesian moments in the canonical frame of the file's cell
     parameters. Use return_metadata=True and its spin_setting when passing
     parsed data to a structure-analysis API.
+
+    ``position_atol`` is a physical periodic distance in cell length units;
+    ``atol`` bounds a physical moment-vector difference, not each component.
+    ``occupancy_atol`` is an absolute dimensionless occupancy difference.
     """
     data = ScifParser(filename, source_text=source_text).parse()
     metadata = _extract_scif_metadata(data)
@@ -1257,6 +1261,8 @@ def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_t
     x = data['_atom_site_fract_x']
     y = data['_atom_site_fract_y']
     z = data['_atom_site_fract_z']
+    if not (len(initial_labels) == len(initial_elements) == len(x) == len(y) == len(z)):
+        raise ValueError("Inconsistent SCIF atomic-site loop lengths.")
     initial_positions = np.array(
         [
             [convert_string_to_float(xi), convert_string_to_float(yi), convert_string_to_float(zi)]
@@ -1268,6 +1274,9 @@ def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_t
         initial_occupancy = [convert_string_to_float(occ) for occ in data['_atom_site_occupancy']]
     else:
         initial_occupancy = [1.0] * len(initial_positions)
+
+    if len(initial_occupancy) != len(initial_positions):
+        raise ValueError("Inconsistent SCIF occupancy and position lengths.")
 
     spin_label_keys = [
         '_atom_site_spin_moment.label',
@@ -1292,7 +1301,12 @@ def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_t
     sw_list = _get_first_existing(data, sw_keys)
 
     moments_by_label = {}
+    if any(v is not None for v in [spin_labels, su_list, sv_list, sw_list]) and not all(
+            v is not None for v in [spin_labels, su_list, sv_list, sw_list]):
+        raise ValueError("Incomplete SCIF spin-moment loop.")
     if all(v is not None for v in [spin_labels, su_list, sv_list, sw_list]):
+        if not (len(spin_labels) == len(su_list) == len(sv_list) == len(sw_list)):
+            raise ValueError("Inconsistent SCIF spin-moment loop lengths.")
         for lbl, su, sv, sw in zip(spin_labels, su_list, sv_list, sw_list):
             moments_by_label[lbl] = np.array(
                 [
@@ -1358,11 +1372,13 @@ def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_t
     if not (len(lattice_real) == len(lattice_spin)):
         raise ValueError("Inconsistent SCIF spin-lattice loop lengths.")
 
-    all_positions = []
-    all_elements = []
-    all_occupancies = []
-    all_labels = []
-    all_moments = []
+    if any(np.any(shift != 0) for _, shift in symop_spin + lattice_spin):
+        raise ValueError("SCIF spin operations must be linear; affine spin shifts are not allowed.")
+    sites = ExpansionSites(
+        lattice, moment_to_cartesian if lattice_frame else np.eye(3),
+        position_atol=position_atol, moment_atol=atol, occupancy_atol=occupancy_atol,
+        format_name="SCIF",
+    )
 
     for pos, elem, occ, label, moment in zip(
         initial_positions,
@@ -1384,44 +1400,16 @@ def parse_scif_file(filename=None, atol=0.02, return_metadata=False, *, source_t
                 if not lattice_frame:
                     new_moment = moment_to_cartesian @ new_moment
 
-                same = False
-                for old_index, old_pos in enumerate(all_positions):
-                    if (
-                        are_positions_equivalent(new_pos, old_pos)
-                        and all_elements[old_index] == elem
-                        and np.allclose(occ, all_occupancies[old_index], atol=1e-6)
-                    ):
-                        if not np.allclose(
-                            new_moment,
-                            all_moments[old_index],
-                            atol=max(atol, 1e-6),
-                        ):
-                            raise ValueError(
-                                "SCIF expansion produced inconsistent moments for the same atomic site. "
-                                "Check spin-operation/spin-lattice composition order. "
-                                "Suggested direction: first retry with "
-                                "`find_spin_group(..., parser_atol=...)` or "
-                                "`parse_scif_file(..., atol=...)` / `parse_scif_text(..., atol=...)`; "
-                                "if you need the parsed-data flow, parse first and then call "
-                                "`find_spin_group_from_data(...)`. "
-                                "Adjust SCIF atom/moment precision before tuning point-group parameters."
-                            )
-                        same = True
-                        break
-                if same:
-                    continue
+                sites.add(new_pos, elem, occ, label, new_moment,
+                          moment_known=label in moments_by_label)
 
-                all_positions.append(new_pos)
-                all_elements.append(elem)
-                all_occupancies.append(occ)
-                all_labels.append(label)
-                all_moments.append(np.asarray(new_moment, dtype=float))
-
-    parsed = (latticefactors, all_positions, all_elements, all_occupancies, all_labels, all_moments)
+    parsed = sites.parsed(latticefactors)
     if return_metadata:
         return parsed, metadata
     return parsed
 
 
-def parse_scif_text(text, atol=0.02, return_metadata=False):
-    return parse_scif_file(None, atol=atol, return_metadata=return_metadata, source_text=text)
+def parse_scif_text(text, atol=0.02, return_metadata=False, *,
+                    position_atol=0.02, occupancy_atol=1e-6):
+    return parse_scif_file(None, atol=atol, return_metadata=return_metadata, source_text=text,
+                           position_atol=position_atol, occupancy_atol=occupancy_atol)

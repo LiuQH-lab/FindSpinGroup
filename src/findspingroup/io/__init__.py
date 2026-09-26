@@ -15,6 +15,8 @@ def parse_structure_file(
     atol=0.02,
     return_metadata=False,
     *,
+    position_atol=0.02,
+    occupancy_atol=1e-6,
     poscar_allow_incar_magmom: bool = False,
     poscar_prefer_incar_magmom: bool = False,
     poscar_require_embedded_magmom: bool = False,
@@ -24,7 +26,8 @@ def parse_structure_file(
     basename = path.name.lower()
     if suffix == '.scif':
         if return_metadata:
-            parsed, metadata = parse_scif_file(filename, atol=atol, return_metadata=True)
+            parsed, metadata = parse_scif_file(filename, atol=atol, return_metadata=True,
+                                               position_atol=position_atol, occupancy_atol=occupancy_atol)
             enriched = {} if metadata is None else dict(metadata)
             enriched.setdefault("source_format", "scif")
             spinframe_abc = (
@@ -38,15 +41,16 @@ def parse_structure_file(
                 "in_lattice" if normalized_spinframe in {None, "a,b,c"} else "cartesian",
             )
             return parsed, enriched
-        return parse_scif_file(filename, atol=atol)
+        return parse_scif_file(filename, atol=atol, position_atol=position_atol, occupancy_atol=occupancy_atol)
     if suffix in {'.cif', '.mcif'}:
         if return_metadata:
-            parsed, metadata = parse_cif_file(filename, atol=atol, return_metadata=True)
+            parsed, metadata = parse_cif_file(filename, atol=atol, return_metadata=True,
+                                              position_atol=position_atol, occupancy_atol=occupancy_atol)
             enriched = {} if metadata is None else dict(metadata)
             enriched.setdefault("source_format", "cif")
             enriched.setdefault("spin_setting", "in_lattice")
             return parsed, enriched
-        return parse_cif_file(filename, atol=atol)
+        return parse_cif_file(filename, atol=atol, position_atol=position_atol, occupancy_atol=occupancy_atol)
     if suffix in {'.vasp', '.poscar'} or basename in {'poscar', 'contcar'} or suffix not in {'.scif', '.cif', '.mcif'}:
         parsed = parse_poscar_file(
             filename,

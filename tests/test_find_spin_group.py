@@ -2483,13 +2483,14 @@ def test_find_spin_group_forwards_parser_atol_to_parse_structure_file(monkeypatc
     monkeypatch.setattr(find_spin_group_module, "parse_structure_file", fake_parse_structure_file)
     monkeypatch.setattr(find_spin_group_module, "_find_spin_group_from_parsed", fake_find_spin_group_from_parsed)
 
-    result = find_spin_group_module.find_spin_group("dummy.scif", parser_atol=0.123)
+    result = find_spin_group_module.find_spin_group("dummy.scif", parser_atol=0.123, space_tol=0.045)
 
     assert result == {"ok": True}
     assert captured["filename"] == "dummy.scif"
     assert captured["atol"] == 0.123
     assert captured["return_metadata"] is True
     assert captured["parse_kwargs"] == {
+        "position_atol": 0.045,
         "poscar_allow_incar_magmom": False,
         "poscar_prefer_incar_magmom": False,
     }
