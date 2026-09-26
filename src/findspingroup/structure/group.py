@@ -1548,7 +1548,8 @@ class SpinSpaceGroupOperation:
         return SpinPointGroupOperation(deepcopy(self.spin_rotation), deepcopy(self.rotation))
 
     def tolist(self):
-        return [self.spin_rotation.round(6).tolist(), self.rotation.round(6).tolist(), self.translation.round(6).tolist()]
+        """Serialize the numerical operation without display rounding or mod-1 reduction."""
+        return [self.spin_rotation.tolist(), self.rotation.tolist(), self.translation.tolist()]
 
     def seitz_description(self, tol=1e-6, max_order=120, max_axis_denom=12, allow_unresolved=False):
         """
