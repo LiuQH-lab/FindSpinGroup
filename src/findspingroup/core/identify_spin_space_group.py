@@ -1685,9 +1685,25 @@ def _finite_order_residual(matrix, *, max_order: int = 120):
 
 
 def _spin_rotations_are_clean_finite_group(rotations, *, clean_tol: float = 1e-6) -> bool:
-    for rotation in rotations:
-        _order, residual = _finite_order_residual(rotation)
-        if residual > clean_tol:
+    """Check the whole Cartesian representation, not individual finite orders.
+
+    A finite, product-closed set of invertible matrices containing identity is
+    a group. Two finite-order mirrors alone do not establish this condition.
+    Frobenius residuals here are invariant under orthogonal spin-frame changes;
+    physical atom/moment preservation is checked separately after projection.
+    """
+    matrices = np.asarray(rotations, dtype=float)
+    if (matrices.ndim != 3 or matrices.shape[1:] != (3, 3) or not len(matrices)
+            or not np.all(np.isfinite(matrices))):
+        return False
+    if np.min(np.linalg.norm(matrices-np.eye(3), axis=(1, 2))) > clean_tol:
+        return False
+    if np.max(np.linalg.norm(matrices.transpose(0, 2, 1)@matrices-np.eye(3), axis=(1, 2))) > clean_tol:
+        return False
+    for left in matrices:
+        products = left @ matrices
+        distances = np.linalg.norm(products[:, None]-matrices[None, :], axis=(2, 3))
+        if np.max(np.min(distances, axis=1)) > clean_tol:
             return False
     return True
 
