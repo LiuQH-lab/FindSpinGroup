@@ -3023,11 +3023,11 @@ class SpinSpaceGroup:
         for op in [[i[0], i[1], i[2] + np.array(j)] for i in self.ops for j in translations]:
             new_rotation = transformation_matrix @ op[1] @ transformation_matrix_inv
             if frac:
-                # This representative can subsequently be lifted into G0 by a
-                # nofrac transform. Preserve the existing canonicalization until
-                # that route explicitly tracks the integer translation lattice.
-                new_translation = normalize_vector_to_zero(
-                    (np.eye(3) - new_rotation) @ origin_shift + transformation_matrix @ op[2], atol=1e-4)
+                # The target cell is a mod-1 quotient. Preserve the common
+                # affine origin instead of snapping each operation separately;
+                # later nofrac lifts carry their period basis explicitly.
+                new_translation = reduce_computed_mod1(
+                    (np.eye(3) - new_rotation) @ origin_shift + transformation_matrix @ op[2])
             else:
                 new_translation = ((np.eye(3) - new_rotation) @ origin_shift + transformation_matrix @ op[2])
             new_op = SpinSpaceGroupOperation(op[0], new_rotation, new_translation)

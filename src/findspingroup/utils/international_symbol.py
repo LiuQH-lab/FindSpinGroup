@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import itertools
 from fractions import Fraction
 from math import gcd, lcm
 from typing import TYPE_CHECKING
@@ -77,7 +78,9 @@ def _transport_standard_real_op_to_current_basis(
     current_translation = standard_to_current @ (
         translation + (rotation - np.eye(3)) @ current_to_standard_shift
     )
-    return current_rotation, _normalize_mod1(current_translation)
+    # The current frame can be a lifted G0 representation, not a mod-1 cell.
+    # Match this literal target modulo the SSG's spin-identity periods later.
+    return current_rotation, current_translation
 
 
 def _transport_standard_generators_to_current_basis(
@@ -254,13 +257,38 @@ def _find_real_operation(
     target_rot: np.ndarray,
     target_trans: np.ndarray,
     tol: float = 1e-4,
+    *,
+    period_basis: np.ndarray | None = None,
 ) -> "SpinSpaceGroupOperation | None":
+    basis = np.eye(3) if period_basis is None else np.asarray(period_basis, dtype=float)
+    inverse = np.linalg.inv(basis)
     for op in ops:
-        if np.allclose(op.rotation, target_rot, atol=tol, rtol=0) and _same_translation_mod1(
-            op.translation, target_trans, tol=tol
+        if np.allclose(op.rotation, target_rot, atol=tol, rtol=0) and _translation_in_period(
+            np.asarray(op.translation) - target_trans, basis, inverse, tol
         ):
             return op
     return None
+
+
+def _translation_in_period(delta, basis, inverse, tol):
+    """Test delta in B Z^3 with an absolute current-coordinate residual budget."""
+    coefficients = inverse @ delta
+    nearest = np.rint(coefficients)
+    if np.max(np.abs(delta - basis @ nearest)) < tol:
+        return True
+    # |delta-Bn|_inf < tol implies |B^-1 delta-n| <= |B^-1|*tol.
+    # Enumerate that bounded box so a sheared basis cannot hide a valid image.
+    radius = np.sum(np.abs(inverse), axis=1) * tol
+    slack = 32 * np.finfo(float).eps * np.maximum(1, np.abs(coefficients) + radius)
+    lower = np.ceil(coefficients - radius - slack).astype(int)
+    upper = np.floor(coefficients + radius + slack).astype(int)
+    counts = np.maximum(upper - lower + 1, 0)
+    if any(count == 0 for count in counts):
+        return False
+    if int(counts[0]) * int(counts[1]) * int(counts[2]) > 100000:
+        raise ValueError("Named-generator period search exceeds its bound; inspect the symbol setting.")
+    return any(np.max(np.abs(delta - basis @ np.asarray(n))) < tol
+               for n in itertools.product(*(range(int(lo), int(hi) + 1) for lo, hi in zip(lower, upper))))
 
 
 def _select_preferred_translation_match(
@@ -477,8 +505,11 @@ def _symbol_type(it: int, ik: int) -> str:
 
 def _transform_to_g0_basis(ssg: "SpinSpaceGroup") -> "SpinSpaceGroup":
     ssg_g0 = ssg.transform(ssg.transformation_to_G0std, ssg.origin_shift_to_G0std)
-    basis_fix = ssg.transformation_to_G0std_id @ np.linalg.inv(ssg.transformation_to_G0std)
-    ssg_g0 = ssg_g0.transform(basis_fix, np.array([0, 0, 0]), frac=False)
+    basis_fix, origin_fix = _compose_setting_transform(
+        ssg.transformation_to_G0std, ssg.origin_shift_to_G0std,
+        ssg.transformation_to_G0std_id, ssg.origin_shift_to_G0std_id,
+    )
+    ssg_g0 = ssg_g0.transform(basis_fix, origin_fix, frac=False)
     return ssg_g0.transform_spin(np.linalg.inv(ssg.n_spin_part_std_transformation))
 
 
@@ -905,12 +936,10 @@ def build_international_symbol(
         else:
             sg_num = int(ssg.G0_num)
             sg_symbol = ssg.G0_symbol
-            current_to_standard, current_to_standard_shift = _compose_setting_transform(
-                np.asarray(ssg.transformation_to_G0std, dtype=float),
-                np.asarray(ssg.origin_shift_to_G0std, dtype=float),
-                np.asarray(ssg.transformation_to_G0std_id, dtype=float),
-                np.asarray(ssg.origin_shift_to_G0std_id, dtype=float),
-            )
+            # These maps start at this SSG's current basis, not its intermediate
+            # integerized G0 cell. Generator back-transport needs the full map.
+            current_to_standard = np.asarray(ssg.transformation_to_G0std_id, dtype=float)
+            current_to_standard_shift = np.asarray(ssg.origin_shift_to_G0std_id, dtype=float)
         ssg_basis = ssg
     else:
         if use_l0_basis:
@@ -942,11 +971,17 @@ def build_international_symbol(
     sg1_token: str | None = None
     if named_ops:
         for (rot, trans), real_tok in zip(named_ops, real_tokens):
-            matched = _find_real_operation(ssg_basis.nssg, rot, trans, tol=tol)
+            matched = _find_real_operation(
+                ssg_basis.nssg, rot, trans, tol=tol,
+                period_basis=ssg_basis._translation_period_basis,
+            )
             if ssg_type == "k":
+                # The L0 generators have identity spin by definition.
                 spin_info = None
             else:
-                spin_info = spin_info_map.get(id(matched)) if matched is not None else None
+                # Missing a real generator is not evidence of identity spin.
+                # Keep the established unresolved token; never invent an op.
+                spin_info = spin_info_map.get(id(matched), {"unresolved": True})
             named_pair_data.append((spin_info, real_tok, matched))
     else:
         # SG #1 has no non-identity named generator; keep trailing "1" for readability.
@@ -1010,14 +1045,15 @@ def build_international_symbol(
             primitive_translation_data.append((label, vector, spin_info, matched))
 
         for label, target in centering_targets:
-            matched = _select_preferred_translation_match(
-                ssg_basis.nssg,
+            matched = _find_real_operation(
+                identity_real_ops,
+                np.eye(3),
                 target,
                 tol=tol,
-                identity_real_ops=identity_real_ops,
+                period_basis=ssg_basis._translation_period_basis,
             )
             vector = np.asarray(matched.translation if matched is not None else target, dtype=float)
-            spin_info = spin_info_map.get(id(matched)) if matched is not None else None
+            spin_info = spin_info_map.get(id(matched), {"unresolved": True})
             centering_translation_data.append((label, vector, spin_info, matched))
 
     # The spin-only suffix should describe the current SpinSpaceGroup frame,

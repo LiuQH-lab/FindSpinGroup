@@ -70,8 +70,8 @@ moment clustering and candidate selection can also change.
 
 MSG identification uses the supplied operations directly. Its translations are
 reduced modulo lattice integers, not rounded to nearby small-denominator
-fractions. Computational mod-1 operation multiplication and inversion
-preserve resolved small translations; cleanup there
+fractions. Computational mod-1 operation multiplication, inversion and setting
+transport preserve resolved small translations; cleanup there
 is limited to machine roundoff, not a physical equivalence tolerance.
 
 `transform(..., frac=False)` has a different purpose: internal G0/nofrac
@@ -90,14 +90,25 @@ be a sublattice of the full primitive translation lattice; explicit centering
 operations are not discarded. This bookkeeping does not change the public
 operation tables or redefine spin-only membership.
 
-This is not a blanket removal of all legacy numerical policies. Setting transport
-(`transform(..., frac=True)`), symbol-generator selection and identify-index
-preprocessing retain separate canonicalization
-budgets; their revision requires their own group-representation validation.
-Setting transport still uses its historical `1e-4` cleanup before a possible
-G0/nofrac lift; removing that step alone can turn near-boundary roundoff into
-a different explicit integer lift and corrupt symbol-generator selection.
-In particular, the legacy symbol closure's `1e-4` translation cleanup is local
+Named real generators and centering operations are also matched modulo the
+tracked spin-identity period, not automatically modulo the displayed G0 axes.
+Integer translations outside this period can carry different spin rotations.
+If a t/g-type named generator cannot be matched, its spin partner is unresolved
+(`?`), not silently reported as identity. L0 generators in a k-type symbol have
+identity spin by definition.
+
+Setting transport retains the complete affine map. If an intermediate cell is
+`x_mid = A x + a` and the final standard cell is `x_std = P x + p`, the second
+step is `(P A^-1, p - P A^-1 a)`. Its origin shift is not generally zero.
+Named generators displayed in the original current setting are transported
+back using the full `(P,p)`, not the intermediate-to-standard map. Snapping
+each transformed translation separately can destroy their common origin and
+must not be used as a substitute for this coordinate transformation.
+
+This is not a blanket removal of all legacy numerical policies. Symbol closure
+and identify-index preprocessing retain separate canonicalization budgets;
+their revision requires their own group-representation validation.
+The legacy symbol closure's `1e-4` translation cleanup remains local
 to generator selection and does not overwrite the supplied numerical operations.
 
 An arbitrary-k query similarly preserves its supplied k point modulo reciprocal
