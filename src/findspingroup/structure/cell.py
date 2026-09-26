@@ -136,6 +136,10 @@ def transform_moments(moments, lattice_factors, inverse=False,lattice_matrix = N
     inverse : bool, default False
         If False, convert lattice -> Cartesian.
         If True, convert Cartesian -> lattice.
+    lattice_matrix : array-like, optional
+        Actual row-vector lattice in world Cartesian coordinates. Without it,
+        use the canonical frame with a along x and b in the xy plane. Components
+        are along unit lattice directions, not relative fractional spin axes.
 
     Returns
     -------
@@ -146,6 +150,11 @@ def transform_moments(moments, lattice_factors, inverse=False,lattice_matrix = N
 
     # lattice -> cartesian
     T_matrix = calculate_vector_coordinates_from_latticefactors(1, 1, 1, alpha, beta, gamma)
+    if lattice_matrix is not None:
+        canonical_lattice, world_to_canonical = standardize_lattice(np.asarray(lattice_matrix, dtype=float))
+        if canonical_lattice[2, 2] < 0:
+            T_matrix[2, 2] *= -1
+        T_matrix = T_matrix @ world_to_canonical
 
     moments = np.asarray(moments)
 
@@ -330,35 +339,33 @@ def _change_cell_settings_unimodular_fast_path(
     # affine map used by the paired SSG transformation.
     transformation = np.asarray(transformation_matrix, dtype=float)
     origin_shift = np.asarray(origin_shift, dtype=float)
-    inverse_transformation = np.linalg.inv(transformation)
+    inverse_integer_transformation = np.rint(np.linalg.inv(integer_transformation)).astype(int)
     new_cell_lattice = np.linalg.inv(transformation).T @ np.asarray(old_cell[0], dtype=float)
+    boundary = np.maximum(eps * np.linalg.norm(np.linalg.inv(new_cell_lattice), axis=0), 1e-12)
     direct_positions = old_positions @ transformation.T + origin_shift
     old_moments = [np.asarray(item, dtype=float) for item in mag]
     candidate_entries = []
     for atom_index, direct_position in enumerate(direct_positions):
         offset_options = []
-        for component in direct_position:
+        for axis, component in enumerate(direct_position):
             base = math.floor(-float(component))
             component_offsets = []
             for offset in range(base - 2, base + 4):
                 shifted = float(component) + offset
-                if -eps < shifted < 1.0 + eps:
+                if -boundary[axis] < shifted < 1.0 + boundary[axis]:
                     component_offsets.append(offset)
             if not component_offsets:
                 return None
             offset_options.append(component_offsets)
 
         for offset in itertools.product(*offset_options):
-            offset = np.asarray(offset, dtype=float)
-            shift = inverse_transformation @ offset
-            rounded_shift = np.rint(shift).astype(int)
-            if not np.allclose(shift, rounded_shift, atol=max(eps, 1e-10), rtol=0.0):
-                continue
+            offset = np.asarray(offset, dtype=int)
+            shift = inverse_integer_transformation @ offset
             candidate_entries.append(
                 (
-                    tuple(int(value) for value in rounded_shift),
+                    tuple(int(value) for value in shift),
                     atom_index,
-                    direct_position + offset,
+                    direct_position + transformation @ shift,
                 )
             )
     if not candidate_entries:
@@ -777,8 +784,9 @@ class CrystalCell:
             )
 
         if self.moments is not None:
-            self.net_moment= np.linalg.norm([sum(_) for _ in zip(*self.moments_cartesian)])
-            if any([np.linalg.norm(i) > MAGNETIC_PRESENCE_TOL for i in self.moments]) :
+            physical_moments = np.asarray(self.moments_cartesian)
+            self.net_moment = np.linalg.norm(physical_moments.sum(axis=0))
+            if any(np.linalg.norm(i) > MAGNETIC_PRESENCE_TOL for i in physical_moments):
                 pass
             else:
                 self.moments = None
@@ -831,7 +839,7 @@ class CrystalCell:
             self.magnetic_atom_indices = None
         else:
             self.magnetic_atom_indices = [
-                i for i, m in enumerate(self.moments)
+                i for i, m in enumerate(self.moments_cartesian)
                 if np.linalg.norm(m) > MAGNETIC_PRESENCE_TOL
             ]
 
@@ -846,7 +854,8 @@ class CrystalCell:
         if self.spin_setting == "cartesian":
             return self.moments
         elif self.spin_setting == "in_lattice":
-            return transform_moments(self.moments, self.lattice_factors, inverse=False)
+            return transform_moments(self.moments, self.lattice_factors, inverse=False,
+                                     lattice_matrix=self.lattice_matrix)
         else:
             raise ValueError("spin_setting must be 'in_lattice', 'cartesian', or None.")
 
@@ -992,7 +1001,7 @@ class CrystalCell:
             new_cell = change_cell_settings(self.to_spglib(mag=False), matrix, shift, eps=self.tol.space)
         else:
             new_cell = change_cell_settings(
-                self.to_spglib(mag=True),
+                (self.lattice_matrix, self.positions, self.atom_types, self.moments_cartesian),
                 matrix,
                 shift,
                 eps=self.tol.space,
@@ -1010,6 +1019,11 @@ class CrystalCell:
         else:
             final_moments = np.asarray(new_moments, dtype=float)
             new_spin_setting = self.spin_setting
+            if new_spin_setting == "in_lattice":
+                final_moments = transform_moments(
+                    final_moments, calculate_lattice_params(new_lattice),
+                    inverse=True, lattice_matrix=new_lattice,
+                )
         return CrystalCell(
             lattice=new_lattice,
             positions=new_positions,
