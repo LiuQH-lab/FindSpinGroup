@@ -1,5 +1,5 @@
 import itertools
-from collections import defaultdict
+from collections import defaultdict, deque
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -16,7 +16,12 @@ from findspingroup.core.identify_symmetry_from_ops import (
 )
 from findspingroup.core.tolerances import Tolerances, DEFAULT_TOL
 from findspingroup.structure.cell import MAGNETIC_PRESENCE_TOL
-from findspingroup.utils.matrix_utils import getNormInf, normalize_vector_to_zero
+from findspingroup.utils.matrix_utils import getNormInf, normalize_vector_to_zero, reduce_computed_mod1
+from findspingroup.utils.periodic import (
+    fractional_search_radius,
+    periodic_cartesian_distance,
+    positions_within_cartesian_tolerance,
+)
 from findspingroup.structure import *
 
 
@@ -78,14 +83,10 @@ def _mag_atom_bucket_key(position, bins: int) -> tuple[int, int, int]:
 
 
 def _mag_atom_neighbor_keys(bucket_key: tuple[int, int, int], bins: int, neighbor_radius: int):
-    for dx in range(-neighbor_radius, neighbor_radius + 1):
-        for dy in range(-neighbor_radius, neighbor_radius + 1):
-            for dz in range(-neighbor_radius, neighbor_radius + 1):
-                yield (
-                    (bucket_key[0] + dx) % bins,
-                    (bucket_key[1] + dy) % bins,
-                    (bucket_key[2] + dz) % bins,
-                )
+    offsets = range(-neighbor_radius, min(neighbor_radius + 1, -neighbor_radius + bins))
+    yield from itertools.product(*[
+        [(component + offset) % bins for offset in offsets] for component in bucket_key
+    ])
 
 
 def _build_magnetic_atom_preservation_checker(mag_atoms, tol: Tolerances):
@@ -93,19 +94,21 @@ def _build_magnetic_atom_preservation_checker(mag_atoms, tol: Tolerances):
     moments = np.asarray([atom.magnetic_moment for atom in mag_atoms], dtype=float)
     elements = [atom.element_symbol for atom in mag_atoms]
     occupancies = np.asarray([float(atom.occupancy) for atom in mag_atoms], dtype=float)
-    bins, neighbor_radius = _mag_atom_bucket_params(tol.space)
+    lattice = mag_atoms[0].lattice_matrix if mag_atoms else None
+    search_radius = tol.space if lattice is None else fractional_search_radius(lattice, tol.space)
+    bins, neighbor_radius = _mag_atom_bucket_params(search_radius)
     buckets: dict[tuple[object, int, int, int], list[int]] = defaultdict(list)
     for index, position in enumerate(positions):
         buckets[(elements[index], *_mag_atom_bucket_key(position, bins))].append(index)
 
-    spatial_cache: dict[tuple[int, ...], list[list[int]] | None] = {}
+    spatial_cache: dict[tuple[bytes, bytes], list[list[int]] | None] = {}
 
-    def spatial_key(rotation: np.ndarray, translation: np.ndarray) -> tuple[int, ...]:
-        key_tol = 1e-8
-        normalized_translation = normalize_vector_to_zero(translation, atol=key_tol)
+    def spatial_key(rotation: np.ndarray, translation: np.ndarray) -> tuple[bytes, bytes]:
+        # Cache reuse is exact; an approximate key cannot decide acceptance at
+        # a physical position tolerance tighter than the key's rounding scale.
         return (
-            *np.rint(np.asarray(rotation, dtype=float).ravel() / key_tol).astype(np.int64),
-            *np.rint(normalized_translation.ravel() / key_tol).astype(np.int64),
+            np.asarray(rotation, dtype=float).tobytes(),
+            np.asarray(translation, dtype=float).tobytes(),
         )
 
     def spatial_candidates_for_op(real_rotation, translation) -> list[list[int]] | None:
@@ -117,23 +120,28 @@ def _build_magnetic_atom_preservation_checker(mag_atoms, tol: Tolerances):
 
         candidates_by_atom: list[list[int]] = []
         for atom_index, position in enumerate(positions):
-            transformed_position = normalize_vector_to_zero(
-                real_rotation @ position + translation,
-                atol=1e-9,
-            )
+            transformed_position = reduce_computed_mod1(real_rotation @ position + translation)
             bucket_key = _mag_atom_bucket_key(transformed_position, bins)
             candidates: list[int] = []
+            checked_indices = set()
             for neighbor_key in _mag_atom_neighbor_keys(bucket_key, bins, neighbor_radius):
                 for candidate_index in buckets.get((elements[atom_index], *neighbor_key), ()):
+                    if candidate_index in checked_indices:
+                        continue
+                    checked_indices.add(candidate_index)
                     if not _distance_within_tolerance(
                         abs(occupancies[atom_index] - occupancies[candidate_index]),
                         tol.occupancy,
                     ):
                         continue
-                    if not _distance_within_tolerance(
-                        getNormInf(transformed_position, positions[candidate_index]),
-                        tol.space,
-                    ):
+                    position_matches = (
+                        _distance_within_tolerance(getNormInf(transformed_position, positions[candidate_index]), tol.space)
+                        if lattice is None
+                        else positions_within_cartesian_tolerance(
+                            transformed_position, positions[candidate_index], lattice, tol.space
+                        )
+                    )
+                    if not position_matches:
                         continue
                     candidates.append(candidate_index)
             if not candidates:
@@ -151,18 +159,52 @@ def _build_magnetic_atom_preservation_checker(mag_atoms, tol: Tolerances):
 
         spin_rotation = np.asarray(spin_rotation, dtype=float)
         transformed_moments = moments @ spin_rotation.T
+        matched_candidates = []
         for atom_index, candidates in enumerate(candidates_by_atom):
-            if not any(
-                _distance_within_tolerance(
+            accepted = [
+                candidate_index for candidate_index in candidates
+                if _distance_within_tolerance(
                     np.linalg.norm(transformed_moments[atom_index] - moments[candidate_index]),
                     tol.moment,
                 )
-                for candidate_index in candidates
-            ):
+            ]
+            if not accepted:
                 return False
-        return True
+            matched_candidates.append(accepted)
+        return _has_bijective_site_matching(matched_candidates)
 
     return operation_preserves
+
+
+def _has_bijective_site_matching(candidates_by_atom) -> bool:
+    """Require a permutation, not independent matches reusing a target site."""
+    if all(len(candidates) == 1 for candidates in candidates_by_atom):
+        return len({candidates[0] for candidates in candidates_by_atom}) == len(candidates_by_atom)
+    owners = {}
+    assigned = {}
+    for root in sorted(range(len(candidates_by_atom)), key=lambda i: len(candidates_by_atom[i])):
+        queue = deque([root])
+        parents = {root: None}
+        free_edge = None
+        while queue and free_edge is None:
+            atom = queue.popleft()
+            for target in candidates_by_atom[atom]:
+                owner = owners.get(target)
+                if owner is None:
+                    free_edge = (atom, target)
+                    break
+                if owner not in parents:
+                    parents[owner] = atom
+                    queue.append(owner)
+        if free_edge is None:
+            return False
+        atom, target = free_edge
+        while atom is not None:
+            previous_target = assigned.get(atom)
+            owners[target] = atom
+            assigned[atom] = target
+            atom, target = parents[atom], previous_target
+    return True
 
 
 def get_ssg_ops(sg,pg,mag_atoms, tol: Tolerances = DEFAULT_TOL):
@@ -213,63 +255,75 @@ def _normalize_candidate_tol(group_tol) -> Tolerances:
 
 
 def _magnetic_action_residual(op: SpinSpaceGroupOperation, mag_atoms, tol: Tolerances):
-    max_position = 0.0
-    max_moment = 0.0
-    for atom in mag_atoms:
-        new_atom = op @ atom
-        best = None
-        for target in mag_atoms:
-            if target.element_symbol != new_atom.element_symbol:
-                continue
-            position_diff = float(np.max(np.minimum(
-                np.abs(np.mod(new_atom.position, 1.0) - np.mod(target.position, 1.0)),
-                1.0 - np.abs(np.mod(new_atom.position, 1.0) - np.mod(target.position, 1.0)),
-            )))
-            moment_diff = float(np.linalg.norm(new_atom.magnetic_moment - target.magnetic_moment))
-            occupancy_diff = abs(float(new_atom.occupancy) - float(target.occupancy))
-            normalized = max(
-                position_diff / max(float(tol.space), 1e-12),
-                moment_diff / max(float(tol.moment), 1e-12),
-                occupancy_diff / max(float(tol.occupancy), 1e-12),
-            )
-            candidate = (normalized, position_diff, moment_diff, occupancy_diff)
-            if best is None or candidate < best:
-                best = candidate
-        if best is None:
-            return float("inf"), float("inf")
-        _, position_diff, moment_diff, _occupancy_diff = best
-        max_position = max(max_position, position_diff)
-        max_moment = max(max_moment, moment_diff)
-    return max_position, max_moment
+    details = _magnetic_action_residual_details(op, mag_atoms, tol)
+    return details["max_position"], details["max_moment"]
 
 
-def _magnetic_action_residual_details(op: SpinSpaceGroupOperation, mag_atoms, tol: Tolerances) -> dict:
+def _magnetic_residual_targets(mag_atoms):
+    grouped = defaultdict(list)
+    for index, atom in enumerate(mag_atoms):
+        grouped[atom.element_symbol].append((index, atom))
+    return {
+        element: (
+            [index for index, _ in items],
+            np.asarray([atom.position for _, atom in items]),
+            np.asarray([atom.magnetic_moment for _, atom in items]),
+            np.asarray([atom.occupancy for _, atom in items], dtype=float),
+        )
+        for element, items in grouped.items()
+    }
+
+
+def _best_magnetic_residual_match(atom, targets, tol):
+    if targets is None:
+        return None, None
+    indices, positions, moments, occupancies = targets
+    delta = atom.position - positions
+    wrapped = delta - np.rint(delta)
+    lattice = atom.lattice_matrix
+    if lattice is None:
+        lower_positions = np.max(np.abs(wrapped), axis=1)
+    else:
+        minimum_scale = 1.0 / fractional_search_radius(lattice, 1.0)
+        lower_positions = minimum_scale * np.linalg.norm(wrapped, axis=1)
+    moment_differences = np.linalg.norm(atom.magnetic_moment - moments, axis=1)
+    occupancy_differences = np.abs(float(atom.occupancy) - occupancies)
+    lower_scores = np.maximum.reduce([
+        lower_positions / max(float(tol.space), 1e-12),
+        moment_differences / max(float(tol.moment), 1e-12),
+        occupancy_differences / max(float(tol.occupancy), 1e-12),
+    ])
+    best = None
+    best_target = None
+    # These are rigorous lower bounds; expensive minimum-image searches are
+    # needed only for targets that can improve the current best residual.
+    for index in np.argsort(lower_scores, kind="stable"):
+        if best is not None and lower_scores[index] > best[0] + 1e-12:
+            break
+        position = (float(lower_positions[index]) if lattice is None else
+                    periodic_cartesian_distance(atom.position, positions[index], lattice))
+        moment = float(moment_differences[index])
+        occupancy = float(occupancy_differences[index])
+        normalized = max(position / max(float(tol.space), 1e-12),
+                         moment / max(float(tol.moment), 1e-12),
+                         occupancy / max(float(tol.occupancy), 1e-12))
+        candidate = (normalized, position, moment, occupancy)
+        if best is None or candidate < best:
+            best, best_target = candidate, indices[index]
+    return best, best_target
+
+
+def _magnetic_action_residual_details(op: SpinSpaceGroupOperation, mag_atoms, tol: Tolerances, *, _targets=None) -> dict:
+    targets = _magnetic_residual_targets(mag_atoms) if _targets is None else _targets
     max_position = 0.0
     max_moment = 0.0
     max_occupancy = 0.0
     max_normalized = 0.0
     for atom_index, atom in enumerate(mag_atoms):
         new_atom = op @ atom
-        best = None
-        best_target_index = None
-        for target_index, target in enumerate(mag_atoms):
-            if target.element_symbol != new_atom.element_symbol:
-                continue
-            position_diff_components = np.abs(
-                np.mod(new_atom.position, 1.0) - np.mod(target.position, 1.0)
-            )
-            position_diff = float(np.max(np.minimum(position_diff_components, 1.0 - position_diff_components)))
-            moment_diff = float(np.linalg.norm(new_atom.magnetic_moment - target.magnetic_moment))
-            occupancy_diff = abs(float(new_atom.occupancy) - float(target.occupancy))
-            normalized = max(
-                position_diff / max(float(tol.space), 1e-12),
-                moment_diff / max(float(tol.moment), 1e-12),
-                occupancy_diff / max(float(tol.occupancy), 1e-12),
-            )
-            candidate = (normalized, position_diff, moment_diff, occupancy_diff)
-            if best is None or candidate < best:
-                best = candidate
-                best_target_index = target_index
+        best, best_target_index = _best_magnetic_residual_match(
+            new_atom, targets.get(new_atom.element_symbol), tol
+        )
         if best is None:
             return {
                 "normalized": float("inf"),
@@ -298,6 +352,7 @@ def _magnetic_action_residual_details(op: SpinSpaceGroupOperation, mag_atoms, to
 
 
 def _ssg_group_residual_details(ssg_ops, mag_atoms, tol: Tolerances) -> dict:
+    targets = _magnetic_residual_targets(mag_atoms)
     max_details = {
         "normalized": 0.0,
         "max_position": 0.0,
@@ -308,7 +363,7 @@ def _ssg_group_residual_details(ssg_ops, mag_atoms, tol: Tolerances) -> dict:
         "matched_atom": None,
     }
     for op_index, op in enumerate(ssg_ops):
-        details = _magnetic_action_residual_details(op, mag_atoms, tol)
+        details = _magnetic_action_residual_details(op, mag_atoms, tol, _targets=targets)
         if details["normalized"] >= max_details["normalized"]:
             max_details.update(details)
             max_details["worst_op"] = op_index

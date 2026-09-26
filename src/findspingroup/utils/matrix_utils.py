@@ -36,6 +36,19 @@ def normalize_vector_to_zero(v,atol=1e-10):
             new_v.append(i %1)
     return np.array(new_v)
 
+
+def reduce_computed_mod1(values):
+    """Reduce computed coordinates modulo one, cleaning only machine roundoff.
+
+    The caller must establish that integer shifts are equivalent in its current
+    representation. Do not use this on lifted G0/nofrac translations or on raw
+    user k-point queries, which have a separate tolerance contract.
+    """
+    values = np.asarray(values, dtype=float)
+    reduced = np.mod(values, 1.0)
+    roundoff = 16 * np.finfo(float).eps * np.maximum(1.0, np.abs(values))
+    return np.where(np.minimum(reduced, 1.0 - reduced) <= roundoff, 0.0, reduced)
+
 def getNormInf(matrix1, matrix2, mode=True):
     if mode:
         a = np.mod(np.asarray(matrix1, dtype=float), 1.0)
@@ -257,7 +270,7 @@ def in_space_group(op,group,tol = 1e-5):
     R1, t1 = op
     for g in group:
         R2, t2 = g
-        if np.allclose(R1, R2,tol) and getNormInf(t1, t2)<tol:
+        if np.allclose(R1, R2, atol=tol, rtol=0) and getNormInf(t1, t2)<tol:
             return True
     return False
 

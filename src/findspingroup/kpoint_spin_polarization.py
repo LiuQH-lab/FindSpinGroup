@@ -50,7 +50,9 @@ def _validate_kpoint_tol(value: float) -> float:
 
 def _reduce_reciprocal(vector: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     reduced = np.mod(np.asarray(vector, dtype=float), 1.0)
-    reduced[np.isclose(reduced, 1.0, atol=1e-12)] = 0.0
+    # Do not snap a nearby k point onto a symmetry stratum before the caller's
+    # membership tolerance is applied. Modulo can round a tiny negative to 1.
+    reduced[reduced == 1.0] = 0.0
     shift = np.rint(np.asarray(vector, dtype=float) - reduced).astype(int)
     return reduced, shift
 

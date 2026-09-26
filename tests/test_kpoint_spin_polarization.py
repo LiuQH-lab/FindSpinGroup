@@ -219,6 +219,40 @@ def test_kpoint_tolerance_controls_little_group_membership_only():
     assert inside.audit["without_soc"]["membership_audit"]["stability"] == "near_boundary"
 
 
+@pytest.mark.parametrize("coordinate", [-5e-6, 5e-6, 1.0 - 5e-6, 1.0 + 5e-6])
+def test_strict_kpoint_tolerance_is_not_bypassed_at_periodic_boundary(coordinate):
+    c2z = np.diag([-1.0, -1.0, 1.0])
+    result = _synthetic_result(
+        [_ssg_op(np.eye(3)), _ssg_op(c2z, real=c2z)],
+        msg_operations=[[1, np.eye(3), np.zeros(3)], [1, c2z, np.zeros(3)]],
+    )
+    analyzer = KPointSpinPolarizationAnalyzer.from_result(result)
+
+    query = analyzer.query([coordinate, 0.0, 0.0], kpoint_tol=1e-8)
+
+    assert query["without_soc"]["dimension"] == 3
+    assert query["with_soc"]["dimension"] == 3
+    assert query.audit["without_soc"]["little_group_order"] == 1
+    assert query.audit["with_soc"]["little_group_order"] == 1
+    coordinates = query.audit["kpoint"]
+    reconstructed = np.asarray(coordinates["acc_primitive_reduced"]) + np.asarray(
+        coordinates["acc_primitive_reciprocal_shift"]
+    )
+    np.testing.assert_allclose(reconstructed, [coordinate, 0.0, 0.0], atol=1e-15, rtol=0)
+
+
+def test_mnte_near_gamma_soc_constraint_uses_the_requested_kpoint():
+    result = find_spin_group("examples/0.800_MnTe.mcif", components=())
+    analyzer = result.prepare_kpoint_spin_polarization_analyzer()
+
+    near_gamma = analyzer.query([0.999995, 0.0, 0.0], kpoint_tol=1e-8)
+    gamma = analyzer.query([0.0, 0.0, 0.0], kpoint_tol=1e-8)
+
+    assert near_gamma["with_soc"]["constraint"] == ["0", "0", "Sz"]
+    assert near_gamma.audit["with_soc"]["little_group_order"] == 2
+    assert gamma["with_soc"]["dimension"] == 0
+
+
 @pytest.mark.parametrize(
     ("spin_rotation", "expected_dimension"),
     [
