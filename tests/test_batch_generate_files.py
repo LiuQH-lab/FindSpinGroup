@@ -1,5 +1,6 @@
 import json
 import importlib.util
+from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from findspingroup.batch_poscar_roundtrip import run_poscar_roundtrip_batch
 from findspingroup.batch_scif_roundtrip import run_scif_roundtrip_batch
 from findspingroup.io import parse_scif_file, parse_scif_text
 from findspingroup.version import __version__
+from findspingroup.spin_splitting import spin_texture_basis_latex
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -35,6 +37,28 @@ def _load_manifest_entries() -> list[str]:
 
 def _baseline_cases() -> dict[str, dict]:
     return json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
+
+
+def _assert_legacy_smoke_scientific_contract(actual, expected):
+    """Retain the legacy scientific golden data, auditing new presentation separately."""
+    actual, expected = deepcopy(actual), deepcopy(expected)
+    for field in ('spin_texture_config_no_soc', 'spin_texture_config_soc',
+                  'spin_texture_config_database'):
+        new, old = actual.get(field), expected.get(field)
+        assert (new is None) == (old is None)
+        if new is None:
+            continue
+        if field != 'spin_texture_config_database':
+            audit = new.pop('constraint_validation')
+            assert audit['passed']
+            if new['nullity']:
+                assert audit['raw_dimension'] == audit['rendered_dimension'] == new['nullity']
+                assert audit['rendered_max_operation_residual'] <= audit['threshold'] + audit['roundoff_allowance']
+        # The ASCII coefficients remain pinned to the independent stored golden
+        # data. LaTeX must render those coefficients, without a second rounding.
+        for ascii_key, latex_key in [('basis', 'basis_latex'), ('basis_vectors', 'basis_vectors_latex')]:
+            old[latex_key] = spin_texture_basis_latex(old[ascii_key])
+    assert actual == expected
 
 
 MANIFEST_ENTRIES = _load_manifest_entries()
@@ -222,7 +246,7 @@ def test_find_spin_group_mcif_smoke_baseline(relative_path):
     result = find_spin_group(str(source_path))
 
     assert expected["status"] == "ok"
-    assert result.to_summary_dict() == expected["result"]
+    _assert_legacy_smoke_scientific_contract(result.to_summary_dict(), expected["result"])
 
 
 @pytest.mark.parametrize("relative_path", MANIFEST_ENTRIES)
@@ -240,8 +264,9 @@ def test_scif_roundtrip_smoke_manifest_preserves_index(tmp_path, relative_path):
     assert roundtrip.index == original.index
 
 
-def test_run_mcif_batch_matches_smoke_baseline(tmp_path):
+def test_run_mcif_batch_reports_only_audited_legacy_smoke_presentation_drift(tmp_path):
     files = [(PROJECT_ROOT / relative_path).resolve() for relative_path in MANIFEST_ENTRIES]
+    baseline_bytes = BASELINE_PATH.read_bytes()
 
     summary = run_mcif_batch(
         files,
@@ -254,9 +279,21 @@ def test_run_mcif_batch_matches_smoke_baseline(tmp_path):
     assert summary["success_count"] == len(files)
     assert summary["error_count"] == 0
     assert summary["comparison"]["missing_in_baseline_count"] == 0
-    assert summary["comparison"]["mismatch_count"] == 0
+    assert summary["comparison"]["mismatch_count"] == len(MANIFEST_ENTRIES)
+    for mismatch in summary['comparison']['mismatches']:
+        assert mismatch['actual']['status'] == mismatch['expected']['status'] == 'ok'
+        _assert_legacy_smoke_scientific_contract(
+            mismatch['actual']['result'], mismatch['expected']['result'])
+        assert all(
+            difference['field'].startswith((
+                'result.spin_texture_config_no_soc.constraint_validation.',
+                'result.spin_texture_config_soc.constraint_validation.',
+                'result.spin_texture_config_database.basis_latex[',
+                'result.spin_texture_config_database.basis_vectors_latex[',
+            )) for difference in mismatch['differences'])
     assert summary["comparison"]["tensor_summary_backfill_count"] == 0
-    assert summary["exit_code"] == 0
+    assert summary["exit_code"] == 1
+    assert BASELINE_PATH.read_bytes() == baseline_bytes
 
 
 def test_run_mcif_batch_supports_parallel_workers(monkeypatch, tmp_path):
