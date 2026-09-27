@@ -185,6 +185,13 @@ Readable GSPG affine rows use the same precise default because they may be
 reused as tensor-analysis input. These rules do not change separate Seitz-label
 display tolerances or globally idealize asymmetric representatives.
 
+Numerical operation-list serialization retains the stored arrays without a
+six-decimal display rounding or an implicit translation reduction. Reusable
+spin-only direction strings likewise retain resolved small components in their
+declared frame. A scale-free SCIF collinear direction may be written as small
+integers only when the ratios agree within machine roundoff. This formatting
+does not change a Cartesian direction into a lattice direction or vice versa.
+
 CIF/SCIF expansion compares periodic positions in the physical cell metric,
 using `position_atol` in cell length units (the file-facing analysis routes pass
 `space_tol`). `parser_atol` bounds the norm of a physical moment-vector
@@ -211,6 +218,12 @@ the operation-level helper retains an explicit dimensionless component budget;
 it does not claim physical frame invariance. Neither mode adds an implicit
 relative tolerance.
 
+When transporting an already validated metric, the implementation transports a
+physical frame `B` with `B.T @ B = G` and forms the new Gram matrix. This avoids
+spurious asymmetry from cancellation in a highly sheared direct congruence
+product. It does not loosen the check on a user-supplied asymmetric metric or
+change the physical quadratic form.
+
 Spin-polarization permission, subspace dimension and readable equations come
 from one numerical kernel. Exact duplicate operation blocks and machine-zero
 blocks do not change its weighting. The SVD uses the RMS of distinct nonzero
@@ -223,6 +236,72 @@ rank threshold as a formatting cutoff. Arbitrary-k query audits include the
 threshold, singular values, separation status, frame conditioning, roundoff
 allowance and maximum full-operation residual. These are numerical stability
 diagnostics, not statistical confidence or experimental uncertainty estimates.
+
+Site constraints use the physical Cartesian kernel and explicitly transform it
+to the output spin frame. The DOF and the printed equations describe the same
+subspace. Absolute SCIF moment components and relative `uvw` coordinates use
+the lengths of the **declared spin basis**, which need not be the real lattice
+lengths. Stable parameter pivots avoid magnifying a small leading component into
+an artificially large coefficient. Vector constraints likewise test the full
+allowed subspace, not only the particular vectors chosen to display a basis.
+
+An accepted finite spin representation must contain identity, be orthogonal in
+its physical frame, and close simultaneously within its representation budget.
+Individual finite matrix orders
+alone do not prove closure. If a fitted representation is projected to an exact
+point group, its operations must still preserve the supplied magnetic sites
+within their physical error budgets. This does not project the crystal or its
+moments. Candidate matrix algebra uses its own dimensionless tolerance, not
+the positional tolerance. Rounded lookup keys only select candidates; they
+are not certificates of operation equality or physical preservation.
+
+Collinear MSG promotion tests the physical action on the common spin axis,
+including its norm. A cosine-only test can hide transverse errors. Domain
+comparisons require compatible bijective site permutations and use physical
+signed magnetic moments. A domain's SOC axis is calculated from its complete
+MSG in the actual child basis, not copied from another standard setting.
+Symmetry permits a domain relation; it does not determine an energy barrier or
+establish experimentally switchable ferroelectricity.
+
+### Spin-Texture Constraints And Recovery
+
+Spin-texture polynomials are solved in OSSG unit Cartesian coordinates, or in
+the explicitly declared quasi-2D variables. Numerical polynomial tolerances
+measure monomial-coefficient action residuals, not magnetic moments in μB.
+Small supplied coefficients are not deleted before solving. Generators may be
+used to obtain a kernel, but the raw kernel and its readable expression are
+checked against all supplied operations. An expression that loses a resolved
+term is reformatted at higher precision; this does not change the accepted rank.
+`constraint_validation` records the norm, threshold, dimensions and largest
+operation residual. Requested higher orders are validated too. A `forbidden`
+search result is bounded by the recorded maximum searched order.
+
+If a database comparison invokes bounded recovery, `calibration` retains the
+strict primary result, strict full-operation result, reference, attempts and
+selected result. Matching a reference type is not sufficient: the selected
+basis must satisfy the full constraints at the explicit recovery budget. The
+database is not a license to relax tolerances indefinitely. Quasi-2D recovery
+records the same evidence and leaves the reference absent when none exists.
+ASCII and LaTeX describe the same accepted coefficients; converting to LaTeX
+does not introduce an independent low-precision approximation.
+
+### Accepted-Model Diagnostics
+
+`magnetic_phase_details.accepted_group_audit` reuses the identifier's physical
+residual evaluation. It records the accepted spin-representation adjustment,
+position/moment/occupancy budgets and units, and the identifier cell and frame.
+Its operation/site indices refer to internal identifier lists, not to the
+reordered public Wyckoff table. The accompanying source-site coordinates and
+lattice specify that context. The field is absent or `None` when no identifier
+context was supplied.
+
+`magnetic_phase_details.net_moment_decision` records the strict comparison
+`abs(net_moment) < zero_net_moment_tol`, its signed margin, and the ratio to the
+threshold. A positive margin is inside the zero-moment criterion. Equality is
+not inside it; a zero threshold has no finite ratio. This is diagnostic evidence,
+not a new uncertainty band or a changed FM/FiM definition. Near-threshold inputs
+can remain sensitive to reconstruction and should be examined with a one-parameter
+scan rather than silently snapped to the preferred classification.
 
 Several separate operations should not be confused with crystal idealization:
 
