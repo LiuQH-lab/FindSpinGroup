@@ -39,10 +39,10 @@ def test_projection_retains_its_matrix_change_without_mutating_the_input():
 
 
 @pytest.mark.parametrize('value,zero', [
-    (np.nextafter(.02, 0.), True), (.02, False),
+    (np.nextafter(.02, 0.), False), (.02, False),
     (np.nextafter(.02, np.inf), False), (-.02, False),
 ])
-def test_net_moment_margin_does_not_snap_the_strict_classification(value, zero):
+def test_net_moment_margin_retains_raw_values_with_nonzero_boundary_ties(value, zero):
     payload = classify_magnetic_phase(
         conf='Collinear', full_spin_part_point_group_hm='m',
         full_spin_part_point_group_s='Cs', net_moment=value,
@@ -52,7 +52,9 @@ def test_net_moment_margin_does_not_snap_the_strict_classification(value, zero):
     decision = payload['details']['net_moment_decision']
     assert decision['margin'] == .02-abs(value)
     assert decision['ratio'] == abs(value)/.02
-    assert decision['at_threshold'] == (abs(value) == .02)
+    assert decision['at_threshold'] is True
+    assert decision['boundary_policy'] == 'nonzero'
+    assert payload['details']['net_moment'] == value
 
 
 def test_zero_net_moment_budget_has_no_division_or_new_zero_policy():

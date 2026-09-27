@@ -295,13 +295,28 @@ reordered public Wyckoff table. The accompanying source-site coordinates and
 lattice specify that context. The field is absent or `None` when no identifier
 context was supplied.
 
-`magnetic_phase_details.net_moment_decision` records the strict comparison
+`magnetic_phase_details.net_moment_decision` records the physical criterion
 `abs(net_moment) < zero_net_moment_tol`, its signed margin, and the ratio to the
-threshold. A positive margin is inside the zero-moment criterion. Equality is
-not inside it; a zero threshold has no finite ratio. This is diagnostic evidence,
-not a new uncertainty band or a changed FM/FiM definition. Near-threshold inputs
-can remain sensitive to reconstruction and should be examined with a one-parameter
-scan rather than silently snapped to the preferred classification.
+threshold. Classification uses a separate numerical tie resolution:
+`numerical_tolerance = sqrt(float64_eps) * zero_net_moment_tol`. Only a margin
+larger than this resolution is inside the zero-moment criterion. Numerical ties,
+including exact equality, go to the nonzero side: FiM for multiple magnetic
+orbits in the FM family, not Compensated FiM. This does not change AFM/FM orbit
+definitions, the input moments, or the user-supplied physical threshold.
+
+`at_threshold` now means the absolute margin is within that numerical resolution,
+not exact floating-point equality. `numerical_relative_tolerance`,
+`numerical_tolerance`, `physical_comparison`, and `boundary_policy` expose the
+decision. At the default 0.02-muB threshold the numerical resolution is about
+2.98e-10 muB. A zero threshold still classifies no moment as strictly below it
+and has no finite ratio. There is no fixed 1-muB floor or atom-count scaling.
+
+This approximately eight-significant-digit comparison is an explicit numerical
+policy, not an experimental uncertainty, a propagated-error certificate, or a
+way to accept inconsistent structures. It prevents final-digit/frame-export
+noise from deciding a threshold tie. Lossy reconstruction or ill-conditioned
+calculations can exceed it; those still require diagnostics rather than a wider
+automatic band. No lattice/position/moment idealization is performed.
 
 Several separate operations should not be confused with crystal idealization:
 
