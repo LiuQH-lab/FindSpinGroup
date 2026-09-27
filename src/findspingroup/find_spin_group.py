@@ -6883,6 +6883,11 @@ def _is_fm_fim_spin_point_group(*symbols: str) -> bool:
     return any(_is_fm_fim_spin_point_group_symbol(symbol) for symbol in symbols if symbol is not None)
 
 
+# Comparison resolution, not a physical moment tolerance or an error certificate.
+# Scale by the threshold (not 1 muB or atom count) to keep the tie rule unit-covariant.
+_NET_MOMENT_BOUNDARY_RTOL = float(np.sqrt(np.finfo(float).eps))
+
+
 def classify_magnetic_phase(
     *,
     conf,
@@ -6899,7 +6904,12 @@ def classify_magnetic_phase(
     zero_net_moment_tol = float(
         DEFAULT_TOL.moment if net_moment_tol is None else net_moment_tol
     )
-    zero_net_moment = abs(net_moment_value) < zero_net_moment_tol
+    moment_margin = zero_net_moment_tol - abs(net_moment_value)
+    moment_boundary_tol = _NET_MOMENT_BOUNDARY_RTOL * zero_net_moment_tol
+    at_moment_threshold = abs(moment_margin) <= moment_boundary_tol
+    # Preserve the strict-equality convention: numerical ties are non-compensated.
+    # Raw moments and the physical threshold remain unchanged.
+    zero_net_moment = moment_margin > moment_boundary_tol
     fm_like_by_spin_point_group = _is_fm_fim_spin_point_group(
         full_spin_part_point_group_hm,
         full_spin_part_point_group_s,
@@ -6969,14 +6979,18 @@ def classify_magnetic_phase(
             'zero_net_moment_tol': zero_net_moment_tol,
             'zero_net_moment': zero_net_moment,
             'net_moment_decision': {
-                'comparison': 'abs(net_moment) < zero_net_moment_tol',
+                'comparison': 'margin > numerical_tolerance',
+                'physical_comparison': 'abs(net_moment) < zero_net_moment_tol',
                 'units': 'mu_B_per_magnetic_primitive_cell',
                 'absolute_net_moment': abs(net_moment_value),
                 'threshold': zero_net_moment_tol,
-                'margin': zero_net_moment_tol - abs(net_moment_value),
+                'margin': moment_margin,
                 'ratio': (abs(net_moment_value) / zero_net_moment_tol
                           if zero_net_moment_tol > 0 else None),
-                'at_threshold': abs(net_moment_value) == zero_net_moment_tol,
+                'at_threshold': at_moment_threshold,
+                'numerical_tolerance': moment_boundary_tol,
+                'numerical_relative_tolerance': _NET_MOMENT_BOUNDARY_RTOL,
+                'boundary_policy': 'nonzero',
             },
             'accepted_group_audit': accepted_group_audit,
             'fm_like_by_spin_point_group': fm_like_by_spin_point_group,
