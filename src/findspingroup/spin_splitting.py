@@ -118,7 +118,22 @@ def _latex_numeric_value(value: float, *, zero_tol: float = 0.) -> str | None:
     return _latex_coefficient_token(radical)
 
 
-def _latex_coefficient_token(token: str) -> str:
+def _latex_display_number(value: float, decimal_places: int) -> str:
+    """Round only for presentation; never erase a nonzero small coefficient."""
+    if not math.isfinite(value):
+        raise ValueError("Display coefficients must be finite.")
+    if value == 0:
+        return "0"
+    fixed = f"{value:.{decimal_places}f}"
+    if abs(value) < 1e-3 or float(fixed) == 0 or abs(value) >= 1e4:
+        mantissa, exponent = f"{value:.{decimal_places}e}".split("e")
+        if "." in mantissa:
+            mantissa = mantissa.rstrip("0").rstrip(".")
+        return rf"{mantissa}\times 10^{{{int(exponent)}}}"
+    return fixed.rstrip("0").rstrip(".") if "." in fixed else fixed
+
+
+def _latex_coefficient_token(token: str, *, decimal_places: int | None = None) -> str:
     token = token.strip()
     if not token:
         return ""
@@ -129,7 +144,7 @@ def _latex_coefficient_token(token: str) -> str:
     if len(polynomial_terms) > 1:
         pieces: list[str] = []
         for i, (term_sign, term) in enumerate(polynomial_terms):
-            factor_sign, factor_latex = _latex_factor(term)
+            factor_sign, factor_latex = _latex_factor(term, decimal_places=decimal_places)
             sign = term_sign * factor_sign
             if i == 0:
                 pieces.append(factor_latex if sign > 0 else rf"-{factor_latex}")
@@ -141,6 +156,10 @@ def _latex_coefficient_token(token: str) -> str:
     except ValueError:
         pass
     else:
+        if decimal_places is not None:
+            if token.lstrip("+-").isdigit():
+                return token
+            return _latex_display_number(numeric, decimal_places)
         numeric_latex = _latex_numeric_value(numeric)
         if numeric_latex is not None:
             return numeric_latex
@@ -152,21 +171,23 @@ def _latex_coefficient_token(token: str) -> str:
 
     if "/" in token:
         numerator, denominator = token.split("/", 1)
-        return rf"\frac{{{_latex_coefficient_token(numerator)}}}{{{_latex_coefficient_token(denominator)}}}"
+        numerator_latex = _latex_coefficient_token(numerator, decimal_places=decimal_places)
+        denominator_latex = _latex_coefficient_token(denominator, decimal_places=decimal_places)
+        return rf"\frac{{{numerator_latex}}}{{{denominator_latex}}}"
     if "*" in token:
         parts = _split_top_level(token, "*")
         if len(parts) > 1:
-            return "".join(_latex_coefficient_token(part) for part in parts)
+            return "".join(_latex_coefficient_token(part, decimal_places=decimal_places) for part in parts)
     return _latex_radical_token(token)
 
 
-def _latex_factor(factor: str) -> tuple[int, str]:
+def _latex_factor(factor: str, *, decimal_places: int | None = None) -> tuple[int, str]:
     factor = _strip_outer_parentheses(factor)
     polynomial_terms = _split_signed_terms(factor)
     if len(polynomial_terms) > 1:
         pieces: list[str] = []
         for i, (term_sign, term) in enumerate(polynomial_terms):
-            factor_sign, factor_latex = _latex_factor(term)
+            factor_sign, factor_latex = _latex_factor(term, decimal_places=decimal_places)
             sign = term_sign * factor_sign
             if i == 0:
                 pieces.append(factor_latex if sign > 0 else rf"-{factor_latex}")
@@ -191,7 +212,7 @@ def _latex_factor(factor: str) -> tuple[int, str]:
         if variable is not None:
             variable_parts.append(variable)
         else:
-            coefficient_parts.append(_latex_coefficient_token(token))
+            coefficient_parts.append(_latex_coefficient_token(token, decimal_places=decimal_places))
 
     coefficient = "".join(part for part in coefficient_parts if part not in {"", "1"})
     body = "".join([coefficient, *variable_parts])
@@ -435,8 +456,22 @@ def combine_spin_texture_basis_span(basis: Sequence[str] | None) -> list[str]:
     return [f"{combined_inner}{remainder}"]
 
 
-def basis_expression_to_latex(expression: str) -> str:
-    """Convert the public ASCII spin-texture basis expression to LaTeX."""
+def basis_expression_to_latex(
+    expression: str, *, decimal_places: int | None = None,
+) -> str:
+    """Render a basis, optionally rounding coefficients for display only.
+
+    ``None`` preserves the precision used by scientific output and validation.
+    A nonnegative integer limits decimal places (also in scientific mantissas),
+    without dropping small nonzero terms or changing powers/parameter labels.
+    Rounded text is an approximate presentation, not a new validated kernel.
+    """
+    if decimal_places is not None and (
+        isinstance(decimal_places, bool)
+        or not isinstance(decimal_places, int)
+        or decimal_places < 0
+    ):
+        raise ValueError("decimal_places must be a nonnegative integer or None.")
 
     text = combine_spin_texture_basis_expression(str(expression).strip())
     if text in {"", "0"}:
@@ -459,7 +494,7 @@ def basis_expression_to_latex(expression: str) -> str:
             latex_terms.append((term_sign, term))
             continue
         factor, sigma = term.rsplit("*", 1)
-        factor_sign, factor_latex = _latex_factor(factor)
+        factor_sign, factor_latex = _latex_factor(factor, decimal_places=decimal_places)
         sign = term_sign * factor_sign
         sigma_latex = _latex_symbol(sigma.strip())
         if factor_latex == "1":
@@ -484,10 +519,21 @@ def basis_expression_to_latex(expression: str) -> str:
     return rf"{coefficient}\left({body}\right)" + _basis_remainder_suffix_to_latex(remainder)
 
 
-def spin_texture_basis_latex(basis: Sequence[str] | None) -> list[str]:
+def spin_texture_basis_latex(
+    basis: Sequence[str] | None, *, decimal_places: int | None = None,
+) -> list[str]:
+    """Format 3D/2D, SOC/no-SOC bases with one presentation policy.
+
+    UI consumers may use ``decimal_places=4`` on a config's ``basis``. The
+    config and its full-precision ``basis_latex`` are not modified. Exact
+    fraction/radical syntax, momentum variable names and remainders are kept.
+    """
     if not basis:
         return []
-    return [basis_expression_to_latex(expression) for expression in basis]
+    return [
+        basis_expression_to_latex(expression, decimal_places=decimal_places)
+        for expression in basis
+    ]
 
 
 def _basis_remainder_ascii(order: int) -> str:

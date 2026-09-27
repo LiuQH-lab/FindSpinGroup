@@ -233,6 +233,24 @@ terms can be omitted and represented with a small-order suffix in display text.
 `basis_latex`
 LaTeX versions of the same basis functions.
 
+For a compact UI presentation, use the shared formatter without modifying the
+scientific payload:
+
+```python
+from findspingroup.spin_splitting import spin_texture_basis_latex
+
+display_latex = spin_texture_basis_latex(config["basis"], decimal_places=4)
+```
+
+This limits decimal coefficients to four decimal places and uses scientific
+notation for magnitudes below `1e-3` or at least `1e4`, and for any other
+nonzero value that would round to zero at the requested precision. Scientific
+mantissas follow the same decimal-place limit.
+Exact fractions and radicals, momentum variables, and parameter labels are
+preserved. This is an approximate display, not another constraint solution.
+Keep `basis` and `basis_latex` at full precision in JSON and downloads. The same
+formatter applies to both SOC modes and to the quasi-2D configs.
+
 For quasi-2D, the code does not simply edit the 3D leading term. It recomputes
 the spin-texture constraint in the two momentum variables that remain after the
 vacuum-axis direction is removed.
