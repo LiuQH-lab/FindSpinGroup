@@ -7,7 +7,7 @@ import numpy as np
 from findspingroup.version import __version__
 from findspingroup.structure import CrystalCell, SpinSpaceGroup, SpinSpaceGroupOperation
 from findspingroup.utils.matrix_utils import normalize_vector_to_zero, reduce_computed_mod1
-from findspingroup.utils.symbolic_format import format_symbolic_scalar
+from findspingroup.utils.symbolic_format import format_direction_components, format_symbolic_scalar
 
 
 SCIF_OPERATION_FULL_PRECISION = 15
@@ -126,54 +126,7 @@ def write_scif_spin_only(conf, spin_only_direction):
                 "SCIF spin-only direction must be a single 3-vector; "
                 f"got shape {np.asarray(spin_only_direction).shape}."
             )
-        direction = [0 if abs(i) < 1e-4 else float(i) for i in direction_array]
-    def _format_collinear_direction_for_scif(direction_values):
-        numeric = np.asarray(
-            [
-                value.item() if hasattr(value, "item") else value
-                for value in direction_values
-            ],
-            dtype=float,
-        ).reshape(-1)
-        if np.linalg.norm(numeric) < 1e-10:
-            return ",".join(
-                _format_scif_symbolic_scalar(
-                    i.item() if hasattr(i, "item") else i,
-                    decimal_precision=6,
-                )
-                for i in direction_values
-            )
-
-        rounded_int = np.rint(numeric).astype(int)
-        if np.allclose(numeric, rounded_int, atol=1e-4):
-            ints = rounded_int.tolist()
-        else:
-            nonzero = [abs(v) for v in numeric if abs(v) > 1e-6]
-            if not nonzero:
-                ints = [0, 0, 0]
-            else:
-                scale = min(nonzero)
-                scaled = numeric / scale
-                rounded_scaled = np.rint(scaled).astype(int)
-                if np.allclose(scaled, rounded_scaled, atol=1e-3):
-                    ints = rounded_scaled.tolist()
-                else:
-                    return ",".join(
-                        _format_scif_symbolic_scalar(
-                            i.item() if hasattr(i, "item") else i,
-                            decimal_precision=6,
-                        )
-                        for i in direction_values
-                    )
-
-        nonzero_ints = [abs(v) for v in ints if v != 0]
-        if nonzero_ints:
-            divisor = nonzero_ints[0]
-            for value in nonzero_ints[1:]:
-                divisor = math.gcd(divisor, value)
-            if divisor > 1:
-                ints = [int(v / divisor) for v in ints]
-        return ",".join(str(v) for v in ints)
+        direction = direction_array
     tags = _scif_spin_tag_names()
     rotation_axis_cartn_line = (
         f"\n{tags['rotation_axis_cartn']}  ."
@@ -182,13 +135,13 @@ def write_scif_spin_only(conf, spin_only_direction):
     )
     if conf == 'Collinear':
         spin_only: str = (
-            f"""{tags['collinear_direction']} '{_format_collinear_direction_for_scif(direction)}'\n"""
+            f"""{tags['collinear_direction']} '{format_direction_components(direction, integer_direction=True)}'\n"""
             + f"{tags['coplanar_perp_uvw']}   . \n{tags['rotation_axis']}  .{rotation_axis_cartn_line} \n{tags['rotation_angle']} ."
         )
     elif conf == 'Coplanar':
         spin_only :str = (
             f"{tags['collinear_direction']} .\n"
-            + f"""{tags['coplanar_perp_uvw']}   '{','.join([_format_scif_symbolic_scalar(i.item() if hasattr(i, "item") else i, decimal_precision=6) for i in direction])}' """
+            + f"""{tags['coplanar_perp_uvw']}   '{format_direction_components(direction)}' """
             + f"\n{tags['rotation_axis']}  .{rotation_axis_cartn_line} \n{tags['rotation_angle']} ."
         )
     else:

@@ -72,6 +72,7 @@ from findspingroup.utils.matrix_utils import (
     normalize_vector_to_zero,
 )
 from findspingroup.utils.symbolic_format import (
+    format_direction_components,
     format_symbolic_scalar,
     symbolize_numeric_tokens_in_string,
 )
@@ -686,12 +687,7 @@ def _spin_texture_config_from_ossg_convention(
 def _format_spin_only_direction(direction) -> str:
     if direction is None:
         return ""
-    values = []
-    for value in np.asarray(direction, dtype=float).reshape(-1):
-        if abs(value) < 1e-4:
-            value = 0.0
-        values.append(_format_scif_symbolic_scalar(float(value), decimal_precision=6))
-    return ",".join(values)
+    return format_direction_components(direction)
 
 
 def _normalize_spin_only_direction(direction) -> np.ndarray | None:

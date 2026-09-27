@@ -7036,11 +7036,10 @@ def test_find_spin_group_exposes_convention_spin_only_direction_cartesian():
     ]
     expected_direction = nonzero_moments[0] / np.linalg.norm(nonzero_moments[0])
 
-    assert result.convention_spin_only_direction_cartesian == "-0.383837,0.664825,0.640841"
     assert np.allclose(
         np.fromstring(result.convention_spin_only_direction_cartesian, sep=","),
         expected_direction,
-        atol=1e-6,
+        atol=1e-12, rtol=0,
     )
 
 
