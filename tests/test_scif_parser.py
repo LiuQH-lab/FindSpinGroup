@@ -357,10 +357,14 @@ def test_generated_scif_collinear_direction_uses_current_lattice_basis():
         na3co2sb.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_CARTESIAN),
         "_space_group_spin.coplanar_perp_uvw",
     ) == "_space_group_spin.coplanar_perp_uvw   '0,0,1' "
-    assert _scif_line(
+    coplanar_line = _scif_line(
         na3co2sb.to_scif(cell_mode=SCIF_CELL_MODE_SSG_CONVENTION_ORIENTED),
         "_space_group_spin.coplanar_perp_uvw",
-    ) == "_space_group_spin.coplanar_perp_uvw   '-0.969673,0,0.244406' "
+    )
+    np.testing.assert_allclose(
+        np.fromstring(coplanar_line.split("'")[1], sep=','),
+        [-0.969672992434744, 0., 0.244405989580141], atol=1e-12, rtol=0,
+    )
 
 
 def test_scif_atom_type_loop_lists_all_emitted_species_for_324():
