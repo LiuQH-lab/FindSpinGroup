@@ -3060,9 +3060,12 @@ class SpinSpaceGroup:
         # Return a new instance that lazily recomputes its derived properties.
         new_metric = self.real_space_metric
         if new_metric is not None:
-            transformation_matrix = np.asarray(transformation_matrix, dtype=float)
-            transformation_matrix_inv = np.linalg.inv(transformation_matrix)
-            new_metric = transformation_matrix_inv.T @ new_metric @ transformation_matrix_inv
+            # Transport a physical frame first, then form its Gram matrix.
+            # Direct G' = P^-T G P^-1 can lose symmetry through cancellation
+            # in a sheared basis, even when the supplied G is valid.
+            frame = np.linalg.cholesky(new_metric).T
+            new_frame = frame @ transformation_matrix_inv
+            new_metric = new_frame.T @ new_frame
         return SpinSpaceGroup(
             new_ops,
             tol=self.tol,
