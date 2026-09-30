@@ -138,18 +138,20 @@ protocol rather than another human tutorial.
 If FindSpinGroup contributes to published work, cite:
 
 > Y. Yu, X. Chen, Y. Zhu, Y. Li, R. Xiong, J. Li, Y. Liu, and Q. Liu,
-> "Identifying Oriented Spin Space Groups and Related Physical Properties
-> Using an Online Platform FINDSPINGROUP," arXiv:2604.21397 (2026).
-> [https://doi.org/10.48550/arXiv.2604.21397](https://doi.org/10.48550/arXiv.2604.21397)
+> "Identifying oriented spin space groups and related physical properties
+> using an online platform FINDSPINGROUP," *National Science Review*,
+> nwag614 (2026).
+> [https://doi.org/10.1093/nsr/nwag614](https://doi.org/10.1093/nsr/nwag614)
 
 ```bibtex
 @article{Yu2026FindSpinGroup,
-  title   = {Identifying Oriented Spin Space Groups and Related Physical Properties Using an Online Platform FINDSPINGROUP},
+  title   = {Identifying oriented spin space groups and related physical properties using an online platform FINDSPINGROUP},
   author  = {Yu, Yutong and Chen, Xiaobing and Zhu, Yanzhou and Li, Yuhui and Xiong, Renzheng and Li, Jiayu and Liu, Yuntian and Liu, Qihang},
-  journal = {arXiv preprint arXiv:2604.21397},
+  journal = {National Science Review},
+  pages   = {nwag614},
   year    = {2026},
-  doi     = {10.48550/arXiv.2604.21397},
-  url     = {https://arxiv.org/abs/2604.21397}
+  doi     = {10.1093/nsr/nwag614},
+  url     = {https://doi.org/10.1093/nsr/nwag614}
 }
 ```
 
